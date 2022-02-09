@@ -4,17 +4,17 @@
 
 MartianRepublic is a first reference implementation (web-based) of a decentralized governance system. It includes the following subsystems:
 
-- **[Wallet](https://app.gitbook.com/o/aPsVVLF0BKIpVGXenBnP/s/DX5xQbaIdwVddBAEPydw/martian-basecamp/wallet)**
-- **[Citizen](https://app.gitbook.com/o/aPsVVLF0BKIpVGXenBnP/s/DX5xQbaIdwVddBAEPydw/martian-basecamp/citizen)**
-- **[Congress](https://app.gitbook.com/o/aPsVVLF0BKIpVGXenBnP/s/DX5xQbaIdwVddBAEPydw/martian-basecamp/congress)**
-- **[Inventory](https://app.gitbook.com/o/aPsVVLF0BKIpVGXenBnP/s/DX5xQbaIdwVddBAEPydw/martian-basecamp/inventory)**
-- **[Logbook](https://app.gitbook.com/o/aPsVVLF0BKIpVGXenBnP/s/DX5xQbaIdwVddBAEPydw/martian-basecamp/logbook)**
+- **[Wallet](https://marscoin.gitbook.io/marscoin-documentation/martian-basecamp/wallet)**
+- **[Citizen](https://marscoin.gitbook.io/marscoin-documentation/martian-basecamp/citizen)**
+- **[Congress](https://marscoin.gitbook.io/marscoin-documentation/martian-basecamp/congress)**
+- **[Inventory](https://marscoin.gitbook.io/marscoin-documentation/martian-basecamp/inventory)**
+- **[Logbook](https://marscoin.gitbook.io/marscoin-documentation/martian-basecamp/logbook)**
 
 MartianRepublic makes extensive use of the Marscoin blockchain's immutable ledger for anchoring and timestamping and IPFS for decentralized data storage.
 
 ## Documentation
 
-MartianRepublic documentation can be found on gitbook [documentation](https://app.gitbook.com/o/aPsVVLF0BKIpVGXenBnP/s/DX5xQbaIdwVddBAEPydw/).
+MartianRepublic documentation can be found on gitbook [documentation](https://marscoin.gitbook.io/marscoin-documentation/martian-basecamp/).
 
 
 ## Contributing
