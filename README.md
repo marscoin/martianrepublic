@@ -1,4 +1,4 @@
-<p align="center"><a href="https://martianrepublic.org" target="_blank">Martian Republic</a></p>
+<p align="center"><a href="https://martianrepublic.org" target="_blank"><img src="https://github.com/marscoin/martianrepublic/blob/main/public/assets/landing/img/headerpic.png" width="400"></a></p>
 
 ## About MartianRepublic
 
