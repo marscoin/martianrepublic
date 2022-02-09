@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<head>
+  <title>Reports Dashboard &middot; MVP Ready</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Google Font -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
+
+  <!-- Font Awesome CSS -->
+  <link rel="stylesheet" href="../../bower_components/fontawesome/css/font-awesome.min.css">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="../../bower_components/bootstrap/dist/css/bootstrap.min.css">
+
+  
+  
+  <!-- App CSS -->
+  <link rel="stylesheet" href="./css/mvpready-admin.css">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="favicon.ico">
+
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+
+<body class="layout-fixed  ">
+
+<div id="wrapper">
+
+  <div class="navbar navbar-default" role="navigation">
+
+    <div class="container">
+
+      <div class="navbar-header">
+        <div class="navbar-brand">
+          <a href="./index.html" class="logo">
+            <img src="http://metarocket.space/mockups/mvpready-2.3.2/templates/admin/img/logo.png" alt="">
+          </a>
+        </div>
+
+        <button class="navbar-toggle pull-right" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <i class="fa fa-cog"></i>
+        </button>
+      </div><!-- /.navbar-header -->
+
+      <div class="navbar-collapse collapse">
+
+        <form class="navbar-form navbar-search-form navbar-left">
+          <div class="form-group">
+            <input type="text" class="form-control navbar-search-field" placeholder="Type here for search...">
+          </div>
+        </form>
+
+        <ul class="nav navbar-nav navbar-right">
+
+          <li class="divider"></li>
+
+          <li class="dropdown navbar-profile">
+            <a class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" href="javascript:;">
+              <img src="../../global/img/avatars/avatar-6-sm.jpg" class="navbar-profile-avatar" alt="">
+              <span class="visible-xs-inline">@peterlandt &nbsp;</span>
+              <i class="fa fa-caret-down"></i>
+            </a>
+
+            <ul class="dropdown-menu" role="menu">
+
+              <li>
+                <a href="./page-profile.html">
+                  <i class="fa fa-user"></i>
+                  &nbsp;&nbsp;My Profile
+                </a>
+              </li>
+
+              <li>
+                <a href="./page-pricing-plans.html">
+                  <i class="fa fa-dollar"></i>
+                  &nbsp;&nbsp;Plans &amp; Billing
+                </a>
+              </li>
+
+              <li>
+                <a href="./page-settings.html">
+                  <i class="fa fa-cogs"></i>
+                  &nbsp;&nbsp;Settings
+                </a>
+              </li>
+
+              <li class="divider"></li>
+
+              <li>
+                <a href="./account-login.html">
+                  <i class="fa fa-sign-out"></i>
+                  &nbsp;&nbsp;Logout
+                </a>
+              </li>
+
+            </ul>
+
+          </li>
+
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+
+          <li class="dropdown">
+
+            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">
+              Templates&nbsp;
+              <i class="fa fa-caret-down"></i>
+            </a>
+
+            <ul class="dropdown-menu mega-menu-2" role="menu">
+
+              <li>
+                      <div class="mega-menu-content">
+
+                  <div class="mega-menu-col">
+
+                    <div class="demo-block">
+                      <a href="../admin-1/index.html" class="demo-launcher">
+                        <img src="../../previews/img/theme-drop-admin-1.png" class="img-responsive" alt="">
+
+                        View Admin Layout #1
+                      </a>
+
+                      <div class="demo-external">
+                        <a href="../admin-1/index.html" target="_blank"><small><i class="fa fa-external-link"></i>&nbsp;&nbsp;(Open in new tab)</small></a>
+                      </div>
+                    </div><!-- /.demo-block -->
+
+                    <div class="demo-block">
+                      <a href="../landing/index.html" class="demo-launcher">
+                        <img src="../../previews/img/theme-drop-landing.png" class="img-responsive" alt="">
+
+                        View Frontend Template
+                      </a>
+
+                      <div class="demo-external">
+                        <a href="../landing/index.html" target="_blank"><small><i class="fa fa-external-link"></i>&nbsp;&nbsp;(Open in new tab)</small></a>
+                      </div>
+                    </div><!-- /.demo-block -->
+                  </div> <!-- /.mega-menu-col -->
+
+                  <div class="mega-menu-col">
+                    <div class="demo-block">
+                      <a href="../admin-2/index.html" class="demo-launcher">
+                        <img src="../../previews/img/theme-drop-admin-2.png" class="img-responsive" alt="">
+
+                        View Admin Layout #2
+                      </a>
+
+                      <div class="demo-external">
+                        <a href="../admin-2/index.html" target="_blank"><small><i class="fa fa-external-link"></i>&nbsp;&nbsp;(Open in new tab)</small></a>
+                      </div>
+                    </div><!-- /.demo-block -->
+
+                    <div class="demo-block">
+                      <a href="../launch/index.html" class="demo-launcher">
+                        <img src="../../previews/img/theme-drop-launch.png" class="img-responsive" alt="">
+
+                        View Launch Template
+                      </a>
+
+                      <div class="demo-external">
+                        <a href="../launch/index.html" target="_blank"><small><i class="fa fa-external-link"></i>&nbsp;&nbsp;(Open in new tab)</small></a>
+                      </div>
+                    </div><!-- /.demo-block -->
+                  </div> <!-- /.mega-menu-col -->
+
+                </div> <!-- /.mega-menu-content -->
+              </li>
+
+            </ul>
+
+          </li>
+
+          <li class="navbar-divider"></li><!-- /.navbar-divider -->
+
+          <li class="dropdown navbar-notification">
+
+            <a href="./page-notifications.html" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">
+              <i class="fa fa-bell navbar-notification-icon"></i>
+              <span class="visible-xs-inline">&nbsp;Notifications</span>
+              <b class="badge badge-primary">3</b>
+            </a>
+
+            <div class="dropdown-menu">
+
+              <div class="dropdown-header">&nbsp;Notifications</div>
+
+              <div class="notification-list">
+
+                <a href="./page-notifications.html" class="notification">
+                  <span class="notification-icon"><i class="fa fa-cloud-upload text-primary"></i></span>
+                  <span class="notification-title">Notification Title</span>
+                  <span class="notification-description">Praesent dictum nisl non est sagittis luctus.</span>
+                  <span class="notification-time">20 minutes ago</span>
+                </a> <!-- / .notification -->
+
+                <a href="./page-notifications.html" class="notification">
+                  <span class="notification-icon"><i class="fa fa-ban text-secondary"></i></span>
+                  <span class="notification-title">Notification Title</span>
+                  <span class="notification-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit...</span>
+                  <span class="notification-time">20 minutes ago</span>
+                </a> <!-- / .notification -->
+
+                <a href="./page-notifications.html" class="notification">
+                  <span class="notification-icon"><i class="fa fa-warning text-tertiary"></i></span>
+                  <span class="notification-title">Storage Space Almost Full!</span>
+                  <span class="notification-description">Praesent dictum nisl non est sagittis luctus.</span>
+                  <span class="notification-time">20 minutes ago</span>
+                </a> <!-- / .notification -->
+
+                <a href="./page-notifications.html" class="notification">
+                  <span class="notification-icon"><i class="fa fa-ban text-danger"></i></span>
+                  <span class="notification-title">Sync Error</span>
+                  <span class="notification-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit...</span>
+                  <span class="notification-time">20 minutes ago</span>
+                </a> <!-- / .notification -->
+
+              </div> <!-- / .notification-list -->
+
+              <a href="./page-notifications.html" class="notification-link">View All Notifications</a>
+
+            </div> <!-- / .dropdown-menu -->
+
+          </li>
+
+
+
+          <li class="dropdown navbar-notification">
+
+            <a href="./page-notifications.html" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">
+              <i class="fa fa-envelope navbar-notification-icon"></i>
+              <span class="visible-xs-inline">&nbsp;Messages</span>
+            </a>
+
+            <div class="dropdown-menu">
+
+              <div class="dropdown-header">Messages</div>
+
+              <div class="notification-list">
+
+                <a href="./page-notifications.html" class="notification">
+                  <div class="notification-icon"><img src="../../global/img/avatars/avatar-3-md.jpg" alt=""></div>
+                  <div class="notification-title">New Message</div>
+                  <div class="notification-description">Praesent dictum nisl non est sagittis luctus.</div>
+                  <div class="notification-time">20 minutes ago</div>
+                </a> <!-- / .notification -->
+
+                <a href="./page-notifications.html" class="notification">
+                  <div class="notification-icon"><img src="../../global/img/avatars/avatar-3-md.jpg" alt=""></div>
+                  <div class="notification-title">New Message</div>
+                  <div class="notification-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit...</div>
+                  <div class="notification-time">20 minutes ago</div>
+                </a> <!-- / .notification -->
+
+                <a href="./page-notifications.html" class="notification">
+                  <div class="notification-icon"><img src="../../global/img/avatars/avatar-4-md.jpg" alt=""></div>
+                  <div class="notification-title">New Message</div>
+                  <div class="notification-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit...</div>
+                  <div class="notification-time">20 minutes ago</div>
+                </a> <!-- / .notification -->
+
+                <a href="./page-notifications.html" class="notification">
+                  <div class="notification-icon"><img src="../../global/img/avatars/avatar-5-md.jpg" alt=""></div>
+                  <div class="notification-title">New Message</div>
+                  <div class="notification-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit...</div>
+                  <div class="notification-time">20 minutes ago</div>
+                </a> <!-- / .notification -->
+
+              </div> <!-- / .notification-list -->
+
+              <a href="./page-notifications.html" class="notification-link">View All Messages</a>
+
+            </div> <!-- / .dropdown-menu -->
+
+          </li>
+
+
+          <li class="dropdown navbar-notification empty">
+
+            <a href="./page-notifications.html" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">
+              <i class="fa fa-warning navbar-notification-icon"></i>
+              <span class="visible-xs-inline">&nbsp;&nbsp;Alerts</span>
+            </a>
+
+            <div class="dropdown-menu">
+
+              <div class="dropdown-header">Alerts</div>
+
+              <div class="notification-list">
+
+                <h4 class="notification-empty-title">No alerts here.</h4>
+                <p class="notification-empty-text">Check out what other makers are doing on Explore!</p>
+
+              </div> <!-- / .notification-list -->
+
+              <a href="./page-notifications.html" class="notification-link">View All Alerts</a>
+
+            </div> <!-- / .dropdown-menu -->
+
+          </li>
+
+
+
+          <li class="navbar-divider"></li><!-- /.navbar-divider -->
+
+        </ul>
+
+      </div>
+
+    </div> <!--/.container -->
+
+  </div> <!--/.navbar -->
+
+  <div class="sidebar">
+
+    <div class="sidebar-bg"></div><!-- /.sidebar-bg -->
+
+    <div class="sidebar-trigger sidebar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+      <i class="fa fa-bars"></i>
+    </div><!-- /.sidebar-trigger -->
+
+    <div class="sidebar-inner sidebar-collapse collapse">
+
+      <ul class="sidebar-menu">
+
+        <li class="sidebar-header">
+            Dashboards
+        </li>
+
+        <li class="">
+          <a href="./index.html">
+            <i class="fa fa-dashboard"></i>
+            Analytics Dashboard
+          </a>
+        </li>
+
+        <li class="">
+          <a href="./dashboard-2.html">
+            <i class="fa fa-dashboard"></i>
+            Sidebar Dashboard
+          </a>
+        </li>
+
+        <li class="active">
+          <a href="./dashboard-3.html">
+            <i class="fa fa-dashboard"></i>
+            Reports Dashboard
+          </a>
+        </li>
+
+        <li class="divider"></li>
+
+        <li class="sidebar-header">
+            Elements
+        </li>
+
+        <li class="dropdown has_sub ">
+
+          <a href="http://jumpstartthemes.com/#" class="">
+            <i class="fa fa-edit"></i>
+
+            Forms
+
+            <span class="">
+              <i class="fa fa-angle-right pull-right"></i>
+            </span>
+          </a>
+
+          <ul class="list-unstyled" style="">
+            <li>
+              <a href="./form-basic.html">
+                Basic Inputs
+              </a>
+            </li>
+
+            <li>
+              <a href="./form-pickers.html">
+                Pickers &amp; Choice
+              </a>
+            </li>
+
+            <li>
+              <a href="./form-slider.html">
+                Sliders <span class="label label-secondary pull-right">New</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="./form-wizard.html">
+                Wizard <span class="label label-secondary pull-right">New</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="./form-validation.html">
+                Validation
+              </a>
+            </li>
+
+            <li>
+              <a href="./form-wysiwyg.html">
+                WYSIWYG <span class="label label-secondary pull-right">New</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="dropdown has_sub ">
+          <a href="http://jumpstartthemes.com/#" class="">
+            <i class="fa fa-table"></i>
+
+            Tables
+
+            <span class="pull-right">
+              <i class="fa fa-angle-right"></i>
+            </span>
+          </a>
+
+          <ul class="list-unstyled" style="">
+            <li>
+              <a href="./components-tables.html">
+                Basic Tables
+              </a>
+            </li>
+
+            <li>
+              <a href="./components-datatables.html">
+                Data Tables <small>(Advanced)</small>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="">
+          <a href="./components-tabs.html">
+            <i class="fa fa-bars dropdown-icon "></i>
+            Tabs &amp; Accordions
+          </a>
+        </li>
+
+        <li class="">
+          <a href="./components-popups.html">
+            <i class="fa fa-calendar-o dropdown-icon "></i>
+            Popups &amp; Alerts
+          </a>
+        </li>
+
+        <li class="">
+          <a href="./components-charts.html">
+            <i class="fa fa-line-chart dropdown-icon "></i>
+            Charts
+          </a>
+        </li>
+
+        <li class="divider"></li>
+
+        <li class="sidebar-header">
+            Example Pages
+        </li>
+
+        <li class="dropdown has_sub ">
+          <a href="http://jumpstartthemes.com/#" class="">
+            <i class="fa fa-file-text-o"></i>
+
+            Demo Pages
+
+            <span class="pull-right">
+              <i class="fa fa-angle-right"></i>
+            </span>
+          </a>
+
+          <ul class="list-unstyled">
+
+            <li>
+              <a href="./page-profile.html">
+                Profile
+              </a>
+            </li>
+
+            <li>
+              <a href="./page-settings.html">
+                Settings
+              </a>
+            </li>
+
+            <li>
+              <a href="./page-faq.html">
+                FAQ
+              </a>
+            </li>
+
+            <li>
+              <a href="./page-pricing-plans.html">
+                Plans & Billing
+              </a>
+            </li>
+
+            <li>
+              <a href="./page-pricing-table.html">
+                Pricing Table
+              </a>
+            </li>
+
+            <li>
+              <a href="./pages-gallery.html">
+                Gallery
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="dropdown has_sub ">
+
+            <a href="http://jumpstartthemes.com/#" class="">
+              <i class="fa fa-file-text-o"></i>
+
+              Utilities
+
+              <span class="pull-right">
+                <i class="fa fa-angle-right"></i>
+              </span>
+            </a>
+
+            <ul class="list-unstyled">
+
+              <li>
+                <a href="./page-sitemap.html">
+                  Sitemap
+                </a>
+              </li>
+
+              <li>
+                <a href="./page-blank.html">
+                  Blank Slate
+                </a>
+              </li>
+
+              <li>
+                <a href="./page-404.html">
+                  404 Error
+                </a>
+              </li>
+
+              <li>
+                <a href="./page-500.html">
+                  500 Error
+                </a>
+              </li>
+
+              <li>
+                <a href="./page-maintenance.html" target="_blank">
+                  Maintenance
+                  &nbsp;
+                  <small><i class="fa fa-external-link pull-right text-secondary" style="position: relative; top: 3px;"></i></small>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="dropdown has_sub">
+            <a href="http://jumpstartthemes.com/#" class="">
+
+              <i class="fa fa-user"></i>
+
+              Account Pages
+
+              <span class="pull-right">
+                <i class="fa fa-angle-right"></i>
+              </span>
+            </a>
+
+            <ul class="list-unstyled">
+              <li>
+                <a href="./account-login.html" target="_blank">
+                  Login
+                  <small><i class="fa fa-external-link pull-right text-secondary" style="position: relative; top: 3px;"></i></small>
+                </a>
+              </li>
+
+              <li>
+                <a href="./account-login-social.html" target="_blank">
+                  Login Social
+                  <small><i class="fa fa-external-link pull-right text-secondary" style="position: relative; top: 3px;"></i></small>
+                </a>
+              </li>
+
+              <li>
+                <a href="./account-signup.html" target="_blank">
+                  Signup
+                  <small><i class="fa fa-external-link pull-right text-secondary" style="position: relative; top: 3px;"></i></small>
+                </a>
+                </li>
+
+              <li>
+                <a href="./account-forgot.html" target="_blank">
+                  Forgot Password
+                  <small><i class="fa fa-external-link pull-right text-secondary" style="position: relative; top: 3px;"></i></small>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="divider"></li>
+
+          <li class="sidebar-header">Templates</li>
+
+          <li>
+            <a href="../admin-1/index.html" class="">
+              <i class="fa fa-desktop"></i>
+              Admin Layout #1
+            </a>
+          </li>
+
+          <li>
+            <a href="../admin-2/index.html" class="">
+              <i class="fa fa-desktop"></i>
+
+              Admin Layout #2
+
+              <span class="label label-secondary pull-right">Current</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="../landing/index.html" class="">
+              <i class="fa fa-desktop"></i>
+
+              Frontend Template
+            </a>
+          </li>
+
+          <li>
+            <a href="../launch/index.html" class="">
+              <i class="fa fa-rocket"></i>
+
+              Launch Template
+            </a>
+          </li>
+
+          <li class="divider"></li>
+
+        </ul>
+
+        <div class="clearfix"></div>
+
+    </div><!-- /.sidebar-inner -->
+
+  </div> <!-- /.side-menu -->
+
+  <div class="content-page">
+
+    <div class="content">
+
+    <div class="container">
+
+      <div class="portlet portlet-boxed">
+
+        <div class="portlet-header">
+          <h4 class="portlet-title">
+            Revenue Stats
+          </h4>
+        </div> <!-- /.portlet-header -->
+
+        <div class="portlet-body">
+
+          <div class="row">
+
+            <div class="col-sm-6 col-md-3">
+              <div class="row-stat">
+                <p class="row-stat-label">Revenue Today</p>
+                <h3 class="row-stat-value">$890.00</h3>
+                <span class="label label-success row-stat-badge">+43%</span>
+              </div> <!-- /.row-stat -->
+            </div> <!-- /.col -->
+
+            <div class="col-sm-6 col-md-3">
+              <div class="row-stat">
+                <p class="row-stat-label">Revenue This Month</p>
+                <h3 class="row-stat-value">$8290.00</h3>
+                <span class="label label-success row-stat-badge">+17%</span>
+              </div> <!-- /.row-stat -->
+            </div> <!-- /.col -->
+
+            <div class="col-sm-6 col-md-3">
+              <div class="row-stat">
+                <p class="row-stat-label">Total Users</p>
+                <h3 class="row-stat-value">98,290</h3>
+                <span class="label label-success row-stat-badge">+26%</span>
+              </div> <!-- /.row-stat -->
+            </div> <!-- /.col -->
+
+            <div class="col-sm-6 col-md-3">
+              <div class="row-stat">
+                <p class="row-stat-label">Currently Active Uses</p>
+                <h3 class="row-stat-value">19</h3>
+                <span class="label label-danger row-stat-badge">+5%</span>
+              </div> <!-- /.row-stat -->
+            </div> <!-- /.col -->
+
+          </div> <!-- /.row -->
+
+        </div> <!-- /.portlet-body -->
+
+      </div> <!-- /.portlet -->
+
+
+
+      <div class="row">
+
+        <div class="col-md-8">
+
+          <div class="portlet portlet-boxed">
+
+            <div class="portlet-header">
+              <h4 class="portlet-title">
+                Revenue Per Month
+              </h4>
+            </div> <!-- /.portlet-header -->
+
+            <div class="portlet-body">
+
+              <div class="chart-bg bg-secondary">
+                <div id="reports-line-chart" class="chart-holder-250"></div>
+              </div> <!-- /.bg-chart -->
+
+              <br>
+
+          </div> <!-- /.portlet-body -->
+
+        </div> <!-- /.portlet -->
+
+        </div> <!-- /.col -->
+
+        <div class="col-md-4">
+
+          <div class="portlet portlet-boxed">
+
+            <div class="portlet-header">
+              <h4 class="portlet-title">
+                Product Sales Breakdown
+              </h4>
+            </div> <!-- /.portlet-header -->
+
+            <div class="portlet-body">
+
+              <div id="donut-chart" class="chart-holder" style="width: 70%;"></div>
+
+            </div> <!-- /.portlet-body -->
+
+          </div> <!-- /.portlet -->
+
+        </div> <!-- /.col -->
+
+      </div> <!-- /.row -->
+
+
+
+      <div class="row">
+
+        <div class="col-md-6">
+
+          <div class="portlet portlet-boxed">
+
+            <div class="portlet-header">
+              <h4 class="portlet-title">
+                Product Sales Today
+              </h4>
+            </div> <!-- /.portlet-header -->
+
+            <div class="portlet-body">
+
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th class="text-right">Purchases</th>
+                    <th class="text-right">Revenue</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td>CSS Hat</td>
+                    <td class="text-right">264</td>
+                    <td class="text-right">$3,129.98</td>
+                  </tr>
+
+                  <tr>
+                    <td>Subtle Patterns</td>
+                    <td class="text-right">20</td>
+                    <td class="text-right">$129.98</td>
+                  </tr>
+
+                  <tr>
+                    <td>PNG Hat</td>
+                    <td class="text-right">45</td>
+                    <td class="text-right">$9,129.98</td>
+                  </tr>
+
+                  <tr>
+                    <td>Academy</td>
+                    <td class="text-right">560</td>
+                    <td class="text-right">$12,249.98</td>
+                  </tr>
+
+                  <tr>
+                    <td>Social Kit</td>
+                    <td class="text-right">120</td>
+                    <td class="text-right">$0.00</td>
+                  </tr>
+
+                  <tr>
+                    <td>Pizaa</td>
+                    <td class="text-right">340</td>
+                    <td class="text-right">$0.00</td>
+                  </tr>
+                </tbody>
+              </table>
+
+            </div> <!-- /.portlet-body -->
+
+          </div> <!-- /.portlet -->
+
+        </div> <!-- /.col -->
+
+
+
+        <div class="col-md-6">
+
+          <div class="portlet portlet-boxed">
+
+            <div class="portlet-header">
+              <h4 class="portlet-title">
+                Product Sales Breakdown
+              </h4>
+            </div> <!-- /.portlet-header -->
+
+            <div class="portlet-body">
+
+              <div id="stacked-horizontal-chart" class="chart-holder-250"></div>
+
+            </div> <!-- /.portlet-body -->
+
+          </div> <!-- /.portlet -->
+
+        </div> <!-- /.col -->
+
+
+      </div> <!-- /.row -->
+
+
+
+      <div class="portlet portlet-boxed">
+
+        <div class="portlet-header">
+          <h4 class="portlet-title">
+            Social Media Stats
+          </h4>
+        </div> <!-- /.portlet-header -->
+
+        <div class="portlet-body">
+
+          <div class="row">
+
+            <div class="col-sm-3">
+              <div class="row-stat">
+                <p class="row-stat-label">Facebook Likes</p>
+                <h3 class="row-stat-value">1,290</h3>
+                <span class="label label-success row-stat-badge">+21</span>
+              </div> <!-- /.row-stat -->
+            </div> <!-- /.col -->
+
+            <div class="col-sm-3">
+              <div class="row-stat">
+                <p class="row-stat-label">Twitter Followers</p>
+                <h3 class="row-stat-value">3,290</h3>
+                <span class="label label-success row-stat-badge">+10</span>
+              </div> <!-- /.row-stat -->
+            </div> <!-- /.col -->
+
+            <div class="col-sm-3">
+              <div class="row-stat">
+                <p class="row-stat-label">Github Followers</p>
+                <h3 class="row-stat-value">21,361</h3>
+                <span class="label label-danger row-stat-badge">-5</span>
+              </div> <!-- /.row-stat -->
+            </div> <!-- /.col -->
+
+            <div class="col-sm-3">
+              <div class="row-stat">
+                <p class="row-stat-label">Email Subscribers</p>
+                <h3 class="row-stat-value">2,689</h3>
+                <span class="label label-warning row-stat-badge">+ 0</span>
+              </div> <!-- /.row-stat -->
+            </div> <!-- /.col -->
+
+          </div> <!-- /.row -->
+
+        </div> <!-- /.portlet-body -->
+
+      </div> <!-- /.portlet -->
+
+
+
+      <div class="row">
+
+        <div class="col-md-6">
+
+          <div class="portlet portlet-boxed">
+
+            <div class="portlet-header">
+              <h4 class="portlet-title">
+                Server Load
+              </h4>
+            </div> <!-- /.portlet-header -->
+
+            <div class="portlet-body">
+
+              <div id="auto-chart" class="chart-holder-250"></div>
+
+            </div> <!-- /.portlet-body -->
+
+          </div> <!-- /.portlet -->
+
+        </div> <!-- /.col -->
+
+
+        <div class="col-md-6">
+
+          <div class="portlet portlet-boxed">
+
+            <div class="portlet-header">
+              <h4 class="portlet-title">
+                Daily Traffic
+              </h4>
+            </div> <!-- /.portlet-header -->
+
+            <div class="portlet-body">
+
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th class="text-right">Visits</th>
+                    <th class="text-right">Conversion</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td>socialkit</td>
+                    <td class="text-right">25,843</td>
+                    <td class="text-right">8.9%</td>
+                  </tr>
+                  <tr>
+                    <td>subtlepatterns</td>
+                    <td class="text-right">5,141</td>
+                    <td class="text-right">2.4%</td>
+                  </tr>
+                  <tr>
+                    <td>google</td>
+                    <td class="text-right">2,562</td>
+                    <td class="text-right">1.2%</td>
+                  </tr>
+                  <tr>
+                    <td>facebook</td>
+                    <td class="text-right">345</td>
+                    <td class="text-right">0.02%</td>
+                  </tr>
+                  <tr>
+                    <td>Social Kit</td>
+                    <td class="text-right">12</td>
+                    <td class="text-right">0.0%</td>
+                  </tr>
+                  <tr>
+                    <td>webappers</td>
+                    <td class="text-right">9</td>
+                    <td class="text-right">0.0%</td>
+                  </tr>
+
+
+                </tbody>
+              </table>
+
+            </div> <!-- /.portlet-body -->
+
+          </div> <!-- /.portlet -->
+
+        </div> <!-- /.col -->
+
+      </div> <!-- /.row -->
+
+
+
+    </div> <!-- /.container -->
+
+    </div> <!-- .content -->
+
+  </div> <!-- /.content-page -->
+
+</div> <!-- /#wrapper -->
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Core JS -->
+<script src="../../bower_components/jquery/dist/jquery.js"></script>
+<script src="../../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../../bower_components/slimscroll/jquery.slimscroll.js"></script>
+
+
+
+<!-- Plugin JS -->
+<script src="../../bower_components/flot/excanvas.min.js"></script>
+<script src="../../bower_components/flot/jquery.flot.js"></script>
+<script src="../../bower_components/flot/jquery.flot.pie.js"></script>
+<script src="../../bower_components/flot/jquery.flot.resize.js"></script>
+<script src="../../bower_components/flot/jquery.flot.time.js"></script>
+<script src="../../bower_components/flot/jquery.flot.stack.js"></script>
+<script src="../../bower_components/flot.tooltip/js/jquery.flot.tooltip.js"></script>
+<script src="../../bower_components/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+
+<!-- App JS -->
+<script src="../../global/js/mvpready-core.js"></script>
+<script src="../../global/js/mvpready-helpers.js"></script>
+<script src="./js/mvpready-admin.js"></script>
+
+
+<!-- Demo JS -->
+<script src="../../global/js/demos/reports/line.js"></script>
+<script src="../../global/js/demos/flot/donut.js"></script>
+<script src="../../global/js/demos/flot/stacked-horizontal.js"></script>
+<script src="../../global/js/demos/flot/auto.js"></script>
+
+
+</body>
+</html>

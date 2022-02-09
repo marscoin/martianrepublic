@@ -1,0 +1,63 @@
+//* !Modal */
+//* ----------------------------------------------- */
+
+.modal-backdrop {
+  background-color: @modal-background-bg;
+
+  &.in {
+    .opacity (.65);
+  }
+}
+
+.lt-ie9 {
+  .modal-content {
+    border-color: #ccc;
+  }
+}
+
+.modal-styled {
+  .modal-header {
+    color: @modal-styled-header-color;
+
+    background-color: @modal-styled-header-bg;
+
+    .border-top-radius (5px);
+
+    .close {
+      color: @modal-styled-close-color;
+
+      background-color: @modal-styled-close-bg;
+
+      text-shadow: none;
+
+      .opacity (1);
+
+      &:hover {
+        color: @modal-styled-close-hover-color;
+
+        background-color: @modal-styled-close-hover-bg;
+      }
+    }
+  }
+
+  .modal-title {
+    color: #fff;
+    
+    font-weight: 300;
+  }
+
+  .modal-content {
+    .box-shadow (2px 2px 5px rgba(0,0,0,.15));
+  }
+
+  .modal-footer {
+    color: @modal-styled-footer-color;
+
+    background-color: @modal-styled-footer-bg;
+
+    border-top-color: @modal-styled-footer-border-color;
+
+    .border-bottom-radius (5px);
+  }
+
+}

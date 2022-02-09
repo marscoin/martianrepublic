@@ -1,0 +1,97 @@
+//* !Account Layout */
+//* ----------------------------------------------- */
+
+.account-bg {
+	background-color: @account-bg;
+}
+
+.account-wrapper {
+	position: relative;
+
+	width: 90%;
+	padding: 0;
+	margin: 0 auto;
+
+	text-align: center;
+
+	.row {
+		& > div {
+			margin-bottom: 1em;
+		}
+	}
+}
+
+.account-form {
+	padding: 0;
+	margin-top: 2em;
+	margin-bottom: 2em;
+
+	text-align: left;
+
+	.placeholder-hidden {
+		display: none;
+	}
+
+	.form-control {
+		height: 40px;
+
+		padding-top: 8px;
+		padding-bottom: 8px;
+		margin-bottom: 1.25em;
+	}
+}
+
+.account-body {
+	position: relative;
+
+	padding: 35px 30px 10px;
+	margin-bottom: 1em;
+	
+	color: @account-body-color;
+
+	background-color: @account-body-bg;
+
+	border: 1px solid @account-body-border-color;
+
+	.border-top-radius (4px);
+	.border-bottom-radius (4px);
+
+	.box-shadow (1px 1px 1px rgba(0,0,0,.15));
+	
+}
+
+.account-footer {
+	padding: 0 25px;
+	margin-top: 1.5em;
+}
+
+.account-or-social {
+	display: block;
+
+	margin-top: 1em;
+}
+
+@media (min-width: @screen-sm) {
+	.account-wrapper {
+		width: 450px;
+		padding: 0;
+
+		.row {
+			& > div {
+				margin-bottom: 0;	
+			}
+		}
+	}
+
+	.account-body {		
+		.account-form { 
+			padding: 0 25px;
+
+			text-align: left;
+		}
+	}
+
+	.account-or-social {
+		margin-top: 2em;
+	}
+}

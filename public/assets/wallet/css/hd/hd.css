@@ -1,0 +1,108 @@
+.mouse-box
+{
+    background-color: rgb(179, 183, 184);
+    box-shadow: 1px 1px  10px #00000050;
+    height: 256px;
+    width: 256px;
+    cursor: pointer;
+}
+
+.success{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+
+}
+
+.left-margin{
+    margin-left: 10px;
+}
+
+
+.progress{
+    margin: 15px
+}
+
+.nav-tabs li.disabled a {
+    pointer-events: none;
+}
+
+.mnemonic{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.mnemonic-text{
+    background-color: #2f4354!important;
+    color: white;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    line-height: 1.3;
+}
+
+#mnemonic{
+    display: flex;
+    flex-direction: column;
+
+
+}
+
+
+#entropy{
+    display: flex;
+    flex-direction: column;
+}
+
+.title-help{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    
+
+}
+
+.next-btn{
+    width: 100px;
+    align-self: flex-end;
+}
+
+.password-encrypt-cont{
+    height: 100%;
+}
+
+
+.copy-icon{
+    background-color: rgb(182, 191, 206);
+    padding: 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    color: rgb(27, 27, 27);
+}
+
+.copy-icon:hover{
+    background-color: rgba(182, 191, 206, 0.719);
+}
+
+.pub-addr
+{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-evenly;
+    width: 100%;
+    height: 100px;
+}
+
+.seed-input{
+    width: 90px; 
+    height: 40px; 
+    margin: 5px
+}
+
+.connect-wallet:hover{
+
+}

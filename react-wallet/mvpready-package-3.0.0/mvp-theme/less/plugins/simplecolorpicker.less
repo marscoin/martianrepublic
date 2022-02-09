@@ -1,0 +1,94 @@
+//* ! Simple Color Picker */
+//* ----------------------------------------------- */
+
+.simplecolorpicker {
+
+  span.color {
+    width: 24px;
+    height: 24px;
+
+    text-align: center;
+
+    border: 3px solid rgba(0,0,0,.075);
+
+    border-radius: 3px;
+
+    outline: none;
+  }
+
+  span.color:hover {
+    border-color: rgba(0,0,0,.15);
+    border-width: 3px;
+  }
+
+  span.color[data-selected],
+  span.color:hover[data-selected] {
+    border-color: #111;
+    border-width: 3px;
+
+    &:after {
+      content: "\f00c";
+
+      font-family: @font-stack-icon;
+    }
+  }
+
+  span.color[data-color="#ffffff"][data-selected],
+  span.color[data-color="#ffffff"]:hover[data-selected] {
+    &:after {
+      color: #444;
+    }
+  }
+
+  &.icon {
+    display: block;
+
+    width: 100px;
+    height: 25px;
+
+    text-align: center;
+
+    border: 3px solid #222;
+
+    border-radius: 3px;
+  }
+
+  &.picker {
+    margin-top: 8px;
+    margin-left: 6px;
+
+    border-color: #ccc;
+
+    &:before {
+      position: absolute;
+      top: -7px;
+      left: 9px;
+      display: inline-block;
+      border-right: 7px solid transparent;
+      border-bottom: 7px solid #ccc;
+      border-left: 7px solid transparent;
+      border-bottom-color: rgba(0, 0, 0, 0.2);
+      content: '';
+    }
+
+    &:after {
+      position: absolute;
+      top: -6px;
+      left: 10px;
+      display: inline-block;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid #ffffff;
+      border-left: 6px solid transparent;
+      content: '';
+    }
+  }
+
+}
+
+.form-group {
+  .simplecolorpicker {
+    &.icon {
+      margin-top: 5px;
+    }
+  }
+}

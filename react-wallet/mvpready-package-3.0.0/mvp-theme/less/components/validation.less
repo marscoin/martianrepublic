@@ -1,0 +1,127 @@
+//* !Form Validation */
+//* ----------------------------------------------- */
+
+.parsley-form {
+  .form-group {
+    position: relative;
+
+    .parsley-success {
+      .parsley-error-list {
+        display: none !important;
+      }
+    }
+
+    .parsley-error-list {
+      position: relative;
+      top: 0;
+
+      display: none !important;
+
+      padding: 2px 10px;
+      margin: 0;
+
+      list-style: none;
+
+      color: @parsely-error-color;
+
+      font-size: 12px;
+      font-weight: 600;
+
+      background: @parsely-error-bg;
+
+      > li {
+        list-style-type: none;
+      }
+
+      .border-top-radius (4px);
+      .border-bottom-radius (4px);
+
+      &:before,
+      &:after {
+        content: '';
+        display: inline-block;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid @parsely-error-bg;
+        position: absolute;
+        top: -6px;
+        left: 3px;
+      }
+
+      &.filled {
+        display: inline-block !important;
+      }
+    }	
+  }
+
+  &.form-horizontal {
+    .form-group {		
+      span.error {
+        margin-left: 1.5em;
+        margin-left: 15px;			
+      }
+    }
+  }
+}
+
+
+
+.parsley-form .form-group .parsley-error-list {
+  position: relative;
+  top: 7px;
+
+  left: auto;
+  right: 0;
+
+  color: darken(@brand-danger, 12.5%);
+
+  background: lighten(@brand-danger, 35%);
+
+  border: 1px solid @brand-danger;
+
+  &::before {
+
+
+    content: "";
+
+    display: inline-block;
+
+    position: absolute;
+    
+
+    top: -6px;
+    left: 5px;
+
+    z-index: 10;
+
+    border-bottom: 6px solid lighten(@brand-danger, 35%);
+    border-top: none;
+  }
+
+  &:after {
+    top: -8px;
+    left: 5px;
+
+    z-index: 9;
+
+    margin-top: 1px;
+
+    border-bottom: 6px solid darken(@brand-danger, 15%);
+    border-top: none;
+  }
+}
+
+.form-horizontal.parsley-form .form-group .parsley-error-list {
+  position: relative;
+  top: 7px;
+
+  left: auto;
+
+  &:after {
+    top: -8px;
+    left: 5px;
+
+    border-bottom: 6px solid darken(@brand-danger, 15%);
+    border-top: none;
+  }
+}

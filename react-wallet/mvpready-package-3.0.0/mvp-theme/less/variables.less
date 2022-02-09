@@ -1,0 +1,782 @@
+  // * ========================================================
+// *
+// * MVP Ready - Lightweight & Responsive Admin Template
+// *
+// * ========================================================
+// *
+// * File: variables.less
+// * Theme Version: 3.0.0
+// * Bootstrap Version: 3.3.6
+// * Author: Jumpstart Themes
+// * Website: http://mvpready.com
+// *
+// * ======================================================== */
+
+
+
+//* General
+//--------------------------------------------- */
+
+//== Branding
+//
+//## []
+
+@brand-layout                          : #222;
+
+@brand-primary                         : #06c;
+@brand-secondary                       : #f90;
+@brand-tertiary                        : #888;
+
+@brand-facebook                        : #3b5998;
+@brand-twitter                         : #00acee;
+
+
+//== Fonts
+//
+//## []
+
+@font-stack-text                       : 'Open Sans', 'Trebuchet MS', arial, sans-serif;
+@font-stack-heading                    : 'Oswald', 'Trebuchet MS', 'Open Sans', arial, sans-serif;
+@font-stack-icon                       : 'FontAwesome';
+
+
+//== Layout Background
+//
+//## []
+
+@layout-bg                             : #fff;
+
+
+
+
+
+//* 2. Bootstrap
+//--------------------------------------------- */
+
+//== Buttons
+//
+//## [.btn-*]
+
+@btn-primary-color                     : #fff;
+@btn-primary-bg                        : @brand-primary;
+@btn-primary-border-color              : darken(@brand-primary, 8%);
+
+@btn-secondary-color                   : #fff;
+@btn-secondary-bg                      : @brand-secondary;
+@btn-secondary-border-color            : darken(@brand-secondary, 8%);
+
+@btn-tertiary-color                    : #fff;
+@btn-tertiary-bg                       : @brand-tertiary;
+@btn-tertiary-border-color             : darken(@brand-tertiary, 8%);
+
+@btn-inverse-color                     : #fff;
+@btn-inverse-bg                        : @brand-layout;
+@btn-inverse-border-color              : darken(@btn-inverse-bg, 8%);
+
+@btn-facebook-color                    : #fff;
+@btn-facebook-bg                       : @brand-facebook;
+@btn-facebook-border-color             : darken(@btn-facebook-bg, 8%);
+
+@btn-twitter-color                     : #fff;
+@btn-twitter-bg                        : @brand-twitter;
+@btn-twitter-border-color              : darken(@btn-twitter-bg, 8%);
+
+
+//== Badge
+//
+//## [.badge-*]
+
+@badge-primary-bg                      : @brand-primary;
+@badge-primary-color                   : #fff;
+
+@badge-secondary-bg                    : @brand-secondary;
+@badge-secondary-color                 : #fff;
+
+@badge-tertiary-bg                     : @brand-tertiary;
+@badge-tertiary-color                  : #fff;
+
+
+//== Label
+//
+//## [.label-*]
+
+@label-primary-bg                      : @brand-primary;
+@label-primary-color                   : #fff;
+
+@label-secondary-bg                    : @brand-secondary;
+@label-secondary-color                 : #fff;
+
+@label-tertiary-bg                     : @brand-tertiary;
+@label-tertiary-color                  : #fff;
+
+
+//== Accordion
+//
+//## [.accordion-pane]l / [.accordion-simple]
+
+@accordion-panel-bg                    : #fff;
+@accordion-panel-color                 : #555;
+@accordion-panel-border-color          : #ddd;
+
+@accordion-panel-active-bg             : @brand-layout;
+@accordion-panel-active-color          : #fff;
+@accordion-panel-active-border-color   : #ddd;
+
+
+@accordion-simple-color                : #444;
+@accordion-simple-arrow-color          : @brand-primary;
+
+@accordion-simple-active-color         : #444;
+@accordion-simple-active-arrow-color   : @brand-primary;
+
+
+//== Nav
+//
+//## [.nav-pills] / [.nav-tabs] / [.nav-stacked]
+
+@nav-pill-bg                           : #eee;
+@nav-pill-color                        : #444;
+
+@nav-pill-hover-bg                     : darken(#eee, 4%);
+@nav-pill-hover-color                  : #444;
+
+@nav-pill-active-bg                    : @brand-primary;
+@nav-pill-active-color                 : #fff;
+
+
+@nav-tab-color                         : #444;
+@nav-tab-bg                            : transparent;
+
+@nav-tab-hover-color                   : #444;
+@nav-tab-hover-bg                      : #eee;
+
+@nav-tab-active-color                  : @brand-primary;
+@nav-tab-active-bg                     : #fff;
+
+@nav-open-bg                           : #eee;
+@nav-open-color                        : #444;
+@nav-open-border-color                 : @brand-primary;
+
+
+//== Text
+//
+//## [.text-*]
+
+@text-primary-color                    : @brand-primary;
+@text-secondary-color                  : @brand-secondary;
+@text-tertiary-color                   : darken(@brand-tertiary, 5%);
+
+@text-success-color                    : @brand-success;
+@text-warning-color                    : @brand-warning;
+@text-danger-color                     : @brand-danger;
+@text-info-color                       : @brand-info;
+
+
+//== Alert
+//
+//## [.alert-*]
+
+@alert-success-bg                      : @brand-success;
+@alert-success-text                    : #fff;
+@alert-success-border-color            : @alert-success-bg;
+
+@alert-info-bg                         : @brand-info;
+@alert-info-text                       : #fff;
+@alert-info-border-color               : @alert-info-bg;
+
+@alert-warning-bg                      : @brand-warning;
+@alert-warning-text                    : #fff;
+@alert-warning-border-color            : @alert-warning-bg;
+
+@alert-danger-bg                       : @brand-danger;
+@alert-danger-text                     : #fff;
+@alert-danger-border-color             : @alert-danger-bg;
+
+
+//== Pagination
+//
+//## [.pagination]
+
+@pagination-bg                         : transparent;
+@pagination-color                      : #222;
+@pagination-border-color               : #ddd;
+
+@pagination-hover-bg                   : #eee;
+@pagination-hover-color                : #2a6496;
+@pagination-hover-border-color         : #ddd;
+
+@pagination-active-bg                  : @brand-primary;
+@pagination-active-color               : #fff;
+@pagination-active-border-color        : darken(@pagination-active-bg, 15%);
+
+
+//== Modal
+//
+//## [.modal-styled]
+
+@modal-background-bg                   : #fff;
+
+@modal-styled-header-bg                : @navbar-admin-bg;
+@modal-styled-header-color             : #fff;
+
+@modal-styled-footer-bg                : #f1f1f1;
+@modal-styled-footer-color             : #555;
+@modal-styled-footer-border-color      : #ddd;
+
+@modal-styled-close-bg                 : transparent;
+@modal-styled-close-color              : lighten(@navbar-admin-bg, 35%);
+
+@modal-styled-close-hover-bg           : transparent;
+@modal-styled-close-hover-color        : #fff;
+
+
+//== Progress Bar
+//
+//## [.progress-bar-*]
+
+@progress-bar-primary-bg               : @brand-primary;
+@progress-bar-secondary-bg             : @brand-secondary;
+@progress-bar-tertiary-bg              : @brand-tertiary;
+
+
+
+
+
+
+//* Components
+//--------------------------------------------- */
+
+//== Layout
+//
+//## [.layout]
+
+@layout-top-margin                     : 40px;
+@layout-bottom-margin                  : 40px;
+@layout-content-padding                : 30px;
+@layout-default-padding                : 15px;
+
+
+
+//== Mega Menu
+//
+//## [.mega-menu]
+
+@megamenu-col-4-width                  : 800px;
+@megamenu-col-4-column-width           : 25%;
+
+@megamenu-col-3-width                  : 650px;
+@megamenu-col-3-column-width           : 33%;
+
+@megamenu-col-2-width                  : 450px;
+@megamenu-col-2-column-width           : 50%;
+
+@megamenu-col-1-width                  : 225px;
+@megamenu-col-1-column-width           : 100%;
+
+
+
+//== Account
+//
+//## [.account]
+
+@account-bg                            : @layout-bg;
+
+@account-body-bg                       : #fff;
+@account-body-color                    : #444;
+@account-body-border-color             : #ddd;
+
+
+
+//== Headings
+//
+//## [.heading-block]
+
+@heading-color                         : @brand-layout;
+@heading-bar-color                     : #e6e6e6;
+@heading-bar-highlight-color           : @brand-secondary;
+
+
+
+//== Back to Top
+//
+//## [#back-to-top]
+
+@backtotop-bg                          : rgba(red(@navbar-admin-bg), green(@navbar-admin-bg), blue(@navbar-admin-bg), .85);
+@backtotop-color                       : #fff;
+
+@backtotop-hover-bg                    : rgba(red(@brand-primary), green(@brand-primary), blue(@brand-primary), .85);
+@backtotop-hover-color                 : @backtotop-color;
+
+
+//== Parsely Error
+//
+//##
+
+@parsely-error-bg                      : @brand-danger;
+@parsely-error-color                   : #fff;
+
+
+//== Portlet
+//
+//## [.portlet-*]
+
+@portlet-header-bg                     : #fff;
+@portlet-header-color                  : lighten(@brand-layout, 7.5%);
+
+@portlet-inverse-header-bg             : @brand-layout;
+@portlet-inverse-header-color          : #fff;
+
+@portlet-danger-header-bg              : lighten(@brand-danger, 2%);
+@portlet-danger-header-color           : #fff;
+
+@portlet-warning-header-bg             : lighten(@brand-warning, 2%);
+@portlet-warning-header-color          : #fff;
+
+@portlet-info-header-bg                : @brand-info;
+@portlet-info-header-color             : #fff;
+
+@portlet-success-header-bg             : @brand-success;
+@portlet-success-header-color          : #fff;
+
+@portlet-primary-header-bg             : @brand-primary;
+@portlet-primary-header-color          : #fff;
+
+@portlet-secondary-header-bg           : @brand-secondary;
+@portlet-secondary-header-color        : #fff;
+
+@portlet-tertiary-header-bg            : @brand-tertiary;
+@portlet-tertiary-header-color         :#fff;
+
+
+//== Pricing Plans
+//
+//## [.pricing-plan]
+
+@pricing-bg                            : #fff;
+@pricing-border-color                  : #ddd;
+
+@pricing-header-bg                     : lighten(@navbar-admin-bg, 5%);
+@pricing-header-title-color            : #fff;
+@pricing-header-color                  : lighten(@pricing-header-bg, 35%);
+
+@pricing-price-bg                      : #f9f9f9;
+@pricing-price-color                   : #555;
+@pricing-price-border-color            : #ddd;
+@pricing-price-amount-color            : #46a546;
+
+
+
+//== Pricing Table
+//
+//## [.pricing-table]
+
+@pricing-table-title-height            : 70px;
+@pricing-table-amount-height           : 50px;
+
+@pricing-table-head-bg                 : lighten(@navbar-admin-bg, 5%);
+@pricing-table-border-color            : #ddd;
+
+@pricing-table-title-color             : #fff;
+@pricing-table-byline-color            : lighten(@pricing-table-head-bg, 35%);
+
+@pricing-table-amount-color            : #444;
+@pricing-table-amount-bg               : #fff;
+
+@pricing-table-even-bg                 : #fff;
+@pricing-table-odd-bg                  : #f9f9f9;
+
+
+
+
+//== Blog
+//
+//## [.blog]
+
+@blog-search-border-color              : #eaeaea;
+@blog-search-border-focus-color        : #E39C88;
+
+@blog-ul-color                         : #444;
+
+@blog-ul-link-color                    : #666;
+@blog-ul-link-hover-color              : #888;
+
+@blog-ul-fa-li-color                   : @brand-primary;
+
+
+@blog-stats-icon-bg                    : @brand-layout;
+@blog-stats-icon-color                 : #fff;
+
+@blog-stats-icon-hover-bg              : lighten(@brand-layout, 7.5%);
+@blog-stats-icon-hover-color           : #fff;
+
+@blog-stats-count-color                : #222;
+@blog-stats-count-hover-color          : #444;
+
+@blog-stats-label-color                : #999;
+@blog-stats-label-hover-color          : #666;
+
+
+//== Posts
+//
+//## [.posts]
+
+@post-date-bg                          : @brand-primary;
+
+@post-date-year-color                  : darken(@brand-primary, 20%);
+@post-date-month-color                 : #fff;
+@post-date-day-color                   : #fff;
+
+@post-comment-bg                       : #fff;
+@post-comment-border-color             : #ccc;
+@post-comment-color                    : #777;
+
+@post-comment-hover-bg                 : #fff;
+@post-comment-hover-border-color       : #aaa;
+@post-comment-hover-color              : #777;
+
+@post-title-color                      : @brand-layout;
+@post-title-hover-color                : darken(@brand-layout, 6%);
+
+@post-meta-color                       : #aaa;
+
+@post-meta-link-color                  : #888;
+@post-meta-link-hover-color            : #888;
+
+
+
+//== Share Widget
+//
+//## [.share-widget]
+
+@share-widget-actions-bg               : #f5f5f5;
+@share-widget-actions-border-color     : #ddd;
+
+@share-widget-type-bg                  : transparent;
+@share-widget-type-color               : #aaa;
+@share-widget-type-border-color        : transparent;
+
+@share-widget-type-hover-bg            : #fff;
+@share-widget-type-hover-color         : @brand-primary;
+@share-widget-type-hover-border-color  : #ccc;
+
+
+
+//== Team Member
+//
+//## [.team-member]
+
+@team-member-name-bg                   : rgba(red(@navbar-admin-bg), green(@navbar-admin-bg), blue(@navbar-admin-bg), .85);
+@team-member-name-color                : #fff;
+
+@team-member-title-bg                  : @brand-primary;
+@team-member-title-color               : #fff;
+
+
+
+//== Background Helpers
+//
+//## [.bg-*]
+
+@bg-primary-bg                         : @brand-primary;
+@bg-secondary-bg                       : @brand-secondary;
+@bg-tertiary-bg                        : @brand-tertiary;
+
+@bg-success-bg                         : @brand-success;
+@bg-info-bg                            : @brand-info;
+@bg-warning-bg                         : @brand-warning;
+@bg-danger-bg                          : @brand-danger;
+
+
+
+//== Misc
+//
+//## []
+
+@required-color                        : @brand-danger;
+
+
+
+
+
+
+
+//* Plugins
+//--------------------------------------------- */
+
+//== jQuery Steps
+//
+//## []
+
+@step-error-color                      : @brand-danger;
+@step-done-color                       : @brand-secondary;
+
+@step-error-icon-font                  : "Open Sans";
+@step-error-icon-content               : "!";
+@step-error-icon-size                  : 17px;
+@step-error-line-height                : 23px;
+@step-error-icon-color                 : #fff;
+
+@step-done-icon-font                   : @font-stack-icon;
+@step-done-icon-content                : "\f00c";
+@step-done-icon-size                   : 11px;
+@step-done-line-height                 : 26px;
+@step-done-icon-color                  : #fff;
+
+@step-btn-next-color                   : #fff;
+@step-btn-next-bg                      : @brand-secondary;
+@step-btn-next-border                  : darken(@step-btn-next-bg, 8%);
+
+@step-btn-finish-color                 : #fff;
+@step-btn-finish-bg                    : @brand-layout;
+@step-btn-finish-border                : darken(@step-btn-finish-bg, 8%);
+
+@step-btn-previous-color               : #444;
+@step-btn-previous-bg                  : #fff;
+@step-btn-previous-border              : #ddd;
+
+@step-btn-cancel-color                 : #444;
+@step-btn-cancel-bg                    : #fff;
+@step-btn-cancel-border                : #ddd;
+
+
+//== jQuery UI Slider
+//
+//## []
+
+@ui-slider-handle-color                : @brand-layout;
+@ui-slider-handle-bg                   : #fff;
+@ui-slider-handle-border-color         : #bbb;
+
+@ui-slider-range-bg                    : #eee;
+@ui-slider-range-border-color          : darken(#eee, 12.5%);
+
+@ui-slider-default-bg                  : @brand-layout;
+@ui-slider-primary-bg                  : @brand-primary;
+@ui-slider-secondary-bg                : @brand-secondary;
+@ui-slider-tertiary-bg                 : @brand-tertiary;
+@ui-slider-success-bg                  : @brand-success;
+@ui-slider-warning-bg                  : @brand-warning;
+@ui-slider-danger-bg                   : @brand-danger;
+@ui-slider-info-bg                     : @brand-info;
+
+
+
+
+
+
+
+
+//* Admin Theme
+//--------------------------------------------- */
+
+//== Admin Navbar
+//
+//## [.navbar]
+
+@navbar-admin-height                   : 54px;
+@navbar-admin-bg                       : darken(@brand-layout, 5.5%);
+
+@navbar-admin-color                    : #fff;
+@navbar-admin-border                   : @navbar-admin-bg;
+
+@navbar-admin-link-color               : lighten(@navbar-admin-bg, 40%);
+
+@navbar-admin-link-hover-color         : #fff;
+@navbar-admin-link-hover-bg            : darken(@navbar-admin-bg, 1.75%);
+
+@navbar-admin-link-active-color        : @navbar-admin-link-hover-color;
+@navbar-admin-link-active-bg           : darken(@navbar-admin-bg, 3%);
+
+@navbar-admin-link-disabled-color      : #444;
+@navbar-admin-link-disabled-bg         : transparent;
+
+@navbar-admin-brand-color              : @navbar-admin-link-color;
+@navbar-admin-brand-hover-color        : #fff;
+@navbar-admin-brand-hover-bg           : darken(@navbar-admin-bg, 1.75%);
+
+@navbar-admin-toggle-hover-bg          : darken(@navbar-admin-bg, 2%);
+@navbar-admin-toggle-icon-bar-bg       : #fff;
+@navbar-admin-toggle-border-color      : transparent;
+
+@navbar-admin-toggle-color             : lighten(@navbar-admin-bg, 20%);
+
+
+//== Mainnav
+//
+//## [.mainnav]
+
+@mainnav-bg                            : #fff;
+@mainnav-border-color                  : #ccc;
+
+@mainnav-toggle-bg                     : transparent;
+@mainnav-toggle-hover-bg               : transparent;
+
+@mainnav-toggle-color                  : @brand-primary;
+@mainnav-toggle-hover-color            : darken(@mainnav-toggle-color, 6%);
+
+@mainnav-link-color                    : #999;
+@mainnav-link-hover-color              : #555;
+@mainnav-link-active-color             : @brand-primary;
+
+@mainnav-link-bg                       : #fff;
+@mainnav-link-hover-bg                 : #f4f4f4;
+@mainnav-link-active-bg                : #fff;
+
+@mainnav-link-border-color             : transparent;
+@mainnav-link-border-hover-color       : transparent;
+@mainnav-link-active-border-color      : @brand-primary;
+
+
+//== Navbar Notifications
+//
+//## [.navbar-notification]
+
+@notification-link-bg                  : transparent;
+@notification-link-color               : lighten(@navbar-admin-bg, 40%);
+@notification-icon-color               : lighten(@navbar-admin-bg, 20%);
+
+@notification-link-hover-bg            : @navbar-admin-link-hover-bg;
+@notification-link-hover-color         : @navbar-admin-link-hover-color;
+@notification-icon-hover-color         : @navbar-admin-link-hover-color;
+
+@notification-link-open-bg             : @navbar-admin-link-active-bg;
+@notification-link-open-color          : @navbar-admin-link-active-color;
+@notification-icon-open-color          : #fff;
+
+
+//== Admin Footer
+//
+//## [.footer]
+
+@footer-admin-bg                       : @navbar-admin-bg;
+@footer-admin-color                    : #fff;
+
+@footer-admin-link-color               : lighten(@navbar-admin-bg, 45%);
+@footer-admin-link-hover-color         : #fff;
+
+
+//== Admin Sidebar
+//
+//## [.sidebar]
+
+@sidebar-bg                            : #fff;
+
+@sidebar-link-color                    : #666;
+@sidebar-link-bg                       : #fff;
+
+@sidebar-link-hover-color              : #666;
+@sidebar-link-hover-bg                 : #f4f4f4;
+
+@sidebar-header-color                  : #999;
+@sidebar-header-bg                     : #fff;
+
+@sidebar-divider-color                 : lighten(#ddd, 5%);
+
+@sidebar-link-open-color               : @brand-layout;
+@sidebar-link-open-bg                  : #f4f4f4;
+@sidebar-link-open-border              : @brand-secondary;
+
+@sidebar-link-active-color             : @brand-primary;
+@sidebar-link-active-bg                : #f4f4f4;
+@sidebar-link-active-border            : @brand-primary;
+
+@sidebar-dropdown-link-bg              : #f4f4f4;
+@sidebar-dropdown-link-color           : @sidebar-link-color;
+
+@sidebar-dropdown-link-hover-bg        : #f8f8f8;
+@sidebar-dropdown-link-hover-color     : @brand-primary;
+
+
+
+
+
+
+
+
+
+//* Landing Theme
+//--------------------------------------------- */
+
+//== Landing Navbar
+//
+//## [.navbar]
+
+@navbar-landing-bg                     : #fff;
+
+@navbar-landing-link-color             : #888;
+@navbar-landing-link-bg                : transparent;
+
+@navbar-landing-link-hover-bg          : #eee;
+@navbar-landing-link-hover-color       : @navbar-landing-link-color;
+
+@navbar-landing-link-active-bg         : transparent;
+@navbar-landing-link-active-color      : @brand-primary;
+
+
+//== Masthead
+//
+//## [.masthead]
+
+@masthead-bg                           : darken(@brand-layout, 2%);
+@masthead-text-color                   : #fff;
+@masthead-subtitle-text-color          : #fff;
+
+@masthead-carousel-control-color       : rgba(0,0,0,.32);
+
+
+
+//== Landing Copyright
+//
+//## [.copyright]
+
+@copyright-landing-bg                  : darken(@footer-landing-bg, 2.5%);
+@copyright-landing-color               : #fff;
+
+@copyright-landing-link-color          : lighten(@copyright-landing-bg, 40%);
+@copyright-landing-link-hover-color    : lighten(@copyright-landing-bg, 50%);
+
+
+//== Landing Footer
+//
+//## [.footer]
+
+@footer-landing-bg                     : darken(@brand-layout, 2%);
+@footer-landing-color                  : #fff;
+
+@footer-landing-heading-block-color    : #fff;
+@footer-landing-heading-block-before-bg: lighten(@footer-landing-bg, 5%);
+@footer-landing-heading-block-after-bg : @brand-primary;
+
+@footer-landing-link-color             : lighten(@footer-landing-bg, 40%);
+@footer-landing-link-hover-color       : lighten(@footer-landing-bg, 50%);
+
+
+
+
+
+
+
+
+//* Launch Theme
+//--------------------------------------------- */
+
+//== Vegas Overlay
+//
+//## [.vegas-overlay]
+
+@vegas-overlay-bg                      : @brand-layout;
+
+
+//== Load Mask
+//
+//## [.load-mask]
+
+@load-mask-bg                          : @brand-layout;
+@load-mask-icon-color                  : #fff;
+
+
+//== Countdown
+//
+//## [.countdown]
+
+@countdown-width                       : 550px;

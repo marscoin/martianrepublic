@@ -1,0 +1,345 @@
+//* !Wizard */
+//* ----------------------------------------------- */
+
+.wizard.wizard-enhanced {
+
+  > .steps {
+    position: relative;
+
+    z-index: 101;
+
+    font-size: 14px;
+
+    > ul > li {
+      width: auto;
+    }
+
+    .number {
+      display: inline-block;
+
+      position: relative;
+
+      width: 24px;
+      height: 24px;
+
+      margin-right: 8px;
+
+      color: #bbb;
+
+      text-align: center;
+
+      font-size: inherit;
+      font-size: 13px;
+      font-weight: 800;
+
+      line-height: 21px;
+
+      border: 1px solid #ccc;
+
+      border-radius: 100px;
+
+      &:after {
+        content: "";
+
+        display: none;
+
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: 24px;
+        height: 24px;
+
+        border-radius: 100px;
+      }
+    }
+  }
+
+  > .steps a,
+  > .steps a:hover,
+  > .steps a:active {
+    position: relative;
+
+    display: block;
+
+    font-size: 14px;
+    text-decoration: none;
+
+    border: 1px solid #eee;
+
+    border-radius: 0;
+
+  }
+
+
+  > .steps .done a,
+  > .steps .done a:hover,
+  > .steps .done a:active {
+    color: #444;
+
+    background: #eee;
+
+    .number {
+      border-color: transparent;
+
+      &:after {
+        content: @step-done-icon-content;
+
+        display: block;
+
+        color: @step-done-icon-color;
+
+        font-family: @step-done-icon-font;
+        font-size: @step-done-icon-size;
+
+        line-height: @step-done-line-height;
+
+        background: @step-done-color;
+      }
+    }
+
+  }
+
+  > .steps .current a,
+  > .steps .current a:hover,
+  > .steps .current a:active {
+    color: #444;
+
+    font-weight: 800;
+
+    background: #fff;
+
+    cursor: default;
+
+    border: 1px solid #ddd;
+
+    .number {
+      color: #444;
+
+      border-color: #bbb;
+    }
+  }
+
+  > .steps .current.done a,
+  > .steps .current.done a:hover,
+  > .steps .current.done a:active {
+    .number {
+      border-color: transparent;
+    }
+  }
+
+  > .steps .error a,
+  > .steps .error a:hover,
+  > .steps .error a:active {
+    color: @step-error-color;
+
+    font-weight: 800;
+
+    .number {
+      border-color: transparent;
+
+      &:after {
+        content: @step-error-icon-content;
+
+        font-size: @step-error-icon-size;
+
+        line-height: @step-error-line-height;
+
+        font-family: @step-error-icon-font;
+
+        display: block;
+
+        color: @step-error-icon-color;
+
+        background: @step-error-color;
+      }
+    }
+
+  }
+
+  > .content {
+    position: relative;
+
+    z-index: 51;
+
+    padding: 0;
+    margin: 0;
+
+    background: #fff;
+
+    border: 1px solid #ddd;
+
+    border-radius: 0;
+
+    -webkit-border-radius: 4px;
+    -webkit-border-top-left-radius: 0;
+    -moz-border-radius: 4px;
+    -moz-border-radius-topleft: 0;
+    border-radius: 4px;
+    border-top-left-radius: 0;
+
+    > .body {
+      width: 100%;
+      height: 100%;
+
+      padding: 20px 15px;
+
+      overflow-y: auto;
+
+      legend {
+        position: relative;
+        top: 20px;
+      }
+
+      .form-control {
+        &:focus {
+          border-color: #66afe9;
+          outline: 0;
+          -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+          box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
+        }
+      }
+
+    }
+  }
+
+  > .actions {
+    padding: 0;
+    margin: 10px 0 0;
+
+    > ul > li {
+      margin: 0 0 0 6px;
+
+      > a[href="#next"] {
+        .wizard-button-variant (@step-btn-next-color, @step-btn-next-bg, @step-btn-next-border);
+      }
+
+      > a[href="#finish"] {
+        .wizard-button-variant (@step-btn-finish-color, @step-btn-finish-bg, @step-btn-finish-border);
+      }
+
+      > a[href="#previous"] {
+        .wizard-button-variant (@step-btn-previous-color, @step-btn-previous-bg, @step-btn-previous-border);
+      }
+
+      > a[href="#cancel"] {
+        .wizard-button-variant (@step-btn-cancel-color, @step-btn-cancel-bg, @step-btn-cancel-border);
+      }
+    }
+
+    > ul > li.disabled {
+      > a[href="#next"],
+      > a[href="#finish"],
+      > a[href="#previous"] {
+        opacity: .40;
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: inherit;
+
+          background: inherit;
+        }
+      }
+    }
+  }
+
+}
+
+
+
+//* !Wizard Vertical */
+//* ----------------------------------------------- */
+
+.wizard-enhanced.wizard-vertical {
+
+  > .steps a,
+  > .steps a:hover,
+  > .steps a:active {
+    padding: 1.35em 1em;
+    margin: 0 0 0.5em;
+
+    border-right-color: #ddd;
+
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+
+  > .steps .current a,
+  > .steps .current a:hover,
+  > .steps .current a:active {
+    border-color: #ddd;
+
+    border-right-color: #fff;
+  }
+
+  > .content {
+    left: -1px;
+
+    width: 70%;
+
+    margin: 0;
+  }
+
+}
+
+
+
+//* !Wizard Horizontal */
+//* ----------------------------------------------- */
+
+.wizard-enhanced.wizard-horizontal {
+
+  > .steps a,
+  > .steps a:hover,
+  > .steps a:active {
+    width: auto;
+    min-width: 150px;
+
+    margin: 0 6px 0 0;
+    padding: 1.35em 1em;
+
+    border-bottom-color: #ddd;
+
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  > .steps .current a,
+  > .steps .current a:hover,
+  > .steps .current a:active {
+    border-bottom-color: #fff;
+  }
+
+  > .content {
+    top: -1px;
+  }
+
+}
+
+
+
+//* !Wizard Mixins */
+//* ----------------------------------------------- */
+
+.wizard-button-variant (@color, @bg, @border) {
+  color: @color;
+
+  background: @bg;
+
+  border: 1px solid darken(@border, 0%);
+
+  &:hover,
+  &:focus,
+  &:active {
+    background: darken(@bg, 8%);
+  }
+}
