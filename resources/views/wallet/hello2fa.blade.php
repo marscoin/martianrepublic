@@ -93,7 +93,7 @@
                         </button>
                     </div> <!-- /.form-group -->
                     <div class="form-group">
-                        <a href="/wallet/login"><i class="fa fa-angle-double-left"></i> &nbsp;Back to Login</a>
+                        <a href="/login"><i class="fa fa-angle-double-left"></i> &nbsp;Back to Login</a>
                     </div> <!-- /.form-group -->
                 </form>
             </div>

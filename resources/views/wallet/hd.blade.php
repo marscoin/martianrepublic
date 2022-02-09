@@ -148,6 +148,7 @@
                 </div> <!-- /.modal-header -->
 
                 <form class="form account-form" method="POST" action="/wallet/createwallet">
+                    @csrf
 
                     <div class="modal-body">
 
@@ -279,7 +280,7 @@
                                         <h2> Backup Wallet </h2>
                                         <a class="btn btn-default left-margin demo-element ui-popover" data-toggle="tooltip"
                                             data-placement="right" data-trigger="hover"
-                                            data-content="We will encrypt your mnemonic with a password you create. Marscoin will never have access to your wallet."
+                                            data-content="We will encrypt your mnemonic with a password you create in your browser. MartianRepublic.org will never have access to your wallet."
                                             title="" data-original-title="Backup Your Wallet" href="#"><i
                                                 class="fa fa-question-circle"></i></a>
                                         <span> (Optional) </span>
