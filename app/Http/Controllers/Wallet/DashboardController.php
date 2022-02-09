@@ -447,7 +447,7 @@ class DashboardController extends Controller
 
 	// POST
 	// Create Wallet
-	public function postCreateWallet()
+	public function postCreateWallet(Request $request)
 	{
 		if (Auth::check()) 
 		{
