@@ -21,6 +21,18 @@ MartianRepublic documentation can be found on gitbook [documentation](https://ma
 
 Thank you for considering contributing to the Martian Republic project!
 
+
+## Installation
+
+
+#For Mars
+Copy project onto USB stick, including a copy of the Marscoin ledger, Marscoin node, IPFS node - then take a SpaceX Starship to Mars and upon arrival bootstrap an entire economic and governance hub using MartianRepublic.
+
+#...In the meantime
+
+`composer update`
+
+
 ## Security Vulnerabilities
 
 If you discover a security vulnerability within Laravel, please send an e-mail to our dev team via [info@marscoin.org](mailto:info@marscoin.org). All security vulnerabilities will be promptly addressed.
