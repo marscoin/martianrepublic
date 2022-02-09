@@ -57,8 +57,8 @@ class IdentityController extends Controller
 			$view->isGP  = $profile->general_public;
 			$view->mePublic = Feed::where('userid', '=', $uid)->where('tag', '=', "GP")->first();
 			$view->meCitizen = Feed::where('userid', '=', $uid)->where('tag', '=', "CT")->first();
-			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and users.id = ? and feed.tag = "GP"', array($uid));
-			$view->everyCitizen = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and users.id = ? and feed.tag = "CT"', array($uid));
+			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "GP"', array($uid));
+			$view->everyCitizen = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "CT"', array($uid));
 
 			if ($wallet) {
 				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
