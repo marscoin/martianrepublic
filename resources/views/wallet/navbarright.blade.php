@@ -56,7 +56,7 @@
       
       <li class="divider"></li> -->
       <li>
-        <a href="/wallet/logout">
+        <a href="/logout">
           <i class="fa fa-sign-out"></i>
           &nbsp;&nbsp;Logout
         </a>
