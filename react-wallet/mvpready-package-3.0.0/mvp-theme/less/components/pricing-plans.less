@@ -1,0 +1,185 @@
+//* !Pricing plans */
+//* ----------------------------------------------- */
+
+.pricing-plan {
+	position: relative;
+
+	display: block;
+	vertical-align: top;
+
+	width: 100%;
+	padding: 15px 15px;
+	margin-bottom: 4em;
+
+	text-align: center;
+
+	background: @pricing-bg;
+
+	border: 1px solid @pricing-border-color;
+
+	.border-top-radius (4px);
+	.border-bottom-radius (4px);
+}
+
+.pricing-header {
+	padding: 15px;
+
+	margin: -25px -15px 15px;
+
+	color: @pricing-header-color;
+
+	background-color: @pricing-header-bg;
+
+	.border-top-radius (4px);
+}
+
+.pricing-plan-help {
+	border-bottom: 1px dotted #000;
+
+	cursor: help;
+
+	strong.ui-popover {
+		border-bottom: 1px dotted #000;
+	}
+}
+
+.pricing-plan-label {
+	padding-right: 12px;
+	padding-left: 12px;
+	margin-bottom: 0;
+
+	font-size: 13px;
+}
+
+.pricing-plan-title {
+	margin-top: 0;
+	margin-bottom: 6px;
+
+	color: @pricing-header-title-color;
+
+	font-size: 21px;
+	font-weight: 400;
+
+	text-transform: uppercase;
+}
+
+.pricing-plan-price {
+	display: block;
+	padding: 10px;
+	margin: -15px -15px 0;
+
+	color: @pricing-price-color;
+
+	background-color: @pricing-price-bg;
+
+	border-bottom: 1px solid @pricing-price-border-color;
+}
+
+.pricing-plan-amount {
+	color: @pricing-price-amount-color;
+
+	font-size: 24px;
+	font-weight: 400;
+}
+
+.pricing-plan-details {
+	padding: .5em 0 0;
+	margin: 0 0 1em;
+
+	li {
+		padding-top: .5em;
+		padding-bottom: .5em;
+		list-style: none;
+
+		border-bottom: 1px solid darken(#eee, 2.5%);
+	}
+}
+
+.pricing-plan hr {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.pricing-plan-current,
+.pricing-plan-current:hover {
+
+	color: #333;
+
+	font-weight: 800;
+
+	text-decoration: none;
+
+	cursor: default;
+}
+
+.pricing-plan-ribbon,
+.pricing-plan-ribbon-primary,
+.pricing-plan-ribbon-secondary,
+.pricing-plan-ribbon-tertiary,
+.pricing-plan-ribbon-current {
+	@ribbon-width: 28px;
+
+	display: inline-block;
+
+	position: absolute;
+	top: 0;
+	right: 15px;
+
+	width: @ribbon-width;
+	padding: 8px 0 12px;
+
+	color: #fff;
+
+	background-color: #777;
+
+	&:before {
+		content: "";
+
+		position: absolute;
+		bottom: 0;
+		left: 0;
+
+		width: 0;
+		height: 0;
+
+		border-bottom:   6px solid @pricing-header-bg;
+		border-right: @ribbon-width/2 solid transparent;
+		border-left:  @ribbon-width/2 solid transparent;
+	}
+}
+
+.pricing-plan-ribbon-primary { background-color: @brand-primary; }
+.pricing-plan-ribbon-secondary { background-color: @brand-secondary; }
+.pricing-plan-ribbon-tertiary { background-color: @brand-tertiary; }
+.pricing-plan-ribbon-current { background-color: lighten(@pricing-header-bg, 5%); color: @brand-primary; }
+
+@media (min-width: @screen-sm) {
+
+	.pricing-plan {
+		//max-width: 300px;
+
+		padding-top: 25px;
+		padding-bottom: 25px;
+		margin-right: auto;
+		margin-left: auto;
+		margin-bottom: 2em;
+
+		hr {
+			margin-top: 20px;
+			margin-bottom: 20px;
+		}
+	}
+
+	.pricing-plan-amount {
+		font-size: 32px;
+	}
+
+	.pricing-plan-details {
+		margin: 0 0 2em;
+
+		li {
+			padding-top: 1.25em;
+			padding-bottom: 1.25em;
+		}
+	}
+}

@@ -1,0 +1,18 @@
+.nav-wallet-connect
+{
+  font-family:   'Open Sans', 'Trebuchet MS', arial, sans-serif;
+  font-weight: 600;
+  transition-duration: .3s;
+}
+
+.nav-wallet-connect:hover
+{
+    box-shadow: 2px 2px 10px 5px #00000040;
+    background-color: #d23636 !important;
+    padding: 10px !important;
+}
+
+.nav-wallet-balance{
+    font-family:   'Open Sans', 'Trebuchet MS', arial, sans-serif;
+    font-weight: 600;
+}

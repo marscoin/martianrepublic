@@ -1,0 +1,35 @@
+.content-page {
+  position: relative;
+
+  top: 0;
+  right: 0;
+  margin-left: 260px;
+
+  padding-top: @layout-top-margin;
+}
+
+.content {
+  padding: 0;
+}
+
+@media (max-width: @screen-sm-max) {
+  .content-page {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: @screen-md-min) {
+  .content {
+    padding: 0;
+  }
+}
+
+@media (min-width: @screen-md-min) {
+  .content-page {
+    padding-top: 15px;
+  }
+
+  .content {
+    padding: 15px 15px 10px;
+  }
+}

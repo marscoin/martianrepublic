@@ -1,0 +1,144 @@
+//* !Masthead */
+//* ----------------------------------------------- */
+
+.masthead {
+  width: 100%;
+
+  padding-top: 0;
+  padding-bottom: 0;
+
+  background-color: @masthead-bg;
+  
+  border-bottom: 1px solid #ddd;
+
+  iframe {
+    border: none;
+  }
+}
+
+h1, h2, h3,
+h4, h5, h6 {
+  &.masthead-title { 
+    color: #fff;
+    
+    font-family: @font-stack-text;
+    font-weight: 600; 
+    
+    letter-spacing: -1px;
+  }
+}
+
+h1.masthead-title { font-size: 56px; }
+h2.masthead-title { font-size: 50px; }
+h3.masthead-title { font-size: 44px; }
+h4.masthead-title { font-size: 38px; }
+h5.masthead-title { font-size: 32px; }
+h6.masthead-title { font-size: 26px; }
+
+.masthead-subtitle {
+  padding: 20px 0;
+  margin-bottom: 0;
+
+  color: @masthead-subtitle-text-color;
+
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.masthead-form {
+  width: 90%;
+  padding-bottom: 6px;
+  margin: 0 auto 0;
+
+  text-align: left;
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+}
+
+.masthead-text {
+  padding-top: 15px;
+
+  color: @masthead-text-color;
+
+  font-size: 15px;
+}
+
+.masthead-img {
+  text-align: center;
+
+  img {
+    margin: 0 auto;
+  }
+}
+
+.masthead-actions {
+  .btn {
+    margin-right: .75em;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+@media (min-width: @screen-sm-min) {
+  .masthead-subtitle {
+    padding-top: 30px;
+    padding-bottom: 30px;
+
+    font-size: 32px;
+  }
+
+  .masthead-form {
+    width: 70%;
+  }
+}
+
+.masthead-carousel .carousel-controls {
+  position: absolute;
+
+  bottom: 25px;
+}
+
+.masthead-carousel .carousel-control {
+  position: static;
+
+  display: inline-block;
+
+  width: 32px;
+  height: 32px;
+}
+
+.masthead-carousel .carousel-control.left,
+.masthead-carousel .carousel-control.right {
+  background: @masthead-carousel-control-color;
+
+  filter: none;
+
+  .border-top-radius (3px);
+  .border-bottom-radius (3px);
+}
+
+@media (max-width: @screen-sm-max) {
+
+  h1.masthead-title { font-size: 40px; }
+  h2.masthead-title { font-size: 40px; }
+  h3.masthead-title { font-size: 32px; }
+  h4.masthead-title { font-size: 32px; }
+  h5.masthead-title { font-size: 24px; }
+  h6.masthead-title { font-size: 24px; }
+
+  .masthead-text {
+    text-align: center;
+  }
+
+  .masthead-actions {    
+    text-align: center;
+
+    .btn {
+      margin: 0 5px .75em;
+    }
+  }
+}

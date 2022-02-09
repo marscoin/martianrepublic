@@ -1,0 +1,15 @@
+//* !Progress Bars */
+//* ----------------------------------------------- */
+
+// Give the progress background some depth
+.progress {
+  background-color: @progress-bg;
+}
+
+// Apply the mixin to the progress bars
+.progress-bar-primary { .progress-bar-styles(@progress-bar-primary-bg); }
+.progress-bar-secondary { .progress-bar-styles(@progress-bar-secondary-bg); }
+.progress-bar-tertiary { .progress-bar-styles(@progress-bar-tertiary-bg); }
+
+.progress-sm { height: 12px; }
+.progress-lg { height: 28px; }

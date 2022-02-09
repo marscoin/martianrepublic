@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<title>
+		Getting Started
+		
+		- 
+		
+		MVP Ready Docs v3.0.0
+	</title>
+
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<!-- Font Awesome -->
+	<link href="./css/font-awesome.min.css" rel="stylesheet">
+
+	<!-- Bootstrap core CSS -->
+	<link href="./css/bootstrap.css" rel="stylesheet">
+
+	
+
+	<!-- Documentation core CSS -->
+	<link href="./css/docs.css" rel="stylesheet">
+
+
+	<link href="./js/plugins/snippet/jquery.snippet.min.css" rel="stylesheet">
+
+	
+
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+	  <script src="./js/libs/html5shiv.js"></script>
+	  <script src="./js/libs/respond.min.js"></script>
+	<![endif]-->
+
+	<!-- Favicons -->
+	<link rel="shortcut icon" href="./assets/ico/favicon.ico">
+
+</head>
+
+<body>
+  <a class="sr-only" href="#content">Skip navigation</a>
+
+  <!-- Docs master nav -->
+  <header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" role="banner">
+    <div class="container">
+
+      <div class="navbar-header">
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <a href="./index.html" class="navbar-brand">MVP Ready 3.0.0</a>
+      </div>
+
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+          <li class="active">
+          <a href="./getting-started.html">Getting started</a>
+          </li>
+          <li class="">
+          <a href="./components.html">Components</a>
+          </li>
+          <li class="">
+          <a href="./templates.html">Templates</a>
+          </li>
+          <li class="">
+          <a href="./third-party.html">Third Party</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Docs page layout -->
+  <div class="bs-header" id="content">
+    <div class="container">
+      <h1>Getting Started</h1>
+    </div>
+  </div>
+
+  <div class="container bs-docs-container">
+    <div class="row">
+
+      <div id="sidebar" class="col-md-3">
+        <div class="bs-sidebar hidden-print affix-top" role="complementary">
+          <ul class="nav bs-sidenav">
+
+          </ul>
+        </div>
+      </div>
+
+      <div id="main" class="col-md-9" role="main">
+
+<section id="start-welcome" data-title="Introduction" class="bs-docs-section">
+
+<h1 class="section-header">Introduction</h1>
+
+<p class="lead">MVP Ready is a responsive admin dashboard template powered with Twitter Bootstrap Framework for admin and backend applications. MVP Ready has a clean and intuitive design which makes your next project look awesome and user friendly. MVP Ready comes with a huge collection of plugins and UI components and it works in all major web browsers, tablets and phones. </p>
+
+<p>Thank you for purchasing MVP Ready. If you have any questions that are beyond the scope of this help file, please feel free to ask in the support forum: <a href="http://jumpstartthemes.com/support.html" target="_blank">http://jumpstartthemes.com/support.html</a>. Thanks so much!</p>
+
+
+<ul class="icons-list">
+  <li>
+    <i class="icon-double-angle-right icon-li"></i>
+    Created On: 02/06/2014
+  </li>
+  <li>
+    <i class="icon-double-angle-right icon-li"></i>
+    Updated On: 06/01/2016
+  </li>
+  <li>
+    <i class="icon-double-angle-right icon-li"></i>
+    Author: <a href="http://jumpstartthemes.com" target="_blank">Jumpstart Themes</a>
+  </li>
+  <li>
+    <i class="icon-double-angle-right icon-li"></i>
+    Contact: <a href="mailto:support@jumpstartthemes.com">support@jumpstartthemes.com</a>
+  </li>
+</ul>
+
+<br>
+
+<div id="start-scope" data-title="Documentation Scope" class="bs-docs-section-sub">
+
+<h3>Documentation Scope</h3>
+
+<p>This documentation is intended to explain basic template structure, custom elements, plugins, helper classes and/or how you can configure the template. Since this template is built on top of the Bootstrap framework, your main source of documentation can be found here: <a href="http://getbootstrap.com/css/">http://getbootstrap.com/css/</a>.</p>
+
+<p>This documentation is  written in a style that assumes you already know the basics of Bootstrap, CSS, JavaScript and HTML. This document only covers additions, extensions, and elements pertinent to this theme.</p>
+
+</div>
+
+
+<div id="start-started" data-title="Getting Started" class="bs-docs-section-sub">
+
+<h3>Getting Started</h3>
+
+<p>To get started, just browse through the demonstration pages. Use Chrome Developer Tools (Chrome), Firebug (Firefox) or similar plugins to analyze the code. To get a deeper understanding of the code, open the HTML and JS files and read through the commented code.</p>
+
+</div>
+
+
+
+
+
+</section>
+<section id="start-lesscss" data-title="Less CSS" class="bs-docs-section">
+
+<h1 class="section-header">Less CSS</h1>
+
+<div id="less-start" data-title="Getting Started" class="bs-docs-section-sub">
+
+	<h2>Getting Started</h2>
+
+  <p>MVP Ready uses Less CSS to manage stylesheets and add new styles. The below sections will document how you should go about editing and managing your Less CSS files.</p>
+
+<br>
+
+<h3>Directory Structure</h3>
+
+<pre class="snip-html">
+- less
+| - bootstrap
+| - components
+| - plugins
+| - skins
+| - templates
+| - mixins.less
+| - variables.less
+
+- templates
+| - admin-1
+  | - less
+    | - mvpready-admin.less
+
+| - admin-2
+  | - less
+    | - mvpready-admin.less
+
+| - landing
+  | - less
+    | - mvpready-landing.less
+
+| - launch
+  | - less
+    | - mvpready-launch.less
+</pre>
+
+
+
+</div>
+
+
+
+<div id="less-build" data-title="Building Less" class="bs-docs-section-sub">
+
+
+<h3>Building Less</h3>
+
+<p>There is a Gruntfile.js and package.json file included in each <code>/templates</code> directory. You can run Grunt for a specific template to build that Less file into the corresponding css directory <code>/templates/admin/css/</code>.</p>
+
+<br>
+
+<pre class="snip-html">
+- templates
+| - admin-1
+  | - Gruntfile.js
+  | - package.json
+
+- templates
+| - admin-2
+  | - Gruntfile.js
+  | - package.json
+
+| - landing
+  | - Gruntfile.js
+  | - package.json
+
+| - launch
+  | - Gruntfile.js
+  | - package.json
+</pre>
+
+</div>
+
+
+
+
+<div id="less-editing" data-title="Editing Less Files" class="bs-docs-section-sub">
+
+<h3>Editing Less Files</h3>
+
+<p>This template will receive consistent updates over the coming weeks, months and years, so how you edit the included Less files is very important. Instead of editing the Less files included in this package directly, you should make copies of the files you want to edit. This will allow you to pull in any updates fully and then check the compatibility with your customizations. </p>
+
+
+
+</div>
+
+
+
+
+</section>
+<section id="start-helpers" data-title="Helpers" class="bs-docs-section">
+
+<h1 class="section-header">Helpers</h1>
+
+<div id="helper-datatable" data-title="Data Tables" class="bs-docs-section-sub">
+
+		<h3>Data Tables</h3>
+
+	<h4>Initialize</h4>
+
+	<p><span class="label label-danger">Important</span> To utilize this helper, you must first include the Data Tables javascript files. Information on what files to include is located at the <a href="./plugins.html#datatables-plugin">Data Tables plugin page</a></p>
+
+	<p>The Data Table helper allows you to use the plugin without dealing with javascript directly. To initialize the Data Table, add the attribute <code>class="ui-datatable"</code> to your <code>table</code> element.</p>
+
+		<pre class="snip-html">
+&lt;table class="ui-datatable"&gt;
+</pre>
+
+
+		<br><br>
+
+
+		<h4>Table Options</h4>
+
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th style="width: 120px;">Name</th>
+					<th style="width: 140px">Attribute</th>
+					<th>Values</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Ajax</td>
+					<td>data-ajax</td>
+					<td>Url</td>
+					<td>Url to your data source.</td>
+				</tr>
+				<tr>
+					<td>Paginate</td>
+					<td>data-paging</td>
+					<td>True/False</td>
+					<td>Enables pagination for the table</td>
+				</tr>
+				<tr>
+					<td>Search</td>
+					<td>data-global-search</td>
+					<td>True/False</td>
+					<td>Enables full table search</td>
+				</tr>
+				<tr>
+					<td>Table Info</td>
+					<td>data-info</td>
+					<td>True/False</td>
+					<td>Displays information about visible rows and total rows for the table.</td>
+				</tr>
+				<tr>
+					<td>Length Change</td>
+					<td>data-length-change</td>
+					<td>True/False</td>
+					<td>Enable the user to change the number of rows in the table.</td>
+				</tr>
+				<tr>
+					<td>Page Length</td>
+					<td>data-page-length</td>
+					<td>10</td>
+					<td>Sets the default number of rows to display.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<br>
+
+		<h5>Example HTML</h5>
+
+		<pre class="snip-html">
+&lt;table class="ui-datatable"
+		data-ajax="data.json"
+		data-paging="true"
+		data-global-search="true"
+		data-info="true"
+		data-length-change="true"
+		data-page-length="10"&gt;
+</pre>
+
+		<br><br><br>
+
+		<h4>Column Options</h4>
+
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th>Option</th>
+					<th>Attribute</th>
+					<th>Values</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Filterable</td>
+					<td>data-filterable</td>
+					<td>Text/Select</td>
+					<td>Enables a specific column to have basic text search</td>
+				</tr>
+				<tr>
+					<td>Sortable</td>
+					<td>data-sortable</td>
+					<td>True/False</td>
+					<td>Enables basic sorting on a specific column</td>
+				</tr>
+				<tr>
+					<td>Direction</td>
+					<td>data-direction</td>
+					<td>Asc/Desc</td>
+					<td>Sets the initial sorting value for column. Can be left blank.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<br />
+
+		<h5>Example HTML</h5>
+
+		<pre class="snip-html">
+&lt;table data-provide="datatable"&gt;
+	&lt;thead&gt;
+		&lt;tr&gt;
+			&lt;th data-sortable="false" data-filterable="text" data-direction="desc"&gt;Column #1&lt;/th&gt;
+			&lt;th data-sortable="true" data-filterable="select"&gt;Column #2&lt;/th&gt;
+			&lt;th data-sortable="true" data-filterable="select"&gt;Column #3&lt;/th&gt;
+		&lt;/tr&gt;
+	&lt;/thead&gt;
+&lt;/table&gt;
+</pre>
+
+	</div>
+<div id="helper-spacing" data-title="Spacing/Line Breaks" class="bs-docs-section-sub">
+
+		<h3>Spacing/Line Breaks </h3>
+
+		<p>The spacing helper allows finer control over the HTML Br tag. It allows you to easily change the amount of space between elements at multiple responsive break points.</p>
+
+<br>
+
+<h4>Examples</h4>
+
+
+<h5 style="font-family: 'open sans';">50px at ALL breakpoints.</h5>
+<pre class="snip-html">
+&lt;br class="xs-50"&gt;
+</pre>
+
+<br><br>
+
+<h5 style="font-family: 'open sans';">10px at XS breakpoint. &nbsp;&nbsp;/&nbsp;&nbsp; 30px at SM breakpoint. &nbsp;&nbsp;/&nbsp;&nbsp; 50px at MD breakpoint. &nbsp;&nbsp;/&nbsp;&nbsp; 70px at LG breakpoint.</h5>
+<pre class="snip-html">
+&lt;br class="xs-10 sm-30 md-50 lg-70"&gt;
+</pre>
+
+<br><br>
+
+<h5 style="font-family: 'open sans';">0px at XS breakpoint. &nbsp;&nbsp;/&nbsp;&nbsp; 50px at SM breakpoint. &nbsp;&nbsp;/&nbsp;&nbsp; 0px at MD and LG breakpoints.</h5>
+<pre class="snip-html">
+&lt;br class="sm-50 md-0"&gt;
+</pre>
+
+<br><br>
+
+<h5 style="font-family: 'open sans';">100px at LG breakpoint only.</h5>
+<pre class="snip-html">
+&lt;br class="sm-50 md-0"&gt;
+</pre>
+
+<br>
+
+<h4>Available Classes</h4>
+
+<p><strong>Breakpoints</strong></p>
+<ul>
+	<li>.xs-##</li>
+	<li>.sm-##</li>
+	<li>.md-##</li>
+	<li>.lg-##</li>
+</ul>
+
+<br><br>
+<p><strong>Sizes</strong></p>
+<ul>
+	<li>0</li>
+	<li>10</li>
+	<li>20</li>
+	<li>30</li>
+	<li>40</li>
+	<li>50</li>
+	<li>60</li>
+	<li>70</li>
+	<li>80</li>
+	<li>90</li>
+	<li>100</li>
+</ul>
+
+	</div>
+<div id="helper-charts" data-title="Charts" class="bs-docs-section-sub">
+
+		<h3>Charts</h3>
+
+		<p>Most charting plugins require a defined height to display the chart correctly. With that being said the <code>.chart-holder</code> class sets a reasonable default height of 300px for your charts. </p>
+
+		<p>This plugin can be easily used with either jQuery Flot charts or Morris.js charts.</p>
+
+<pre class="snip-html">
+&lt;div id="CHART_ID" class="chart-holder"&gt;&lt;/div&gt; &lt;!-- .chart-holder --&gt;
+</pre>
+
+	</div>
+<div id="helper-validation" data-title="Form Validation" class="bs-docs-section-sub">
+
+		<h3>Form Validation</h3>
+
+		<p>To enable Parsley validation with custom error messages, add the class <code>.parsley-form</code> to your form. </p>
+
+		<p><span class="label label-danger">Important</span> This is different form the default Parsley method, which is using the attribute <code>data-validate</code>. You do not want to use the default Parsley method if utilizing the custom error messages.</p>
+
+	<pre class="snip-html">
+&lt;form class="form parsley-form"&gt;
+
+&lt;/form&gt;
+</pre>
+
+	</div>
+<div id="helper-datepicker" data-title="Date Picker" class="bs-docs-section-sub">
+
+		<h3>Date Picker</h3>
+
+		<h4>Basic Input</h4>
+
+		<p>To utilize the date picker helper, add the class <code>.ui-datepicker</code> to your <code>input</code> element.</p>
+	<pre class="snip-html">
+&lt;input type="text" name="datepicker" class="form-control ui-datepicker"&gt;
+</pre>
+
+		<br>
+
+		<h4>Picker Component</h4>
+
+		<p>To utilize the date picker helper as a component, add the class <code>.ui-datepicker</code> to your <code>.input-group</code> element.</p>
+
+		<pre class="snip-html">
+&lt;div class="input-group date ui-datepicker"&gt;
+    &lt;input class="form-control" type="text"&gt;
+    &lt;span class="input-group-addon"&gt;&lt;i class="icon-calendar"&gt;&lt;/i&gt;&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+
+	</div>
+<div id="helper-timepicker" data-title="Time Picker" class="bs-docs-section-sub">
+
+		<h3>Time Picker</h3>
+
+		<h4>Picker Dropdown</h4>
+
+		<p>To enable the Timepicker dropdown helper add the class <code>.ui-timepicker</code> to your input element.</p>
+
+	<pre class="snip-html">
+&lt;div class="input-group bootstrap-timepicker"&gt;
+  &lt;input type="text" class="form-control ui-timepicker" placeholder="Choose Time"&gt;
+  &lt;span class="input-group-addon"&gt;&lt;i class="fa fa-clock-o"&gt;&lt;/i&gt;&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+
+<br><br>
+
+<h4>Modal Picker</h4>
+
+		<p>To enable the Timepicker modal helper add the class <code>.ui-timepicker-modal</code> to your input element.</p>
+
+<pre class="snip-html">
+&lt;div class="input-group bootstrap-timepicker"&gt;
+	&lt;input type="text" class="form-control ui-timepicker-modal" placeholder="Choose Time"&gt;
+	&lt;span class="input-group-addon"&gt;&lt;i class="fa fa-clock-o"&gt;&lt;/i&gt;&lt;/span&gt;
+&lt;/div&gt;
+</pre>
+
+	</div>
+<div id="helper-icheck" data-title="iCheck" class="bs-docs-section-sub">
+
+		<h3>iCheck</h3>
+
+		<p>To utilize the iCheck helper, add the class <code>.icheck-input</code> to your <code>input:checkbox</code> and <code>input:radio</code> elements.</p>
+
+	<pre class="snip-html">
+&lt;input type="checkbox" name="check" class="ui-check" value=""&gt;
+&lt;input type="radio" name="radio" class="ui-check" value=""&gt;
+
+</pre>
+
+	</div>
+
+<div id="helper-lightbox" data-title="Lightbox" class="bs-docs-section-sub">
+
+		<h3>Lightbox</h3>
+
+		<h4>Single Image Lightbox</h4>
+
+		<p>To utilize the lightbox helper, add the class <code>.ui-lightbox</code> to the <code>a</code> element for the full sized image.</p>
+
+	<pre class="snip-html">
+&lt;a href="FULL_IMAGE_PATH" class="ui-lightbox"&gt;Open Larger Image&lt;/a&gt;
+</pre>
+
+		<br>
+
+		<h4>Gallery Image Lightbox</h4>
+
+		<p>To utilize the lightbox gallery helper, add a <code>div</code> with the class <code>.ui-lightbox-gallery</code> as a wrapper for the desired full image links.</p>
+
+	<pre class="snip-html">
+&lt;div class="ui-lightbox-gallery"&gt;
+	&lt;a href="FULL_IMAGE_PATH"&gt;Open Larger Image&lt;/a&gt;
+	&lt;a href="FULL_IMAGE_PATH"&gt;Open Larger Image&lt;/a&gt;
+	&lt;a href="FULL_IMAGE_PATH"&gt;Open Larger Image&lt;/a&gt;
+&lt;/div&gt;
+</pre>
+
+		<br>
+
+		<h4>iFrame Lightbox</h4>
+
+		<p>To utilize the lightbox iframe helper, add the class <code>.ui-lightbox-iframe</code> to the <code>a</code> element for the external page you would like to display.</p>
+
+	<pre class="snip-html">
+&lt;a href="GOOGLE_MAP_URL" class="ui-lightbox-iframe"&gt;Open Google Mape&lt;/a&gt;
+</pre>
+
+	</div>
+<div id="helper-select2" data-title="Select2" class="bs-docs-section-sub">
+
+		<h3>Select2</h3>
+
+		<p>To utilize the basic Select2 helper, add the class <code>.select2-input</code> to your <code>select</code> element.</p>
+
+	<pre class="snip-html">
+&lt;select name="select" class="form-control ui-select"&gt;
+	&lt;option value=""&gt;Please Select&lt;/option&gt;
+	&lt;option value="1"&gt;1&lt;/option&gt;
+	&lt;option value="2"&gt;2&lt;/option&gt;
+&lt;/select&gt;
+</pre>
+
+	</div>
+<div id="helper-colorpicker" data-title="Color Picker" class="bs-docs-section-sub">
+
+		<h3>Simple Color Picker</h3>
+
+		<p>To utilize the basic Color Picker helper, add the class <code>.ui-colorpicker</code> to your <code>select</code> element.</p>
+
+    <h4>Default Usage:</h4>
+	<pre class="snip-html">
+&lt;select class="form-control ui-colorpicker"&gt;
+  &lt;!-- Colors from Google Calendar --&gt;
+  &lt;option value="#ffffff"&gt;Select&lt;/option&gt;
+  &lt;option value="#e5412d"&gt;Red&lt;/option&gt;
+  &lt;option value="#f0ad4e"&gt;Yellow&lt;/option&gt;
+  &lt;option value="#428bca"&gt;Blue&lt;/option&gt;
+  &lt;option value="#5cb85c"&gt;Green&lt;/option&gt;
+  &lt;option value="#5bc0de"&gt;Teal&lt;/option&gt;
+&lt;/select&gt;
+</pre>
+
+<br />
+
+    <h4>Component Usage:</h4>
+  <pre class="snip-html">
+&lt;select class="form-control ui-colorpicker" data-picker="true"&gt;
+  &lt;!-- Colors from Google Calendar --&gt;
+  &lt;option value="#ffffff"&gt;Select&lt;/option&gt;
+  &lt;option value="#e5412d"&gt;Red&lt;/option&gt;
+  &lt;option value="#f0ad4e"&gt;Yellow&lt;/option&gt;
+  &lt;option value="#428bca"&gt;Blue&lt;/option&gt;
+  &lt;option value="#5cb85c"&gt;Green&lt;/option&gt;
+  &lt;option value="#5bc0de"&gt;Teal&lt;/option&gt;
+&lt;/select&gt;
+</pre>
+
+	</div>
+<div id="helper-tooltips" data-title="Tooltips" class="bs-docs-section-sub">
+
+		<h3>Tooltips</h3>
+
+		<h4>Popover Helper</h4>
+
+		<p>To utilize the popover helper, add the class <code>.ui-popover</code> to the element you would like to connect the popover to.</p>
+
+	<pre class="snip-html">
+&lt;a href="javascript:;" 
+		class="ui-popover" 
+		title="Tooltip content here." 
+		data-content="Popover content here."&gt;
+		Popover
+&lt;/a&gt;</pre>
+
+		<br/>
+
+		<h4>Tooltip Helper</h4>
+
+		<p>To utilize the tooltip helper, add the class <code>.ui-tooltip</code> to the element you would like to connect the tooltip to.</p>
+
+	<pre class="snip-html">
+&lt;a href="javascript:;" 
+		class="ui-tooltip" 
+		title="Tooltip content here."&gt;
+		Tooltip
+&lt;/a&gt;</pre>
+
+	</div>
+
+</section>
+
+<section id="start-changelog" data-title="Changelog" class="bs-docs-section">
+
+<h1 class="section-header">Changelog</h1>
+
+<div id="changelog-7" data-title="v3.0.0" class="bs-docs-section-sub">
+
+  <h3>Version 3.0.0 - <small>June 3rd, 2016</small></h3>
+
+  <ul class="icons-list">
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Admin Dashboard Layout #2
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Simple Colorpicker 0.3.0
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Summernote 0.8.1
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> jQuery UI Slider 1.11.4
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> jQuery Steps 1.1.0
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Theme Styling
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Bootstrap 3.3.6
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Font Awesome 4.6.3
+    </li>
+  </ul>
+
+
+</div>
+
+<div id="changelog-6" data-title="v2.1.0" class="bs-docs-section-sub">
+
+  <h3>Version 2.1.0 - <small>September 21st, 2015</small></h3>
+
+  <ul class="icons-list">
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Team Page
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Company Page
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Price Table Comparison
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Job Openings
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Maintenance Page
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Product Tour
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Gap CSS 1.0.0
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Select2 Bootstrap Theme 0.1.0-beta.4
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Macbook PSD
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> iPhone PSD
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> iPad2 PSD
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Flat Browser PSD
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>FIX:</strong> Replaced line break helper
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Bootstrap 3.3.5
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Font Awesome 4.4.0
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Flot Tooltip 0.8.5
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Datatables 1.10.8
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Select2 4.0.0
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Parsley 2.0.7
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Animate.css 3.2.6
+    </li>
+  </ul>
+
+
+
+
+
+</div>
+
+<div id="changelog-5" data-title="v2.0.1" class="bs-docs-section-sub">
+
+  <h3>Version 2.0.1 - <small>March 28th, 2015</small></h3>
+
+  <ul class="icons-list">
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>FIX:</strong> JS Path Fix
+    </li>
+  </ul>
+
+</div>
+
+<div id="changelog-4" data-title="v2.0" class="bs-docs-section-sub">
+
+	<h3>Version 2.0 - <small>March 28th, 2015</small></h3>
+
+	<ul class="icons-list">
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>ENHANCEMENT:</strong> Redesigned Landing Page Theme
+    </li>
+
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Launch Theme
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Slim Scroll 1.3.3
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Select2 3.5.1
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> iCheck 1.0.2
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Datepicker 1.3.0
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Timepicker 0.2.6
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> DownCount 1.0.0
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> VegasJS 1.3.5
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>NEW:</strong> Datatable Helper 0.1.0
+    </li>
+
+		<li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Bootstrap 3.3.2
+    </li>
+		<li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Font Awesome 4.3.0
+    </li>
+		<li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> jQuery 1.11.1
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Parsly 2.0.5
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> File Upload 3.1.3
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Data Tables 1.10.3
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Magnific Popup 0.9.9
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Flot 0.8.3
+    </li>
+	</ul>
+
+
+</div>
+
+<div id="chagelog-3" data-title="v1.1" class="bs-docs-section-sub">
+
+<h3>Version 1.1.0 - <small>May 21st, 2014</small></h3>
+
+  <ul class="icons-list">
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Bootstrap to 3.1.1 from 3.0.3
+    </li>
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>UPDATE:</strong> Font Awesome to 4.1.0 from 4.0.3
+    </li>
+  </ul>
+
+</div>
+
+<div id="chagelog-2" data-title="v1.1" class="bs-docs-section-sub">
+
+<h3>Version 1.0.1 - <small>May 19th, 2014</small></h3>
+
+  <ul class="icons-list">
+    <li>
+      <i class="icon-li icon-double-angle-right"></i>
+      <strong>FIX:</strong> Responsive bug fix on iPad
+    </li>
+  </ul>
+
+</div>
+
+
+<div id="changelog-1" data-title="v1.0" class="bs-docs-section-sub">
+
+	<h3>Version 1.0 - <small>February 6th, 2014</small></h3>
+
+	<ul class="icons-list">
+		<li>
+			<i class="icon-li icon-double-angle-right"></i>
+			Initial Release
+		</li>
+	</ul>
+
+</div>
+
+
+
+</section>
+
+      </div>
+
+    </div>
+  </div>
+
+    <!-- Footer
+  ================================================== -->
+  <footer class="bs-footer" role="contentinfo">
+    <div class="container">
+
+      
+      <p>Documentation licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+    
+      <ul class="footer-links">
+        <li><a href="./index.html">MVP Ready Docs v3.0.0</a></li>
+        <li class="muted">·</li>
+        <li><a href="http://jumpstartthemes.com">Jumpstart Themes</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- JS and analytics only. -->
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="./js/libs/jquery-1.8.1.min.js"></script>
+  <script src="./js/libs/bootstrap.min.js"></script>
+  <script src="./js/libs/handlebars.js"></script>
+  <script src="./js/plugins/snippet/jquery.snippet.min.js"></script>
+  <script src="./js/docs.js"></script>
+
+  
+  <script id="bs-sidenav-tmpl" type="text/x-handlebars-template">    
+  {{#sections}}
+    <li>
+      <a href="{{id}}">
+      {{title}}
+
+      {{#if subsCount}}
+      <small class="bs-sidenav-sub-count">({{subsCount}})</small>
+      {{/if}}
+      </a>
+
+      <ul class="nav">
+        {{#subs}}
+        <li>
+          <a href="{{id}}">--&nbsp;&nbsp;{{title}}</a>
+        </li>
+        {{/subs}}
+      </ul>
+    </li>
+  {{/sections}}  
+  </script>
+  
+
+</body>
+
+</html>

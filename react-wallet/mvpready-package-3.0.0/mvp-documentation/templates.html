@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<title>
+		Templates
+		
+		- 
+		
+		MVP Ready Docs v3.0.0
+	</title>
+
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<!-- Font Awesome -->
+	<link href="./css/font-awesome.min.css" rel="stylesheet">
+
+	<!-- Bootstrap core CSS -->
+	<link href="./css/bootstrap.css" rel="stylesheet">
+
+	
+
+	<!-- Documentation core CSS -->
+	<link href="./css/docs.css" rel="stylesheet">
+
+
+	<link href="./js/plugins/snippet/jquery.snippet.min.css" rel="stylesheet">
+
+	
+
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+	  <script src="./js/libs/html5shiv.js"></script>
+	  <script src="./js/libs/respond.min.js"></script>
+	<![endif]-->
+
+	<!-- Favicons -->
+	<link rel="shortcut icon" href="./assets/ico/favicon.ico">
+
+</head>
+
+<body>
+  <a class="sr-only" href="#content">Skip navigation</a>
+
+  <!-- Docs master nav -->
+  <header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" role="banner">
+    <div class="container">
+
+      <div class="navbar-header">
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <a href="./index.html" class="navbar-brand">MVP Ready 3.0.0</a>
+      </div>
+
+      <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <ul class="nav navbar-nav">
+          <li class="">
+          <a href="./getting-started.html">Getting started</a>
+          </li>
+          <li class="">
+          <a href="./components.html">Components</a>
+          </li>
+          <li class="active">
+          <a href="./templates.html">Templates</a>
+          </li>
+          <li class="">
+          <a href="./third-party.html">Third Party</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Docs page layout -->
+  <div class="bs-header" id="content">
+    <div class="container">
+      <h1>Templates</h1>
+    </div>
+  </div>
+
+  <div class="container bs-docs-container">
+    <div class="row">
+
+      <div id="sidebar" class="col-md-3">
+        <div class="bs-sidebar hidden-print affix-top" role="complementary">
+          <ul class="nav bs-sidenav">
+
+          </ul>
+        </div>
+      </div>
+
+      <div id="main" class="col-md-9" role="main">
+
+<section id="templates-admin" data-title="Admin Template" class="bs-docs-section">
+<h1 class="section-header">Admin Template</h1>
+
+
+
+
+<div id="admin-notification" data-title="Notifications" class="bs-docs-section-sub">
+
+	<h2>Notifications</h2>
+<p>Below is an example of a navbar notification. Use this template to get started creating your own notification items within the navbar.</p>
+<br>
+
+<h3>Example HTML</h3>
+
+<pre class="snip-html">
+&lt;li class="dropdown navbar-notification"&gt;
+
+  &lt;a href="./page-notifications.html" class="dropdown-toggle" data-toggle="dropdown"&gt;
+    &lt;i class="fa fa-bell navbar-notification-icon"&gt;&lt;/i&gt;
+    &lt;span class="visible-xs-inline"&gt;&nbsp;Notifications&lt;/span&gt;
+    &lt;b class="badge badge-primary"&gt;3&lt;/b&gt;
+  &lt;/a&gt;
+
+  &lt;div class="dropdown-menu"&gt;
+
+    &lt;div class="dropdown-header"&gt;&nbsp;Notifications&lt;/div&gt;
+
+    &lt;div class="notification-list"&gt;
+      &lt;a href="./page-notifications.html" class="notification"&gt;
+        &lt;span class="notification-icon"&gt;&lt;i class="fa fa-cloud-upload text-primary"&gt;&lt;/i&gt;&lt;/span&gt;
+        &lt;span class="notification-title"&gt;Notification Title&lt;/span&gt;
+        &lt;span class="notification-description"&gt;Praesent dictum nisl non est sagittis luctus.&lt;/span&gt;
+        &lt;span class="notification-time"&gt;20 minutes ago&lt;/span&gt;
+      &lt;/a&gt;
+    &lt;/div&gt;
+
+    &lt;a href="./page-notifications.html" class="notification-link"&gt;View All Notifications&lt;/a&gt;
+
+  &lt;/div&gt;
+
+&lt;/li&gt;
+</pre>
+
+<br><br>
+
+<br>
+
+<h3>Empty Notification HTML</h3>
+
+<pre class="snip-html">
+&lt;li class="dropdown navbar-notification empty"&gt;
+
+  &lt;a href="./page-notifications.html" class="dropdown-toggle" data-toggle="dropdown"&gt;
+    &lt;i class="fa fa-warning navbar-notification-icon"&gt;&lt;/i&gt;
+    &lt;span class="visible-xs-inline"&gt;&nbsp;&nbsp;Alerts&lt;/span&gt;
+  &lt;/a&gt;
+
+  &lt;div class="dropdown-menu"&gt;
+
+    &lt;div class="dropdown-header"&gt;Alerts&lt;/div&gt;
+
+    &lt;div class="notification-list"&gt;
+      &lt;h4 class="notification-empty-title"&gt;No alerts here.&lt;/h4&gt;
+      &lt;p class="notification-empty-text"&gt;Check out what other makers are doing on Explore!&lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;a href="./page-notifications.html" class="notification-link"&gt;View All Alerts&lt;/a&gt;
+
+  &lt;/div&gt;
+
+&lt;/li&gt;          
+</pre>
+
+
+</div>
+
+
+
+
+<div id="admin-portlet" data-title="Portlets" class="bs-docs-section-sub">
+
+	<h2>Portlet</h2>
+
+	<h3>Example HTML</h3>
+
+	<p>Below is the example html for a portlet container. Portlets will usually go directly inside of a Bootstrap column, but could really go anywhere.</p>
+
+<pre class="snip-html">
+&lt;div class="portlet"&gt;
+
+  &lt;h4 class="portlet-title"&gt;
+    Daily Stats
+  &lt;/h4&gt;
+
+  &lt;div class="portlet-body"&gt;   
+	 &lt;!-- Example Content --&gt;
+  &lt;/div&gt;
+
+&lt;/div&gt;</pre>
+
+</div>
+
+
+
+
+
+
+
+
+<div id="admin-social" data-title="Social Feed" class="bs-docs-section-sub">
+
+<h2>Social Feed</h2>
+
+<h3>Feed Item Example</h3>
+
+<p>An example of the <code>.feed-item</code> html shown below.</p>
+
+<pre class="snip-html">
+&lt;div class="feed-item"&gt;
+
+	&lt;div class="feed-icon"&gt;
+		&lt;i class="icon-lightbulb"&gt;&lt;/i&gt;
+	&lt;/div&gt; &lt;!-- /.feed-icon --&gt;
+
+	&lt;div class="feed-subject"&gt;
+		&lt;a href="javascript:;"&gt;Rod Howard&lt;/a&gt; shared an idea: &lt;a href="javascript:;"&gt;New Idea&lt;/a&gt;
+	&lt;/div&gt; &lt;!-- /.feed-subject --&gt;
+
+	&lt;div class="feed-content"&gt;
+		&lt;p&gt;
+			&lt;i class="icon-quote-left"&gt;&lt;/i&gt; 
+			Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.
+		&lt;/p&gt;
+	&lt;/div&gt; &lt;!-- /.feed-content --&gt;
+
+	&lt;div class="feed-actions"&gt;
+		&lt;a href="javascript:;" class="pull-left"&gt;&lt;i class="icon-thumbs-up"&gt;&lt;/i&gt; 123&lt;/a&gt; 
+		&lt;a href="javascript:;" class="pull-left"&gt;&lt;i class="icon-comment-alt"&gt;&lt;/i&gt; 29&lt;/a&gt;
+
+		&lt;a href="javascript:;" class="pull-right"&gt;&lt;i class="icon-time"&gt;&lt;/i&gt; 2 days ago&lt;/a&gt;
+	&lt;/div&gt; &lt;!-- /.feed-actions --&gt;
+
+&lt;/div&gt; &lt;!-- /.feed-item --&gt;
+</pre>
+
+
+<br><br>
+
+	<h3>Feed Item Types</h3>
+
+	<p>Use feed item types of change the color of the <code>.feed-icon</code> for your post.</p>
+
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>Type</th>
+				<th>Class Name</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr>
+				<td>Idea</td>
+				<td><code>.feed-item-idea</code></td>
+			</tr>
+			<tr>
+				<td>Image</td>
+				<td><code>.feed-item-image</code></td>
+			</tr>
+			<tr>
+				<td>File</td>
+				<td><code>.feed-item-file</code></td>
+			</tr>
+			<tr>
+				<td>Bookmark</td>
+				<td><code>.feed-item-bookmark</code></td>
+			</tr>
+			<tr>
+				<td>Question</td>
+				<td><code>.feed-item-question</code></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<br />
+
+	<pre class="snip-html">
+&lt;div class="feed-item feed-item-idea"&gt;
+
+&lt;/div&gt;
+</pre>
+
+
+
+</div>	
+</section>
+
+<section id="templates-landing" data-title="Landing Template" class="bs-docs-section">
+<h1 class="section-header">Landing Template</h1>
+<div id="landing-masthead" data-title="Masthead" class="bs-docs-section-sub">
+
+	<h2>Masthead</h2>
+
+<br>
+
+<h3>Slide Items</h3>
+
+The easist method to update the look and feel of a masthead item is to add inline background properties directly to the <code>.item</code> element. An example is below where the background-color and background-image properties are set.</p>
+
+
+
+<pre class="snip-html">
+&lt;div class="item active" style="background-color: #354b5e; background-image: url();"&gt;
+
+  &lt;div class="container"&gt;
+
+    &lt;div class="row"&gt;
+
+      &lt;div class="col-md-6 masthead-text"&gt;
+        &lt;div class="masthead-actions"&gt;&lt;/div&gt; &lt;!-- /.masthead-actions --&gt;
+      &lt;/div&gt; &lt;!-- /.masthead-text --&gt;
+
+      &lt;div class="col-md-6 masthead-img"&gt;
+        &lt;img src="img/masthead/mobile.png" alt="slide2" class="img-responsive" /&gt;     
+      &lt;/div&gt; &lt;!-- /.masthead-img --&gt;
+
+    &lt;/div&gt; &lt;!-- /.row --&gt;
+
+  &lt;/div&gt; &lt;!-- /.container --&gt;
+
+&lt;/div&gt; &lt;!-- /.item --&gt;
+</pre>
+
+<br><br>
+
+<h3>Layouts</h3>
+
+<p>The layouts of the masthead items are controlled using the Bootstrap grid system. You can create many different layouts using the system along with shifting the position of columns via CSS.</p>
+
+
+</div>
+
+
+
+
+
+
+<div id="landing-feature-lg" data-title="Features Large" class="bs-docs-section-sub">
+
+	<h2>Features Large</h2>
+
+<br>
+
+<h3>Feature Image Left Aligned</h3>
+
+<pre class="snip-html">
+&lt;div class="feature-lg"&gt;
+
+  &lt;div class="row"&gt;
+    
+    &lt;div class="col-sm-6"&gt;
+      &lt;figure class="feature-figure"&gt;
+        &lt;img src="" class="img-responsive" alt=""&gt;
+      &lt;/figure&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="col-sm-6"&gt;
+      &lt;div class="feature-content"&gt;
+        &lt;h3&gt;Fully flexible user interface&lt;/h3&gt;
+        &lt;p&gt;Magnis modipsae que lib voloratati andigen daepeditem quiate ut reporemni aut labor.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    
+  &lt;/div&gt;
+
+&lt;/div&gt;
+</pre>
+
+
+<br><br>
+
+<h3>Feature Image Right Aligned</h3>
+
+<pre class="snip-html">
+&lt;div class="feature-lg figure-right"&gt;
+
+  &lt;div class="row inner-top-md"&gt;
+    
+    &lt;div class="col-sm-6 col-sm-push-6 "&gt;
+      &lt;figure class="feature-figure"&gt;
+        &lt;img src="" class="img-responsive" alt=""&gt;
+      &lt;/figure&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="col-sm-6 col-sm-pull-6"&gt;
+      &lt;div class="feature-content"&gt;
+        &lt;h3&gt;Over 14,000 designs available&lt;/h3&gt;
+        &lt;p&gt;Magnis modipsae que lib voloratati andigen daepeditem quiate es reporemus aut labor.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    
+  &lt;/div&gt;
+
+&lt;/div&gt;
+</pre>
+
+
+</div>
+
+
+
+
+
+
+<div id="landing-feature-sm" data-title="Features Small" class="bs-docs-section-sub">
+
+	<h2>Features Small</h2>
+
+<br>
+
+<h3>Example HTML</h3>
+
+<p>Example HTML to create a small feature item with large item at the top. This should usually be display within a Bootstrap grid column <code>.col-md-4</code>.</p>
+
+<pre class="snip-html">
+&lt;div class="feature-sm"&gt;
+  &lt;i class="fa fa-anchor feature-sm-icon text-secondary"&gt;&lt;/i&gt;
+
+  &lt;h3 class="feature-sm-label"&gt;Feature Title #1&lt;/h3&gt;
+
+  &lt;p class="feature-sm-content"&gt;
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+  &lt;/p&gt;
+&lt;/div&gt;  
+</pre>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="landing-testimonial" data-title="Testimonials" class="bs-docs-section-sub">
+
+	<h2>Testimonials</h2>
+
+<br>
+
+<h3>Example HTML</h3>
+
+<p>Example HTML to create a testimonial item. This should usually be display within a Bootstrap grid column <code>.col-md-4</code>.</p>
+
+<pre class="snip-html">
+&lt;div class="testimonial"&gt;
+
+  &lt;div class="testimonial-icon bg-secondary"&gt;
+    &lt;i class="fa fa-quote-left"&gt;&lt;/i&gt;
+  &lt;/div&gt;
+
+  &lt;div class="testimonial-content"&gt;
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit.
+  &lt;/div&gt;
+
+  &lt;div class="testimonial-author"&gt;
+    &lt;div class="testimonial-image"&gt;
+      &lt;img alt="" src=""&gt;
+    &lt;/div&gt;
+
+    &lt;div class="testimonial-author-info"&gt;
+      &lt;h5&gt;&lt;a href="#"&gt;Peter Landt&lt;/a&gt;&lt;/h5&gt; @peterlandt
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+&lt;/div&gt; 
+</pre>
+
+
+</div>
+</section>
+
+<section id="templates-launch" data-title="Launch Template" class="bs-docs-section">
+<h1 class="section-header">Launch Template</h1>
+<div id="templates-launch-intro" data-title="Editing" class="bs-docs-section-sub">
+
+
+	<p>This template is the most straight-forward template of the three. Just view the source of the <code>index.html</code> and <code>mvpready-launch.js</code> files to update the template.</p>
+
+</div>
+</section>
+
+      </div>
+
+    </div>
+  </div>
+
+    <!-- Footer
+  ================================================== -->
+  <footer class="bs-footer" role="contentinfo">
+    <div class="container">
+
+      
+      <p>Documentation licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p>
+    
+      <ul class="footer-links">
+        <li><a href="./index.html">MVP Ready Docs v3.0.0</a></li>
+        <li class="muted">·</li>
+        <li><a href="http://jumpstartthemes.com">Jumpstart Themes</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- JS and analytics only. -->
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="./js/libs/jquery-1.8.1.min.js"></script>
+  <script src="./js/libs/bootstrap.min.js"></script>
+  <script src="./js/libs/handlebars.js"></script>
+  <script src="./js/plugins/snippet/jquery.snippet.min.js"></script>
+  <script src="./js/docs.js"></script>
+
+  
+  <script id="bs-sidenav-tmpl" type="text/x-handlebars-template">    
+  {{#sections}}
+    <li>
+      <a href="{{id}}">
+      {{title}}
+
+      {{#if subsCount}}
+      <small class="bs-sidenav-sub-count">({{subsCount}})</small>
+      {{/if}}
+      </a>
+
+      <ul class="nav">
+        {{#subs}}
+        <li>
+          <a href="{{id}}">--&nbsp;&nbsp;{{title}}</a>
+        </li>
+        {{/subs}}
+      </ul>
+    </li>
+  {{/sections}}  
+  </script>
+  
+
+</body>
+
+</html>

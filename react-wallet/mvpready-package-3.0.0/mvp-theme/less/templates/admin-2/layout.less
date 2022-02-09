@@ -1,0 +1,64 @@
+body {
+  background: @layout-bg;
+}
+
+@media (max-width: @screen-sm-max) {
+  .sidebar-opened {
+    .sidebar {
+      display: block;
+
+      left: 0;
+      right: 0;
+
+      width: auto;
+    }
+
+    .sidebar-inner {
+      display: block;
+
+      width: 100%;
+    }
+  }
+
+  .sidebar-toggle {
+    text-align: center;
+
+    display: block;
+
+    padding: 12px 10px;
+
+    color: @brand-primary;
+
+    font-size: 18px;
+
+    cursor: pointer;
+  }
+}
+
+
+
+@media (min-width: @screen-md-min) {
+  .layout-fixed {
+    .navbar {
+      position: fixed;
+
+      top: 0;
+      right: 0;
+      left: 0;
+
+      z-index: 1030;
+    }
+
+    .sidebar {
+      bottom: 50px;
+      height: 100%;
+      padding-bottom: 50px;
+      margin-top: 0px;
+      position: fixed;
+    }
+
+    .content-page {
+      top: 54px;
+    }
+  }
+}

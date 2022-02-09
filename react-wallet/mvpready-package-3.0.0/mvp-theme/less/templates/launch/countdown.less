@@ -1,0 +1,38 @@
+//* !Counter */
+//* ----------------------------------------------- */
+
+.counter {
+
+  padding: 0;
+
+  h2 { 
+    margin-bottom: 15px; 
+
+    font-weight: 500; 
+    font-size: 30px; 
+  }
+}
+
+ul.countdown li { 
+  width: 49%;
+  margin: 0 0 15px; 
+
+  .days,
+  .hours,
+  .minutes,
+  .seconds { font-family: @font-stack-heading; font-size: 28px; font-weight: 600; }
+
+  .days_ref,
+  .hours_ref,
+  .minutes_ref,
+  .seconds_ref { display: block; font-size: 14px; color: #999; margin-bottom: 0; }
+}
+
+@media (min-width: @screen-xs-min) {
+  ul.countdown li {
+    width: auto;
+
+    margin: 0 12px; 
+  }
+}
+  
