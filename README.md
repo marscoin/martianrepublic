@@ -25,10 +25,11 @@ Thank you for considering contributing to the Martian Republic project!
 ## Installation
 
 
-#For Mars
+### For Mars
 Copy project onto USB stick, including a copy of the Marscoin ledger, Marscoin node, IPFS node - then take a SpaceX Starship to Mars and upon arrival bootstrap an entire economic and governance hub using MartianRepublic.
 
-#...In the meantime
+### ...In the meantime
+Checkout from github, then:
 
 `composer update`
 
