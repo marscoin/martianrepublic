@@ -60,6 +60,7 @@
           </button>
         </div> 
       </form>
+      <a href="/logout"><i class="fa fa-angle-double-left"></i> &nbsp;Back to Login</a>
     </div>
 
 
