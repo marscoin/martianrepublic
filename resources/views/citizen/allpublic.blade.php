@@ -53,7 +53,7 @@
                         </td>
                     </tr>
 
-                    <tr>
+                    {{-- <tr>
                         <td>
                             <img id="photo" src="/assets/citizen/generic_profile.jpg"
                                 class="profile-avatar-img thumbnail" alt="Profile Image">
@@ -67,9 +67,9 @@
                         <td class="file-info valign-middle">
                             <span class="label label-default demo-element public-status">General Public</span>
                         </td>
-                    </tr>
+                    </tr> --}}
 
-                    <tr>
+                    {{-- <tr>
                         <td>
 
                             <img id="photo" src="/assets/citizen/generic_profile.jpg"
@@ -85,7 +85,7 @@
                         <td class="file-info valign-middle">
                             <span class="label label-default demo-element public-status">General Public</span>
                         </td>
-                    </tr>
+                    </tr> --}}
 
 
                 </tbody>
@@ -215,7 +215,7 @@
 
 <?php foreach($everyPublic as $gp){?>
 
-<div id="endorseModal_{{{$gp->id}}}" class="modal fade dyanmic-vote-modal">
+<div id="endorseModal_{{{$gp->id}}}" class="modal fade dynamic-vote-modal">
 
   <div class="modal-dialog">
 
@@ -236,30 +236,33 @@
                   <h5> User Address </h5>
                   <p class="modal-description">{{$gp->address}}</p>
               </div>
-
-
+            
               <div class="modal-body-box">
                   <h5>Cost of Endorsement: </h5>
                   <h3 class="modal-cost"></h3>
               </div>
 
               <div class="modal-message" style="display: none">
-                  <i class="fa fa-times-circle"></i>
+                  
                   <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
-                  <span id="modal-message-success" style="font-weight: 600"> </span>
+                  <span id="modal-message-success" style="font-weight: 600"> <i class="fa fa-check-circle"></i> Successfully Endorsed <h3>{{$gp->fullname}}</h3></span>
               </div>
-          </div> <!-- /.modal-body -->
-         
+              <div class="modal-message" style="display: flex, align-items: center">
+                    <a  rel="noreferrer noopener"  target="_blank"  class="transaction-hash-link" href="">
+                        <h5 class="transaction-hash">
+            
+            
+                        </h5>
+                    </a>
+                </div>
+
+            </div> <!-- /.modal-body -->
+          
 
 
           <div class="modal-footer">
-            <a class="transaction-hash-link" href="">
-              <h5 class="transaction-hash">
-  
-  
-              </h5>
-            </a>
-              <button id="confirm-endorse-btn" type="submit" class="btn btn-primary submit-endorse">Confirm Endorsement</button>
+          
+              <button id="confirm-endorse-btn-{{{$gp->address}}}" type="submit" class="btn btn-primary submit-endorse">Confirm Endorsement</button>
               <img src="https://i.stack.imgur.com/FhHRx.gif" alt="enter image description here"
                   style="display: none" id="loading">
           </div> <!-- /.modal-footer -->
@@ -278,6 +281,10 @@
 <script src="/assets/wallet/js/dist/my_bundle.js"></script>
 <script>
     $(document).ready(function() {
+
+        $('.dynamic-vote-modal').on('hidden.bs.modal', function () {
+            location.reload();
+        })
 
       const Marscoin = {
         mainnet: {
@@ -343,14 +350,15 @@
 
             $(".modal-cost").text(total_amount + " MARS")
 
-            $(`#confirm-endorse-btn`).click(async (e) => {
+            $(`#confirm-endorse-btn-${id}`).click(async (e) => {
+                console.log("button clicked")
                 $("#loading").show()
-                // $(`#submit-${vote}-vote`).hide()
+                $(`.submit-endorse`).hide()
                 try {
                     const tx = await signMARS(message, mars_amount, io)
                     console.log(tx)
                     $("#loading").hide()
-                    $("#modal-message-success").show()
+                    $(".modal-message").show()
                     $(".transaction-hash-link").attr("href",
                         "https://explore.marscoin.org/tx/" + tx.tx_hash)
                     $(".transaction-hash").text(tx.tx_hash)

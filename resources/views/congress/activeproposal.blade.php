@@ -62,7 +62,7 @@
     </div>
 
     <!--YES MODAL -->
-    <div id="ProposalModal_{{{$proposal->id}}}_yes" class="modal fade dyanmic-vote-modal">
+    <div id="ProposalModal_{{{$proposal->id}}}_yes" class="modal fade dynamic-vote-modal">
 
         <div class="modal-dialog">
 
@@ -102,11 +102,13 @@
                         <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
                         <span id="modal-message-success" style="font-weight: 600"> </span>
                     </div>
+                    <div class="modal-message">
+                        <a class="transaction-hash-link" href="" target="_blank" rel="noreferrer noopener">
+                            <h5 class="transaction-hash">
+                            </h5>
+                        </a>
+                    </div>
                 </div> <!-- /.modal-body -->
-                <h5 class="transaction-hash">
-
-
-                </h5>
 
                 <div class="modal-footer">
                     <img src="https://i.stack.imgur.com/FhHRx.gif" alt="enter image description here"
@@ -123,7 +125,7 @@
     </div>
 
     <!--NO MODAL -->
-    <div id="ProposalModal_{{{$proposal->id}}}_no" class="modal fade dyanmic-vote-modal">
+    <div id="ProposalModal_{{{$proposal->id}}}_no" class="modal fade dynamic-vote-modal">
 
         <div class="modal-dialog">
 
@@ -163,11 +165,18 @@
                         <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
                         <span id="modal-message-success" style="font-weight: 600"> </span>
                     </div>
+
+                    <div class="modal-message">
+                        
+                        <a rel="noreferrer noopener" target="_blank" class="transaction-hash-link" href="" style="display: flex, text-align: center, align-items: center">
+                            <h5 class="transaction-hash">
+        
+        
+                            </h5>
+                        </a>
+                    </div>
                 </div> <!-- /.modal-body -->
-                <h5 class="transaction-hash">
-
-
-                </h5>
+              
 
                 <div class="modal-footer">
                     <span id="modal-message-success" style="font-weight: 600"> </span>
@@ -183,7 +192,7 @@
     </div>
 
     <!--NULL MODAL -->
-    <div id="ProposalModal_{{{$proposal->id}}}_null" class="modal fade dyanmic-vote-modal">
+    <div id="ProposalModal_{{{$proposal->id}}}_null" class="modal fade dynamic-vote-modal">
 
         <div class="modal-dialog">
 
@@ -222,12 +231,18 @@
                         <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
                         <span id="modal-message-success" style="font-weight: 600"> </span>
                     </div>
+                    <div class="modal-message">
+
+                        <a rel="noreferrer noopener"  target="_blank" class="transaction-hash-link" href="" style="display: flex, text-align: center, align-items: center">
+                            <h5 class="transaction-hash">
+        
+                            </h5>
+                        </a>
+                    </div>
+                    
+    
                 </div> <!-- /.modal-body -->
-                <h5 class="transaction-hash">
-
-
-                </h5>
-
+              
                 <div class="modal-footer">
                     <button id="submit-null-vote" type="submit" class="btn btn-primary">Vote</button>
                     <img src="https://i.stack.imgur.com/FhHRx.gif" alt="enter image description here"
@@ -244,6 +259,10 @@
 <script src="/assets/wallet/js/dist/my_bundle.js"></script>
 <script>
     $(document).ready(function() {
+
+        $('.dynamic-vote-modal').on('hidden.bs.modal', function () {
+            location.reload();
+        })
 
         ////// Proposal creation Logic..........
         // YES VOTE
@@ -270,9 +289,9 @@
         const buildAndSign = async (e, vote) =>
         {
             const message = "PR" + e.target.id
-            console.log("message:",message)
+            //console.log("message:",message)
 
-            const io = await sendMARS(1, "<?= $public_address ?>");
+            const io = await sendMARS(1, "{{$public_address}}");
 
             //const fee = marsConvert(io.fee);
             const fee = marsConvert(io.fee)
@@ -288,7 +307,6 @@
                 $(`#submit-${vote}-vote`).hide()
                 try {
                     const tx = await signMARS(message, mars_amount, io)
-                    console.log(tx)
                     $("#loading").hide()
                     $("#modal-message-success").show()
                     $(".transaction-hash-link").attr("href",
@@ -296,6 +314,7 @@
                     $(".transaction-hash").text("" + tx.tx_hash)
 
                 } catch (e) {
+                    handleError("signing mars")
                     throw e;
                 }
             })
@@ -309,7 +328,9 @@
         //console.log("send mars running...")
 
         // obtain utxo i/o
-        const sender_address = "<?= $public_address ?>".trim()
+        const public_address = "{{$public_address}}"
+        const sender_address = public_address.trim()
+
 
         // console.log("amount", mars_amount)
         // console.log("receiver", receiver_address)
@@ -329,8 +350,10 @@
     }
 
     const signMARS = async (message, mars_amount, tx_i_o) => {
+
         const mnemonic = localStorage.getItem("key").trim();
-        const sender_address = "<?= $public_address ?>".trim()
+        
+        const sender_address = "{{$public_address}}".trim()
 
         //const mnemonic = "business tattoo current news edit bronze ketchup wrist thought prize mistake supply"
         //console.log("Mnemonic:", mnemonic)
@@ -408,7 +431,7 @@
 
         try {
             const txId = await broadcastTxHash(txhash);
-
+            return txId
         } catch (e) {
             handleError()
             throw e;
