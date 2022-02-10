@@ -75,6 +75,9 @@
 
       <h5>Build the Future on Mars now. Join our community of Martians.</h5>
 
+      <!-- Validation Errors -->
+        <x-auth-validation-errors class="mb-4" :errors="$errors" />
+
       <form class="form account-form" method="POST" action="{{ route('register') }}">
       @csrf
       @if(Session::has('message'))
@@ -83,17 +86,17 @@
       
         <div class="form-group">
           <label for="signup-email" class="placeholder-hidden">Email Address</label>
-          <input type="text" class="form-control" name="email" id="signup-email" placeholder="Your Email" tabindex="1">
+          <input type="text" class="form-control" name="email" id="email" placeholder="Your Email" tabindex="1">
         </div> <!-- /.form-group -->
 
         <div class="form-group">
           <label for="signup-fullname" class="placeholder-hidden">Your Name</label>
-          <input type="text" class="form-control" name="fullname" id="signup-fullname" placeholder="Your Name" tabindex="2">
+          <input type="text" class="form-control" name="name" id="name" placeholder="Your Name" tabindex="2">
         </div> <!-- /.form-group -->
 
         <div class="form-group">
           <label for="login-password" class="placeholder-hidden">Password</label>
-          <input type="password" name="password" class="form-control" id="login-password" placeholder="Password" tabindex="4">
+          <input type="password" name="password" class="form-control" id="password" placeholder="Password" tabindex="4">
         </div> <!-- /.form-group -->
 
         <div class="form-group">
