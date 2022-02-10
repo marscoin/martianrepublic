@@ -39,8 +39,6 @@ Route::any('/wallet/getwallet', 'Wallet\DashboardController@getWallet');
 Route::any('/wallet/failwallet', 'Wallet\DashboardController@failWallet');
 
 Route::post('/wallet/createwallet', 'Wallet\DashboardController@postCreateWallet');
-Route::post('/wallet/register', 'Wallet\DashboardController@postRegister');
-Route::post('/wallet/loginattempt', 'Wallet\DashboardController@postLogin');
 Route::post('/wallet/dashboard/buy', 'Wallet\DashboardController@postBuy');
 
 Route::any('/check', 'Wallet\DashboardController@showChallenge');
