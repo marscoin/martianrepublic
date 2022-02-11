@@ -50,14 +50,23 @@
         @include('wallet.mainnav', array('active'=>'logbook', 'info'=>$network, 'balance' => $balance))
         <div class="content">
             <div class="container">
-                <div class="row">
-                    
-                    
-                </div> <!-- /.row -->
-                <div class="row">
-                    
-
-                </div> <!-- /.row -->
+                <?php if($wallet_open){ ?>
+                <div class="portlet">
+                    <div class="portlet-body">
+                        <h3>
+                            Under construction...
+                        </h3>
+                    </div>
+                </div>
+                 <?php }else{ ?>
+                <div class="portlet">
+                    <div class="portlet-body">
+                        <h3>
+                            Please open / connect your wallet in order to access the Research Logbook.
+                        </h3>
+                    </div>
+                </div>
+            <?php } ?>
             </div> <!-- /.container -->
         </div> <!-- .content -->
     </div> <!-- /#wrapper -->
