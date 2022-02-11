@@ -17,6 +17,7 @@ use App\Models\IPFSRoot;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Includes\jsonRPCClient;
+use App\Includes\AppHelper;
 
 class DashboardController extends Controller
 {

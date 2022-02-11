@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use App\Includes\jsonRPCClient;
+use App\Includes\AppHelper;
 
 
 class ApiController extends Controller {
