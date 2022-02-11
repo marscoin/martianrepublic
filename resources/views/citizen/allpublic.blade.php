@@ -159,8 +159,8 @@
             <div class="col-md-6 col-sm-6">
                 <div class="thumbnail">
                     <div class="thumbnail-view">
-                        <a href="/assets/citizen/mars_flag.png" class="thumbnail-view-hover ui-lightbox"></a>
-                        <img src="/assets/citizen/mars_flag.png" style="width: 100%" alt="Gallery Image">
+                         <a href="/assets/citizen/mars_flag_q1.png" class="thumbnail-view-hover ui-lightbox"></a>
+                            <img src="/assets/citizen/mars_flag_q1.png" style="width: 100%" alt="Gallery Image">
                     </div>
                 </div>
 
