@@ -54,7 +54,7 @@
                 <div class="portlet">
                     <div class="portlet-body">
                         <h3>
-                            Under construction...
+                            Under construction...Consider joining our developer community.
                         </h3>
                     </div>
                 </div>
