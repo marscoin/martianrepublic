@@ -72,6 +72,8 @@
 
             <div class="container">
 
+
+                <?php if($wallet_open){ ?>
                 <div class="portlet">
                     <div class="portlet-body">
 
@@ -112,7 +114,17 @@
 
                     </div> <!-- /.portlet-body -->
 
-                </div> <!-- /.portlet -->
+                </div>
+                <?php }else{ ?>
+                <div class="portlet">
+                    <div class="portlet-body">
+                        <h3>
+                            Please open / connect your wallet in order to access the Martian Citizen Congress.
+                        </h3>
+                    </div>
+                </div>
+            <?php } ?>    
+
 
             </div> <!-- /.container -->
 

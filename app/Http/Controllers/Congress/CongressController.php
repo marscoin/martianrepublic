@@ -86,17 +86,9 @@ class CongressController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-
+			
 			$view = View::make('congress.voting');
-			$view->proposals = $proposals;
-			$view->gravtar_link  = $gravtar_link;
-			$view->fullname = Auth::user()->fullname;
-			$view->isCitizen = true;
-			$view->isGP  = $profile->general_public;
-			$view->public_address = $wallet->public_addr;
-			$view->wallet_open = $profile->wallet_open;
-
+			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 
 			if (count($IPFS) > 0)
 				$view->ipfs_root_hash = $IPFS->last()->folder_hash;
@@ -106,9 +98,19 @@ class CongressController extends Controller
 			if ($wallet) {
 				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
 				$view->balance = ($cur_balance * 0.00000001);
+				$view->public_address = $wallet->public_addr;
 			} else {
 				$view->balance = 0;
 			}
+
+			$view->proposals = $proposals;
+			$view->gravtar_link  = $gravtar_link;
+			$view->fullname = Auth::user()->fullname;
+			$view->isCitizen = true;
+			$view->isGP  = $profile->general_public;
+			$view->wallet_open = $profile->wallet_open;
+
+
 
 			// echo "Hello, World";
 			// die();

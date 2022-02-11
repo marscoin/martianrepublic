@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Http\Controllers\Controller;
 use App\Models\HDWallet;
+use App\Includes\AppHelper;
 
-class InventoryController extends BaseController
+class InventoryController extends Controller
 {
 
 	/**
@@ -41,11 +42,25 @@ class InventoryController extends BaseController
 				}
 			}
 			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
+			
 			$view = View::make('inventory.dashboard');
+			$view->wallet_open = $profile->wallet_open;
 			$view->gravtar_link  = $gravtar_link;
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
+			$view->isCitizen = $profile->citizen;
+			$view->isGP  = $profile->general_public;
 			$view->balance = 0; //for now, could move to stats helper function as well
+			
+			if ($wallet) {
+				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
+				$view->balance = ($cur_balance * 0.00000001);
+				$view->public_address = $wallet['public_addr'];
+			} else {
+				$view->balance = 0;
+				$view->public_address = "";
+			}
+
 			return $view;
 
 

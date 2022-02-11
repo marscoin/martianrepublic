@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Http\Controllers\Controller;
 use App\Models\HDWallet;
+use App\Includes\AppHelper;
 
 class LogbookController extends Controller
 {
@@ -34,20 +35,33 @@ class LogbookController extends Controller
 			$wallet = HDWallet::where('user_id', '=', $uid)->first();
 
 			if (!$profile) {
-				return redirect('/twofa');
+				return Redirect::to('/twofa');
 			} else {
 				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-					return redirect('/twofachallenge');
+					return Redirect::to('/twofachallenge');
 				}
 			}
 			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
+			
 			$view = View::make('logbook.dashboard');
+			$view->wallet_open = $profile->wallet_open;
 			$view->gravtar_link  = $gravtar_link;
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
+			$view->isCitizen = $profile->citizen;
+			$view->isGP  = $profile->general_public;
 			$view->balance = 0; //for now, could move to stats helper function as well
-			return $view;
+			
+			if ($wallet) {
+				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
+				$view->balance = ($cur_balance * 0.00000001);
+				$view->public_address = $wallet['public_addr'];
+			} else {
+				$view->balance = 0;
+				$view->public_address = "";
+			}
 
+			return $view;
 
 		}else{
             return redirect('/login');
