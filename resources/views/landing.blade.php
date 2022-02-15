@@ -418,6 +418,7 @@
           <div class="col-sm-6 col-sm-pull-6 text-center">
             <br><br>
             <img class="img-responsive figure-shadow center-block shadow-lg" src="/assets/citizen/mars_flag5.png" >
+            <p style="font-size: 10px; text-align: left;" class="small">Fictional fan-made Mars flag from the Sci-Fi show "The Expanse" by James S. A. Corey. The Expanse portraits Mars as a sophisticated and technologically advanced society in which governance is closely and intimiately directed by self-empowered citizens.</p>
           </div> 
         </div> 
 
