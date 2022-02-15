@@ -94,13 +94,13 @@ class ApiController extends Controller {
 
 
 
-	public function permapinjson()
+	public function permapinjson(Request $request)
 	{
 		if (Auth::check()) {
 			$hash = "";
-			$json = Input::get('payload');
-			$type = Input::get('type');
-			$public_address = Input::get('address');
+			$json = $request->input('payload');
+			$type = $request->input('type');
+			$public_address = $request->input('address');
 			$file_path = "./assets/citizen/" . $public_address . "/";
 			if (!file_exists($file_path)) {
 				mkdir($file_path);
