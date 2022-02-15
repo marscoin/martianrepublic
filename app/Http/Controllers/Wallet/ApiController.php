@@ -121,5 +121,30 @@ class ApiController extends Controller {
 	}
 
 
+	public function setfeed(Request $request)
+	{
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$txid = $request->input('txid');
+			$action_tag = $request->input('type');
+			$public_address = $request->input('address');
+			$embedded_link = $request->input('embedded_link');
+
+			AppHelper::insertBlockchainCache($public_address, $uid, $action_tag, "", $embedded_link, $txid);
+
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$profile->general_public = 1;
+			$profile->save();
+
+			return (new Response(json_encode(array("Hash" => $hash)), 200))
+              ->header('Content-Type', "application/json;");
+
+		
+		}else{
+            return redirect('/login');
+        }
+	}
+
+
 
 }

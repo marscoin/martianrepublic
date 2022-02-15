@@ -147,6 +147,7 @@ $("#saveprofilebutton").click(function() {
     $.post("/api/permapinpic", {"type": "profile_pic", "picture": pic, "address": '<?=$public_address?>'} , function(data) {
         if(data){
             cid = data.Hash;
+            $("#pin_message").text("Pinned!").fadeIn().delay(2000).fadeOut("slow");
             $("#s_ipfs_profile_pic").text("https://ipfs.marscoin.org/ipfs/"+ cid);
             $("#photo").attr("src", "https://ipfs.marscoin.org/ipfs/"+ cid);
         }
@@ -181,6 +182,33 @@ $("#savevideo").click(function() {
 
 $("#publish").click(async (e) => {
     event.preventDefault();
+
+    if($('#firstname').val() == ""){
+        alert("First Name missing - required");
+        return false;
+    }
+    if($('#lastname').val() == ""){
+        alert("Last Name missing - required");
+        return false;
+    }
+    if($('#displayname').val() == ""){
+        alert("Display Name missing - required");
+        return false;
+    }
+    if($('#shortbio').val() == ""){
+        alert("Short bio missing - required");
+        return false;
+    }
+    if($('#s_ipfs_profile_pic').val() == "< IPFS_LINK >"){
+        alert("Please capture your profile picture first - required");
+        return false;
+    }
+    if($('#s_ipfs_liveness_vid').val() == "< IPFS_LINK >"){
+        alert("Please capture your short introductory video first - required");
+        return false;
+    }
+    
+
     //api
     $("#publish_progress").show();
     $("#publish_progress_message").text("Publishing...").delay(2500).fadeOut();
@@ -237,7 +265,8 @@ $("#publish").click(async (e) => {
         //$(".transaction-hash").text("" + tx.tx_hash)
         $("#publish_progress_message").text("Published successfully...").delay(2500).fadeOut();
         $("#publish_progress_message").text(tx.tx_hash);
-        document.location.reload();
+        const data = await doAjax("/api/setfeed", {"type": "GP", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+        //document.location.reload();
 
     } catch (e) {
         throw e;
