@@ -25,6 +25,7 @@
                       <div class="fileupload-new" style="width: 250px; height: 250px;">
                         <img id="photo" src="/assets/citizen/generic_profile.jpg" class="profile-avatar-img thumbnail" alt="Profile Image">
                       </div>
+                      <div id="pin_message"></div>
 
                       <div style="display: none;" class="camera">
                       <video id="photo-video">Video stream not available.</video>
