@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
 use App\Models\Feed;
+use App\Models\Profile;
 
 
 class ApiController extends Controller {
