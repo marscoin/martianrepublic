@@ -258,8 +258,6 @@ $("#publish").click(async (e) => {
 
     try {
         const tx = await signMARS(message, mars_amount, io)
-        console(tx)
-        console(tx.tx_hash)
         //$("#loading").hide()
         //$(".success-message").show()
         // $(".transaction-hash-link").attr("href",
@@ -407,10 +405,15 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     }
 
     var txId = "";
-    const txhash = psbt.finalizeAllInputs().extractTransaction().toHex()
+
+    const tx = psbt.finalizeAllInputs().extractTransaction(); 
+    const txhash = tx.toHex()
 
     try {
         const txId = await broadcastTxHash(txhash);
+        if(txId == ""){
+            txId = tx.getId();
+        }
 
     } catch (e) {
         handleError()
