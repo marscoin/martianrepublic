@@ -386,8 +386,6 @@
 
         // psbt.signInput(0, key);
 
-        //console.log(psbt.finalizeAllInputs().extractTransaction().toHex());
-        var txId = "";
         const txhash = psbt.finalizeAllInputs().extractTransaction().toHex()
 
         try {

@@ -223,25 +223,11 @@ $("#publish").click(async (e) => {
     obj.data.picture = $('#s_ipfs_profile_pic').text();
     obj.data.video = $('#s_ipfs_liveness_vid').text();
     var jsonString = JSON.stringify(obj.data);
-    $("#publish_progress_message").text("Generating data hash...").delay(2500).fadeOut();
+    $("#publish_progress_message").text("Generating data hash...");
     var m = sha256(jsonString);
     obj.meta.hash = m;
     var jsonString = JSON.stringify(obj);
     $("#publish_progress_message").text("Writing data to IPFS and cache...");
-    // $.post("/api/permapinjson", {"type": "registration", "payload": jsonString, "address": '<?=$public_address?>'} , function (data) {
-    //     if(data){
-    //         cid = data.Hash;
-    //         // $("#s_ipfs_profile_pic").text("https://ipfs.marscoin.org/ipfs/"+ cid);
-    //         // $("#photo").attr("src", "https://ipfs.marscoin.org/ipfs/"+ cid);
-    //         $("#publish_progress_message").text("CID acquired: " + cid).delay(2500).fadeOut();
-    //         $("#publish_progress_message").text("Blockchain anchoring in progress...").delay(2500).fadeOut();
-    //         //creating transaction with OP_RETURN "GP_CID"
-    //         $("#publish_progress_message").text("Finalizing passport...");
-
-
-    //     }
-    // })
-
     const data = await doAjax("/api/permapinjson", {"type": "registration", "payload": jsonString, "address": '<?=$public_address?>'});
     cid = data.Hash;
 
@@ -257,13 +243,8 @@ $("#publish").click(async (e) => {
     $(".conversion-rate").text(total_amount)
 
     try {
-        const tx = await signMARS(message, mars_amount, io)
-        //$("#loading").hide()
-        //$(".success-message").show()
-        // $(".transaction-hash-link").attr("href",
-        //     "https://explore.marscoin.org/tx/" + tx.tx_hash)
-        //$(".transaction-hash").text("" + tx.tx_hash)
-        $("#publish_progress_message").show().text("Published successfully...").delay(2500).fadeOut();
+        const tx = await signMARS(message, mars_amount, io);
+        $("#publish_progress_message").show().text("Published successfully...");
         $("#publish_progress_message").show().text(tx.tx_hash);
         const data = await doAjax("/api/setfeed", {"type": "GP", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
         if(data.Hash){
