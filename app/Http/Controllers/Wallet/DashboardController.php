@@ -130,7 +130,7 @@ class DashboardController extends Controller
 				// }
 			}
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -159,7 +159,7 @@ class DashboardController extends Controller
 				return $view;
 			}
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -183,7 +183,7 @@ class DashboardController extends Controller
 				}
 			}
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -304,7 +304,7 @@ class DashboardController extends Controller
 			}
 
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -377,7 +377,7 @@ class DashboardController extends Controller
 				return $view;
 			}
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -442,7 +442,7 @@ class DashboardController extends Controller
 
 
 		}else{
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -565,7 +565,7 @@ class DashboardController extends Controller
 
 			return $view;
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -591,7 +591,7 @@ class DashboardController extends Controller
 			$view->network = $network;
 			return $view;
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -623,7 +623,7 @@ class DashboardController extends Controller
 
 			return $view;
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -666,7 +666,7 @@ class DashboardController extends Controller
 			$view->network = $network;
 			return $view;
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -692,7 +692,7 @@ class DashboardController extends Controller
 			$view->network = $network;
 			return $view;
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -728,7 +728,7 @@ class DashboardController extends Controller
 
 			return $view;
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -767,7 +767,7 @@ class DashboardController extends Controller
 
 
 		}else{
-            return redirect('wallet/login');
+            return redirect('/login');
         }
 		
 	}
@@ -795,7 +795,7 @@ class DashboardController extends Controller
 
 			return $view;
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
@@ -823,7 +823,7 @@ class DashboardController extends Controller
 
 			return $view;
 		} else {
-			return redirect('wallet/login');
+			return redirect('/login');
 		}
 	}
 
