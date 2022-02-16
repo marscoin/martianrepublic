@@ -85,4 +85,4 @@ Route::post('/api/redeem', 'Wallet\ApiController@redeem');
 Route::post('/api/permapinpic', 'Wallet\ApiController@permapinpic');
 Route::post('/api/permapinvideo', 'Wallet\ApiController@permapinvideo');
 Route::post('/api/permapinjson', 'Wallet\ApiController@permapinjson');
-
+Route::post('/api/setfeed', 'Wallet\ApiController@setfeed');
