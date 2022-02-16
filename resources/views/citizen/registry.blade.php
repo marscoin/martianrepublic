@@ -249,15 +249,17 @@ $("#publish").click(async (e) => {
     const io = await sendMARS(1, "<?=$public_address?>");
 
     //const fee = marsConvert(io.fee);
-    const fee = 0.001
+    const fee = 0.01
     //console.log("THE FEE: ", fee);
-    const mars_amount = 0.001
+    const mars_amount = 0.01
     const total_amount = fee + parseInt(mars_amount)
     $(".estimated-fee").text("$ " + fee)
     $(".conversion-rate").text(total_amount)
 
     try {
         const tx = await signMARS(message, mars_amount, io)
+        console(tx)
+        console(tx.tx_hash)
         //$("#loading").hide()
         //$(".success-message").show()
         // $(".transaction-hash-link").attr("href",
@@ -466,7 +468,8 @@ const broadcastTxHash = async (txhash) => {
         const response = await fetch(url, {
             method: 'GET'
         });
-        return response.json() // parses JSON response into native JavaScript objects
+        const shorthash =  response.json() 
+        return shorthash;
     } catch (e) {
         throw e;
     }
