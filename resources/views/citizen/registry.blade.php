@@ -404,23 +404,17 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
         psbt.signInput(i, key);
     }
 
-    var txId = "";
-
     const tx = psbt.finalizeAllInputs().extractTransaction(); 
     const txhash = tx.toHex()
 
     try {
         const txId = await broadcastTxHash(txhash);
-        if(txId == ""){
-            txId = tx.getId();
-        }
+        return txId;
 
     } catch (e) {
         handleError()
         throw e;
     }
-
-    return txId;
 
 }
 
