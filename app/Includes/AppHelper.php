@@ -2,6 +2,7 @@
 
 
 namespace App\Includes;
+use App\Models\Feed;
 
 
 class AppHelper{
