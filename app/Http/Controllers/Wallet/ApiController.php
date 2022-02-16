@@ -138,7 +138,7 @@ class ApiController extends Controller {
 			$profile->general_public = 1;
 			$profile->save();
 
-			return (new Response(json_encode(array("Hash" => $hash)), 200))
+			return (new Response(json_encode(array("Hash" => $txid)), 200))
               ->header('Content-Type', "application/json;");
 
 		
