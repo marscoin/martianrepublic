@@ -28,6 +28,13 @@
                             </a>
                         </li>
 
+                        <li>
+                            <a target="_blank" href="https://ex.udonex.com/market/marsusdt">
+                                <i class="fa fa-area-chart"></i>
+                                Udonex
+                            </a>
+                        </li>
+
 
 
                     </ul>
