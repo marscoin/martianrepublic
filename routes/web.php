@@ -17,6 +17,9 @@ Route::get('/', function()
 });
 
 
+Route::get('/status', 'StatusController@showStatus');
+
+
 // 
 // Wallet
 // ==================================================================================
