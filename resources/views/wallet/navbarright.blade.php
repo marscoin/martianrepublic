@@ -6,7 +6,7 @@
     <a target="_blank" href="http://www.marscoin.org/community/">Discussion</a>
   </li>
   <li>
-    <a target="_blank" href="https://app.gitbook.com/">Documentation</a>
+    <a target="_blank" href="https://marscoin.gitbook.io/marscoin-documentation/">Documentation</a>
   </li>
   <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:;">
