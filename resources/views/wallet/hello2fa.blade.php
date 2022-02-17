@@ -18,7 +18,8 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap"
+        rel="stylesheet">
 
     <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
@@ -54,9 +55,10 @@
                 </button>
 
                 <a href="/" class="navbar-brand navbar-brand-img" style="font-family: 'Orbitron', sans-serif;">
-                    <img style="font-family: 'Orbitron', sans-serif;width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic Logo" >
+                    <img style="font-family: 'Orbitron', sans-serif;width: 67px;"
+                        src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic Logo">
                     Martian Republic
-                    </a>
+                </a>
             </div> <!-- /.navbar-header -->
 
             <nav class="collapse navbar-collapse" role="navigation">
@@ -78,7 +80,7 @@
                 <h2>Two Factor Authentication</h2>
                 <h5>Use the following QR code to setup your Google Authenticator or Authy application</h5>
                 <form class="form account-form" method="POST" action="/twofa">
-                     @csrf
+                    @csrf
                     <div class="form-group">
                         <label for="forgot-email" class="placeholder-hidden">Your Email</label>
                         <div style="text-align: center;"><img src="data:image/png;base64, {{ $qrcode_image }} " />
@@ -95,6 +97,8 @@
                     <div class="form-group">
                         <a href="/logout"><i class="fa fa-angle-double-left"></i> &nbsp;Back to Login</a>
                     </div> <!-- /.form-group -->
+                    <input type="hidden" value="meow" class="local" name="local"/>
+
                 </form>
             </div>
         @endif
@@ -102,11 +106,13 @@
             <div class="account-body">
                 <h2>Two Factor Authentication Setup completed successfully</h2>
                 <form class="form account-form" method="POST" action="/check">
-                     @csrf
+                    @csrf
                     <div class="form-group" style="text-align: center;">
                         <a href="/wallet/dashboard" class="btn btn-success btn-block btn-lg" tabindex="2">Go to
                             Dashboard</a>
                     </div>
+                    <input type="hidden" value="meow" class="local" name="local"/>
+
                 </form>
             </div>
         @endif
@@ -114,10 +120,12 @@
             <div class="account-body">
                 <h2>Two Factor Authentication Setup FAILED</h2>
                 <form class="form account-form" method="POST" action="/twofa">
-                     @csrf
+                    @csrf
                     <div class="form-group" style="text-align: center;">
                         <a href="/wallet/dashboard" class="btn btn-danger btn-block btn-lg" tabindex="2">Try again</a>
                     </div>
+                    <input type="hidden" value="meow" class="local" name="local"/>
+
                 </form>
             </div>
         @endif
@@ -135,10 +143,19 @@
     <script>
         $(document).ready(function() {
 
-            document.onload = function() {
-                localStorage.clear();
+            // document.onload = function() {
+            //     localStorage.clear();
 
+            // }
+            let item = localStorage.getItem("key")
+
+            if (item != null) {
+                $(".local").val("true")
+                
+            } else {
+                $(".local").val("false")
             }
+
 
         })
     </script>
