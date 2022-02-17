@@ -561,7 +561,7 @@
 
         <div class="col-sm-3">
           <h4 class="content-title">
-            <span>Marscoin Wallet</span>
+            <span>Martian Republic</span>
           </h4>
 
           Is a project by the Marscoin Foundation, Inc. to further the cause of Marscoin and cryptocurrencies in space exploration.
@@ -644,8 +644,11 @@
 
     <div class="row">
 
-      <div class="col-sm-12">
+      <div class="col-sm-6">
         <p>Copyright &copy; 2014-<?=date('Y')?> The Marscoin Foundation, Inc.</p>
+    </div>
+      <div class="col-sm-6">
+        <p class="pull-right"><a style="color: white;" href="/status">Server Status</a></p>
       </div> <!-- /.col -->
 
     </div> <!-- /.row -->
@@ -654,27 +657,12 @@
 </footer>
 
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
 <script src="/assets/landing/js/libs/jquery-1.10.2.min.js"></script>
 <script src="/assets/landing/js/libs/bootstrap.min.js"></script>
-
 <script src="/assets/landing/js/plugins/timeago/jquery.timeago.js"></script>
 <script src="/assets/landing/js/plugins/tweetable/tweetable.jquery.min.js"></script>
-
-<!--[if lt IE 9]>
-<script src="/assets/landing/js/libs/excanvas.compiled.js"></script>
-<![endif]-->
-
-
-<!-- Plugin JS -->
 <script src="/assets/landing/js/plugins/carouFredSel/jquery.carouFredSel-6.2.1-packed.js"></script>
-
-  <!-- App JS -->
 <script src="/assets/landing/js/mvpready-core.js"></script>
 <script src="/assets/landing/js/mvpready-landing.js"></script>
-
-
 </body>
 </html>

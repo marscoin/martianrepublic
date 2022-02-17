@@ -52,11 +52,6 @@ class DashboardController extends Controller
 
 
 	
-	protected function showSignup()
-	{
-		return view('wallet.signup');
-	}
-
 
 
 	protected function show2FA(Request $request)
@@ -517,29 +512,11 @@ class DashboardController extends Controller
 		return redirect('wallet/dashboard/hd')->with('message', 'Wallet Unsuccessful!');
 	}
 
-	// protected function createTransaction()
-	// {
-
-
-	// }
 
 	// Logout of Wallet ONLY
 	public function walletLogout()
 	{
 	}
-
-
-
-
-
-
-
-
-
-	// Done
-	// ==================================================================================
-	// ==================================================================================
-
 
 
 
@@ -569,64 +546,7 @@ class DashboardController extends Controller
 		}
 	}
 
-	protected function showBuy()
-	{
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$profile = Profile::where('userid', '=', $uid)->first();
-			if (!$profile) {
-				return redirect('/twofa');
-			} else {
-				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-					return redirect('/twofachallenge');
-				}
-			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-			$view = View::make('wallet.buy');
-			$view->gravtar_link  = $gravtar_link;
-			$view->email = Auth::user()->email;
-
-			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
-			return $view;
-		} else {
-			return redirect('/login');
-		}
-	}
-
-	protected function showSend()
-	{
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$profile = Profile::where('userid', '=', $uid)->first();
-			if (!$profile) {
-				return redirect('/twofa');
-			} else {
-				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-					return redirect('/twofachallenge');
-				}
-			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-			$view = View::make('wallet.send');
-			$view->gravtar_link  = $gravtar_link;
-
-			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
-
-
-			$json = $this->file_get_contents_curl('https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?slug=marscoin');
-			$latest = json_decode($json, true);
-			$view->latest = $latest;
-
-
-			return $view;
-		} else {
-			return redirect('/login');
-		}
-	}
-
+	
 	protected function showChart()
 	{
 		$json = $this->file_get_contents_curl('https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/historical?id=154');
@@ -635,41 +555,7 @@ class DashboardController extends Controller
 		die();
 	}
 
-	protected function showReceive()
-	{
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$profile = Profile::where('userid', '=', $uid)->first();
-			if (!$profile) {
-				return redirect('/twofa');
-			} else {
-				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-					return redirect('/twofachallenge');
-				}
-			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-			$view = View::make('wallet.receive');
-			$view->gravtar_link  = $gravtar_link;
-			$data = json_decode(file_get_contents("/home/mars/constitution/marswallet.json"), true);
-			$RPC_Host = $data['rpc_host'];          // host for marscoin rpc
-			$RPC_Port = $data['rpc_port'];              // port for marscoin rpc
-			$RPC_User = $data['rpc_user'];      // username for marscoin rpc
-			$RPC_Pass = $data['rpc_pass'];     // password for marscoin rpc
-
-			$nu92u5p9u2np8uj5wr = "http://" . $RPC_User . ":" . $RPC_Pass . "@" . $RPC_Host . ":" . $RPC_Port . "/";
-			$Marscoind = new jsonRPCClient($nu92u5p9u2np8uj5wr);
-			$user = new User;
-			$view->addresses = array_reverse($Marscoind->getaddressesbyaccount(Auth::user()->email));
-
-			$json = $this->file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
-			return $view;
-		} else {
-			return redirect('/login');
-		}
-	}
-
+	
 
 	protected function showReports()
 	{
@@ -690,42 +576,6 @@ class DashboardController extends Controller
 			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
 			$network = json_decode($json, true);
 			$view->network = $network;
-			return $view;
-		} else {
-			return redirect('/login');
-		}
-	}
-
-	protected function showTransactions()
-	{
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$profile = Profile::where('userid', '=', $uid)->first();
-			if (!$profile) {
-				return redirect('/twofa');
-			} else {
-				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-					return redirect('/twofachallenge');
-				}
-			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-			$view = View::make('wallet.transactions');
-			$view->gravtar_link  = $gravtar_link;
-			$RPC_Host = "127.0.0.1";         // host for marscoin rpc
-			$RPC_Port = "8337";              // port for marscoin rpc
-			$RPC_User = "marscoinrpcb";     // username for marscoin rpc
-			$RPC_Pass = "DPFXH8vFxzzIAYSwHF1ZLpzS8RKjjoFhPjz4VW2Yo3DM8";     // password for marscoin rpc
-
-			$nu92u5p9u2np8uj5wr = "http://" . $RPC_User . ":" . $RPC_Pass . "@" . $RPC_Host . ":" . $RPC_Port . "/";
-			$Marscoind = new jsonRPCClient($nu92u5p9u2np8uj5wr);
-			$user = new User;
-			$view->transactions = array_reverse($Marscoind->listtransactions(Auth::user()->email, 100));
-			//print_r($view->transactions);
-
-			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
-
 			return $view;
 		} else {
 			return redirect('/login');
@@ -800,39 +650,6 @@ class DashboardController extends Controller
 	}
 
 
-	protected function showFeatures()
-	{
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$profile = Profile::where('userid', '=', $uid)->first();
-			if (!$profile) {
-				return redirect('/twofa');
-			} else {
-				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-					return redirect('/twofachallenge');
-				}
-			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-			$view = View::make('wallet.features');
-			$view->gravtar_link  = $gravtar_link;
-			$view->email = Auth::user()->email;
-
-			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
-
-			return $view;
-		} else {
-			return redirect('/login');
-		}
-	}
-
-
-
-	protected function showForgot()
-	{
-		return View::make('wallet.forgot');
-	}
 
 	private function file_get_contents_curl($url)
 	{
