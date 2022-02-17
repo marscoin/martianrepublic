@@ -153,7 +153,11 @@
                       <h3 class="pricing-plan-title">Web Server</h3>               
                       <p class="pricing-plan-label">Base Reference Implementation</p>   
                     </div>
+                    <?php if($web_status == "success"){ ?>
                     <a href="#" class="btn btn-success">Online</a>
+                    <?php }else { ?>
+                    <a href="#" class="btn btn-danger">Offline</a>
+                    <?php } ?>
                   </div> <!-- /.pricing-plan -->
                 </div> <!-- /.col -->
 
@@ -164,7 +168,11 @@
                       <h3 class="pricing-plan-title">Database Server</h3>               
                       <p class="pricing-plan-label">Local Database Cache</p>   
                     </div>
+                    <?php if($mysql_status == "success"){ ?>
                     <a href="#" class="btn btn-success">Online</a>
+                    <?php }else { ?>
+                    <a href="#" class="btn btn-danger">Offline</a>
+                    <?php } ?>
                   </div> <!-- /.pricing-plan -->
                 </div> <!-- /.col -->
 
@@ -175,7 +183,11 @@
                       <h3 class="pricing-plan-title">Marscoin Node</h3>               
                       <p class="pricing-plan-label">Local Marscoin node</p>   
                     </div>
+                    <?php if($marscoind_status == "success"){ ?>
                     <a href="#" class="btn btn-success">Online</a>
+                    <?php }else { ?>
+                    <a href="#" class="btn btn-danger">Offline</a>
+                    <?php } ?>
                   </div> <!-- /.pricing-plan -->
                 </div> <!-- /.col -->              
 
@@ -193,7 +205,11 @@
                       <h3 class="pricing-plan-title">Blockexplorer</h3>               
                       <p class="pricing-plan-label">Blockchain explorer node</p>   
                     </div>
+                    <?php if($blockexplorer == "success"){ ?>
                     <a href="#" class="btn btn-success">Online</a>
+                    <?php }else { ?>
+                    <a href="#" class="btn btn-danger">Offline</a>
+                    <?php } ?>
                   </div> <!-- /.pricing-plan -->
                 </div> <!-- /.col -->      
 
@@ -206,7 +222,11 @@
                       <h3 class="pricing-plan-title">Pebas Node</h3>               
                       <p class="pricing-plan-label">Blockexplorer API Bridge </p>   
                     </div>
+                    <?php if($pebas_status == "success"){ ?>
                     <a href="#" class="btn btn-success">Online</a>
+                    <?php }else { ?>
+                    <a href="#" class="btn btn-danger">Offline</a>
+                    <?php } ?>
                   </div> <!-- /.pricing-plan -->
                 </div> <!-- /.col --> 
 
@@ -217,7 +237,11 @@
                       <h3 class="pricing-plan-title">IPFS Node</h3>               
                       <p class="pricing-plan-label">IPFS Pinning Service</p>   
                     </div>
+                    <?php if($ipfs_status == "success"){ ?>
                     <a href="#" class="btn btn-success">Online</a>
+                    <?php }else { ?>
+                    <a href="#" class="btn btn-danger">Offline</a>
+                    <?php } ?>
                   </div> <!-- /.pricing-plan -->
                 </div> <!-- /.col --> 
 
@@ -232,6 +256,20 @@
             </div> <!-- /.col -->
 
           </div> <!-- /.row -->
+
+
+          <br>
+
+
+          <?php if($network && count($network) > 0){ ?>
+          <h4>Marscoin Network</h4>
+                <p class="noticebar-empty-text">Block Height: #<?=$network['info']['blocks']?></p>
+                <p class="noticebar-empty-text">Server Connections: <?=$network['info']['connections']?></p>
+                <p class="noticebar-empty-text">Network Difficulty: <?=$network['info']['difficulty']?></p>
+                <p class="noticebar-empty-text">Node Version: <?=$network['info']['version']?></p>
+          <?php } ?>
+
+
 
           <br>
 

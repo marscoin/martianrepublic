@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\DB;
 
 
 class StatusController extends Controller {
@@ -24,7 +25,114 @@ class StatusController extends Controller {
 
 	protected function showStatus()
 	{
+
+		$web_status = "danger";
+		$mysql_status = "danger";
+		$marscoind_status = "danger";
+
+		$blockexplorer = "danger";
+		$pebas_status = "danger";
+		$ipfs_status = "danger";
+
+
+
+		//apache webserver check
+		try {
+    		$a = AppHelper::file_get_contents_curl('http://127.0.0.1');
+    		if($a)
+    			$web_status = "success";
+    		else $web_status = "danger";
+		}
+		catch (Exception $e) {
+		    $web_status = "danger";
+		}
+
+
+		// Test database connection
+		try {
+		    DB::connection()->getPdo();
+		    $mysql_status = "success";
+		} catch (\Exception $e) {
+		    $mysql_status = "danger";
+		}
+
+
+		try {
+			$data = json_decode(file_get_contents("/home/mars/constitution/marswallet.json"), true);
+			$RPC_Host = $data['rpc_host'];          // host for marscoin rpc
+			$RPC_Port = $data['rpc_port'];              // port for marscoin rpc
+			$RPC_User = $data['rpc_user'];      // username for marscoin rpc
+			$RPC_Pass = $data['rpc_pass'];     // password for marscoin rpc
+
+			$nu92u5p9u2np8uj5wr = "http://" . $RPC_User . ":" . $RPC_Pass . "@" . $RPC_Host . ":" . $RPC_Port . "/";
+			$Marscoind = new jsonRPCClient($nu92u5p9u2np8uj5wr);
+			$json = $Marscoind->getnetworkinfo();
+			$network = $json;
+			$a = json_decode($json, true);
+    		if($a)
+    			$marscoind_status = "success";
+    		else $marscoind_status = "danger";
+		} catch (\Exception $e) {
+		    $marscoind_status = "danger";
+		    $network = array();
+		}
+		
+
+		//blockexplorer check
+		try {
+    		$json = AppHelper::file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
+    		$a = json_decode($json, true);
+    		if($a)
+    			$blockexplorer = "success";
+    		else $blockexplorer = "danger";
+		}
+		catch (Exception $e) {
+		    $blockexplorer = "danger";
+		}
+
+
+		//pebas api check
+		try {
+    		$json = AppHelper::file_get_contents_curl('https://pebas.marscoin.org/api/mars/utxo?sender_address=MRKAuE7k9UhANQ8JjoU5A9KACic5Rt2Diz&receiver_address=MRKAuE7k9UhANQ8JjoU5A9KACic5Rt2Diz&amount=1');
+    		$a = json_decode($json, true);
+    		if($a)
+    			$pebas_status = "success";
+    		else $pebas_status = "danger";
+		}
+		catch (Exception $e) {
+		    $pebas_status = "danger";
+		}
+
+
+		
+		//ipfs node check
+		try {
+    		$json = AppHelper::file_get_contents_curl('http://127.0.0.1:5001/api/v0/swarm/peers');
+    		$a = json_decode($json, true);
+    		if($a)
+    			$ipfs_status = "success";
+    		else $ipfs_status = "danger";
+		}
+		catch (Exception $e) {
+		    $ipfs_status = "danger";
+		}
+
+
+
+		
+
+
 		$view = View::make('status');
+
+		$view->web_status = $web_status;
+		$view->mysql_status = $mysql_status;
+		$view->marscoind_status = $marscoind_status;
+		$view->network = $network;
+		$view->blockexplorer = $blockexplorer;
+		$view->pebas_status = $pebas_status;
+		$view->ipfs_status = $ipfs_status;
+
+
 		return $view;
 	}
 

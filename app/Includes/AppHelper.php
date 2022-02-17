@@ -112,6 +112,27 @@ class AppHelper{
 			return $details['Hash'];
 		}
 
+
+		public static function file_post_content($url, $data)
+		{
+
+			$postdata = http_build_query($data);
+
+			$opts = array('http' =>
+		    	array(
+		        	'method'  => 'POST',
+		        	'header'  => 'Content-Type: application/x-www-form-urlencoded',
+		        	'content' => $postdata
+		    	)
+			);
+
+			$context  = stream_context_create($opts);
+
+			$result = file_get_contents($url, false, $context);
+			return $result;
+		}
+
+
 		public static function getUserFromCache($address)
 		{
 			$user = array();
