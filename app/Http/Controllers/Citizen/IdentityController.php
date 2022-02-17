@@ -54,9 +54,13 @@ class IdentityController extends Controller
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;
+			//print_r($view->isCitizen);
+			//die();
 			$view->isGP  = $profile->general_public;
 			$view->mePublic = Feed::where('userid', '=', $uid)->where('tag', '=', "GP")->first();
 			$view->meCitizen = Feed::where('userid', '=', $uid)->where('tag', '=', "CT")->first();
+			//print_r(is_null($view->meCitizen));
+			//die();
 			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "GP"', array($uid));
 			$view->everyCitizen = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "CT"', array($uid));
 
