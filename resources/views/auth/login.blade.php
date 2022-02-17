@@ -140,6 +140,7 @@
           <button type="submit" class="btn btn-primary btn-block btn-lg" tabindex="4">Signin &nbsp; <i class="fa fa-play-circle"></i></button>
         </div> <!-- /.form-group -->
 
+
       </form>
 
       <div style="margin: 0 0 0px;">
@@ -170,8 +171,8 @@
 
 <script>
   $(document).ready(function(){
-    localStorage.clear();
-
+    // localStorage.clear();
+   
   });
   </script>
 
