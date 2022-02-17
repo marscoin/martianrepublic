@@ -71,6 +71,12 @@ class StatusController extends Controller {
 			if($a)
     			$marscoind_status = "success";
     		else $marscoind_status = "danger";
+
+    		if($network && count($network) > 0)
+    			$marscoind_status = "success";
+    		else
+    			$marscoind_status = "danger";
+
 		} catch (\Exception $e) {
 		    $marscoind_status = "danger";
 		    $network = array();
