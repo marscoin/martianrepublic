@@ -223,25 +223,11 @@ $("#publish").click(async (e) => {
     obj.data.picture = $('#s_ipfs_profile_pic').text();
     obj.data.video = $('#s_ipfs_liveness_vid').text();
     var jsonString = JSON.stringify(obj.data);
-    $("#publish_progress_message").text("Generating data hash...").delay(2500).fadeOut();
+    $("#publish_progress_message").text("Generating data hash...");
     var m = sha256(jsonString);
     obj.meta.hash = m;
     var jsonString = JSON.stringify(obj);
     $("#publish_progress_message").text("Writing data to IPFS and cache...");
-    // $.post("/api/permapinjson", {"type": "registration", "payload": jsonString, "address": '<?=$public_address?>'} , function (data) {
-    //     if(data){
-    //         cid = data.Hash;
-    //         // $("#s_ipfs_profile_pic").text("https://ipfs.marscoin.org/ipfs/"+ cid);
-    //         // $("#photo").attr("src", "https://ipfs.marscoin.org/ipfs/"+ cid);
-    //         $("#publish_progress_message").text("CID acquired: " + cid).delay(2500).fadeOut();
-    //         $("#publish_progress_message").text("Blockchain anchoring in progress...").delay(2500).fadeOut();
-    //         //creating transaction with OP_RETURN "GP_CID"
-    //         $("#publish_progress_message").text("Finalizing passport...");
-
-
-    //     }
-    // })
-
     const data = await doAjax("/api/permapinjson", {"type": "registration", "payload": jsonString, "address": '<?=$public_address?>'});
     cid = data.Hash;
 
@@ -249,24 +235,21 @@ $("#publish").click(async (e) => {
     const io = await sendMARS(1, "<?=$public_address?>");
 
     //const fee = marsConvert(io.fee);
-    const fee = 0.001
+    const fee = 0.01
     //console.log("THE FEE: ", fee);
-    const mars_amount = 0.001
+    const mars_amount = 0.01
     const total_amount = fee + parseInt(mars_amount)
     $(".estimated-fee").text("$ " + fee)
     $(".conversion-rate").text(total_amount)
 
     try {
-        const tx = await signMARS(message, mars_amount, io)
-        //$("#loading").hide()
-        //$(".success-message").show()
-        // $(".transaction-hash-link").attr("href",
-        //     "https://explore.marscoin.org/tx/" + tx.tx_hash)
-        //$(".transaction-hash").text("" + tx.tx_hash)
-        $("#publish_progress_message").text("Published successfully...").delay(2500).fadeOut();
-        $("#publish_progress_message").text(tx.tx_hash);
+        const tx = await signMARS(message, mars_amount, io);
+        $("#publish_progress_message").show().text("Published successfully...");
+        $("#publish_progress_message").show().text(tx.tx_hash);
         const data = await doAjax("/api/setfeed", {"type": "GP", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
-        //document.location.reload();
+        if(data.Hash){
+            if(!alert('Submitted to Blockchain successfully')){window.location.reload();}
+        }
 
     } catch (e) {
         throw e;
@@ -351,46 +334,33 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     const mnemonic = localStorage.getItem("key").trim();
     const sender_address = "<?=$public_address?>".trim()
 
-    //const mnemonic = "business tattoo current news edit bronze ketchup wrist thought prize mistake supply"
-    //console.log("Mnemonic:", mnemonic)
-
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
 
-    // console.log("seed: ", seed)
-
-    // ROOT === xprv
     const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
 
-    //private key
     const child = root.derivePath("m/44'/2'/0'/0/0");
-    //const child = root.derivePath(getDerivationPath());
 
     const wif = child.toWIF()
 
-    //=======================================================================
-
     const zubs = zubrinConvert(mars_amount)
 
-
     var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-    //console.log("Key:", key)
-
+    
     var psbt = new my_bundle.bitcoin.Psbt({
         network: Marscoin.mainnet,
     });
     psbt.setVersion(1)
-    psbt.setMaximumFeeRate(100000);
+    psbt.setMaximumFeeRate(1000000);
 
     unspent_vout = 0
     var data = my_bundle.Buffer(message)
     const embed = my_bundle.bitcoin.payments.embed({ data: [data] });
-    //var dataScript = psbt.script.nullDataOutput(data)
+    
     psbt.addOutput({
     script: embed.output,
     value: 0,
     })
-    //psbt.addOutput(dataScript, 1000)
-
+    
     tx_i_o.inputs.forEach((input, i) => {
         psbt.addInput({
             hash: input.txId,
@@ -400,8 +370,6 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     })
 
     tx_i_o.outputs.forEach(output => {
-        // watch out, outputs may have been added that you need to provide
-        // an output address/script for
         if (!output.address) {
             output.address = sender_address
         }
@@ -412,26 +380,21 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
         })
     })
 
-    //console.log("length:",tx_i_o.inputs.length )
     for (let i = 0; i < tx_i_o.inputs.length; i++) {
         psbt.signInput(i, key);
     }
 
-    // psbt.signInput(0, key);
-
-    //console.log(psbt.finalizeAllInputs().extractTransaction().toHex());
-    var txId = "";
-    const txhash = psbt.finalizeAllInputs().extractTransaction().toHex()
+    const tx = psbt.finalizeAllInputs().extractTransaction(); 
+    const txhash = tx.toHex()
 
     try {
         const txId = await broadcastTxHash(txhash);
+        return txId;
 
     } catch (e) {
         handleError()
         throw e;
     }
-
-    return txId;
 
 }
 
@@ -482,7 +445,8 @@ const broadcastTxHash = async (txhash) => {
         const response = await fetch(url, {
             method: 'GET'
         });
-        return response.json() // parses JSON response into native JavaScript objects
+        const shorthash =  response.json() 
+        return shorthash;
     } catch (e) {
         throw e;
     }

@@ -60,25 +60,24 @@
       <hr>
 
       <p>
-        <?php if($isGP){?>
+        @if($isGP)
         <a target="_blank" href="https://explore.marscoin.org/tx/<?=$mePublic['txid']?>" class="btn btn-primary">Member of the General Martian Public</a>
         &nbsp;&nbsp;
-        <?}
-        if($isCitizen){
-        ?>
+        @endif
+        @if(!is_null($meCitizen))
         <a target="_blank" href="https://explore.marscoin.org/tx/<?=$meCitizen['txid']?>" class="btn btn-success">MCR Citizen</a>
-        <?php } ?>
+        @endif
       </p>
 
       <hr>
       <ul class="icons-list">
-        <?php if($isGP){?>
+        @if($isGP)
             <li><i class="icon-li fa fa-users"></i> Joined as Member of the Martian Republic on <?=date( 'M, jS, Y', strtotime($mePublic['mined']) )?></li>
-        <?}
-        if($isCitizen){
+        @endif
+        @if(!is_null($meCitizen))
         ?>
-            <li><i class="icon-li fa fa-drivers-license"></i> Gained Citizenship status on <?=date( 'M, jS, Y', strtotime($mePublic['mined']) )?></li>
-        <?php } ?>
+            <li><i class="icon-li fa fa-drivers-license"></i> Gained Citizenship status on <?=date( 'M, jS, Y', strtotime($meCitizen['mined']) )?></li>
+        @endif
             <li><i class="icon-li fa fa-globe"></i> Awaiting Starship flight</li>
       </ul>
       <hr>

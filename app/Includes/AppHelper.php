@@ -132,6 +132,7 @@ class AppHelper{
 			if(!$action_tag)
 				return FALSE;
 			$feed->tag = $action_tag;
+			$feed->address = $address;
 			$feed->message = $message;
 			$feed->embedded_link = $embedded_link;
 			$feed->txid = $txid;
