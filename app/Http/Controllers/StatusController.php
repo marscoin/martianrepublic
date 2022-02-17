@@ -68,8 +68,7 @@ class StatusController extends Controller {
 			$Marscoind = new jsonRPCClient($nu92u5p9u2np8uj5wr);
 			$json = $Marscoind->getinfo();
 			$network = $json;
-			$a = json_decode($json, true);
-    		if($a)
+			if($a)
     			$marscoind_status = "success";
     		else $marscoind_status = "danger";
 		} catch (\Exception $e) {
