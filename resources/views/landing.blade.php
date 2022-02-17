@@ -134,11 +134,11 @@
                   <br>
 
                  <div class="masthead-actions">
-                   <a href="https://martianrepublic.org/wallet/login" class="btn btn-success btn-jumbo">
+                   <a href="https://martianrepublic.org/login" class="btn btn-success btn-jumbo">
                     Login
                     </a>
                     
-                    <a href="https://martianrepublic.org/wallet/signup" class="btn btn-primary btn-jumbo">
+                    <a href="https://martianrepublic.org/signup" class="btn btn-primary btn-jumbo">
                     Create account
                     </a>
                   </div>
@@ -165,11 +165,11 @@
                   <br>
 
                   <div class="masthead-actions">
-                    <a href="https://martianrepublic.org/wallet/login" class="btn btn-success btn-jumbo">
+                    <a href="https://martianrepublic.org/login" class="btn btn-success btn-jumbo">
                     Login
                     </a>
 
-                    <a href="https://martianrepublic.org/wallet/signup" class="btn btn-primary btn-jumbo">
+                    <a href="https://martianrepublic.org/signup" class="btn btn-primary btn-jumbo">
                     Create account
                     </a>
                   </div> <!-- /.masthead-actions -->
@@ -194,11 +194,11 @@
                   <br>
 
                   <div class="masthead-actions">
-                    <a href="https://martianrepublic.org/wallet/login" class="btn btn-success btn-jumbo">
+                    <a href="https://martianrepublic.org/login" class="btn btn-success btn-jumbo">
                     Login
                     </a>
 
-                    <a href="https://martianrepublic.org/wallet/signup" class="btn btn-primary btn-jumbo">
+                    <a href="https://martianrepublic.org/signup" class="btn btn-primary btn-jumbo">
                     Create account
                     </a>
                   </div> <!-- /.masthead-actions -->
@@ -219,11 +219,11 @@
                   </p>
                   <br>
                   <div class="masthead-actions">
-                   <a href="https://martianrepublic.org/wallet/login" class="btn btn-success btn-jumbo">
+                   <a href="https://martianrepublic.org/login" class="btn btn-success btn-jumbo">
                     Login
                     </a>
                     
-                    <a href="https://martianrepublic.org/wallet/signup" class="btn btn-primary btn-jumbo">
+                    <a href="https://martianrepublic.org/signup" class="btn btn-primary btn-jumbo">
                     Create account
                     </a>
                   </div>
@@ -243,11 +243,11 @@
                   </p>
                   <br>
                   <div class="masthead-actions">
-                   <a href="https://martianrepublic.org/wallet/login" class="btn btn-success btn-jumbo">
+                   <a href="https://martianrepublic.org/login" class="btn btn-success btn-jumbo">
                     Login
                     </a>
                     
-                    <a href="https://martianrepublic.org/wallet/signup" class="btn btn-primary btn-jumbo">
+                    <a href="https://martianrepublic.org/signup" class="btn btn-primary btn-jumbo">
                     Create account
                     </a>
                   </div>
@@ -268,11 +268,11 @@
                   </p>
                   <br>
                   <div class="masthead-actions">
-                   <a href="https://martianrepublic.org/wallet/login" class="btn btn-success btn-jumbo">
+                   <a href="https://martianrepublic.org/login" class="btn btn-success btn-jumbo">
                     Login
                     </a>
                     
-                    <a href="https://martianrepublic.org/wallet/signup" class="btn btn-primary btn-jumbo">
+                    <a href="https://martianrepublic.org/signup" class="btn btn-primary btn-jumbo">
                     Create account
                     </a>
                   </div>
@@ -292,11 +292,11 @@
                   </p>
                   <br>
                   <div class="masthead-actions">
-                   <a href="https://martianrepublic.org/wallet/login" class="btn btn-success btn-jumbo">
+                   <a href="https://martianrepublic.org/login" class="btn btn-success btn-jumbo">
                     Login
                     </a>
                     
-                    <a href="https://martianrepublic.org/wallet/signup" class="btn btn-primary btn-jumbo">
+                    <a href="https://martianrepublic.org/signup" class="btn btn-primary btn-jumbo">
                     Create account
                     </a>
                   </div>
@@ -413,7 +413,7 @@
             <p class="lead lead-small">This open source code itself <i>is</i> the constitution. It uses the Marscoin blockchain to immutably anchor data and allows all Martian citizens to directly vote on how their Republic evolves.</p>
             <p class="lead lead-small">Unlike token based projects, The Martian Congress is formed by individuals whose identity is known and who openly participate in discussion but vote cryptographically secured and anonymously.</p>
             <br>
-            <a href="/wallet/signup" class="btn btn-default">Join the Martian Republic</a>
+            <a href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
           <div class="col-sm-6 col-sm-pull-6 text-center">
             <br><br>
@@ -435,7 +435,7 @@
             <p class="lead lead-small">As forward looking and technology friendly Mars enthusiasts we believe that blockchain technology presents a unique opportunity to improve upon current indirect methods of cooperation.</p>
             <p class="lead lead-small">This open source reference implementation is our proposal to take the advantages and advances in cryptography allowing direct citizen participation and experiment and form our community prior to settling Mars.</p>
             <br>
-            <a href="/wallet/signup" class="btn btn-default">Join the Martian Republic</a>
+            <a href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
         </div> 
 
@@ -451,7 +451,7 @@
             <p>A seed phrase thus generated can also be used to regain access to a previously created wallet.</p>
             <p>Basic receive and send functions allow users to receive and send Marscoin to other participants in the network.</p>
             <br>
-            <a href="/wallet/signup" class="btn btn-default">Join the Martian Republic</a>
+            <a href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
           <div class="col-sm-6 col-sm-pull-6 text-center">
             <br><br>
@@ -477,7 +477,7 @@
             <p class="">It comes with a community driven identity attestation service in which an initial community dictates the terms to invite new members to join their group using clear programmatic guidelines that future proposal can modify, allowing a virtuous feedback loop in which the community is allowed to integrate new members.</p>
             <p class="">We start out with a basic user submission form and liveness-test which could be further improved with kiosk-style self service terminals (upon arrival on Mars, for instance). After an initial registration the users are vetted by the community itself and integrated into the general public.</p>
             <br>
-            <a href="/wallet/signup" class="btn btn-default">Join the Martian Republic</a>
+            <a href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
         </div> 
 
@@ -495,7 +495,7 @@
             <p>Utilizing the Marscoin blockchain to timestamp proposals and identify the members of the public is part of the solution in conjuction with a public voter registry. The Martian Congress favors a transparent and intuitive solution which allows all participants to easily audit and verify the validity of the vote.</p>
             <p> By utilizing an open source model in which the code itself becomes the constitution, we opt for a server/client architecture in which citizens can initiate proposals, bills, and amendments. </p>
             <br>
-            <a href="/wallet/signup" class="btn btn-default">Join the Martian Republic</a>
+            <a href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
           <div class="col-sm-6 col-sm-pull-6 text-center">
             <br><br>
