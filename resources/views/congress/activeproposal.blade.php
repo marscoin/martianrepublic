@@ -35,7 +35,9 @@
                     <span class="sr-only">40% Complete (primary)</span>
                 </div>
             </div>
+
             <div>
+            <?php if($isCitizen){?>
                 <a data-toggle="modal" href="#ProposalModal_{{{$proposal->id}}}_yes" id="Y_{{{$proposal->ipfs_hash}}}"
                 class="btn-lg btn-primary demo-element vote-modal-btn-yes">Yes</a>
 
@@ -45,8 +47,11 @@
                 <a data-toggle="modal" href="#ProposalModal_{{{$proposal->id}}}_null" id="NU_{{{$proposal->ipfs_hash}}}"
                 class="btn-lg btn-primary demo-element vote-modal-btn-null">Null</a>
                     
-
+            <?php }else{ ?>
+                <p>To cast a vote, please <a href="/citizen/all">join the voter registry</a> first</p>
+            <?php } ?>
             </div>
+
         </div> <!-- /.feed-content -->
 
 

@@ -106,7 +106,7 @@ class CongressController extends Controller
 			$view->proposals = $proposals;
 			$view->gravtar_link  = $gravtar_link;
 			$view->fullname = Auth::user()->fullname;
-			$view->isCitizen = true;
+			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->wallet_open = $profile->wallet_open;
 
