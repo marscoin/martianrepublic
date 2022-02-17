@@ -264,7 +264,7 @@
           <h4 class="text-center">
             Running into bugs?
             <span>Send us a bug report.</span>
-            <a href="mailto:info@marscoin.org">Get in touch &nbsp;<i class="fa fa-external-link"></i></a>
+            <a target="_blank" href="https://github.com/marscoin/martianrepublic">Get in touch &nbsp;<i class="fa fa-external-link"></i></a>
           </h4>
 
           <br><br><br><br>
