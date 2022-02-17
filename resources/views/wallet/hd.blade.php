@@ -102,7 +102,6 @@
                             style="display: flex; justify-content: space-evenly; align-items: center; width: 40%; margin: 40px">
 
 
-                            @if ($wallet_open == 0)
                                 <a data-toggle="modal" href="#styledModal" class="btn-lg btn-primary demo-element"
                                     data-backdrop="static" data-keyboard="false">New Wallet</a>
                                 <h4>OR</h4>
@@ -110,7 +109,6 @@
                                     class="btn-lg btn-primary demo-element">Open Wallet</a>
 
 
-                            @endif
 
 
                         </div> <!-- /.accordion -->

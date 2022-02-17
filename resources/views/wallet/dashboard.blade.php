@@ -104,6 +104,7 @@
 
                             @if ($wallet_open)
 
+                            <div class="wallet-is-open" >
 
                                 <h4 class="portlet-title">
                                     <u>Account Interactions</u>
@@ -154,12 +155,14 @@
                                     </tbody>
                                 </table>
 
+                            </div>
+                              
 
 
 
                             @else
 
-
+                            <div class="wallet-is-not-open" >
                                 <h4 class="portlet-title">
                                     <u>Open Marscoin Wallet</u>
                                 </h4>
@@ -170,6 +173,8 @@
                                     <a id="" type="button" class="btn-lg btn-primary " href="/wallet/dashboard/hd">Open
                                         Wallet</a>
                                 </div>
+                            </div>
+
                             @endif
 
                             <div class="portlet-body">
@@ -257,6 +262,24 @@
         <script src="/assets/wallet/js/demos/flot/line.js"></script>
     @endif
     <script>
+
+        // okay - make check on localstorage real quick and pass that as another php var...? check local
+        // const key = localStorage.getItem("key");
+        // if(key != null)
+        // {
+        //     $(".wallet-is-open").show()
+        //     $(".wallet-is-not-open").hide()
+
+        // }   
+        // else{
+        //     $(".wallet-is-not-open").show()
+        //     $(".wallet-is-open").hide()
+
+        // }
+
+
+
+
         updateBalance();
 
         function updateBalance() {

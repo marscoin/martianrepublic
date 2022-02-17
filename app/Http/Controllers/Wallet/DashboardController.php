@@ -72,12 +72,17 @@ class DashboardController extends Controller
 					$profile->twofaset = 1;
 					$profile->save();
 					$view->isvalid = "Success";
+
 				} else {
 					$view->isvalid = "Failed";
 				}
+
+
+
 				return $view;
 			} else {
 				$profile = Profile::where('userid', '=', Auth::user()->id)->first();
+
 				if (!$profile) {
 					$key = $google2fa->generateSecretKey();
 					$g2faUrl = $google2fa->getQRCodeUrl(
@@ -102,6 +107,8 @@ class DashboardController extends Controller
 					$view->qrcode_image = base64_encode($writer->writeString($g2faUrl));
 					return $view;
 				} else if ($profile && $profile->twofaset == 0) {
+
+
 					$key = $profile->twofakey;
 					$g2faUrl = $google2fa->getQRCodeUrl(
 						'marscoinwallet',
@@ -137,13 +144,27 @@ class DashboardController extends Controller
 			$uid = Auth::user()->id;
 			$google2fa = app(Google2FA::class);
 			$secret = $request->input('secret');
+
+
+
 			if ($secret) {
 				$profile = Profile::where('userid', '=', Auth::user()->id)->first();
 				$google2fa_secret = $profile->twofakey;
 				$valid = $google2fa->verifyKey($google2fa_secret, $secret);
 				if ($valid) {
+					$local = $request->input('local');
+
+					if($local == "true"){
+						$profile->wallet_open = 1;
+					}
+					else if($local == "false"){
+						$profile->wallet_open = 0;
+					}
+				
+
 					$profile->openchallenge = 0;
 					$profile->save();
+
 					return redirect('wallet/dashboard');
 				} else {
 					$view = View::make('wallet.challenge2fa');
@@ -170,6 +191,7 @@ class DashboardController extends Controller
 			} else {
 				$is2faset = $profile->twofaset;
 				$profile->openchallenge = 1;
+				$profile->wallet_open = 0;
 				$profile->save();
 				if (!$is2faset) {
 					return redirect('/twofa');
