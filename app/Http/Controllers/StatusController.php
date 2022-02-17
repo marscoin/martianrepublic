@@ -106,8 +106,7 @@ class StatusController extends Controller {
 		
 		//ipfs node check
 		try {
-    		$json = AppHelper::file_get_contents_curl('http://127.0.0.1:5001/api/v0/swarm/peers');
-    		$a = json_decode($json, true);
+    		$a = AppHelper::file_get_contents_curl('http://127.0.0.1:5001/api/v0/swarm/peers');
     		if($a)
     			$ipfs_status = "success";
     		else $ipfs_status = "danger";
