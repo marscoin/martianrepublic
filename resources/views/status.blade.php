@@ -263,10 +263,10 @@
 
           <?php if($network && count($network) > 0){ ?>
           <h4>Marscoin Network</h4>
-                <p class="noticebar-empty-text">Block Height: #<?=$network['info']['blocks']?></p>
-                <p class="noticebar-empty-text">Server Connections: <?=$network['info']['connections']?></p>
-                <p class="noticebar-empty-text">Network Difficulty: <?=$network['info']['difficulty']?></p>
-                <p class="noticebar-empty-text">Node Version: <?=$network['info']['version']?></p>
+                <p class="noticebar-empty-text">Block Height: #<?=$network['blocks']?></p>
+                <p class="noticebar-empty-text">Server Connections: <?=$network['connections']?></p>
+                <p class="noticebar-empty-text">Network Difficulty: <?=$network['difficulty']?></p>
+                <p class="noticebar-empty-text">Node Version: <?=$network['version']?></p>
           <?php } ?>
 
 

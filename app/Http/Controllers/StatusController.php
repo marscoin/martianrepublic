@@ -66,7 +66,7 @@ class StatusController extends Controller {
 
 			$nu92u5p9u2np8uj5wr = "http://" . $RPC_User . ":" . $RPC_Pass . "@" . $RPC_Host . ":" . $RPC_Port . "/";
 			$Marscoind = new jsonRPCClient($nu92u5p9u2np8uj5wr);
-			$json = $Marscoind->getnetworkinfo();
+			$json = $Marscoind->getinfo();
 			$network = $json;
 			$a = json_decode($json, true);
     		if($a)
