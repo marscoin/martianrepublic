@@ -475,7 +475,7 @@ $(function () {
     function format_time(s) {
         if(s)
             return new Date(s * 1000).toISOString().slice(0, 19).replace('T', ' ');
-        else return "n/a";
+        else return "pending...";
     }
 
 
