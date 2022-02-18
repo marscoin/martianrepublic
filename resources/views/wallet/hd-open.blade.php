@@ -72,8 +72,11 @@
 
                                 <div>
                                     <span for="name">Destination Address</span>
-                                    <input type="text" name="recipient" class="form-control destination-address" style="width: 90%"
+                                    <input type="text" name="recipient" id="recipient" class="form-control destination-address" style="width: 90%"
                                         data-required="true" placeholder="Marscoin Address">
+
+                                    <a style="float: right; margin-top: -35px;margin-right: 67px;" href="#" onclick="scan();" class="btn btn-primary">Scan <i class="fa fa-qrcode "></i></a>
+
                                     <span id="address-error" style="display: none;" class="error-message">Enter a valid
                                         MARS address</span>
                                     <br />
@@ -363,31 +366,32 @@
 
     </div> <!-- /#wrapper -->
 
+
+
+<div class="modal scan-popup" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+           <div id="app">
+            <div class="sidebar">
+            </div>
+           <canvas hidden="" style="height: 100%; width: 100%; padding: 5px;" id="qr-canvas"></canvas>
+
+          </div>
+    </div>
+  </div>
+</div>
     <footer class="footer">
         @include('footer')
     </footer>
-    <!-- Bootstrap core JavaScript
-================================================== -->
-    <!-- Core JS ----------------------------------------------------------------------------------------------->
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
-    <!---------------------------------------------------------------------------------------------------------->
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
-    <!--[if lt IE 9]>
-<script src="/assets/wallet/js/libs/excanvas.compiled.js"></script>
-<![endif]-->
-    <!-- Plugin JS -->
-
     <script src="/assets/wallet/js/plugins/dataTables/jquery.dataTables.js"></script>
     <script src="/assets/wallet/js/plugins/dataTables/dataTables.bootstrap.js"></script>
-
-    <!-- App JS -->
     <script src="/assets/wallet/js/mvpready-core.js"></script>
     <script src="/assets/wallet/js/mvpready-admin.js"></script>
-
-    <!-- Plugin JS -->
     <script src="/assets/wallet/js/demos/table_demo.js"></script>
-
+    <script src="/assets/wallet/js/plugins/scan/qrcode.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             // ================================================================
@@ -964,6 +968,75 @@ var qr = new QRious({
           value: '{{ $public_addr }}',
           size: '250'
         });
+
+function scan(){
+  $('.scan-popup').modal('show');
+}
+
+const video = document.createElement("video");
+const canvasElement = document.getElementById("qr-canvas");
+const canvas = canvasElement.getContext("2d");
+const outputData = document.getElementById("outputData");
+const btnScanQR = document.getElementById("btn-scan-qr");
+
+let scanning = false;
+
+$('.scan-popup').on('shown.bs.modal', function (e) {
+  
+  console.log("Here");
+  navigator.mediaDevices
+    .getUserMedia({ video: { facingMode: "environment" } })
+    .then(function(stream) {
+      scanning = true;
+      canvasElement.hidden = false;
+      video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+      video.srcObject = stream;
+      video.play();
+      tick();
+      scan2();
+    });
+
+});
+
+
+
+
+qrcode.callback = res => {
+  if (res) {
+    res = res.replace("bitcoin:", "");
+    $("#recipient").val(res);
+    scanning = false;
+    $('.scan-popup').modal('hide');
+
+    video.srcObject.getTracks().forEach(track => {
+      track.stop();
+    });
+
+ 
+    canvasElement.hidden = true;
+    btnScanQR.hidden = false;
+    $('.scan-popup').modal('hide');
+
+  }
+};
+
+
+function tick() {
+  canvasElement.height = video.videoHeight;
+  canvasElement.width = video.videoWidth;
+  canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+  scanning && requestAnimationFrame(tick);
+}
+
+function scan2() {
+  try {
+    qrcode.decode();
+  } catch (e) {
+    setTimeout(scan2, 300);
+  }
+}
+
 </script>
 </body>
 
