@@ -149,4 +149,22 @@ class ApiController extends Controller {
 
 
 
+	public function getTransactions(Request $request)
+	{
+		if (Auth::check()) {
+			
+			$address = $request->input('address');
+			$json = AppHelper::file_get_contents_curl("http://explore1.marscoin.org/api/txs/?address={$address}");
+			
+			return (new Response($json))
+              ->header('Content-Type', "application/json;");
+
+		
+		}else{
+            return redirect('/login');
+        }
+	}
+
+
+
 }

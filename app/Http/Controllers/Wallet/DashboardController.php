@@ -222,41 +222,32 @@ class DashboardController extends Controller
 			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			$view = View::make('wallet.dashboard');
 			$view->gravtar_link  = $gravtar_link;
-
+			$view->public_addr = "";
 			try{
-				$RPC_Host = "127.0.0.1";         // host for marscoin rpc
-				$RPC_Port = "8337";              // port for marscoin rpc
-				$RPC_User = "marscoinrpcb";     // username for marscoin rpc
-				$RPC_Pass = "DPFXH8vFxzzIAYSwHF1ZLpzS8RKjjoFhPjz4VW2Yo3DM8";     // password for marscoin rpc
-
-				$nu92u5p9u2np8uj5wr = "http://" . $RPC_User . ":" . $RPC_Pass . "@" . $RPC_Host . ":" . $RPC_Port . "/";
-				$Marscoind = new jsonRPCClient($nu92u5p9u2np8uj5wr);
-				$user = new User;
-				$view->address = $Marscoind->getaccountaddress(Auth::user()->email);
-
-				// echo "<pre>";
-				// print_r($wallet);
-				// echo"</pre>";
-				// die();
 
 				if ($wallet) {
 					$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
 					$view->balance = ($cur_balance * 0.00000001);
+					$view->public_addr = $wallet->public_addr;
 				} else {
 					$view->balance = 0;
 				}
 
-				//$view->balance = $Marscoind->getbalance(Auth::user()->email);
-				$view->received = $Marscoind->getreceivedbyaccount(Auth::user()->email);
-				$view->sent = floatval($view->received) - floatval($view->balance);
-				$view->transactions = array_reverse($Marscoind->listtransactions(Auth::user()->email, 10));
+				$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalReceived");
+				$received = json_decode($json, true);
+				$view->received = ($received * 0.00000001);
+				$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalSent");
+				$sent = json_decode($json, true);
+				$view->sent = ($sent * 0.00000001);
+				$view->transactions = array();
+
+				$cur_price = json_decode(file_get_contents("https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd"));
+				$view->mars_price = $cur_price->marscoin->usd;
+				
 				$view->wallet_open = $profile->wallet_open;
 
-				// print_r($view->wallet_open);
-				// die();
-
-				$json = $this->file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
-				$network = json_decode($json, true);
+				// $json = $this->file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
+				// $network = json_decode($json, true);
 				$json2 = $this->file_get_contents_curl('http://explore.marscoin.org/api/status?q=getTxOutSetInfo');
 				$total = json_decode($json2, true);
 				if ($total && count($total) > 0)
@@ -272,41 +263,8 @@ class DashboardController extends Controller
 				$lastdate = 0;
 				$a = 0;
 				$b = 0;
-				$view->transactions = array_reverse($view->transactions);
-				foreach ($view->transactions as $transaction) {
-					if ($transaction['amount'] > 0) {
-						$t = $transaction['time'] . "000";
-						if (empty($firstdate))
-							$firstdate = $t;
-						if ($lastdate < $t)
-							$lastdate = $t;
-						$a = intval($a) + floor($transaction['amount']);
-						$item = array("time" => $t, "amount" => $a);
-						array_push($incomes, $item);
-						$balance = floatval($balance) + floatval($transaction['amount']);
-						$item = array("time" => $t, "amount" => $balance);
-						array_push($balances, $item);
-					} else if ($transaction['amount'] < 0) {
-						$t = $transaction['time'] . "000";
-						if (empty($firstdate))
-							$firstdate = $t;
-						if ($lastdate < $t)
-							$lastdate = $t;
-						$b = intval($b) + abs(floor($transaction['amount']));
-						$item = array("time" => $t, "amount" => $b);
-						array_push($expenses, $item);
-						$balance = floatval($balance) + floatval($transaction['amount']);
-						$item = array("time" => $t, "amount" => $balance);
-						array_push($balances, $item);
-					}
-				}
-				$view->firstdate = $firstdate;
-				$view->lastdate = $lastdate;
-				$view->incomes = $incomes;
-				$view->expenses = $expenses;
-				$view->balances = $balances;
+
 				$view->voucher = false;
-				$view->network = $network;
 				$voucher = Voucher::where('user_account', '=', Auth::user()->email)->first();
 				if ($voucher != null)
 					$view->voucher = true;

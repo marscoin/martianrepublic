@@ -90,14 +90,6 @@
               </li>
               <li class="noticebar-empty">
                 <h4 class="noticebar-empty-title">Marscoin Network</h4>
-                <?php if($network && count($network) > 0){ ?>
-                <p class="noticebar-empty-text">Block Height: #<?=$network['info']['blocks']?></p>
-                <p class="noticebar-empty-text">Server Connections: <?=$network['info']['connections']?></p>
-                <p class="noticebar-empty-text">Network Difficulty: <?=$network['info']['difficulty']?></p>
-                <p class="noticebar-empty-text">Node Version: <?=$network['info']['version']?></p>
-              <?php }else{ ?>
-                <p class="noticebar-empty-text">Loading...</p>
-              <?php } ?>
               </li>
             </ul>
           </li> -->
