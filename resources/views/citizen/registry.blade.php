@@ -312,9 +312,6 @@ const Marscoin = {
 
 
 const sendMARS = async (mars_amount, receiver_address) => {
-    //console.log("send mars running...")
-
-    // obtain utxo i/o
     const sender_address = "<?=$public_address?>".trim()
 
     try {
@@ -439,8 +436,7 @@ const broadcastTxHash = async (txhash) => {
         throw new Error("Missing tx hash...");
     }
 
-    const url =
-        `https://pebas.marscoin.org/api/mars/broadcast?txhash=${txhash}`
+    const url = 'https://pebas.marscoin.org/api/mars/broadcast?txhash=${txhash}'
     try {
         const response = await fetch(url, {
             method: 'GET'
