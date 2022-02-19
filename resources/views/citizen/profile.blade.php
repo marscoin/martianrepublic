@@ -75,7 +75,6 @@
             <li><i class="icon-li fa fa-users"></i> Joined as Member of the Martian Republic on <?=date( 'M, jS, Y', strtotime($mePublic['mined']) )?></li>
         @endif
         @if(!is_null($meCitizen))
-        ?>
             <li><i class="icon-li fa fa-drivers-license"></i> Gained Citizenship status on <?=date( 'M, jS, Y', strtotime($meCitizen['mined']) )?></li>
         @endif
             <li><i class="icon-li fa fa-globe"></i> Awaiting Starship flight</li>
