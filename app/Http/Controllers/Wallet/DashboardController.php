@@ -229,18 +229,20 @@ class DashboardController extends Controller
 					$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
 					$view->balance = ($cur_balance * 0.00000001);
 					$view->public_addr = $wallet->public_addr;
+					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalReceived");
+					$received = json_decode($json, true);
+					$view->received = ($received * 0.00000001);
+					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalSent");
+					$sent = json_decode($json, true);
+					$view->sent = ($sent * 0.00000001);
 				} else {
 					$view->balance = 0;
+					$view->received = 0;
+					$view->sent = 0;
 				}
 
-				$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalReceived");
-				$received = json_decode($json, true);
-				$view->received = ($received * 0.00000001);
-				$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalSent");
-				$sent = json_decode($json, true);
-				$view->sent = ($sent * 0.00000001);
-				$view->transactions = array();
 
+				$view->transactions = array();
 				$cur_price = json_decode(file_get_contents("https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd"));
 				$view->mars_price = $cur_price->marscoin->usd;
 				
