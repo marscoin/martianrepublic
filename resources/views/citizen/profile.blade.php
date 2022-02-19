@@ -210,7 +210,7 @@
 
         <br>
 
-        <h5 class="content-title"><u>Blockchain Activity</u></h5>
+        <h5 class="content-title"><u>Blockchain Activity (Example)</u></h5>
 
         <div class="well">
 

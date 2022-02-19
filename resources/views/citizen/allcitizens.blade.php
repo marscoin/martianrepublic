@@ -1,3 +1,6 @@
+<?php 
+use App\Includes\AppHelper;
+?>
 <h3 class="content-title"><u>Citizens</u></h3>
 <div class="row">
   <div class="col-md-9">
@@ -41,23 +44,29 @@
 
             <div class="list-group">  
 
-              <a href="javascript:;" class="list-group-item">
-                  <h3 class="pull-right"><i class="fa fa-eye text-primary"></i></h3>
-                  <h4 class="list-group-item-heading">38,847</h4>
-                  <p class="list-group-item-text">Martians</p>                  
-                </a>
+            <a href="javascript:;" class="list-group-item">
+                <h3 class="pull-right"><i class="fa fa-globe text-primary"></i></h3>
+                <h4 class="list-group-item-heading"><?=count($everyPublic)?></h4>
+                <p class="list-group-item-text">Martians</p>
+            </a>
 
-              <a href="javascript:;" class="list-group-item">
-                <h3 class="pull-right"><i class="fa fa-facebook-square  text-primary"></i></h3>
-                <h4 class="list-group-item-heading">3,482</h4>
+            <a href="javascript:;" class="list-group-item">
+                <h3 class="pull-right"><i class="fa fa-user  text-primary"></i></h3>
+                <h4 class="list-group-item-heading"><?=count($everyCitizen)?></h4>
                 <p class="list-group-item-text">Citizens</p>
-              </a>
+            </a>
 
-              <a href="javascript:;" class="list-group-item">
-                <h3 class="pull-right"><i class="fa fa-twitter-square  text-primary"></i></h3>
-                <h4 class="list-group-item-heading">5</h4>
+            <a href="javascript:;" class="list-group-item">
+                <h3 class="pull-right"><i class="fa fa-pencil  text-primary"></i></h3>
+                <h4 class="list-group-item-heading">0</h4>
                 <p class="list-group-item-text">Open Proposals</p>
-              </a>
+            </a>
+
+            <a href="javascript:;" class="list-group-item">
+                <h3 class="pull-right"><i class="fa fa-legal  text-primary"></i></h3>
+                <h4 class="list-group-item-heading">0</h4>
+                <p class="list-group-item-text">Open Bills</p>
+            </a>
             </div> <!-- /.list-group -->
 
             <br>
@@ -69,29 +78,28 @@
 
               <ul class="icons-list text-md">
 
-                <li>
-                  <i class="icon-li fa fa-location-arrow"></i>
-
-                  <strong>Jennifer Rowlings</strong> joined. 
-                  <br>
-                  <small>about 4 hours ago</small>
-                </li>
+              <?php foreach($activity as $a){ ?>
 
                 <li>
-                  <i class="icon-li fa fa-location-arrow"></i>
-
-                  <strong>Paul Anderson</strong> joined. 
-                  <br>
-                  <small>about 23 hours ago</small>
+                    <?php if($a->tag == "GP"){ ?>
+                        <i class="icon-li fa fa-address-card"></i>
+                        <strong><?=$a->fullname?></strong> joined the Republic.
+                    <?php } else if($a->tag == "CT"){ ?>
+                        <i class="icon-li fa fa-rocket"></i>
+                        <strong><?=$a->fullname?></strong> became citizen.
+                    <?php } else if($a->tag == "ED"){ ?>
+                        <i class="icon-li fa fa-thumbs-up"></i>
+                        <strong><?=$a->fullname?></strong> endorsed someone.
+                    <?php } else if($a->tag == "PR"){ ?>
+                        <i class="icon-li fa fa-pencil"></i>
+                        <strong><?=$a->fullname?></strong> published proposal.
+                    <?php } ?>
+                    <br>
+                    <small>about <?=AppHelper::time_elapsed_string($a->mined)?></small>
                 </li>
 
-                <li>
-                  <i class="icon-li fa fa-location-arrow"></i>
-
-                  <strong>John Smith</strong> joined. 
-                  <br>
-                  <small>2 days ago</small>
-                </li>
+            <?php } ?>
+               
               </ul>
 
             </div> <!-- /.well -->
