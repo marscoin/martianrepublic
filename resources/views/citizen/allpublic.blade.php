@@ -34,59 +34,7 @@
                         </td>
                     </tr>
                     <?php } ?>
-                    <tr>
-                        <td>
-                            <img id="photo" src="/assets/citizen/generic_profile.jpg"
-                                class="profile-avatar-img thumbnail" alt="Profile Image">
-                        </td>
-                        <td class="valign-middle"><a href="javascript:;" title="">Sandrine Kirino</a>
-                            <p><a target="_blank"
-                                    href="https://explore.marscoin.org/address/MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK">MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK</a>
-                            </p>
-
-                            <a data-toggle="modal" href="#endorseModal_" id=""
-                              class="btn-sm btn-primary demo-element endorse-btn">Endorse for Citizenship</a>
-                        </td>
-                        <td class="valign-middle">Feb 12, 2022. 12:28</td>
-                        <td class="file-info valign-middle">
-                            <span class="label label-default demo-element public-status">General Public</span>
-                        </td>
-                    </tr>
-
-                    {{-- <tr>
-                        <td>
-                            <img id="photo" src="/assets/citizen/generic_profile.jpg"
-                                class="profile-avatar-img thumbnail" alt="Profile Image">
-                        </td>
-                        <td class="valign-middle"><a href="javascript:;" title="">Theresa Yao</a>
-                            <p><a target="_blank"
-                                    href="https://explore.marscoin.org/address/MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK">MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK</a>
-                            </p>
-                        </td>
-                        <td class="valign-middle">Feb 12, 2022. 12:28</td>
-                        <td class="file-info valign-middle">
-                            <span class="label label-default demo-element public-status">General Public</span>
-                        </td>
-                    </tr> --}}
-
-                    {{-- <tr>
-                        <td>
-
-                            <img id="photo" src="/assets/citizen/generic_profile.jpg"
-                                class="profile-avatar-img thumbnail" alt="Profile Image">
-
-                        </td>
-                        <td class="valign-middle"><a href="javascript:;" title="">Esai Martin</a>
-                            <p><a target="_blank"
-                                    href="https://explore.marscoin.org/address/MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK">MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK</a>
-                            </p>
-                        </td>
-                        <td class="valign-middle">Feb 12, 2022. 12:28</td>
-                        <td class="file-info valign-middle">
-                            <span class="label label-default demo-element public-status">General Public</span>
-                        </td>
-                    </tr> --}}
-
+                    
 
                 </tbody>
             </table>

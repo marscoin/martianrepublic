@@ -28,52 +28,7 @@
                               </td>
                             </tr>
                             <?php } ?>
-
-                            <tr>
-                              <td>
-                                <img id="photo" src="/assets/citizen/generic_profile.jpg" class="profile-avatar-img thumbnail" alt="Profile Image">
-                               </td>
-                              <td class="valign-middle"><a href="javascript:;" title="">Richard Travis</a>
-                              <p><a target="_blank" href="https://explore.marscoin.org/address/MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK">MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK</a></p>
-                              <p>(Test)</p>
-                              </td>
-                              <td class="valign-middle">Feb 12, 2022. 12:28</td>
-                              <td class="file-info valign-middle">
-                                <span class="label label-success demo-element public-status">Citizen</span>
-                              </td>
-                            </tr>    
-
-                                <tr>
-                              <td>
-                        
-                                      <img id="photo" src="/assets/citizen/generic_profile.jpg" class="profile-avatar-img thumbnail" alt="Profile Image">
-                       
-                              </td>
-                              <td class="valign-middle"><a href="javascript:;" title="">Paolo Mayer</a>
-                              <p><a target="_blank" href="https://explore.marscoin.org/address/MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK">MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK</a></p>
-                              <p>(Test)</p>
-                              </td>
-                              <td class="valign-middle">Feb 12, 2022. 12:28</td>
-                              <td class="file-info valign-middle">
-                                <span class="label label-success demo-element public-status">Citizen</span>
-                              </td>
-                            </tr>  
-
-                            <tr>
-                              <td>
-                             
-                                      <img id="photo" src="/assets/citizen/generic_profile.jpg" class="profile-avatar-img thumbnail" alt="Profile Image">
-                        
-                              </td>
-                              <td class="valign-middle"><a href="javascript:;" title="">Pyotr Korshunov</a>
-                              <p><a target="_blank" href="https://explore.marscoin.org/address/MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK">MGCxvRiRrScBWbCSX1QhtG1axMR5ku3XcK</a></p>
-                              <p>(Test)</p>
-                              </td>
-                              <td class="valign-middle">Feb 12, 2022. 12:28</td>
-                              <td class="file-info valign-middle">
-                                <span class="label label-success demo-element public-status">Citizen</span>
-                              </td>
-                            </tr>                      
+                    
                            
                         </tbody>
                        </table>
