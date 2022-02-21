@@ -155,6 +155,16 @@ $("#saveprofilebutton").click(function() {
 });
 
 
+
+$("#lastname").blur(function() {
+    firstname = $("#firstname").val();
+    lastname = $("#lastname").val();
+    $.post("/api/setfullname", {firstname: firstname, lastname: lastname} , function(data) {
+        
+    });
+});
+
+
 $("#savevideo").click(function() {
     //api
     vid = $("#finished-video").attr("src");

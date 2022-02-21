@@ -9,7 +9,7 @@ use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
 use App\Models\Feed;
 use App\Models\Profile;
-
+use App\Models\User;
 
 class ApiController extends Controller {
 
@@ -163,6 +163,27 @@ class ApiController extends Controller {
 		}else{
             return redirect('/login');
         }
+	}
+
+
+	public function setfullname(Request $request)
+	{
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$firstname = $request->input('firstname');
+			$lastname = $request->input('lastname');
+			if(!isset($firstname))
+				return;
+			if(!isset($lastname))
+				return;
+
+			$fullname = $firstname . " " . $lastname;
+
+			$user = User::where('id', '=', $uid)->first();
+			$user->fullname = $fullname;
+			$user->save();
+			return;
+		}
 	}
 
 

@@ -90,3 +90,4 @@ Route::post('/api/permapinvideo', 'Wallet\ApiController@permapinvideo');
 Route::post('/api/permapinjson', 'Wallet\ApiController@permapinjson');
 Route::post('/api/setfeed', 'Wallet\ApiController@setfeed');
 Route::post('/api/getTransactions', 'Wallet\ApiController@getTransactions');
+Route::post('/api/setfullname', 'Wallet\ApiController@setfullname');
