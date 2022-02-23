@@ -27,7 +27,7 @@ use App\Includes\AppHelper;
                                     href="https://explore.marscoin.org/tx/<?= $gp->txid ?>"><?= $gp->address ?></a></p>
 
                             <?php if($isCitizen && $gp->address != $public_address){ ?>
-                            <a data-toggle="modal" href="#endorseModal" data-endorse="{{{$gp->id}}}"  data-name="{{{$gp->fullname}}}" data-address="{{{$gp->address}}}"
+                            <a data-toggle="modal" href="#endorseModal" data-endorse="{{{$gp->userid}}}"  data-name="{{{$gp->fullname}}}" data-address="{{{$gp->address}}}"
                               class="btn-sm btn-primary demo-element endorse-btn">Endorse for Citizenship</a>
                             <?php } ?>
                         </td>
@@ -207,7 +207,7 @@ use App\Includes\AppHelper;
                 </div>
             </div>
           <div class="modal-footer">
-              <button id="confirm-endorse-btn" type="submit" data-confirm class="btn btn-primary submit-endorse">Confirm Endorsement</button>
+              <button id="confirm-endorse-btn" type="submit" data-confirm data-endorse class="btn btn-primary submit-endorse">Confirm Endorsement</button>
               <img src="/assets/citizen/loading.gif" alt="enter image description here" style="display: none" id="confirm-loading">
           </div> 
       </div>

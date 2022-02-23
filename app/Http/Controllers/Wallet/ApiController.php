@@ -108,7 +108,7 @@ class ApiController extends Controller {
 				mkdir($file_path);
 			}
 			
-			$file_path = "./assets/citizen/" . $public_address . "/data.json";
+			$file_path = "./assets/citizen/" . $public_address . "/".$type.".json";
 
 			file_put_contents($file_path, $json);
 			$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
@@ -131,8 +131,10 @@ class ApiController extends Controller {
 			$action_tag = $request->input('type');
 			$public_address = $request->input('address');
 			$embedded_link = $request->input('embedded_link');
+			$message = $request->input('message');
 
-			AppHelper::insertBlockchainCache($public_address, $uid, $action_tag, "", $embedded_link, $txid);
+			AppHelper::profileUpdate($action_tag, $message);
+			AppHelper::insertBlockchainCache($public_address, $uid, $action_tag, $message, $embedded_link, $txid);
 
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$profile->general_public = 1;
@@ -194,6 +196,20 @@ class ApiController extends Controller {
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$profile->wallet_open = 0;
 			$profile->save();
+			return;
+		}
+	}
+
+
+	public function setendorsed(Request $request)
+	{
+		if (Auth::check()) {
+			$uid = $request->input("id");
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$cnt = $profile->endorse_cnt;
+			$profile->endorse_cnt = $cnt + 1;
+			$profile->save();
+			return;
 		}
 	}
 
