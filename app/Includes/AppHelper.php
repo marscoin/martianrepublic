@@ -146,6 +146,10 @@ class AppHelper{
 		}
 
 
+		/**
+		 * Helper function keeping a local cache of the Marscoin blockchain embedded data feed 
+		 * as it pertains to MartianRepublic protocol anchors.
+		 */
 		public static function insertBlockchainCache($address, $uid, $action_tag, $message, $embedded_link, $txid)
 		{
 			$feed = new Feed;
@@ -160,6 +164,20 @@ class AppHelper{
 			$feed->txid = $txid;
 			$feed->save();
 			return TRUE;
+		}
+
+
+		/**
+		 * Helper function that monitors and adjusts platform specific changes due to 
+		 * the data anchors discovered (or successfully injected into) the Marscoin
+		 * blockchain.
+		 */
+		public static function profileUpdate($action_tag, $message)
+		{
+			if($action_tag == "ED")
+			{
+
+			}
 		}
 
 

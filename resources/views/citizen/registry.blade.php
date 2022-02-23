@@ -236,7 +236,7 @@ $("#publish").click(async (e) => {
     obj.meta.hash = m;
     var jsonString = JSON.stringify(obj);
     $("#publish_progress_message").text("Writing data to IPFS and cache...");
-    const data = await doAjax("/api/permapinjson", {"type": "registration", "payload": jsonString, "address": '<?=$public_address?>'});
+    const data = await doAjax("/api/permapinjson", {"type": "data", "payload": jsonString, "address": '<?=$public_address?>'});
     cid = data.Hash;
 
     message = "GP_"+cid;
@@ -332,6 +332,7 @@ if ("{{ $balance }}" < 1) {
     $("#endorse-cost").text("1 MARS (paid as network fee)")
 
     $("#confirm-endorse-btn").attr("data-confirm", address);
+    $("#confirm-endorse-btn").attr("data-endorse", id);
     $(".modal-message").show()
 }
 
@@ -342,16 +343,35 @@ $("#confirm-endorse-btn").click(async (e)=>
 {
     $("#confirm-loading").show();
     address  = e.target.getAttribute("data-confirm")
+    id  = e.target.getAttribute("data-endorse")
     console.log("confirming..." + address)
+
+    var obj = new Object();
+    obj.data = {};
+    obj.meta = {};
+    obj.data.message = "Citizen <?=$public_address?> herewith endorses " + address + ". May you live long and prosper!";
+    var jsonString = JSON.stringify(obj.data);
+    var m = sha256(jsonString);
+    obj.meta.hash = m;
+    var jsonString = JSON.stringify(obj);
+    console.log("Writing data to IPFS and cache...");
+    const data = await doAjax("/api/permapinjson", {"type": "endorsement", "payload": jsonString, "address": '<?=$public_address?>'});
+    cid = data.Hash;
+    message = "ED_"+cid;
+
     const io = await sendMARS(0.1, "<?= $public_address ?>");
     try {
-        const tx = await signMARS("ED_"+address, 1.1, io);
+        const tx = await signMARS(message, 1.1, io);
         $("#publish_progress_message").show().text("Published successfully...");
         if(tx.tx_hash){
             $("#confirm-success-message").show()
             $("#confirm-transaction-hash").text(tx.tx_hash)
             $("#confirm-loading").hide();
-            if(!alert('Submitted to Blockchain successfully')){window.location.reload();}
+            const edata = await doAjax("/api/setendorsed", {id: id});
+            const data = await doAjax("/api/setfeed", {"type": "ED", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "message": address, "address": '<?=$public_address?>'});
+            if(data.Hash){
+                if(!alert('Submitted to Blockchain successfully')){window.location.reload();}
+            }
         }
 
     } catch (e) {
