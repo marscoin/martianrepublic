@@ -106,7 +106,7 @@
                                     data-backdrop="static" data-keyboard="false">New Wallet</a>
                                 <h4>OR</h4>
                                 <a data-backdrop="static" data-keyboard="false" data-toggle="modal" href="#modalLogin"
-                                    class="btn-lg btn-primary demo-element">Open Wallet</a>
+                                    class="btn-lg btn-primary demo-element">Connect Wallet</a>
 
 
 
