@@ -28,8 +28,10 @@ use App\Includes\AppHelper;
 
                             {{-- <button class="endorse-btn primary-btn" id="{{{$gp->id}}}">Endorse </button> --}}
 
+                            <?php if($isCitizen){ ?>
                             <a data-toggle="modal" href="#endorseModal_{{{$gp->id}}}" id="{{{$gp->address}}}"
                               class="btn-sm btn-primary demo-element endorse-btn">Endorse for Citizenship</a>
+                            <?php } ?>
                         </td>
                         <td class="valign-middle"><?= $gp->mined ?></td>
                         <td class="file-info valign-middle">
