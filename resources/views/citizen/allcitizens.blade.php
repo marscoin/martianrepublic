@@ -27,7 +27,7 @@ use App\Includes\AppHelper;
                               <td class="valign-middle"><?=$gp->mined?></td>
                               <td class="file-info valign-middle">
                                   <span class="label label-success demo-element public-status">Citizen</span><br>
-                                  <span class="label label-warning row-stat-badge">Endorsements: + 0</span>
+                                  <span class="label label-warning row-stat-badge">Endorsements: +<?=0 + $gp->endorse_cnt?></span>
                               </td>
                             </tr>
                             <?php } ?>
