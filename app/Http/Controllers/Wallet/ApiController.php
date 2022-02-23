@@ -187,5 +187,16 @@ class ApiController extends Controller {
 	}
 
 
+	public function closewallet(Request $request)
+	{
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$profile->wallet_open = 0;
+			$profile->save();
+		}
+	}
+
+
 
 }
