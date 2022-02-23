@@ -63,6 +63,12 @@
       
       <li class="divider"></li> -->
       <li>
+        <a href="/wallet/dashboard/hd-close">
+          <i class="fa fa-window-close-o"></i>
+          &nbsp;&nbsp;Disconnect Wallet
+        </a>
+      </li>
+      <li>
         <a href="/logout">
           <i class="fa fa-sign-out"></i>
           &nbsp;&nbsp;Logout

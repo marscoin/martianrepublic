@@ -141,7 +141,6 @@ $.ajaxSetup({
 });
 
 $("#saveprofilebutton").click(function() {
-    //api
     pic = $("#photo").attr("src");
     event.preventDefault();
     $.post("/api/permapinpic", {"type": "profile_pic", "picture": pic, "address": '<?=$public_address?>'} , function(data) {
@@ -166,7 +165,6 @@ $("#lastname").blur(function() {
 
 
 $("#savevideo").click(function() {
-    //api
     vid = $("#finished-video").attr("src");
     event.preventDefault();
     console.log(vid);
@@ -305,6 +303,69 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 
 
 
+$('.dynamic-vote-modal').on('hidden.bs.modal', function () {
+    location.reload();
+})
+
+
+$(".endorse-btn").click(async (e)=>
+{
+
+if ("{{ $balance }}" < 1) {
+    alert("Not enough Marscoin to endorse...")
+}else{
+
+    let id = e.target.getAttribute("data-endorse")
+    let address = e.target.getAttribute("data-address")
+    let name = e.target.getAttribute("data-name")
+    console.log(address)
+
+    $("#endorse-title").text("Endorse: " + name)
+    $("#endorse-address").text(address)
+
+    // const io = await sendMARS(1, "<?= $public_address ?>");
+    // console.log(io)
+    // const fee = marsConvert(io.fee)
+    // console.log("THE FEE: ", fee);
+    // const mars_amount = 0.001;
+    // const total_amount = fee + parseInt(mars_amount);
+    $("#endorse-cost").text("1 MARS (paid as network fee)")
+
+    $("#confirm-endorse-btn").attr("data-confirm", address);
+    $(".modal-message").show()
+}
+
+})
+
+
+$("#confirm-endorse-btn").click(async (e)=>
+{
+    $("#confirm-loading").show();
+    address  = e.target.getAttribute("data-confirm")
+    console.log("confirming..." + address)
+    const io = await sendMARS(0.1, "<?= $public_address ?>");
+    try {
+        const tx = await signMARS("ED_"+address, 1.1, io);
+        $("#publish_progress_message").show().text("Published successfully...");
+        if(tx.tx_hash){
+            $("#confirm-success-message").show()
+            $("#confirm-transaction-hash").text(tx.tx_hash)
+            $("#confirm-loading").hide();
+            if(!alert('Submitted to Blockchain successfully')){window.location.reload();}
+        }
+
+    } catch (e) {
+        throw e;
+    }
+
+})
+
+
+
+
+
+////////////////////////////
+
 const Marscoin = {
     mainnet: {
         messagePrefix: "\x19Marscoin Signed Message:\n",
@@ -357,7 +418,7 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
         network: Marscoin.mainnet,
     });
     psbt.setVersion(1)
-    psbt.setMaximumFeeRate(1000000);
+    psbt.setMaximumFeeRate(10000000);
 
     unspent_vout = 0
     var data = my_bundle.Buffer(message)
@@ -393,6 +454,7 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
 
     const tx = psbt.finalizeAllInputs().extractTransaction(); 
     const txhash = tx.toHex()
+    console.log(txhash)
 
     try {
         const txId = await broadcastTxHash(txhash);
@@ -446,7 +508,7 @@ const broadcastTxHash = async (txhash) => {
         throw new Error("Missing tx hash...");
     }
 
-    const url = 'https://pebas.marscoin.org/api/mars/broadcast?txhash=${txhash}'
+    const url = 'https://pebas.marscoin.org/api/mars/broadcast?txhash='+txhash
     try {
         const response = await fetch(url, {
             method: 'GET'

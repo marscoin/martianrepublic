@@ -38,6 +38,7 @@ Route::get('/wallet/anchor', 'Wallet\DashboardController@anchor');
 
 Route::any('/wallet/dashboard/hd', 'Wallet\DashboardController@showHDWallet');
 Route::any('/wallet/dashboard/hd-open', 'Wallet\DashboardController@showHDOpen');
+Route::any('/wallet/dashboard/hd-close', 'Wallet\DashboardController@showHDClose');
 Route::any('/wallet/getwallet', 'Wallet\DashboardController@getWallet');
 Route::any('/wallet/failwallet', 'Wallet\DashboardController@failWallet');
 
@@ -91,3 +92,4 @@ Route::post('/api/permapinjson', 'Wallet\ApiController@permapinjson');
 Route::post('/api/setfeed', 'Wallet\ApiController@setfeed');
 Route::post('/api/getTransactions', 'Wallet\ApiController@getTransactions');
 Route::post('/api/setfullname', 'Wallet\ApiController@setfullname');
+Route::post('/api/closewallet', 'Wallet\ApiController@closewallet');
