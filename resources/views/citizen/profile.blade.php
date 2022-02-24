@@ -104,7 +104,7 @@
                 </div> <!-- /.feed-subject -->
                 <div class="feed-content">
                   <?php if($f->tag == 'ED'){?>
-                    <p><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> successfully <strong>notarized</strong> an edorsement for <?=$f->message?></p>
+                    <p><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> successfully <strong>notarized</strong> an endorsement for <?=$f->message?></p>
                   <?php } ?>
                 </div> <!-- /.feed-content -->
                 <div class="feed-actions">
@@ -194,7 +194,34 @@
             </div> <!-- /.tab-pane -->
 
             <div class="tab-pane fade" id="endorsed">
-            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
+                    
+            <?php foreach($endorsed as $e){?>
+
+                <div class="feed-item feed-item-idea">
+                  <div class="feed-icon">
+                    <i class="fa fa-thumbs-up"></i>
+                  </div> <!-- /.feed-icon -->
+                  <div class="feed-subject">
+                    <?php if($e->tag == 'ED'){?>
+                    <p>Your were endorsed by another citizen</p>
+                    <?php } ?>
+                  </div> <!-- /.feed-subject -->
+                  <div class="feed-content">
+                      <p><b><a target="_blank" href="https://explore.marscoin.org/tx/<?=$e->txid?>"><?=$e->address?></b> </a> successfully <strong>notarized</strong> an endorsement for you on the blockchain.</p>
+                  </div> <!-- /.feed-content -->
+                  <div class="feed-actions">
+                    <a href="javascript:;" class="pull-left"><i class="fa  fa-lock"></i> <?=$e->blockid?></a> 
+                    <a href="javascript:;" class="pull-right"><i class="fa fa-clock-o"></i> <?=$e->mined?></a>
+                  </div> <!-- /.feed-actions -->
+                </div> <!-- /.feed-item -->
+
+
+                <?php } 
+                if(count($endorsed) <= 0){
+                ?>
+                <p>You haven't received any endorsements yet by other citizens.</p>
+                <?php } ?>
+                    
             </div> <!-- /.tab-pane -->
 
             <div class="tab-pane fade" id="settings">
@@ -218,7 +245,7 @@
 
           <a href="javascript:;" class="list-group-item">
               <h3 class="pull-right"><i class="fa fa-thumbs-o-up text-primary"></i></h3>
-              <h4 class="list-group-item-heading">0</h4>
+              <h4 class="list-group-item-heading"><?=count($endorsed)?></h4>
               <p class="list-group-item-text">Endorsements</p>                  
             </a>
 
