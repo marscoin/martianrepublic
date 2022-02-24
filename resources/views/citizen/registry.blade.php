@@ -510,7 +510,7 @@ const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
 
     try {
         const response = await fetch(url, {
-            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            method: 'GET',
         });
 
         return response.json()
