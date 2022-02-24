@@ -90,6 +90,33 @@
 
           <h4 class="content-title"><u>Blockchain Notarized Public Activity Feed</u></h4>
 
+
+            <?php foreach($feed as $f){?>
+
+              <div class="feed-item feed-item-file">
+                <div class="feed-icon">
+                  <i class="fa fa-link"></i>
+                </div> <!-- /.feed-icon -->
+                <div class="feed-subject">
+                  <?php if($f->tag == 'ED'){?>
+                  <p>Endorsement of Citizen</p>
+                  <?php } ?>
+                </div> <!-- /.feed-subject -->
+                <div class="feed-content">
+                  <?php if($f->tag == 'ED'){?>
+                    <p><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> successfully <strong>notarized</strong> an edorsement for <?=$f->message?></p>
+                  <?php } ?>
+                </div> <!-- /.feed-content -->
+                <div class="feed-actions">
+                  <a href="javascript:;" class="pull-left"><i class="fa  fa-lock"></i> <?=$f->blockid?></a> 
+                  <a href="javascript:;" class="pull-right"><i class="fa fa-clock-o"></i> <?=$f->mined?></a>
+                </div> <!-- /.feed-actions -->
+              </div> <!-- /.feed-item -->
+
+
+            <?php } ?>
+
+
             <div class="feed-item feed-item-file">
 
               <div class="feed-icon">

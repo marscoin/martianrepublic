@@ -59,6 +59,7 @@ class IdentityController extends Controller
 			$view->isGP  = $profile->general_public;
 			$view->mePublic = Feed::where('userid', '=', $uid)->where('tag', '=', "GP")->first();
 			$view->meCitizen = Feed::where('userid', '=', $uid)->where('tag', '=', "CT")->first();
+			$view->feed = Feed::where('userid', '=', $uid)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
 			//print_r(is_null($view->meCitizen));
 			//die();
 			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "GP" ORDER BY feed.id desc', array($uid));
