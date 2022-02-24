@@ -37,21 +37,9 @@
                       <script>
                           (function() {
 
-                            // The width and height of the captured photo. We will set the
-                            // width to the value defined here, but the height will be
-                            // calculated based on the aspect ratio of the input stream.
-
                             var width = 320;    // We will scale the photo width to this
                             var height = 0;     // This will be computed based on the input stream
-
-                            // |streaming| indicates whether or not we're currently streaming
-                            // video from the camera. Obviously, we start at false.
-
                             var streaming = false;
-
-                            // The various HTML elements we need to configure or control. These
-                            // will be set by the startup() function.
-
                             var video = null;
                             var canvas = null;
                             var photo = null;
@@ -198,6 +186,13 @@
 
                   <script>
 
+                  // create audio and video constraints
+                  const constraintsVideo = {
+                      audio: false,
+                      video: true
+                  }
+                  const constraintsAudio = {audio: true}
+
                   let camera_button = document.querySelector("#start-camera");
                   let save_button = document.querySelector("#savevideo");
                   let video = document.querySelector("#video");
@@ -209,12 +204,15 @@
                   // let download_link = document.querySelector("#download-video");
 
                   let camera_stream = null;
+                  let audio_stream = null;
                   let media_recorder = null;
                   let blobs_recorded = [];
 
                   camera_button.addEventListener('click', async function() {
                       try {
-                        camera_stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                        audioStream = await navigator.mediaDevices.getUserMedia(constraintsAudio)
+                        camera_stream = await navigator.mediaDevices.getUserMedia(constraintsVideo)
+                        //camera_stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                         placeholder_video.style.display = "none";
                         video.style.display = "block";
                       }
@@ -240,7 +238,8 @@
                       video.style.display = "block";
                       finished_video.style.display = "none";
                       finished_video.src = "";
-                      media_recorder = new MediaRecorder(camera_stream, { mimeType: 'video/webm' });
+                      let combined = new MediaStream([...camera_stream.getVideoTracks(), ...audioStream.getAudioTracks()]);
+                      media_recorder = new MediaRecorder(combined, { mimeType: 'video/webm' });
 
                       media_recorder.addEventListener('dataavailable', function(e) {
                         blobs_recorded.push(e.data);
