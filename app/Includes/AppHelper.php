@@ -145,6 +145,15 @@ class AppHelper{
 			return $user;
 		}
 
+		
+		/**
+		 * @todo Pulls in user data from IPFS links as per blockchain
+		 */
+		public static function addUserToLocalCache($address)
+		{
+
+		}
+
 
 		/**
 		 * Helper function keeping a local cache of the Marscoin blockchain embedded data feed 
@@ -164,20 +173,6 @@ class AppHelper{
 			$feed->txid = $txid;
 			$feed->save();
 			return TRUE;
-		}
-
-
-		/**
-		 * Helper function that monitors and adjusts platform specific changes due to 
-		 * the data anchors discovered (or successfully injected into) the Marscoin
-		 * blockchain.
-		 */
-		public static function profileUpdate($action_tag, $message)
-		{
-			if($action_tag == "ED")
-			{
-
-			}
 		}
 
 

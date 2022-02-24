@@ -12,8 +12,8 @@ use App\Models\HDWallet;
 use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
-
-
+use App\Exceptions\Handler;
+use Exception;
 
 class IdentityController extends Controller
 {
@@ -60,6 +60,8 @@ class IdentityController extends Controller
 			$view->mePublic = Feed::where('userid', '=', $uid)->where('tag', '=', "GP")->first();
 			$view->meCitizen = Feed::where('userid', '=', $uid)->where('tag', '=', "CT")->first();
 			$view->feed = Feed::where('userid', '=', $uid)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
+			$view->endorsed = array();
+			
 			//print_r(is_null($view->meCitizen));
 			//die();
 			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "GP" ORDER BY feed.id desc', array($uid));
@@ -70,13 +72,21 @@ class IdentityController extends Controller
 				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
 				$view->balance = ($cur_balance * 0.00000001);
 				$view->public_address = $wallet['public_addr'];
+				$view->endorsed = Feed::where('message', '=', $wallet['public_addr'])->where('tag', '=', "ED")->get();
 			} else {
 				$view->balance = 0;
 				$view->public_address = "";
 			}
 
 			if($profile->general_public ){
-				$view->user = AppHelper::getUserFromCache($wallet['public_addr']);
+				try
+				{
+					$view->user = AppHelper::getUserFromCache($wallet['public_addr']);
+				}
+				catch(Exception $e) {
+					$view->user = AppHelper::addUserToLocalCache($wallet['public_addr']);
+					$view->user = AppHelper::getUserFromCache($wallet['public_addr']);
+				}
 			}
 			return $view;
 
