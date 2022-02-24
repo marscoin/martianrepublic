@@ -26,7 +26,7 @@ use App\Includes\AppHelper;
                             <p><a target="_blank"
                                     href="https://explore.marscoin.org/tx/<?= $gp->txid ?>"><?= $gp->address ?></a></p>
 
-                            <?php if($isCitizen && $gp->address != $public_address){ ?>
+                            <?php if($isCitizen && $gp->address != $public_address && !$gp->citizen){ ?>
                             <a data-toggle="modal" href="#endorseModal" data-endorse="{{{$gp->userid}}}"  data-name="{{{$gp->fullname}}}" data-address="{{{$gp->address}}}"
                               class="btn-sm btn-primary demo-element endorse-btn">Endorse for Citizenship</a>
                             <?php } ?>
