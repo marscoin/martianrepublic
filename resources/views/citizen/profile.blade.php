@@ -38,6 +38,12 @@
           <i class="fa fa-chevron-right list-group-chevron"></i>
         </a> 
 
+        <a href="#digid" data-toggle="tab" class="list-group-item">
+          <i class="fa fa-drivers-license text-primary"></i> &nbsp;&nbsp;Digital ID
+
+          <i class="fa fa-chevron-right list-group-chevron"></i>
+        </a> 
+
         <a href="#settings" data-toggle="tab" class="list-group-item">
           <i class="fa fa-cog text-primary"></i> &nbsp;&nbsp;Settings
 
@@ -190,7 +196,26 @@
             </div> <!-- /.tab-pane -->
 
             <div class="tab-pane fade" id="signed">
-            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
+            
+                  <h4 class="content-title"><u>Public Message</u></h4>
+                  <div class="share-widget clearfix">
+
+                  <textarea class="form-control share-widget-textarea" rows="3" placeholder="What would you like to publish?..." tabindex="1"></textarea>
+
+                  <div class="share-widget-actions">
+                    <div class="share-widget-types pull-left">
+                      <a href="javascript:;" class="fa fa-picture-o ui-tooltip" title="" data-original-title="Post an Image"><i></i></a>
+                      <a href="javascript:;" class="fa fa-video-camera ui-tooltip" title="" data-original-title="Upload a Video"><i></i></a>
+                    </div>	
+
+                  <div class="pull-right">
+                    <a class="btn btn-primary btn-sm" tabindex="2">Sign and Publish</a>
+                  </div>
+
+                  </div> <!-- /.share-widget-actions -->
+
+                </div>
+
             </div> <!-- /.tab-pane -->
 
             <div class="tab-pane fade" id="endorsed">
@@ -224,8 +249,15 @@
                     
             </div> <!-- /.tab-pane -->
 
+            <div class="tab-pane fade" id="digid">
+              <h4 class="content-title"><u>Printable Digital ID</u></h4>
+              <p> <a class="btn btn-secondary btn-lg btn-block " target="_blank" href="/citizen/printout"><i class="fa  fa-drivers-license"></i> Basic Design</a></p>
+              <p> <a class="btn btn-secondary btn-lg btn-block " target="_blank" href="/citizen/printout2"><i class="fa  fa-drivers-license"></i> Space Theme</a></p>
+              <p> <a class="btn btn-secondary btn-lg btn-block " target="_blank" href="/citizen/printout3"><i class="fa  fa-drivers-license"></i> Mars Theme</a></p>
+            </div> <!-- /.tab-pane -->
+
             <div class="tab-pane fade" id="settings">
-            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
+              <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
             </div> <!-- /.tab-pane -->
 
           </div> <!-- /.tab-content -->

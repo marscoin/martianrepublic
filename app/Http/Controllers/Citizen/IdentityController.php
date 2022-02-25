@@ -130,6 +130,65 @@ class IdentityController extends Controller
 	}
 
 
+	protected function printout2()
+	{
+		
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$view = View::make('citizen.themes.printout2');
+			$view->fullname = Auth::user()->fullname;
+			
+			if ($wallet) {
+				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
+				$view->balance = ($cur_balance * 0.00000001);
+				$view->public_address = $wallet['public_addr'];
+			} else {
+				$view->balance = 0;
+				$view->public_address = "";
+			}
+			
+			return $view;
+
+
+		}else{
+            return redirect('/login');
+        }
+
+		
+	}
+
+
+
+	protected function printout3()
+	{
+		
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$view = View::make('citizen.themes.printout3');
+			$view->fullname = Auth::user()->fullname;
+			
+			if ($wallet) {
+				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
+				$view->balance = ($cur_balance * 0.00000001);
+				$view->public_address = $wallet['public_addr'];
+			} else {
+				$view->balance = 0;
+				$view->public_address = "";
+			}
+			
+			return $view;
+
+
+		}else{
+            return redirect('/login');
+        }
+
+		
+	}
 
 
 
