@@ -56,6 +56,8 @@ Route::any('/logout', 'Wallet\DashboardController@showLogout');
 // ==================================================================================
 Route::get('/citizen/all', 'Citizen\IdentityController@showAll');
 Route::get('/citizen/printout', 'Citizen\IdentityController@printout');
+Route::get('/citizen/printout2', 'Citizen\IdentityController@printout2');
+Route::get('/citizen/printout3', 'Citizen\IdentityController@printout3');
 
 // 
 // Inventory Routes
