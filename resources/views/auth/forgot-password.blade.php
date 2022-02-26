@@ -74,7 +74,7 @@
             <h2>Password Reset</h2>
 
             <h5>Please enter your email to reset password</h5>
-
+            <x-auth-validation-errors class="mb-4" :errors="$errors" />
  <form class="form account-form" method="POST" action="{{ route('password.email') }}">
             @csrf
 
