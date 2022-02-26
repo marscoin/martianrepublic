@@ -200,16 +200,19 @@
                   <h4 class="content-title"><u>Public Message</u></h4>
                   <div class="share-widget clearfix">
 
-                  <textarea class="form-control share-widget-textarea" rows="3" placeholder="What would you like to publish?..." tabindex="1"></textarea>
+                  <textarea id="signedpublishpost" class="form-control share-widget-textarea" rows="3" placeholder="What would you like to publish?..." tabindex="1"></textarea>
 
                   <div class="share-widget-actions">
                     <div class="share-widget-types pull-left">
-                      <a href="javascript:;" class="fa fa-picture-o ui-tooltip" title="" data-original-title="Post an Image"><i></i></a>
-                      <a href="javascript:;" class="fa fa-video-camera ui-tooltip" title="" data-original-title="Upload a Video"><i></i></a>
+                    <img id="signedpublishprogress" src="/assets/citizen/loading.gif" alt="enter image description here" style="display: none" id="loading">
+                    <a id="signedpublishhash" href="" title=""></a>
+                      <!-- <a id="signedpublishpic" href="javascript:;" class="fa fa-picture-o ui-tooltip" title="" data-original-title="Post an Image"><i></i></a>
+                      <a id="signedpublishvid"href="javascript:;" class="fa fa-video-camera ui-tooltip" title="" data-original-title="Upload a Video"><i></i></a> -->
+
                     </div>	
 
                   <div class="pull-right">
-                    <a class="btn btn-primary btn-sm" tabindex="2">Sign and Publish</a>
+                    <a id="signedpublishbtn" class="btn btn-primary btn-sm" tabindex="2">Sign and Publish</a>
                   </div>
 
                   </div> <!-- /.share-widget-actions -->
