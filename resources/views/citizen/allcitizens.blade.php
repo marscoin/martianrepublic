@@ -21,7 +21,7 @@ use App\Includes\AppHelper;
                                  <img id="photo" src="/assets/citizen/<?=$gp->address?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image">
                               </td>
                               <td class="valign-middle">
-                                 <a href="javascript:;" title=""><?=$gp->fullname?> </a>
+                                 <a target="_blank" href="/citizen/id/<?=$gp->address?>" title=""><?=$gp->fullname?> </a>
                                 <p><a target="_blank" href="https://explore.marscoin.org/tx/<?=$gp->txid?>"><?=$gp->address?></a></p>
                               </td>
                               <td class="valign-middle"><?=$gp->mined?></td>
@@ -40,7 +40,7 @@ use App\Includes\AppHelper;
         </div> 
 
   <div class="col-md-3">
-            <h5 class="content-title"><u>Martian Society Stats</u></h5>
+            <h5 class="content-title"><u>Martian Republic Stats</u></h5>
 
             <div class="list-group">  
 
