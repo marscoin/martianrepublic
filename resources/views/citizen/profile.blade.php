@@ -222,6 +222,8 @@
             </div> <!-- /.tab-pane -->
 
             <div class="tab-pane fade" id="endorsed">
+
+            <h4 class="content-title"><u>Public Endorsements</u></h4>
                     
             <?php foreach($endorsed as $e){?>
 
