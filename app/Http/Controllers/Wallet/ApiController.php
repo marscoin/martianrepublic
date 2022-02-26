@@ -133,7 +133,6 @@ class ApiController extends Controller {
 			$embedded_link = $request->input('embedded_link');
 			$message = $request->input('message');
 
-			AppHelper::profileUpdate($action_tag, $message);
 			AppHelper::insertBlockchainCache($public_address, $uid, $action_tag, $message, $embedded_link, $txid);
 
 			$profile = Profile::where('userid', '=', $uid)->first();

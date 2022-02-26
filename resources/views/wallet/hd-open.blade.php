@@ -340,7 +340,7 @@
                         <div class="modal-footer"
                             style="display: flex; align-itmes: center; justify-content: center;">
                             <button type="button" class="btn-lg btn-primary" id="send-mars">Send MARS</button>
-                            <img src="https://i.stack.imgur.com/FhHRx.gif" alt="enter image description here"
+                            <img src="/assets/citizen/loading.gif" alt="enter image description here"
                                 style="display: none" id="loading">
                             <div class="success-message" style="display: none">
                                 <i class="fa fa-check" style="color: rgb(33, 192, 33)"></i>

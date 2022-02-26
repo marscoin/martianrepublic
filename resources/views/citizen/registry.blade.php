@@ -283,6 +283,42 @@ async function doAjax(ajaxurl, args) {
 
 
 
+$("#signedpublishbtn").click(async (e) => {
+    event.preventDefault();
+    $("#signedpublishprogress").show();
+    var obj = new Object();
+    obj.data = {};
+    obj.meta = {};
+    obj.data.post = $('#signedpublishpost').val();
+    var jsonString = JSON.stringify(obj.data);
+    var m = sha256(jsonString);
+    obj.meta.hash = m;
+    var jsonString = JSON.stringify(obj);
+    utcnow = new Date().getTime();
+    const data = await doAjax("/api/permapinjson", {"type": "signedpost_"+utcnow, "payload": jsonString, "address": '<?=$public_address?>'});
+    cid = data.Hash;
+
+    message = "SP_"+cid;
+    const io = await sendMARS(1, "<?=$public_address?>");
+    const fee = 0.01
+    const mars_amount = 0.01
+    const total_amount = fee + parseInt(mars_amount)
+
+    try {
+        const tx = await signMARS(message, mars_amount, io);
+        $("#signedpublishhash").show().text(tx.tx_hash);
+        $("#signedpublishhash").attr("href", 'https://explore.marscoin.org/tx/'+tx.tx_hash);
+        const data = await doAjax("/api/setfeed", {"type": "SP", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+        if(data.Hash){
+            $("#signedpublishprogress").hide();
+            $('#signedpublishpost').val('');
+        }
+    } catch (e) {
+        throw e;
+    }
+})
+
+
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
   e.target // newly activated tab
   //alert(e.target)
@@ -469,7 +505,11 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     })
 
     for (let i = 0; i < tx_i_o.inputs.length; i++) {
-        psbt.signInput(i, key);
+        try{
+            psbt.signInput(i, key);
+        } catch (e) {
+            alert("Problem while trying to sign with your key. Please try to reconnect your wallet...");
+        }
     }
 
     const tx = psbt.finalizeAllInputs().extractTransaction(); 
