@@ -192,4 +192,79 @@ class IdentityController extends Controller
 
 
 
+
+	//Get profile view of another Martian Citizen
+	//
+    protected function showId($address)
+	{
+		
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			//Martian user we are looking at
+			$martian = HDWallet::where('public_addr', '=', $address)->first();
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+
+			if (!$profile) {
+				return redirect('/twofa');
+			} else {
+				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
+					return redirect('/twofachallenge');
+				}
+			}
+			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
+			$view = View::make('citizen.martian');
+			$view->wallet_open = $profile->wallet_open;
+			$view->gravtar_link  = $gravtar_link;
+			$view->network = AppHelper::stats()['network'];
+			$view->coincount = AppHelper::stats()['coincount'];
+			$view->isCitizen = $profile->citizen;
+
+			
+			//print_r($view->isCitizen);
+			//die();
+			$view->isGP  = $profile->general_public;
+			$view->mePublic = Feed::where('userid', '=', $martian->user_id)->where('tag', '=', "GP")->first();
+			$view->meCitizen = Feed::where('userid', '=', $martian->user_id)->where('tag', '=', "CT")->first();
+			$view->feed = Feed::where('userid', '=', $martian->user_id)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
+			$view->endorsed = array();
+			
+			//print_r(is_null($view->meCitizen));
+			//die();
+			$view->activity = DB::select('select profile.userid, users.fullname, feed.tag, feed.mined  from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id ORDER BY feed.id DESC limit 3');
+
+
+			if ($wallet) {
+				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
+				$view->balance = ($cur_balance * 0.00000001);
+				$view->public_address = $wallet['public_addr'];
+				$view->endorsed = Feed::where('message', '=', $wallet['public_addr'])->where('tag', '=', "ED")->get();
+			} else {
+				$view->balance = 0;
+				$view->public_address = "";
+			}
+
+			if($profile->general_public ){
+				try
+				{
+					$view->user = AppHelper::getUserFromCache($address);
+				}
+				catch(Exception $e) {
+					$view->user = AppHelper::addUserToLocalCache($address);
+					$view->user = AppHelper::getUserFromCache($address);
+				}
+			}
+
+			return $view;
+
+
+		}else{
+            return redirect('/login');
+        }
+
+		
+	}
+
+
+
 }

@@ -58,6 +58,7 @@ Route::get('/citizen/all', 'Citizen\IdentityController@showAll');
 Route::get('/citizen/printout', 'Citizen\IdentityController@printout');
 Route::get('/citizen/printout2', 'Citizen\IdentityController@printout2');
 Route::get('/citizen/printout3', 'Citizen\IdentityController@printout3');
+Route::get('/citizen/id/{address?}', 'Citizen\IdentityController@showId');
 
 // 
 // Inventory Routes
