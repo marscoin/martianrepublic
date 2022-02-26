@@ -205,7 +205,7 @@
                   <div class="share-widget-actions">
                     <div class="share-widget-types pull-left">
                     <img id="signedpublishprogress" src="/assets/citizen/loading.gif" alt="enter image description here" style="display: none" id="loading">
-                    <a id="signedpublishhash" href="" title=""></a>
+                    <a target="_blank" id="signedpublishhash" href="" title=""></a>
                       <!-- <a id="signedpublishpic" href="javascript:;" class="fa fa-picture-o ui-tooltip" title="" data-original-title="Post an Image"><i></i></a>
                       <a id="signedpublishvid"href="javascript:;" class="fa fa-video-camera ui-tooltip" title="" data-original-title="Upload a Video"><i></i></a> -->
 
