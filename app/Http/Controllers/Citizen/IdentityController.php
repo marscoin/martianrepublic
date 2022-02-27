@@ -64,8 +64,8 @@ class IdentityController extends Controller
 			
 			//print_r(is_null($view->meCitizen));
 			//die();
-			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "GP" ORDER BY feed.id desc', array($uid));
-			$view->everyCitizen = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "CT" ORDER BY feed.id desc', array($uid));
+			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "GP" ORDER BY feed.id desc');
+			$view->everyCitizen = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "CT" ORDER BY feed.id desc');
 			$view->activity = DB::select('select profile.userid, users.fullname, feed.tag, feed.mined  from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id ORDER BY feed.id DESC limit 3');
 
 			if ($wallet) {
