@@ -244,6 +244,8 @@ class IdentityController extends Controller
 				$view->public_address = "";
 			}
 
+			$view->public_address = $address;
+
 			if($profile->general_public ){
 				try
 				{
