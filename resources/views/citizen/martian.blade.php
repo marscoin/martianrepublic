@@ -118,17 +118,23 @@
               <?php if($f->tag == 'ED'){?>
               <p>Endorsement of Citizen</p>
               <?php } ?>
+              <?php if($f->tag == 'SP'){?>
+              <p>Signed Public Message</p>
+              <?php } ?>
             </div> <!-- /.feed-subject -->
             <div class="feed-content">
               <?php if($f->tag == 'ED'){?>
                 <p><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> successfully <strong>notarized</strong> an endorsement for <?=$f->message?></p>
               <?php } ?>
+              <?php if($f->tag == 'SP'){?>
+                <p><blockquote><?=str_replace('\"', "'", str_replace('\n', "\n", $f->message))?></blockquote></p>
+              <?php } ?>
             </div> <!-- /.feed-content -->
             <div class="feed-actions">
-              <a href="javascript:;" class="pull-left"><i class="fa  fa-lock"></i> <?=$f->blockid?></a> 
-              <a href="javascript:;" class="pull-right"><i class="fa fa-clock-o"></i> <?=$f->mined?></a>
-            </div> <!-- /.feed-actions -->
-          </div> <!-- /.feed-item -->
+              <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-left"><i class="fa  fa-lock"></i> <?=$f->blockid?></a> 
+              <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-right"><i class="fa fa-clock-o"></i> <?=$f->mined?></a>
+            </div> 
+          </div> 
 
 
         <?php } ?>
@@ -167,9 +173,8 @@
             <a href="javascript:;" class="pull-left"><i class="fa  fa-lock"></i> 123</a> 
 
             <a href="javascript:;" class="pull-right"><i class="fa fa-clock-o"></i> timestamp</a>
-          </div> <!-- /.feed-actions -->
-
-        </div> <!-- /.feed-item -->
+          </div> 
+        </div> 
 
 
         <div class="feed-item feed-item-question">

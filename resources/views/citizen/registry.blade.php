@@ -286,10 +286,11 @@ async function doAjax(ajaxurl, args) {
 $("#signedpublishbtn").click(async (e) => {
     event.preventDefault();
     $("#signedpublishprogress").show();
+    posting = $('#signedpublishpost').val();
     var obj = new Object();
     obj.data = {};
     obj.meta = {};
-    obj.data.post = $('#signedpublishpost').val();
+    obj.data.post = posting;
     var jsonString = JSON.stringify(obj.data);
     var m = sha256(jsonString);
     obj.meta.hash = m;
@@ -308,7 +309,7 @@ $("#signedpublishbtn").click(async (e) => {
         const tx = await signMARS(message, mars_amount, io);
         $("#signedpublishhash").show().text(tx.tx_hash);
         $("#signedpublishhash").attr("href", 'https://explore.marscoin.org/tx/'+tx.tx_hash);
-        const data = await doAjax("/api/setfeed", {"type": "SP", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+        const data = await doAjax("/api/setfeed", {"type": "SP", "txid": tx.tx_hash, message: posting, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
         if(data.Hash){
             $("#signedpublishprogress").hide();
             $('#signedpublishpost').val('');

@@ -97,27 +97,33 @@
           <h4 class="content-title"><u>Blockchain Notarized Public Activity Feed</u></h4>
 
 
-            <?php foreach($feed as $f){?>
+     <?php foreach($feed as $f){?>
 
-              <div class="feed-item feed-item-file">
-                <div class="feed-icon">
-                  <i class="fa fa-link"></i>
-                </div> <!-- /.feed-icon -->
-                <div class="feed-subject">
-                  <?php if($f->tag == 'ED'){?>
-                  <p>Endorsement of Citizen</p>
-                  <?php } ?>
-                </div> <!-- /.feed-subject -->
-                <div class="feed-content">
-                  <?php if($f->tag == 'ED'){?>
-                    <p><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> successfully <strong>notarized</strong> an endorsement for <?=$f->message?></p>
-                  <?php } ?>
-                </div> <!-- /.feed-content -->
-                <div class="feed-actions">
-                  <a href="javascript:;" class="pull-left"><i class="fa  fa-lock"></i> <?=$f->blockid?></a> 
-                  <a href="javascript:;" class="pull-right"><i class="fa fa-clock-o"></i> <?=$f->mined?></a>
-                </div> <!-- /.feed-actions -->
-              </div> <!-- /.feed-item -->
+          <div class="feed-item feed-item-file">
+            <div class="feed-icon">
+              <i class="fa fa-link"></i>
+            </div> <!-- /.feed-icon -->
+            <div class="feed-subject">
+              <?php if($f->tag == 'ED'){?>
+              <p>Endorsement of Citizen</p>
+              <?php } ?>
+              <?php if($f->tag == 'SP'){?>
+              <p>Signed Public Message</p>
+              <?php } ?>
+            </div> <!-- /.feed-subject -->
+            <div class="feed-content">
+              <?php if($f->tag == 'ED'){?>
+                <p><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> successfully <strong>notarized</strong> an endorsement for <?=$f->message?></p>
+              <?php } ?>
+              <?php if($f->tag == 'SP'){?>
+                <p><blockquote><?=str_replace('\"', "'", str_replace('\n', "\n", $f->message))?></blockquote></p>
+              <?php } ?>
+            </div> <!-- /.feed-content -->
+            <div class="feed-actions">
+              <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-left"><i class="fa  fa-lock"></i> <?=$f->blockid?></a> 
+              <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-right"><i class="fa fa-clock-o"></i> <?=$f->mined?></a>
+            </div> 
+          </div> 
 
 
             <?php } ?>
@@ -218,6 +224,39 @@
                   </div> <!-- /.share-widget-actions -->
 
                 </div>
+
+
+
+                 <?php foreach($feed as $f){
+                    if($f->tag != 'SP')
+                      continue;
+                  ?>
+
+                      <div class="feed-item feed-item-file">
+                        <div class="feed-icon">
+                          <i class="fa fa-link"></i>
+                        </div> <!-- /.feed-icon -->
+                        <div class="feed-subject">
+                          <?php if($f->tag == 'SP'){?>
+                          <p>Signed Public Message</p>
+                          <?php } ?>
+                        </div> <!-- /.feed-subject -->
+                        <div class="feed-content">
+                          <?php if($f->tag == 'SP'){?>
+                            <p><blockquote><?=str_replace('\"', "'", str_replace('\n', "\n", $f->message))?></blockquote></p>
+                          <?php } ?>
+                        </div> <!-- /.feed-content -->
+                        <div class="feed-actions">
+                          <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-left"><i class="fa  fa-lock"></i> <?=$f->blockid?></a> 
+                          <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-right"><i class="fa fa-clock-o"></i> <?=$f->mined?></a>
+                        </div> 
+                      </div> 
+
+
+                        <?php } ?>
+
+
+
 
             </div> <!-- /.tab-pane -->
 
