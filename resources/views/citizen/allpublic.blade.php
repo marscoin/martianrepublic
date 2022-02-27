@@ -99,6 +99,9 @@ use App\Includes\AppHelper;
                     <?php } else if($a->tag == "PR"){ ?>
                         <i class="icon-li fa fa-pencil"></i>
                         <strong><?=$a->fullname?></strong> published proposal.
+                    <?php } else if($a->tag == "SP"){ ?>
+                        <i class="icon-li fa fa-quote-left"></i>
+                        <strong><?=$a->fullname?></strong> signed public message.
                     <?php } ?>
                     <br>
                     <small>about <?=AppHelper::time_elapsed_string($a->mined)?></small>
