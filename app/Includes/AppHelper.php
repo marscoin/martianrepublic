@@ -138,6 +138,12 @@ class AppHelper{
 		{
 			$user = array();
 			$file_path = "./assets/citizen/" . $address . "/";
+
+			if (!file_exists($file_path)) {
+				mkdir($file_path);
+				AppHelper::addUserToLocalCache($address);
+			}
+
 			$json_string = file_get_contents($file_path . "data.json");
 			$user['data'] = json_decode($json_string);
 			$user['pic'] = "/assets/citizen/" . $address . "/profile_pic.png";
@@ -151,6 +157,34 @@ class AppHelper{
 		 */
 		public static function addUserToLocalCache($address)
 		{
+			//find user's GP transaction in cache
+			$transaction_gp = Feed::where('address', '=', $address)->where('tag', '=', "GP")->first();
+			//pull up transaction using blockchain explorer
+			$json = AppHelper::file_get_contents_curl("http://explore1.marscoin.org/api/tx/".$transaction_gp['txid']);
+			if($json)
+			{
+				$tx = json_decode($json);
+				$op_return = $tx->vout[0]->scriptPubKey->asm;
+				$parts = explode(" ", $op_return);
+				if(count($parts)>0)
+				{
+					$ipfs_gp_hash = AppHelper::hex2str($parts[1]);
+					$p = explode("_", $ipfs_gp_hash);
+					if(count($p) > 0)
+					{
+						$ipfs_hash = $p[1];
+						$data = AppHelper::file_get_contents_curl("https://ipfs.marscoin.org/ipfs/".$ipfs_hash);
+						$file_path = "./assets/citizen/" . $address . "/data.json";
+						file_put_contents($file_path, $data);
+						$d = json_decode($data);
+
+						$img = AppHelper::file_get_contents_curl($d->data->picture);
+						$file_path = "./assets/citizen/" . $address . "/profile_pic.png";
+						file_put_contents($file_path, $img);
+					}
+				}
+
+			}
 
 		}
 
@@ -215,6 +249,14 @@ class AppHelper{
 				$diff = $now->diff($ago);
 				
 				return $diff->days;
+		}
+
+
+		public static function hex2str($hex) 
+		{
+		    $str = '';
+		    for($i=0;$i<strlen($hex);$i+=2) $str .= chr(hexdec(substr($hex,$i,2)));
+		    return $str;
 		}
 
 
