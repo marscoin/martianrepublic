@@ -79,6 +79,16 @@
                 </a>
                 </li>
 
+                @if ($active === 'forum')
+                    <li class="dropdown active">
+                    @else
+                    <li class="dropdown">
+                @endif
+                <a href="/forum">
+                    Forum
+                </a>
+                </li>
+
                 @if ($active === 'inventory')
                     <li class="dropdown active">
                     @else

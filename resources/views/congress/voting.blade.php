@@ -109,7 +109,6 @@
                                     @include('congress.noteligableyet')
                                     </div> 
                                 <?php } ?>
-                            
 
                         </div>
 
