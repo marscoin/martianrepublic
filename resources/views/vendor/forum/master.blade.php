@@ -1,50 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en" class="no-js">
+<!--<![endif]-->
+
 <head>
+    <title>Mars Basecamp - Congress</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
+    <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
+    <link rel="stylesheet" href="/assets/wallet/css/voting/voting.css">
+    <link rel="shortcut icon" href="/assets/favicon.ico">
 
-    <title>
-        @if (isset($thread))
-            {{ $thread->title }} -
-        @endif
-        @if (isset($category))
-            {{ $category->title }} -
-        @endif
-        {{ trans('forum::general.home_title') }}
-    </title>
 
-    <!-- Bootstrap (https://github.com/twbs/bootstrap) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <!-- Feather icons (https://github.com/feathericons/feather) -->
+    <!-- Begin Forum header includes -->
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-
-    <!-- Vue (https://github.com/vuejs/vue) -->
     @if (config('app.debug'))
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     @else
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
     @endif
-
-    <!-- Axios (https://github.com/axios/axios) -->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
-    <!-- Pickr (https://github.com/Simonwep/pickr) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
-
-    <!-- Sortable (https://github.com/SortableJS/Sortable) -->
     <script src="//cdn.jsdelivr.net/npm/sortablejs@1.10.1/Sortable.min.js"></script>
-    <!-- Vue.Draggable (https://github.com/SortableJS/Vue.Draggable) -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.23.2/vuedraggable.umd.min.js"></script>
-
     <style>
-    body
-    {
-        padding: 0;
-        background: #f8fafc;
-    }
 
     textarea
     {
@@ -174,67 +167,51 @@
         }
     }
     </style>
-</head>
-<body>
-    <nav class="v-navbar navbar navbar-expand-md navbar-light bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url(config('forum.web.router.prefix')) }}">Laravel Forum</a>
-            <button class="navbar-toggler" type="button" :class="{ collapsed: isCollapsed }" @click="isCollapsed = ! isCollapsed">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" :class="{ show: !isCollapsed }">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url(config('forum.web.router.prefix')) }}">{{ trans('forum::general.index') }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('forum.recent') }}">{{ trans('forum::threads.recent') }}</a>
-                    </li>
-                    @auth
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('forum.unread') }}">{{ trans('forum::threads.unread_updated') }}</a>
-                        </li>
-                    @endauth
-                    @can ('moveCategories')
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('forum.category.manage') }}">{{ trans('forum::general.manage') }}</a>
-                        </li>
-                    @endcan
-                </ul>
-                <ul class="navbar-nav">
-                    @if (Auth::check())
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" @click="isUserDropdownCollapsed = ! isUserDropdownCollapsed">
-                                {{ $username }}
-                            </a>
-                            <div class="dropdown-menu" :class="{ show: ! isUserDropdownCollapsed }" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item" href="{{ url('/logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    Log out
-                                </a>
-                                <form id="logout-form" action="{{ url('/logout') }}" method="POST" style="display: none;">
-                                    @csrf
-                                </form>
-                            </div>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/login') }}">Log in</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/register') }}">Register</a>
-                        </li>
-                    @endif
-                </ul>
-            </div>
-        </div>
-    </nav>
+<!-- /.FORUM HEADER INCLUDE -->
 
-    <div id="main" class="container">
+    <style>
+        span.qrcodeicon span {
+            position: absolute;
+            display: block;
+            top: 7px;
+            right: 21px;
+            width: 18px;
+            height: 18px;
+            background: url('/assets/wallet/img/qrcode.png');
+            cursor: pointer;
+            z-index: 1;
+        }
+
+    </style>
+    <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
+</head>
+
+<body class=" ">
+    <div id="wrapper">
+        <header class="v-navbar navbar navbar-inverse" role="banner">
+            <div class="container">
+                <div class="navbar-header">
+                    @include('wallet.header')
+                </div> <!-- /.navbar-header -->
+                <nav class="collapse navbar-collapse" role="navigation">
+                    @include('wallet.navbarleft')
+                    @include('wallet.navbarright')
+                </nav>
+            </div> <!-- /.container -->
+        </header>
+        @include('wallet.mainnav', array('active'=>'forum'))
+
+        
+        <div class="content">
+
+            <div class="container">
+
+
         @include('forum::partials.breadcrumbs')
         @include('forum::partials.alerts')
 
         @yield('content')
-    </div>
+
 
     <div class="mask"></div>
 
@@ -392,5 +369,26 @@
     });
     </script>
     @yield('footer')
+
+
+    </div> <!-- /.container -->
+
+</div> <!-- .content -->
+
+</div> <!-- /#wrapper -->
+
+<footer class="footer">
+@include('footer')
+</footer>
+
+<script src="/assets/wallet/js/dist/my_bundle.js"></script>
+<script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
+<script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
+<script src="/assets/wallet/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/assets/wallet/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="/assets/wallet/js/mvpready-core.js"></script>
+<script src="/assets/wallet/js/mvpready-admin.js"></script>
+<script src="/assets/wallet/js/demos/table_demo.js"></script>
+
 </body>
 </html>
