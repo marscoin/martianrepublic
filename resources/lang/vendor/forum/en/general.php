@@ -15,7 +15,7 @@ return [
     'editing' => "You're editing :item",
     'generic_confirm' => 'Are you sure?',
     'home_title' => 'Forum',
-    'index' => 'Index',
+    'index' => 'Forum',
     'invalid_selection' => 'Invalid selection',
     'last_updated' => 'Last updated',
     'manage' => 'Manage',

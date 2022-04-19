@@ -12,14 +12,14 @@
     </div>
 
     <div class="v-category-show">
-        <div class="clearfix">
+        <div class="clearfix" style="margin-top: -50px; margin-bottom: 25px;">
             @if ($category->accepts_threads)
                 @can ('createThreads', $category)
                     <a href="{{ Forum::route('thread.create', $category) }}" class="btn btn-primary float-end">{{ trans('forum::threads.new_thread') }}</a>
                 @endcan
             @endif
 
-            <div class="btn-group" role="group">
+            <div class="btn-group" role="group" style="float:right; margin-right: 5px;">
                 @can ('manageCategories')
                     <button type="button" class="btn btn-secondary" data-open-modal="edit-category">
                         {{ trans('forum::general.edit') }}
@@ -40,7 +40,7 @@
                     {{ $threads->links('forum::pagination') }}
                 </div>
 
-                @if (count($selectableThreadIds) > 0)
+                <!-- @if (count($selectableThreadIds) > 0)
                     @can ('manageThreads', $category)
                         <form :action="actions[selectedAction]" method="POST">
                             @csrf
@@ -55,7 +55,7 @@
                                 </div>
                             </div>
                     @endcan
-                @endif
+                @endif -->
 
                 <div class="threads list-group my-3 shadow-sm">
                     @foreach ($threads as $thread)
@@ -140,17 +140,17 @@
                     {{ $threads->links('forum::pagination') }}
                 </div>
                 <div class="col col-xs-4 text-end">
-                    @if ($category->accepts_threads)
+                    <!-- @if ($category->accepts_threads)
                         @can ('createThreads', $category)
                             <a href="{{ Forum::route('thread.create', $category) }}" class="btn btn-primary">{{ trans('forum::threads.new_thread') }}</a>
                         @endcan
-                    @endif
+                    @endif -->
                 </div>
             </div>
         @endif
     </div>
 
-    @if (! $threads->isEmpty())
+    <!-- @if (! $threads->isEmpty())
         @can ('markThreadsAsRead')
             <div class="text-center mt-3">
                 <button class="btn btn-primary px-5" data-open-modal="mark-threads-as-read">
@@ -160,7 +160,7 @@
 
             @include ('forum::category.modals.mark-threads-as-read')
         @endcan
-    @endif
+    @endif -->
 
     @can ('manageCategories')
         @include ('forum::category.modals.edit')

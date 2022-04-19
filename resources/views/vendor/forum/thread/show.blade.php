@@ -95,7 +95,7 @@
             <div class="col-md-auto text-end">
                 @if (! $thread->trashed())
                     @can ('reply', $thread)
-                        <div class="btn-group" role="group">
+                        <div class="btn-group" role="group" style="margin-bottom: 20px;margin-right: 15px;">
                             <a href="{{ Forum::route('post.create', $thread) }}" class="btn btn-primary">
                                 {{ trans('forum::general.new_reply') }}
                             </a>
@@ -164,7 +164,7 @@
 
         @if (! $thread->trashed())
             @can ('reply', $thread)
-                <h3>{{ trans('forum::general.quick_reply') }}</h3>
+                <h3 style="margin-top: 20px;">{{ trans('forum::general.quick_reply') }}</h3>
                 <div id="quick-reply">
                     <form method="POST" action="{{ Forum::route('post.store', $thread) }}">
                         @csrf
@@ -192,7 +192,7 @@
             {{ trans('forum::general.generic_confirm') }}
 
             @slot('actions')
-                <button type="submit" class="btn btn-primary">{{ trans('forum::general.proceed') }}</button>
+                <button type="submit" style="margin-top: 5px;" class="btn btn-primary">{{ trans('forum::general.proceed') }}</button>
             @endslot
         @endcomponent
     @endif

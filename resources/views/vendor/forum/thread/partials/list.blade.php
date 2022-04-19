@@ -1,5 +1,5 @@
-<div class="list-group-item {{ $thread->pinned ? 'pinned' : '' }} {{ $thread->locked ? 'locked' : '' }} {{ $thread->trashed() ? 'deleted' : '' }}" :class="{ 'border-primary': selectedThreads.includes({{ $thread->id }}) }">
-    <div class="row align-items-center text-center">
+<div style="padding-left: 50px;" class="list-group-item {{ $thread->pinned ? 'pinned' : '' }} {{ $thread->locked ? 'locked' : '' }} {{ $thread->trashed() ? 'deleted' : '' }}" :class="{ 'border-primary': selectedThreads.includes({{ $thread->id }}) }">
+    <div class="row align-items-center text-left">
         <div class="col-sm text-md-start">
             <span class="lead">
                 <a href="{{ Forum::route('thread.show', $thread) }}" @if (isset($category))style="color: {{ $category->color }};"@endif>{{ $thread->title }}</a>
@@ -12,27 +12,27 @@
                 <a href="{{ Forum::route('category.show', $thread->category) }}" style="color: {{ $thread->category->color }};">{{ $thread->category->title }}</a>
             @endif
         </div>
-        <div class="col-sm text-md-end">
+        <div class="col-sm text-md-end" style="float:right;     padding-right: 50px;">
             @if ($thread->pinned)
-                <span class="badge rounded-pill bg-info">{{ trans('forum::threads.pinned') }}</span>
+                <div class="badge rounded-pill bg-info">{{ trans('forum::threads.pinned') }}</div>
             @endif
             @if ($thread->locked)
-                <span class="badge rounded-pill bg-warning">{{ trans('forum::threads.locked') }}</span>
+                <div class="badge rounded-pill bg-warning">{{ trans('forum::threads.locked') }}</div>
             @endif
             @if ($thread->userReadStatus !== null && ! $thread->trashed())
-                <span class="badge rounded-pill bg-success">{{ trans($thread->userReadStatus) }}</span>
+                <div class="badge rounded-pill bg-success">{{ trans($thread->userReadStatus) }}</div>
             @endif
             @if ($thread->trashed())
-                <span class="badge rounded-pill bg-danger">{{ trans('forum::general.deleted') }}</span>
+                <div class="badge rounded-pill bg-danger">{{ trans('forum::general.deleted') }}</div>
             @endif
-            <span class="badge rounded-pill bg-primary" @if (isset($category))style="background: {{ $category->color }};"@endif>
+            <div class="badge rounded-pill bg-primary" @if (isset($category))style="background: {{ $category->color }};"@endif>
                 {{ trans('forum::general.replies') }}: 
                 {{ $thread->reply_count }}
-            </span>
+                </div>
         </div>
 
         @if ($thread->lastPost)
-            <div class="col-sm text-md-end text-muted">
+            <div class="col-sm text-md-end text-muted" style="float: right; margin-top: -50px;  margin-right: -80px;">
                 <a href="{{ Forum::route('thread.show', $thread->lastPost) }}">{{ trans('forum::posts.view') }} &raquo;</a>
                 <br>
                 {{ $thread->lastPost->authorName }}
@@ -40,10 +40,10 @@
             </div>
         @endif
 
-        @if (isset($category) && isset($selectableThreadIds) && in_array($thread->id, $selectableThreadIds))
-            <div class="col-sm" style="flex: 0;">
+        <!-- @if (isset($category) && isset($selectableThreadIds) && in_array($thread->id, $selectableThreadIds))
+            <div class="col-sm" style="flex: 0;" style="float:right">
                 <input type="checkbox" name="threads[]" :value="{{ $thread->id }}" v-model="selectedThreads">
             </div>
-        @endif
+        @endif -->
     </div>
 </div>

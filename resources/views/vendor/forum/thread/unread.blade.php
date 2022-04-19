@@ -19,7 +19,7 @@
         @endif
     </div>
 
-    @if (! $threads->isEmpty())
+    <!-- @if (! $threads->isEmpty())
         @can ('markThreadsAsRead')
             <div class="text-center">
                 <button class="btn btn-primary px-5" data-open-modal="mark-as-read">
@@ -29,5 +29,5 @@
 
             @include ('forum::thread.modals.mark-as-read')
         @endcan
-    @endif
+    @endif -->
 @stop

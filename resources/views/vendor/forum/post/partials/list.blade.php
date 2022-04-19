@@ -14,8 +14,7 @@
                 @endif
             </span>
         @endif
-
-        {{ $post->authorName }}
+        {{ $post->author->fullname }} | 
 
         <span class="text-muted">
             @include ('forum::partials.timestamp', ['carbon' => $post->created_at])

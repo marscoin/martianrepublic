@@ -18,7 +18,7 @@
 
             <div class="text-end">
                 <a href="{{ URL::previous() }}" class="btn btn-link">{{ trans('forum::general.cancel') }}</a>
-                <button type="submit" class="btn btn-primary px-5">{{ trans('forum::general.create') }}</button>
+                <button type="submit" style="margin-top: 5px;" class="btn btn-primary px-5">{{ trans('forum::general.create') }}</button>
             </div>
         </form>
     </div>
