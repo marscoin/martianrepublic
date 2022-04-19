@@ -41,6 +41,6 @@ return [
     |
     */
 
-    'user_name' => 'name',
+    'user_name' => 'fullname',
 
 ];

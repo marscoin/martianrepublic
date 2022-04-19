@@ -1,24 +1,14 @@
 <div class="category list-group my-4">
     <div class="list-group-item shadow-sm">
         <div class="row align-items-center text-center">
-            <div class="col-sm text-md-start">
-                <h5 class="card-title">
+            <div style="text-align: left; padding-left: 50px; padding-top: 20px;" class="col-sm text-md-start">
+                <h5 style="font-size: 25px;" class="card-title">
                     <a href="{{ Forum::route('category.show', $category) }}" style="color: {{ $category->color }};">{{ $category->title }}</a>
                 </h5>
-                <p class="card-text text-muted">{{ $category->description }}</p>
+                <p class="card-text text-muted"><i>{{ $category->description }}</i></p>
             </div>
-            <div class="col-sm-2 text-md-end">
-                @if ($category->accepts_threads)
-                    <span class="badge rounded-pill bg-primary" style="background: {{ $category->color }};">
-                        {{ trans_choice('forum::threads.thread', 2) }}: {{ $category->thread_count }}
-                    </span>
-                    <br>
-                    <span class="badge rounded-pill bg-primary" style="background: {{ $category->color }};">
-                        {{ trans_choice('forum::posts.post', 2) }}: {{ $category->post_count }}
-                    </span>
-                @endif
-            </div>
-            <div class="col-sm text-md-end text-muted">
+            
+            <div style="text-align: left; padding-left: 90px; margin-top: 15px;"  class="col-sm text-md-end text-muted">
                 @if ($category->accepts_threads)
                     @if ($category->newestThread)
                         <div>
@@ -34,6 +24,19 @@
                     @endif
                 @endif
             </div>
+
+            <div style="float:right; text-align: left;     display: flex; justify-content: flex-end;" class="col-sm-2 text-md-end">
+                @if ($category->accepts_threads)
+                    <span class="badge rounded-pill bg-primary" style="background: {{ $category->color }};">
+                        {{ trans_choice('forum::threads.thread', 2) }}: {{ $category->thread_count }}
+                    </span>
+                    <br>
+                    <span class="badge rounded-pill bg-primary" style="background: {{ $category->color }};">
+                        {{ trans_choice('forum::posts.post', 2) }}: {{ $category->post_count }}
+                    </span>
+                @endif
+            </div>
+
         </div>
     </div>
 
