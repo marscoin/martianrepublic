@@ -56,11 +56,14 @@
                                 <?php } ?>
                             </li>
                             <li class="">
-                                <a href="#citizens" data-toggle="tab">Citizens</a>
+                                <a href="#citizens" data-toggle="tab">All Citizens</a>
                             </li>
 
                             <li class="">
-                                <a href="#all" data-toggle="tab">Public</a>
+                                <a href="#all" data-toggle="tab">General Public</a>
+                            </li>
+                            <li class="">
+                                <a href="#applicants" data-toggle="tab">Applicants</a>
                             </li>
                         </ul>
                         <div id="myTab1Content" class="tab-content" style="margin-top: 50px;">
@@ -80,6 +83,10 @@
                             <!-- Show the general public -->
                             <div class="tab-pane fade" id="all">
                                 @include('citizen.allpublic')
+                            </div>
+                             <!-- Show the general public -->
+                             <div class="tab-pane fade" id="applicants">
+                                @include('citizen.allapplicants')
                             </div>
                             <!-- New public registration form -->
    
