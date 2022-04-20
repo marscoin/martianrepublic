@@ -128,7 +128,15 @@
     <script src="/assets/wallet/js/sha256.js"></script>
 
 <script>
+
+function imgError(image) {
+    image.onerror = "";
+    image.src = "/assets/citizen/generic_profile.jpg";
+    return true;
+}
+
 $(document).ready(function() {
+
 
 $.ajaxSetup({
     headers: {
