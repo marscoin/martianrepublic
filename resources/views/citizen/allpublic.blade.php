@@ -19,7 +19,7 @@ use App\Includes\AppHelper;
                     <tr>
                         <td>
                             <img id="photo" src="/assets/citizen/<?= $gp->address ?>/profile_pic.png"
-                                class="profile-avatar-img thumbnail" alt="Profile Image">
+                                class="profile-avatar-img thumbnail" alt="Profile Image" style="max-height: 100px;">
                         </td>
                         <td class="valign-middle">
                             <a href="javascript:;" title=""><?= $gp->fullname ?> </a>
