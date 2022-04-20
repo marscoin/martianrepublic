@@ -22,10 +22,9 @@ use App\Includes\AppHelper;
                         </td>
                         <td class="valign-middle">
                             <a href="javascript:;" title=""><?= $apps->fullname ?> </a>
-                            <p><a target="_blank"
-                                    href="https://explore.marscoin.org/tx/<?= $apps->txid ?>"><?= $apps->address ?></a></p>
+                            <p><a target="_blank"  href="#><?= $apps->address ?></a></p>
 
-                            <?php if($isCitizen && $apps->address != $public_address && !$apps->citizen){ ?>
+                            <?php if($isCitizen && $apps->address != $public_address){ ?>
                             <a data-toggle="modal" href="#endorseModal" data-endorse="{{{$apps->userid}}}"  data-name="{{{$apps->fullname}}}" data-address="{{{$apps->address}}}"
                               class="btn-sm btn-primary demo-element endorse-btn">Donate Marscoin</a>
                             <?php } ?>
