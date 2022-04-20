@@ -30,7 +30,7 @@ try:
         sql = "SELECT * from feed where address = %s"
         cur1.execute(sql, (s))  
         entries = cur1.fetchall()
-        if entries is None:
+        if cur1.rowcount == 0:
             print("Enter applicant " + str(s))
             try:
                 sql = "UPDATE profile, hd_wallet SET has_application = 1 WHERE profile.userid = hd_wallet.user_id AND hd_wallet.public_addr = %s "
@@ -41,7 +41,8 @@ try:
             except Exception as e:
                 reason = 'Error: %s - %s' % sys.exc_info()[:2]
                 print(reason)
-
+        else:
+            print("Address found in feed table")
 
     #
     #   Find applicants that did notarize their appliation and remove their applicant flag
