@@ -23,7 +23,7 @@
                   <div class="col-md-4">
                     
                       <div class="fileupload-new" style="width: 250px; height: 250px;">
-                        <img id="photo" src="/assets/citizen/generic_profile.jpg" class="profile-avatar-img thumbnail" alt="Profile Image">
+                        <img id="photo" src="/assets/citizen/generic_profile.jpg" class="profile-avatar-img thumbnail" alt="Profile Image" style="max-height: 100px;">
                       </div>
                       <div id="pin_message"></div>
 
