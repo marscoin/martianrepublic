@@ -9,7 +9,7 @@ use App\Includes\AppHelper;
                 <thead>
                     <tr>
                         <th style="width: 150px">Profile Picture</th>
-                        <th>Not Blockchain Notarized Yet</th>
+                        <th>Public Address</th>
                         <th>Since</th>
                         <th>Status</th>
                     </tr>
@@ -18,18 +18,18 @@ use App\Includes\AppHelper;
                     <?php foreach($everyApplicant as $apps){?>
                     <tr>
                         <td>
-                            <img id="photo" src="/assets/citizen/<?= $apps->address ?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image" style="max-height: 100px;">
+                            <img id="photo" src="/assets/citizen/<?= $apps->address ?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image" style="max-height: 100px;" onerror="imgError(this);">
                         </td>
                         <td class="valign-middle">
                             <a href="javascript:;" title=""><?= $apps->fullname ?> </a>
-                            <p><a target="_blank"  href="#><?= $apps->address ?></a></p>
+                            <p><a target="_blank"  href="#"><?= $apps->address ?></a></p>
 
                             <?php if($isCitizen && $apps->address != $public_address){ ?>
                             <a data-toggle="modal" href="#endorseModal" data-endorse="{{{$apps->userid}}}"  data-name="{{{$apps->fullname}}}" data-address="{{{$apps->address}}}"
                               class="btn-sm btn-primary demo-element endorse-btn">Donate Marscoin</a>
                             <?php } ?>
                         </td>
-                        <td class="valign-middle">n/a</td>
+                        <td class="valign-middle">not notarized yet</td>
                         <td class="file-info valign-middle">
                             <span class="label label-default demo-element public-status">Applicant</span>
                         </td>
