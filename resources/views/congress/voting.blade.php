@@ -7,35 +7,23 @@
 <!--<![endif]-->
 
 <head>
-    <title>Mars Basecamp - Congress</title>
+    <title>Martian Republic - Congress</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <!-- Google Font: Open Sans -->
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
-    <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
-    <!-- App CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
-
     <link rel="stylesheet" href="/assets/wallet/css/voting/voting.css">
-
-    <!-- <link href="/assets/wallet/css/custom.css" rel="stylesheet">-->
-    <!-- Favicon -->
+    <link rel="stylesheet" href="/assets/wallet/css/simplemde.min.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-  <![endif]-->
     <style>
         span.qrcodeicon span {
             position: absolute;
@@ -48,6 +36,178 @@
             cursor: pointer;
             z-index: 1;
         }
+
+
+        .price-box {
+    margin: 0 auto;
+	background: #E9E9E9;
+	border-radius: 10px;
+	padding: 40px 15px;
+	width: 500px;
+}
+
+.ui-widget-content {
+	border: 1px solid #bdc3c7;
+	background: #e1e1e1;
+	color: #222222;
+	margin-top: 4px;
+}
+
+.ui-slider .ui-slider-handle {
+	position: absolute;
+	z-index: 2;
+	width: 5.2em;
+	height: 2.2em;
+	cursor: default;
+	margin: 0 -40px auto !important;
+	text-align: center;	
+	line-height: 30px;
+	color: #FFFFFF;
+	font-size: 15px;
+}
+
+.ui-slider .ui-slider-handle .glyphicon {
+	color: #FFFFFF;
+	margin: 0 3px; 
+	font-size: 11px;
+	opacity: 0.5;
+}
+
+.ui-corner-all {
+	border-radius: 20px;
+}
+
+.ui-slider-horizontal .ui-slider-handle {
+	top: -.9em;
+}
+
+.ui-state-default,
+.ui-widget-content .ui-state-default {
+	border: 1px solid #f9f9f9;
+	background: #3498db;
+}
+
+.ui-slider-horizontal .ui-slider-handle {
+	margin-left: -0.5em;
+}
+
+.ui-slider .ui-slider-handle {
+	cursor: pointer;
+}
+
+.ui-slider a,
+.ui-slider a:focus {
+	cursor: pointer;
+	outline: none;
+}
+
+.price, .lead p {
+	font-weight: 600;
+	font-size: 32px;
+	display: inline-block;
+	line-height: 60px;
+}
+
+h4.great {
+	background: #00ac98;
+	margin: 0 0 25px -60px;
+	padding: 7px 15px;
+	color: #ffffff;
+	font-size: 18px;
+	font-weight: 600;
+	border-radius: 5px;
+	display: inline-block;
+	-moz-box-shadow:    2px 4px 5px 0 #ccc;
+  	-webkit-box-shadow: 2px 4px 5px 0 #ccc;
+  	box-shadow:         2px 4px 5px 0 #ccc;
+}
+
+.total {
+	border-bottom: 1px solid #7f8c8d;
+	/*display: inline;
+	padding: 10px 5px;*/
+	position: relative;
+	padding-bottom: 20px;
+}
+
+.total:before {
+	content: "";
+	display: inline;
+	position: absolute;
+	left: 0;
+	bottom: 5px;
+	width: 100%;
+	height: 3px;
+	background: #7f8c8d;
+	opacity: 0.5;
+}
+
+.price-slider {
+	margin-bottom: 70px;
+}
+
+.price-slider span {
+	font-weight: 200;
+	display: inline-block;
+	color: #7f8c8d;
+	font-size: 13px;
+}
+
+.form-pricing {
+	background: #ffffff;
+	padding: 20px;
+	border-radius: 4px;
+}
+
+.price-form {
+	background: #ffffff;
+	margin-bottom: 10px;
+	padding: 20px;
+	border: 1px solid #eeeeee;
+	border-radius: 4px;
+	/*-moz-box-shadow:    0 5px 5px 0 #ccc;
+  	-webkit-box-shadow: 0 5px 5px 0 #ccc;
+  	box-shadow:         0 5px 5px 0 #ccc;*/
+}
+
+.form-group {
+	margin-bottom: 0;
+}
+
+.form-group span.price {
+	font-weight: 200;
+	display: inline-block;
+	color: #7f8c8d;
+	font-size: 14px;
+}
+
+.help-text {
+	display: block;
+	margin-top: 32px;
+	margin-bottom: 10px;
+	color: #737373;
+	position: absolute;
+	/*margin-left: 20px;*/
+	font-weight: 200;
+	text-align: right;
+	width: 188px;
+}
+
+.price-form label {
+	font-weight: 200;
+	font-size: 21px;
+}
+
+img.payment {
+	display: block;
+    margin-left: auto;
+    margin-right: auto
+}
+
+.ui-slider-range-min {
+	background: #2980b9;
+}
+
 
     </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
@@ -144,6 +304,88 @@
     <script src="/assets/wallet/js/mvpready-core.js"></script>
     <script src="/assets/wallet/js/mvpready-admin.js"></script>
     <script src="/assets/wallet/js/demos/table_demo.js"></script>
+    <script src="/assets/wallet/js/jquery-ui.min.js"></script>
+    <script src="/assets/wallet/js/simplemde.min.js"></script>
+   
+    <script>
+        var simplemde = new SimpleMDE({ element: document.getElementById("description") });
+    </script>
+    <script>
+    $(document).ready(function() {
+          $("#slider").slider({
+              animate: true,
+              value:1,
+              min: 0,
+              max: 100,
+              step: 1,
+              slide: function(event, ui) {
+                  update(1,ui.value); //changed
+              }
+          });
+
+          $("#slider2").slider({
+              animate: true,
+              value:0,
+              min: 0,
+              max: 680,
+              step: 1,
+              slide: function(event, ui) {
+                  update(2,ui.value); //changed
+              }
+          });
+          $("#slider3").slider({
+              animate: true,
+              value:0,
+              min: 51,
+              max: 100,
+              step: 1,
+              slide: function(event, ui) {
+                  update(2,ui.value); //changed
+              }
+          });
+          $("#slider4").slider({
+              animate: true,
+              value:0,
+              min: 0,
+              max: 2672,
+              step: 1,
+              slide: function(event, ui) {
+                  update(2,ui.value); //changed
+              }
+          });
+
+          //Added, set initial value.
+          $("#amount").val(0);
+          $("#duration").val(0);
+          $("#amount-label").text(0);
+          $("#duration-label").text(0);
+          
+          update();
+      });
+
+      //changed. now with parameter
+      function update(slider,val) {
+        //changed. Now, directly take value from ui.value. if not set (initial, will use current value.)
+        var $amount = slider == 1?val:$("#amount").val();
+        var $duration = slider == 2?val:$("#duration").val();
+
+        /* commented
+        $amount = $( "#slider" ).slider( "value" );
+        $duration = $( "#slider2" ).slider( "value" );
+         */
+
+         $total = "$" + ($amount * $duration);
+         $( "#amount" ).val($amount);
+         $( "#amount-label" ).text($amount);
+         $( "#duration" ).val($duration);
+         $( "#duration-label" ).text($duration);
+         $( "#total" ).val($total);
+         $( "#total-label" ).text($total);
+
+         $('#slider a').html('<label><span class="glyphicon glyphicon-chevron-left"></span> '+$amount+' <span class="glyphicon glyphicon-chevron-right"></span></label>');
+         $('#slider2 a').html('<label><span class="glyphicon glyphicon-chevron-left"></span> '+$duration+' <span class="glyphicon glyphicon-chevron-right"></span></label>');
+      }
+</script>
 
     <script type="text/javascript">
         $(document).ready(function() {
