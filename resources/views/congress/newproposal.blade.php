@@ -10,7 +10,7 @@
 
                 <label for="textarea-input">Description *</label>
                 <textarea type="description" data-required="true" data-minlength="5" name="description" id="description"
-                    cols="10" rows="20" style="min-height: 260px;" class="form-control"></textarea>
+                    cols="10" rows="180" style="min-height: 9860px;" class="form-control"></textarea>
 
                 <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 15px">
 
@@ -26,32 +26,112 @@
 
                         <br />
 
-                        <label for="category">Proposal Category: </label>
+                        <label for="preset">Proposal Presets: </label>
+                        <select name="preset" id="preset">
 
-                        <select name="category" id="category">
-
-                            <option value="Basic">
-                                Basic
+                            <option value="Poll">
+                                Poll
                             </option>
-                            <option value="Bill">
-                                Bill
+                            <option value="Ordinance">
+                                Ordinance
+                            </option>
+                            <option value="Regulation">
+                            Regulation
+                            </option>
+                            <option value="Statute">
+                            Statute
+                            </option>
+                            <option value="Law">
+                            Law
                             </option>
                             <option value="Amendment">
-                                Amendment
+                            Amendment
                             </option>
                         </select>
+                        <p>Amendment: Runtime: 1 Month - Requirement: 90% of Citizenry - Threshold: 75% - Expiration: None.</p>
+                        <p>Law: Runtime: 1 Month - Requirement: 80% of Citizenry - Threshold: 65% - Expiration: 4 years.</p>
+                        <p>Statute: Runtime: 2 Weeks - Requirement: 75% of Citizenry - Threshold: 60% - Expiration: 2 years.</p>
+                        <p>Regulation: Runtime: 2 Weeks - Requirement: 70% of Citizenry - Threshold: 60% - Expiration: 1 year.</p>
+                        <p>Ordinance: Runtime: 2 Weeks - Requirement: 60% of Citizenry - Threshold: 55% - Expiration: 1 year.</p>
+                        <p>Poll: Runtime: 1 Week - Requirement: 0% of Citizenry - Threshold: None - Expiration: Immediate.</p>
 
+                        <label>Custom:</label>
+                        <div class="price-box">
 
+                            <form class="form-horizontal form-pricing" role="form">
+
+                            <div class="price-slider">
+                                <h4 class="great">Participation</h4>
+                                <span>Minimum 5% is required</span>
+                                <div class="col-sm-12">
+                                <div id="slider"></div>
+                                </div>
+                            </div>
+                            <div class="price-slider">
+                                <h4 class="great">Duration</h4>
+                                <span>Minimum 1 day is required</span>
+                                <div class="col-sm-12">
+                                <div id="slider2"></div>
+                                </div>
+                            </div>
+                            <div class="price-slider">
+                                <h4 class="great">Threshold</h4>
+                                <span>Minimum 55% required to pass</span>
+                                <div class="col-sm-12">
+                                <div id="slider3"></div>
+                                </div>
+                            </div>
+                            <div class="price-slider">
+                                <h4 class="great">Expiration</h4>
+                                <span>Default: Never</span>
+                                <div class="col-sm-12">
+                                <div id="slider3"></div>
+                                </div>
+                            </div>
+
+                            <div class="price-form">
+
+                                <div class="form-group">
+                                <label for="amount" class="col-sm-6 control-label">Participation (%): </label>
+                                <span class="help-text">Please choose your citizen participation percentage</span>
+                                <div class="col-sm-6">
+                                    <input type="hidden" id="amount" class="form-control">
+                                    <p class="price lead" id="amount-label"></p>
+                                    <span class="price">.00</span>
+                                </div>
+                                </div>
+                                <div class="form-group">
+                                <label for="duration" class="col-sm-6 control-label">Duration: </label>
+                                <span class="help-text">Choose your proposal timeframe</span>
+                                <div class="col-sm-6">
+                                    <input type="hidden" id="duration" class="form-control">
+                                    <p class="price lead" id="duration-label"></p>
+                                    <span class="price">days</span>
+                                </div>
+                                </div>
+                                <hr class="style">
+                                <div class="form-group total">
+                                <label for="total" class="col-sm-6 control-label"><strong>Total Citizen Committment: </strong></label>
+                                <span class="help-text">(Amount * Days)</span>
+                                <div class="col-sm-6">
+                                    <input type="hidden" id="total" class="form-control">
+                                    <p class="price lead" id="total-label"></p>
+                                    <span class="price">.00</span>
+                                </div>
+                                </div>
+
+                            </div>
+
+            
+                            </form>
+
+                        </div>
 
                         <br />
 
-                        <label for="name">Discussion URL *</label>
                         <div class="" style="display: flex; align-items: center; justify-content: center">
 
-                            <input type="text" id="discussion" name="discussion" class="form-control parsley-validated"
-                                data-required="true" placeholder="www.discussion.example.com">
-
-
+                            <p>Citizens can submit proposals to the community. A standard </p>
 
                         </div>
 
@@ -143,7 +223,6 @@
 </form>
 <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
 <script src="/assets/wallet/js/dist/my_bundle.js"></script>
-
 <script>
     const Marscoin = {
         mainnet: {
