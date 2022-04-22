@@ -105,7 +105,7 @@ class AppHelper{
 				if (isset($detais["msg"])) {
 					throw new \Exception($detais["msg"], 1);
 				} else {
-					throw new \Exception("HTTP Return " . $r["http_code"], 1);
+					return "Error";
 				}
 			}
 			$details = json_decode($result, true);
