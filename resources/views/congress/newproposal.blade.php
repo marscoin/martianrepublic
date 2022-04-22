@@ -156,21 +156,13 @@
                         <p class="modal-configuration"></p>
                     </div>
 
-                    <div class="modal-body-box">
-                        <h5>Cost of Proposal: </h5>
-                        <h3 class="modal-cost"></h3>
-                    </div>
-
                     <div class="modal-message" style="display: none">
                         <i class="fa fa-times-circle"></i>
                         <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
                         <span id="modal-message-success" style="font-weight: 600"> </span>
                     </div>
                 </div> <!-- /.modal-body -->
-                <h5 class="transaction-hash">
-
-
-                </h5>
+                <h5 class="transaction-hash" style="text-align: center;"></h5>
 
                 <div class="modal-footer">
                     <button id="submit-proposal" type="submit" class="btn btn-primary">Submit Proposal</button>
