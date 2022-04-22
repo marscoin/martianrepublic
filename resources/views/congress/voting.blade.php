@@ -547,6 +547,11 @@ $(document).ready(function() {
                         if(data.Hash){
                             $("#modal-message-success").show()
                             $("#loading").hide()
+                            $(".modal-footer").hide();
+                            const data = await doAjax("/api/cacheproposal", {"type": "PR", "txid": tx.tx_hash, message: jsonString, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+                            if(data.Discussion){
+                                //if(!alert('Submitted to Blockchain successfully')){location.href = '/forum/'+data.Discussion;}
+                            }
                         }
                     } catch (e) {
                         throw e;

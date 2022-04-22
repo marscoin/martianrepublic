@@ -271,7 +271,7 @@ $("#publish").click(async (e) => {
         $("#publish_progress_message").show().text(tx.tx_hash);
         const data = await doAjax("/api/setfeed", {"type": "GP", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
         if(data.Hash){
-            if(!alert('Submitted to Blockchain successfully')){window.location.reload();}
+            if(!alert('Submitted to Marscoin Blockchain successfully')){window.location.reload();}
         }
 
     } catch (e) {

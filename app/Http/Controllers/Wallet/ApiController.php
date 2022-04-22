@@ -10,6 +10,8 @@ use App\Includes\AppHelper;
 use App\Models\Feed;
 use App\Models\Profile;
 use App\Models\User;
+use App\Models\Proposals;
+use App\Models\Threads;
 
 class ApiController extends Controller {
 
@@ -210,6 +212,56 @@ class ApiController extends Controller {
 			$profile->save();
 			return;
 		}
+	}
+
+
+
+	public function cacheproposal(Request $request)
+	{
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$txid = $request->input('txid');
+			$public_address = $request->input('address');
+			$embedded_link = $request->input('embedded_link');
+			$json = $request->input('message');
+			$data = json_decode($json);
+
+			$proposal = new Proposals;	
+			$proposal->user_id = $uid;
+			$proposal->title = $data->data->title;
+			$proposal->description = $data->data->description;
+			$proposal->category = $data->data->category;
+			$proposal->author = Auth::user()->fullname;
+			$proposal->ipfs_hash = $embedded_link;
+			$proposal->participation = $data->data->participation;
+			$proposal->threshold = $data->data->threshold;
+			$proposal->duration = $data->data->duration;
+			$proposal->expiration = $data->data->expiration;
+			$proposal->txid = $txid;
+			$proposal->public_address = $public_address;
+
+
+			$proposal->save();
+			$prop_id = $proposal->id;
+
+			$threads = new Threads;
+			$threads->category_id = 2;
+			$threads->author_id = $uid;
+			$threads->title = $data->data->title;
+			$threads->proposal_id = $prop_id;
+			$threads->save();
+
+			$thd_id = $threads->id;
+			
+			$proposal->where('id', $prop_id)->update(['discussion' => $thd_id]);
+
+			return (new Response(json_encode(array("Proposal" => $prop_id, "Discussion" => $thd_id)), 200))
+              ->header('Content-Type', "application/json;");
+
+		
+		}else{
+            return redirect('/login');
+        }
 	}
 
 
