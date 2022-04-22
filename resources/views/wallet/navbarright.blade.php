@@ -3,7 +3,7 @@
     <a target="_blank" href="http://marscoin.org/">About Marscoin</a>
   </li>
   <li>
-    <a target="_blank" href="http://martianrepublic.local/forum/c/1-public-square">Discussion</a>
+    <a target="_blank" href="http://martianrepublic.org/forum/c/1-public-square">Discussion</a>
   </li>
   <li>
     <a target="_blank" href="https://marscoin.gitbook.io/marscoin-documentation/">Documentation</a>
