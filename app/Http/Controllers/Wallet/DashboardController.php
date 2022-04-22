@@ -528,7 +528,7 @@ class DashboardController extends Controller
 				$profile->wallet_open = 1;
 				$profile->save();
 
-				return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Open!');
+				return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Opened!');
 			}
 			// } 
 			// else 
@@ -537,7 +537,7 @@ class DashboardController extends Controller
 			// }
 
 		}else{
-			return redirect('wallet/dashboard/hd');
+			return redirect('/login');
 		}
 
 	}
@@ -546,14 +546,20 @@ class DashboardController extends Controller
 	// Open Pre-Existing Wallet
 	public function getWallet()
 	{
+		if (Auth::check()) 
+		{
 
-		$uid = Auth::user()->id;
-		$profile = Profile::where('userid', '=', $uid)->first();
-		$hd_wallet = HDWallet::where('user_id', '=', $uid)->get();
-		$profile->wallet_open = 1;
-		$profile->save();
+			$uid = Auth::user()->id;
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$hd_wallet = HDWallet::where('user_id', '=', $uid)->get();
+			$profile->wallet_open = 1;
+			$profile->save();
 
-		return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Open!');
+			return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Open!');
+
+		}else{
+			return redirect('/login');
+		}
 	}
 
 	public function failWallet(){
