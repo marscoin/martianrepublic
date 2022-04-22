@@ -3,7 +3,7 @@
     <a target="_blank" href="http://marscoin.org/">About Marscoin</a>
   </li>
   <li>
-    <a target="_blank" href="http://www.marscoin.org/community/">Discussion</a>
+    <a target="_blank" href="http://martianrepublic.local/forum/c/1-public-square">Discussion</a>
   </li>
   <li>
     <a target="_blank" href="https://marscoin.gitbook.io/marscoin-documentation/">Documentation</a>
@@ -16,17 +16,24 @@
 
                     <ul class="dropdown-menu" role="menu">
                         <li>
-                            <a target="_blank" href="https://www.xt.com/trade/mars_usdt">
-                                <i class="fa fa-area-chart"></i>
-                                Xt.com
-                            </a>
-                        </li>
-                        <li>
                             <a target="_blank" href="https://www.finexbox.com/market/pair/MARS-BTC.html">
                                 <i class="fa fa-area-chart"></i>
                                 FinexBox
                             </a>
                         </li>
+                        <li>
+                            <a target="_blank" href="https://dex-trade.com/spot/trading/MARSUSDT">
+                                <i class="fa fa-area-chart"></i>
+                                Dex-Trade
+                            </a>
+                        </li>
+                        <li>
+                            <a target="_blank" href="https://www.xt.com/trade/mars_usdt">
+                                <i class="fa fa-area-chart"></i>
+                                Xt.com
+                            </a>
+                        </li>
+
 
                         <li>
                             <a target="_blank" href="https://ex.udonex.com/market/marsusdt">
