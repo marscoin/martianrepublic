@@ -258,7 +258,7 @@ img.payment {
                                 <a href="#New-Proposal" data-toggle="tab">New Proposal</a>
                             </li>
                         </ul>
-                        <a class="archival pull-right" style="margin-top: -80px" href="https://ipfs.io/ipfs/{{{$ipfs_root_hash}}}" target="_blank"><i class="fa fa-hdd-o"></i>Archives</a>
+                        <a class="archival pull-right" style="margin-top: -80px" href="#" target="_blank"><i class="fa fa-hdd-o"></i>Archives</a>
                         <div id="myTab1Content" class="tab-content" style="margin-top: 50px;">
 
                             <div class="tab-pane fade active in" id="Active">

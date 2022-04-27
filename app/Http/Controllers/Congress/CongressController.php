@@ -13,6 +13,7 @@ use App\Models\Proposals;
 use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
+use Illuminate\Support\Facades\DB;
 
 class CongressController extends Controller
 {
@@ -73,11 +74,7 @@ class CongressController extends Controller
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$wallet = HDWallet::where('user_id', '=', $uid)->first();
-			$proposals = Proposals::all();
-			$IPFS = IPFSRoot::all();
-
-			// print_r($IPFS);
-			// die();
+			$proposals = DB::table('proposals')->leftJoin('ballots', 'proposals.id', '=', 'ballots.proposalid')->select('proposals.*', 'ballots.btxid', 'ballots.proposalid')->where('active', '=', '1')->get();
 
 			if (!$profile) {
 				return redirect('/twofa');
@@ -89,11 +86,6 @@ class CongressController extends Controller
 			
 			$view = View::make('congress.voting');
 			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-
-			if (count($IPFS) > 0)
-				$view->ipfs_root_hash = $IPFS->last()->folder_hash;
-			else
-				$view->ipfs_root_hash = null;
 
 			if ($wallet) {
 				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
@@ -125,9 +117,53 @@ class CongressController extends Controller
 	}
 
 
+	protected function acquireBallot($propid)
+	{
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$proposal = Proposals::where('id', '=', $propid)->first();
+
+			if (!$profile) {
+				return redirect('/twofa');
+			} else {
+				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
+					return redirect('/twofachallenge');
+				}
+			}
+			
+			$view = View::make('congress.ballot');
+			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
+
+			if ($wallet) {
+				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
+				$view->balance = ($cur_balance * 0.00000001);
+				$view->public_address = $wallet->public_addr;
+			} else {
+				$view->balance = 0;
+			}
+
+			$view->proposals = $proposal;
+			$view->gravtar_link  = $gravtar_link;
+			$view->fullname = Auth::user()->fullname;
+			$view->isCitizen = $profile->citizen;
+			$view->isGP  = $profile->general_public;
+			$view->wallet_open = $profile->wallet_open;
 
 
 
+			// echo "Hello, World";
+			// die();
+			$json = AppHelper::file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
+			$network = json_decode($json, true);
+			$view->network = $network;
+
+			return $view;
+		}else{
+            return redirect('/login');
+        }
+	}
 
 
 }

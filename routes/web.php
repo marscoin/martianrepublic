@@ -72,6 +72,7 @@ Route::get('/inventory/all', 'Inventory\InventoryController@showAll');
 Route::get('/congress/all', 'Congress\CongressController@showAll');
 Route::any('/congress/voting', 'Congress\CongressController@showVoting');
 Route::post('/congress/createproposal', 'Congress\CongressController@postCreateProposal');
+Route::get('/congress/ballot/{propid?}', 'Congress\CongressController@acquireBallot');
 
 
 // 

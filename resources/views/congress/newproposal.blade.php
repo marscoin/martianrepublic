@@ -57,6 +57,19 @@
                         <div class="descriptor-text" id="ordinance-descriptor" style="display: none;">Ordinance: Runtime: 2 Weeks - Requirement: 60% of Citizenry - Threshold: 55% - Expiration: 1 year.</div>
                         <div class="descriptor-text" id="poll-descriptor" style="display: none;">Certified Poll: Runtime: 1 Week - Requirement: 5% of Citizenry - Threshold: 51% - Expiration: None.</div>
 
+
+                        <hr>
+                        <div class="">
+                            <h4>Total Citizen Committment</h4>
+                            <p>Citizens can submit proposals to the community. Every citzen endorsed member of the general Martian public ("citizen") can request a ballot to participate in any proposal submitted. </p>
+                            <p>The criteria you selected above require a <b><u><span id="req_amount"></span></u></b> percentage of the entire Martian Republic citizenry to partcipate in this proposal. The duration for casting a vote on this 
+                            proposal is set to <b><u><span id="req_duration"></span></u></b>. To pass successfully and be adopted at least <b><u><span id="req_threshold"></span></u></b> have to vote in favor of this proposal. This would indicate that 
+                            <b><u><span id="req_total"></span></u></b> percentage of the population would support this proposal. It will automatically expire after <b><u><span id="req_expiration"></span></u></b>. Any proposal that reaches the threshold of required participants 
+                            via ballots requested will automatically be considered a bill. Any bill that passes the threshold of required votes becomes part of the Constitution (if it is a code change to the system) or an active piece of legislation. Any such law can 
+                            be amended or terminated with the same or more citizen voting in favor of a change before it naturally expires.</p>
+
+                        </div>
+
                         <label>Custom:</label>
                         <div class="price-box">
 
@@ -98,17 +111,7 @@
 
                             </form>
                         </div>
-                        <hr>
-                        <div class="">
-                            <h4>Total Citizen Committment</h4>
-                            <p>Citizens can submit proposals to the community. Every citzen endorsed member of the general Martian public ("citizen") can request a ballot to participate in any proposal submitted. </p>
-                            <p>The criteria you selected above require a <b><u><span id="req_amount"></span></u></b> percentage of the entire Martian Republic citizenry to partcipate in this proposal. The duration for casting a vote on this 
-                            proposal is set to <b><u><span id="req_duration"></span></u></b>. To pass successfully and be adopted at least <b><u><span id="req_threshold"></span></u></b> have to vote in favor of this proposal. This would indicate that 
-                            <b><u><span id="req_total"></span></u></b> percentage of the population would support this proposal. It will automatically expire after <b><u><span id="req_expiration"></span></u></b>. Any proposal that reaches the threshold of required participants 
-                            via ballots requested will automatically be considered a bill. Any bill that passes the threshold of required votes becomes part of the Constitution (if it is a code change to the system) or an active piece of legislation. Any such law can 
-                            be amended or terminated with the same or more citizen voting in favor of a change before it naturally expires.</p>
-
-                        </div>
+                        
 
                     </div>
 
