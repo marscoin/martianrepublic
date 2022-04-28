@@ -144,7 +144,7 @@ class CongressController extends Controller
 				$view->balance = 0;
 			}
 
-			$view->proposals = $proposal;
+			$view->proposal = $proposal;
 			$view->gravtar_link  = $gravtar_link;
 			$view->fullname = Auth::user()->fullname;
 			$view->isCitizen = $profile->citizen;
