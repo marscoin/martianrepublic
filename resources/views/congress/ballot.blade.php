@@ -299,7 +299,7 @@ $(document).ready(function() {
     $("#messages").html("Connecting to ballot server...")
      
 
-    let socket = new WebSocket("wss://martianrepublic.org:8990");
+    let socket = new WebSocket("wss://martianrepublic.org:3678");
 
     socket.onopen = function(e) {
         $("#messages").html("[open] Connection established");
