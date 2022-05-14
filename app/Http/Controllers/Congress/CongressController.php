@@ -150,8 +150,8 @@ class CongressController extends Controller
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->wallet_open = $profile->wallet_open;
-
-
+			$view->propid = $propid;
+			$view->random_bytes = bin2hex(random_bytes(16));
 
 			// echo "Hello, World";
 			// die();
