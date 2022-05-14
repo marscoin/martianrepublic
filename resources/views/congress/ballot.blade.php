@@ -216,6 +216,12 @@ img.payment {
 .CodeMirror-scroll {
     min-height: 968px;
 }
+
+/* #messages {
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  overflow-y: scroll;
+} */
     </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
 </head>
@@ -291,24 +297,289 @@ img.payment {
     <script src="/assets/wallet/js/simplemde.min.js"></script>
     <script src="/assets/wallet/js/md5.min.js"></script>
     <script src="/assets/wallet/js/sha256.js"></script>
-
+    <script src="/assets/wallet/js/jsencrypt.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
 $(document).ready(function() {
 
-    $("#messages").html("Connecting to ballot server...")
-     
+    const Marscoin = {
+        mainnet: {
+            messagePrefix: "\x19Marscoin Signed Message:\n",
+            bech32: "M",
+            bip44: 2,
+            bip32: {
+                public: 0x043587cf,
+                private: 0x04358394,
+            },
+            pubKeyHash: 0x32,
+            scriptHash: 0x32,
+            wif: 0x80,
+        }
+    };
+    var crypt = new JSEncrypt({default_key_size: 1024});
+    crypt.getKey();
+    var amount = 1
+    var addr = '{{$public_address}}'
+    var source = "ip"
+    var hidden_target = "generated receiving address"
+    var privkey  = crypt.getPrivateKeyB64()
+    console.log(privkey)
+    var ek = crypt.getPublicKeyB64() //ephemeral public key
+    console.log(ek)
+    var index = null
+    var peers = null
+    var order = null
+    var is_last_shuffler = null
+    var server_addr = server_addr
+    var start_called = false
+    //var messageKey = ""
 
-    let socket = new WebSocket("wss://martianrepublic.org:3678");
+    //test()
+
+    function parseHexString(str) { 
+        var result = [];
+        while (str.length >= 2) { 
+            result.push(parseInt(str.substring(0, 2), 16));
+            str = str.substring(2, str.length);
+        }
+
+        return result;
+    }
+
+    function createHexString(arr) {
+        var result = "";
+        for (i in arr) {
+            var str = arr[i].toString(16);
+            str = str.length == 0 ? "00" :
+                str.length == 1 ? "0" + str : 
+                str.length == 2 ? str :
+                str.substring(str.length-2, str.length);
+            result += str;
+        }
+        return result;
+    }
+
+    function nodeToLegacyAddress(hdNode) {
+        return my_bundle.bitcoin.payments.p2pkh({
+            pubkey: hdNode.publicKey,
+            network: Marscoin.mainnet,
+        }).address;
+    }
+
+    function genSeed(mnemonic){
+        const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
+        const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
+        const child = root.derivePath("m/999999'/107'/<?=$propid?>'").neutered();
+        let tpub = child.toBase58()
+        const hdNode = my_bundle.bip32.fromBase58(tpub, Marscoin.mainnet)
+        const node = hdNode.derive(0)
+        const addy = nodeToLegacyAddress(node.derive(0))
+        const publicKey = node.publicKey.toString('hex')
+        const resp = {
+            address: addy,
+            pubKey: publicKey,
+            xprv: root.toBase58(),
+            mnemonic: mnemonic
+        }
+        return resp;
+    }
+
+    function getProposalOutputAddress(){
+        rb = '<?=$random_bytes?>';
+        rb = parseHexString(createHexString(rb))
+        mnemonic = my_bundle.bip39.entropyToMnemonic(rb)
+        $("#messages").prepend('<br>Ballot Seed: ' + mnemonic);
+        const wallet = genSeed(mnemonic)
+        return wallet.address;
+    }
+
+    function find_index(order){
+        index = -1;
+        Object.keys(order).forEach(function(k){
+            if(order[k].replace(/\s/g,'') == ek.replace(/\s/g,'')){
+                index = k;
+            }
+        });
+        return index;
+    }
+
+    //The de-facto unbiased shuffle algorithm is the Fisher-Yates (aka Knuth) Shuffle.
+    function shuffle(array) {
+        let currentIndex = array.length,  randomIndex;
+
+        // While there remain elements to shuffle.
+        while (currentIndex != 0) {
+
+            // Pick a remaining element.
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            // And swap it with the current element.
+            [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+        }
+
+        return array;
+    }
+
+
+    function shuffle_data(data){
+        new_order = shuffle(data);
+        new_data = {}
+        for([i, v] of Object.entries(data)) {
+            new_data[new_order[parseInt(i)]] = v
+        }
+        return new_data 
+    }
+
+    function decrypt_data(data){
+        new_data = {}
+        for([i, v] of Object.entries(data)) {
+            console.log(i, v);
+            vp = v;
+            vp['target'] = decrypt(privkey, v["target"]);
+            new_data[i] = vp; 
+        }
+        return new_data;
+    }
+
+    function encrypt(epkey, message){
+        //Applies public key (hybrid) encryption to a given message when supplied
+        //with a path to a public key (RSA in PEM format).
+        //Load the recipients pubkey
+        var crypt = new JSEncrypt();
+        crypt.setKey(epkey);
+
+        //Encrypt the message with AES-GCM using a newly selected key
+        var password = "test";
+        var iterations = 500;
+        var keySize = 256;
+        var salt = CryptoJS.lib.WordArray.random(128/8);
+        //console.log(salt.toString(CryptoJS.enc.Base64));
+        var output = CryptoJS.PBKDF2(password, salt, {
+            keySize: keySize/32,
+            iterations: iterations
+        });
+        messageKey = output.toString(CryptoJS.enc.Base64)
+        console.log("Key: " + messageKey);
+        var ctext = CryptoJS.AES.encrypt(message, messageKey);
+        console.log("Encrypted Text: " + ctext.toString())
+        
+        //Encrypt the message key and prepend it to the ciphertext
+        encMsg = ctext.toString();
+        ckey = crypt.encrypt(messageKey);
+        console.log("Encrypted Key: " + ckey)
+        encMsgTotal = ckey + encMsg
+        console.log("Encrypted cKey + encMsg: " + encMsgTotal)
+        return encMsgTotal;
+    }
+
+    function decrypt(keypair, ctext){
+        //Load the recipients privatekey
+        var crypt = new JSEncrypt();
+        crypt.setKey(keypair);
+        encM = ctext
+        encKey = encM.substring(0, 172)
+        console.log("Or key enc: " + encKey)
+        ctext = encM.substring(172, encM.length)
+        console.log("Or ctext: " + ctext)
+        messageKey = crypt.decrypt(encKey)
+        console.log("Or unenc key: " + messageKey)
+        message = CryptoJS.AES.decrypt(ctext, messageKey);
+        console.log(message.toString(CryptoJS.enc.Utf8))
+        return message.toString(CryptoJS.enc.Utf8)
+    }
+
+    function test(){
+        console.log("++++++++++++++++TEST++++++++++++++++++++++++++++")
+        var message = "The Quick Brown Fox Jumps Over The Lazy Dog";
+        console.log(message)
+        e = encrypt(ek, message)
+        d = decrypt(privkey, e)
+        console.log(d)
+        console.log("++++++++++++++++ENDTEST++++++++++++++++++++++++++++")
+    }
+
+
+    function encrypt_dest(){
+        var t = hidden_target
+        for (let i = num_peers-1;i > index; --i){
+            console.log(t)
+            t = encrypt(order[i], t)
+            console.log("Encrypted: " + t)
+        }
+        return t
+    }
+
+    function construct_transactions(data, sources){
+        return "";
+    }
+
+    $("#messages").html("Connecting to ballot server...")
+    var socket;
+    var domain = document.domain.split('.')[1]
+    if(domain == "local")
+        socket = new WebSocket("wss://127.0.0.1:3678");
+    else
+        socket = new WebSocket("wss://martianrepublic.org:3678");
 
     socket.onopen = function(e) {
-        $("#messages").html("[open] Connection established");
-        $("#messages").html("Sending to server");
-    socket.send("My name is John");
+        $("#messages").prepend("'<br>[open] Connection established");
+        $("#messages").prepend("'<br>Sending to server");
+        socket.send("{{$public_address}}_{{ strtoupper(substr(str_replace('https://ipfs.marscoin.org/ipfs/', '', $proposal->ipfs_hash), 1, 8)) }}");
     };
 
     socket.onmessage = function(event) {
-        $("#messages").html(`[message] Data received from server: ${event.data}`);
+        $("#messages").prepend(`<br>[BALLOT SERVER]: ${event.data}`);
+        if(event.data == "JOINED_ACK")
+        {
+            //Generate a new receive address for the ballot
+            $("#messages").prepend('<br>Generating ballot for proposal');
+
+            //generate ephemeral public key and shuffling keypair
+            socket.send("SUBMIT_KEY#"+ek+"#")
+
+            hidden_target = getProposalOutputAddress();
+            $("#messages").prepend('<br>Generated: ' + hidden_target);
+            $("#messages").prepend('<br>Ballot shuffle in progress... ');
+
+        }
+        if(event.data.includes("INITIATE_SHUFFLE_"))
+        {
+            json = event.data.split("_")[2]
+            data = JSON.parse(json);
+            start_called = true
+            peers = JSON.parse(data.peers)
+            num_peers = Object.keys(peers).length;
+            order = JSON.parse(data.order)
+            ord_length = Object.keys(order).length;
+            index = parseInt(find_index(order))
+            is_last_shuffler = (index + 1 == ord_length)
+            encrypted_target = encrypt_dest()
+            if (index != 0)
+                socket.send("SHUFFLE_INIT_COMPLETE_"+JSON.stringify(encrypted_target)); //<- next one in order until last one is us, then this:
+        }
+        if(event.data.includes("PERFORM_SHUFFLE"))
+        {
+            json = event.data.split("_")[2]
+            data = JSON.parse(json);
+            json = event.data.split("_")[3]
+            sources = JSON.parse(json);
+            if(index != data.length)
+                console.log("Wrong order...")
+            data = decrypt_data(data)
+            data[index] = {
+                "public_key": ek,
+                "target": encrypted_target
+            }
+            sources[index] = {"source": "tx_input"}
+            data =  shuffle_data(data)
+            if (index == num_peers - 1)
+                construct_transactions(sources, data)
+            else
+                return "{'data': "+JSON.stringify(data) + "," + "'sources: ' "+JSON.stringify(sources)+"}"
+        }
     };
 
     socket.onclose = function(event) {
@@ -317,12 +588,12 @@ $(document).ready(function() {
     } else {
         // e.g. server process killed or network down
         // event.code is usually 1006 in this case
-        $("#messages").html('[close] Connection died');
+        $("#messages").prepend('<br>[close] Connection died');
     }
     };
 
     socket.onerror = function(error) {
-        $("#messages").html(`[error] ${error.message}`);
+        $("#messages").prepend(`<br>[error] ${error.message}`);
     };
 
 })
@@ -334,6 +605,80 @@ $(document).ready(function() {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });  
+
+const signMARS = async (message, mars_amount, tx_i_o) => {
+    const mnemonic = localStorage.getItem("key").trim();
+    const sender_address = "<?=$public_address?>".trim()
+
+    const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
+
+    const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
+
+    const child = root.derivePath("m/99999'/107'/0'/0/0");
+
+    const wif = child.toWIF()
+
+    const zubs = zubrinConvert(mars_amount)
+
+    var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
+    
+    var psbt = new my_bundle.bitcoin.Psbt({
+        network: Marscoin.mainnet,
+    });
+    psbt.setVersion(1)
+    psbt.setMaximumFeeRate(10000000);
+
+    unspent_vout = 0
+    var data = my_bundle.Buffer(message)
+    const embed = my_bundle.bitcoin.payments.embed({ data: [data] });
+    
+    psbt.addOutput({
+    script: embed.output,
+    value: 0,
+    })
+    
+    tx_i_o.inputs.forEach((input, i) => {
+        psbt.addInput({
+            hash: input.txId,
+            index: input.vout,
+            nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex'),
+        })
+    })
+
+    tx_i_o.outputs.forEach(output => {
+        if (!output.address) {
+            output.address = sender_address
+        }
+
+        psbt.addOutput({
+            address: output.address,
+            value: output.value,
+        })
+    })
+
+    for (let i = 0; i < tx_i_o.inputs.length; i++) {
+        try{
+            psbt.signInput(i, key);
+        } catch (e) {
+            alert("Problem while trying to sign with your key. Please try to reconnect your wallet...");
+        }
+    }
+
+    const tx = psbt.finalizeAllInputs().extractTransaction(); 
+    const txhash = tx.toHex()
+    console.log(txhash)
+
+    try {
+        const txId = await broadcastTxHash(txhash);
+        return txId;
+
+    } catch (e) {
+        handleError()
+        throw e;
+    }
+
+}
+
 
         });
 </script>
