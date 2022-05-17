@@ -425,7 +425,8 @@ $(document).ready(function() {
 
 
     function shuffle_data(data){
-        new_order = shuffle(data);
+        old_order = Object.keys(data)
+        new_order = shuffle(old_order);
         new_data = {}
         for([i, v] of Object.entries(data)) {
             new_data[new_order[parseInt(i)]] = v
@@ -578,7 +579,7 @@ $(document).ready(function() {
             if (index == num_peers - 1)
                 construct_transactions(sources, data)
             else
-                return "{'data': "+JSON.stringify(data) + "," + "'sources: ' "+JSON.stringify(sources)+"}"
+                socket.send("PERFORM_SHUFFLE_ACK_{'data': "+JSON.stringify(data) + "," + "'sources: ' "+JSON.stringify(sources)+"}")
         }
     };
 
