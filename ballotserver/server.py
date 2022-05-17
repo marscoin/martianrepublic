@@ -25,6 +25,7 @@ ssl_context.load_cert_chain(ssl_cert, keyfile=ssl_key)
 
 STATE = {"value": 0}
 USERS = set()
+SHUFFLE = {}
 
 server = CoinShuffleServer()
 
@@ -52,9 +53,12 @@ async def ballotserver_start(room):
             for client, _ in room.items():
                 client_addr = str(client.remote_address[0]) + ":" + str(client.remote_address[1])
                 if client_addr == addr:
-                    ret = await client.send('PERFORM_SHUFFLE_' + json.dumps(data) + "_" + json.dumps(sources))
-                    data = json.loads(ret.split(",")[0])
-                    sources = json.loads(ret.split(",")[1])
+                    await client.send('PERFORM_SHUFFLE_' + json.dumps(data) + "_" + json.dumps(sources))
+                    while True:
+                        if client_addr in SHUFFLE:
+                            data = SHUFFLE[client_addr]
+                            data = json.loads(ret.split(",")[0])
+                            sources = json.loads(ret.split(",")[1])
         return
 
 def state_event():
@@ -149,6 +153,9 @@ async def client_handler(websocket, path):
             if len(rooms[room].items()) >= 3:
                 # Let the most recent client that joined kick the shuffle process off
                 await ballotserver_start(rooms[room])
+
+        if "PERFORM_SHUFFLE_ACK" in message:
+            SHUFFLE[str(websocket.remote_address[0])+":"+str(websocket.remote_address[1])] = message
 
         # Send message to all clients
         #for client, _ in clients.items():
