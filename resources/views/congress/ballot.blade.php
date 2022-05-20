@@ -333,6 +333,7 @@ $(document).ready(function() {
     var is_last_shuffler = null
     var server_addr = server_addr
     var start_called = false
+    var bpk = ""
     //var messageKey = ""
 
     //test()
@@ -376,6 +377,7 @@ $(document).ready(function() {
         const node = hdNode.derive(0)
         const addy = nodeToLegacyAddress(node.derive(0))
         const publicKey = node.publicKey.toString('hex')
+        bpk = node.privkey;
         const resp = {
             address: addy,
             pubKey: publicKey,
@@ -513,8 +515,9 @@ $(document).ready(function() {
         return t
     }
 
-    function construct_transactions(data, sources){
-        return "";
+    function construct_transaction(data, sources){
+        raw_tx = "";
+        return raw_tx;
     }
 
     $("#messages").html("Connecting to ballot server...")
@@ -563,9 +566,9 @@ $(document).ready(function() {
         }
         if(event.data.includes("PERFORM_SHUFFLE"))
         {
-            json = event.data.split("_")[2]
+            json = event.data.split("#")[1]
             data = JSON.parse(json);
-            json = event.data.split("_")[3]
+            json = event.data.split("#")[2]
             sources = JSON.parse(json);
             if(index != data.length)
                 console.log("Wrong order...")
@@ -576,10 +579,24 @@ $(document).ready(function() {
             }
             sources[index] = {"source": "tx_input"}
             data =  shuffle_data(data)
-            if (index == num_peers - 1)
-                construct_transactions(sources, data)
-            else
-                socket.send("PERFORM_SHUFFLE_ACK_{'data': "+JSON.stringify(data) + "," + "'sources: ' "+JSON.stringify(sources)+"}")
+            if (index == num_peers - 1){
+                raw_tx = createRawTransaction(sources, data)
+                socket.send("COLLECT_SIGNATURES#" + raw_tx)
+            }
+            else{
+                socket.send("PERFORM_SHUFFLE_ACK#"+index+"#{'data': "+JSON.stringify(data) + "," + "'sources': "+JSON.stringify(sources)+"}")
+            }
+        }
+        if(event.data.includes("SIGN_TX"))
+        {
+            raw_tx = event.data.split("#")[1];
+            signed_raw_tx = signPartial(raw_tx, );
+            socket.send("SIGN_TX_COMPLETE#"+index+"#" + signed_raw_tx); 
+        }
+        if(event.data.includes("COMBINE_AND_BROADCAST"))
+        {
+            raw_tx = event.data.split("#")[1];
+            signed_raw_tx = combineAndBroadcastTransaction(raw_tx);
         }
     };
 
@@ -601,11 +618,114 @@ $(document).ready(function() {
 </script>
 <script type="text/javascript">
     $(document).ready(function() {
-            $.ajaxSetup({
+            
+        $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
-            });  
+        });  
+
+
+        function createRawTransaction(sources, destinations)
+        {
+            var psbt = new my_bundle.bitcoin.Psbt({
+                network: Marscoin.mainnet,
+            });
+            psbt.setVersion(1)
+            psbt.setMaximumFeeRate(10000000);
+
+            Object.keys(sources).forEach(function(k){
+                inputBlock = sources[k]
+                psbt.addInput({
+                    hash: inputBlock.txId,
+                    index: inputBlock.vout,
+                    nonWitnessUtxo: my_bundle.Buffer.from(inputBlock.rawTx, 'hex'),
+                })
+                psbt.addOutput({
+                    address: inputBlock.changeAddress,
+                    value: inputBlock.changeValue,
+                }) 
+            });
+            
+            // network is only needed if you pass an address to addOutput
+            // using script (Buffer of scriptPubkey) instead will avoid needed network.
+            Object.keys(data).forEach(function(k){
+                output = data[k]
+                target = output['target']
+                psbt.addOutput({
+                    address: target,
+                    value: 1,
+                }) //the actual ballot address
+                
+            });
+            
+            // We can have multiple signers sign in parrallel and combine them.
+            // (this is not necessary, but a nice feature)
+
+            // encode to send out to the signers
+            const psbtBaseText = psbt.toBase64();
+            return psbtBaseText;
+        }
+
+        function signPartial(psbtBaseText)
+        {
+            // each signer imports
+            const signer1 =  my_bundle.bitcoin.Psbt.fromBase64(psbtBaseText);
+            
+            // Alice signs each input with the respective private keys
+            // signInput and signInputAsync are better
+            // (They take the input index explicitly as the first arg)
+            signer1.signAllInputs(bpk);
+
+            // If your signer object's sign method returns a promise, use the following
+            // await signer2.signAllInputsAsync(alice2.keys[0])
+
+            // encode to send back to combiner (signer 1 and 2 are not near each other)
+            const s1text = signer1.toBase64();
+            
+            return s1text;
+        }
+
+        function combineAndBroadcastTransaction(signedTexts)
+        {
+            // final1.combine(final2) would give the exact same result
+
+            //for loop over signedTexts
+            // final1.combine(final2) would give the exact same result
+            //psbt.combine(final1, final2);
+            initial = signedTexts[0];
+            const psbt =  my_bundle.bitcoin.Psbt.fromBase64(stext);
+            assert.strictEqual(psbt.validateSignaturesOfInput(0), true);
+
+            for (let i = 1; i < signedTexts.length; i++) {
+                stext = signedTexts[i];
+            
+                const final1 =  my_bundle.bitcoin.Psbt.fromBase64(stext);
+                psbt.combine(final1);
+
+                // Finalizer wants to check all signatures are valid before finalizing.
+                // If the finalizer wants to check for specific pubkeys, the second arg
+                // can be passed. See the first multisig example below.
+                assert.strictEqual(psbt.validateSignaturesOfInput(i), true);
+
+            }
+
+            // build and broadcast our RegTest network
+            const tx = psbt.finalizeAllInputs().extractTransaction(); 
+            const txhash = tx.toHex()
+            console.log(txhash)
+
+            try {
+                const txId = await broadcastTxHash(txhash);
+                return txId;
+
+            } catch (e) {
+                handleError()
+                throw e;
+            }
+
+        }
+
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
     const mnemonic = localStorage.getItem("key").trim();
@@ -681,7 +801,7 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
 }
 
 
-        });
+});
 </script>
 
 </body>
