@@ -5,6 +5,7 @@ import logging
 import websockets
 import ssl
 import os
+import ast
 from dotenv import load_dotenv
 from ballot_shuffle import CoinShuffleServer
 
@@ -26,10 +27,14 @@ ssl_context.load_cert_chain(ssl_cert, keyfile=ssl_key)
 STATE = {"value": 0}
 USERS = set()
 SHUFFLE = {}
-
+SIGNATURES = {}
+PEER_NUM = 0
+CURRENT_SHUFFLE_PEER = 0
+response = {}
 server = CoinShuffleServer()
 
 async def ballotserver_start(room):
+        global response
         response, dostart = server.start()
         encoded_response = {'order' : json.dumps(response['order']),
                             'peers' : json.dumps(response['peers'])}
@@ -44,22 +49,24 @@ async def ballotserver_start(room):
                     await client.send('INITIATE_SHUFFLE_' + json.dumps(encoded_response))
 
         #assume all initializations have taken place
-        #now perform shuffle in reverse order
+        #now perform shuffle in reverse order. kick off with first client in list
         data = {}
         sources = {}
-        for i in range(0, len(response['order']) - 1, 1):
-            ek = response['order'][i]
-            addr = response['peers'][ek]
-            for client, _ in room.items():
-                client_addr = str(client.remote_address[0]) + ":" + str(client.remote_address[1])
-                if client_addr == addr:
-                    await client.send('PERFORM_SHUFFLE_' + json.dumps(data) + "_" + json.dumps(sources))
-                    while True:
-                        if client_addr in SHUFFLE:
-                            data = SHUFFLE[client_addr]
-                            data = json.loads(ret.split(",")[0])
-                            sources = json.loads(ret.split(",")[1])
+        CURRENT_SHUFFLE_PEER = 0
+        ek = response['order'][CURRENT_SHUFFLE_PEER]
+        addr = response['peers'][ek]
+        for client, _ in room.items():
+            client_addr = str(client.remote_address[0]) + ":" + str(client.remote_address[1])
+            if client_addr == addr:
+                await client.send('PERFORM_SHUFFLE#' + json.dumps(data) + "#" + json.dumps(sources))
         return
+
+async def concatenateSignatures(signatures):
+    return ""
+
+async def broadcastFinalShuffleTx(final_tx):
+    return ""
+
 
 def state_event():
     return json.dumps({"type": "state", **STATE})
@@ -115,6 +122,7 @@ clients = {} #: {websocket: name}
 rooms = {}  #: {websocket: proposalname}
 entity = {}
 
+
 async def client_handler(websocket, path):
     print('New client', websocket)
     print(' ({} existing clients)'.format(len(clients)))
@@ -155,7 +163,48 @@ async def client_handler(websocket, path):
                 await ballotserver_start(rooms[room])
 
         if "PERFORM_SHUFFLE_ACK" in message:
-            SHUFFLE[str(websocket.remote_address[0])+":"+str(websocket.remote_address[1])] = message
+            peer_index = int(message.split("#")[1])
+            SHUFFLE[peer_index] = message.split("#")[2]
+
+            PEER_NUM = len(rooms[room].items())
+            print(SHUFFLE)
+            print(PEER_NUM)
+            print(len(SHUFFLE))
+            if len(SHUFFLE) <= PEER_NUM:
+                obj = SHUFFLE[peer_index]
+                print(obj)
+                obj = ast.literal_eval(obj)
+                print(obj['data'])
+                data = obj['data']
+                sources = obj['sources']
+                peer_index = peer_index + 1
+                ek = response['order'][peer_index]
+                addr = response['peers'][ek]
+                for client, _ in rooms[room].items():
+                    client_addr = str(client.remote_address[0]) + ":" + str(client.remote_address[1])
+                    if client_addr == addr:
+                        await client.send('PERFORM_SHUFFLE#' + json.dumps(data) + "#" + json.dumps(sources))
+
+            else:
+                print("Now sign the transaction?")
+
+        if "COLLECT_SIGNATURES" in message:
+            raw_tx = message.split("#")[1]
+            for client, _ in rooms[room].items():
+                await client.send('SIGN_TX#' + raw_tx)
+
+        if "SIGN_TX_COMPLETE" in message:
+            peer_index = int(message.split("#")[1])
+            SIGNATURES[peer_index] = message.split("#")[2]
+
+            PEER_NUM = len(rooms[room].items())
+            print(SIGNATURES)
+            print(PEER_NUM)
+            print(len(SIGNATURES))
+            if len(SIGNATURES) == PEER_NUM:
+                #Send to all clients for combining and broadcasting...
+                for client, _ in rooms[room].items():
+                    await client.send('SIGN_TX#' + json.dumps(SIGNATURES))
 
         # Send message to all clients
         #for client, _ in clients.items():
@@ -165,3 +214,6 @@ start_server = websockets.serve(client_handler, str(BALLOT_SERVER_HOST), BALLOT_
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
+
+
+#https://github.com/bitcoinjs/bitcoinjs-lib/blob/533d6c2e6d0aa4111f7948b1c12003cf6ef83137/test/integration/transactions.spec.ts#L19
