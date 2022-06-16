@@ -137,6 +137,11 @@ function imgError(image) {
 
 $(document).ready(function() {
 
+var mem = localStorage.getItem("key").trim();
+if (!mem || mem == ""){
+    alert("Coul not retrieve wallet key. Please disconnect and reconnect your wallet.")
+}
+
 
 $.ajaxSetup({
     headers: {
