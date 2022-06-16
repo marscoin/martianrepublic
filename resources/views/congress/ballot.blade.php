@@ -319,7 +319,7 @@ $(document).ready(function() {
     };
     var crypt = new JSEncrypt({default_key_size: 1024});
     crypt.getKey();
-    var amount = 1
+    var amount = 0.1
     var addr = '{{$public_address}}'
     var source = "ip"
     var hidden_target = "generated receiving address"
@@ -333,10 +333,78 @@ $(document).ready(function() {
     var is_last_shuffler = null
     var server_addr = server_addr
     var start_called = false
-    var bpk = ""
+    var bpk = "";
+    var bpkk = "";
+    var local_key = "";
+    var inputBlock = {}
     //var messageKey = ""
 
     //test()
+    $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+    });  
+
+    const getLocalKey = async  => {
+        const mnemonic = localStorage.getItem("key").trim();
+        const sender_address = "<?=$public_address?>".trim()
+        const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
+        const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
+        const child = root.derivePath("m/99999'/107'/0'/0/0");
+        const wif = child.toWIF()
+        local_key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
+    }
+
+    const init = async () => {
+        hidden_target = getProposalOutputAddress();
+        $("#messages").prepend('<br>Generated: ' + hidden_target);
+        $("#messages").prepend('<br>Ballot shuffle in progress... ');
+        inputBlock = await getInputBlock()
+        $("#messages").prepend('<br>Generated: inputs for hidden target');
+        $("#messages").prepend('<br>Ballot shuffle in progress... ');
+        await getLocalKey()
+    }
+
+    const getInputBlock = async () => {
+        sources = []
+        sender_address = addr;
+        receiver_address = hidden_target;
+        const io = await getTxInputsOutputs(sender_address, receiver_address, 0.1)
+        console.log(io)
+        io.inputs.forEach((input, i) => {
+            var obj = {'txId': input.txId, 'vout': input.vout, 'rawTx':  my_bundle.Buffer.from(input.rawTx, 'hex')};
+            sources.push(obj); 
+        })
+        sources_string = JSON.stringify(sources);
+        return sources_string;
+    }
+
+    const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
+    // Default options are marked with *
+        if (!sender_address || !receiver_address || !amount) {
+            throw new Error("Missing inputs for tx hash call...");
+        }
+        console.log(sender_address)
+        console.log(receiver_address)
+        console.log(amount)
+
+        const url =
+            `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+            });
+
+            return response.json()
+
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    init();
 
     function parseHexString(str) { 
         var result = [];
@@ -371,13 +439,17 @@ $(document).ready(function() {
     function genSeed(mnemonic){
         const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
         const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
-        const child = root.derivePath("m/999999'/107'/<?=$propid?>'").neutered();
+        const child = root.derivePath("m/999999'/107'/<?=$propid?>'");
         let tpub = child.toBase58()
         const hdNode = my_bundle.bip32.fromBase58(tpub, Marscoin.mainnet)
         const node = hdNode.derive(0)
         const addy = nodeToLegacyAddress(node.derive(0))
         const publicKey = node.publicKey.toString('hex')
-        bpk = node.privkey;
+        bpk = node.privateKey.toString('hex')
+        console.log("PrivateKey")
+        console.log(bpk)
+        bpkk = my_bundle.bitcoin.ECPair.fromPrivateKey(my_bundle.Buffer.from(bpk, 'hex'), Marscoin.mainnet);
+        console.log(bpkk)
         const resp = {
             address: addy,
             pubKey: publicKey,
@@ -395,6 +467,8 @@ $(document).ready(function() {
         const wallet = genSeed(mnemonic)
         return wallet.address;
     }
+
+    
 
     function find_index(order){
         index = -1;
@@ -544,10 +618,6 @@ $(document).ready(function() {
             //generate ephemeral public key and shuffling keypair
             socket.send("SUBMIT_KEY#"+ek+"#")
 
-            hidden_target = getProposalOutputAddress();
-            $("#messages").prepend('<br>Generated: ' + hidden_target);
-            $("#messages").prepend('<br>Ballot shuffle in progress... ');
-
         }
         if(event.data.includes("INITIATE_SHUFFLE_"))
         {
@@ -577,7 +647,7 @@ $(document).ready(function() {
                 "public_key": ek,
                 "target": encrypted_target
             }
-            sources[index] = {"source": "tx_input"}
+            sources[index] = inputBlock; 
             data =  shuffle_data(data)
             if (index == num_peers - 1){
                 raw_tx = createRawTransaction(sources, data)
@@ -590,7 +660,7 @@ $(document).ready(function() {
         if(event.data.includes("SIGN_TX"))
         {
             raw_tx = event.data.split("#")[1];
-            signed_raw_tx = signPartial(raw_tx, );
+            signed_raw_tx = signPartial(raw_tx );
             socket.send("SIGN_TX_COMPLETE#"+index+"#" + signed_raw_tx); 
         }
         if(event.data.includes("COMBINE_AND_BROADCAST"))
@@ -614,117 +684,124 @@ $(document).ready(function() {
         $("#messages").prepend(`<br>[error] ${error.message}`);
     };
 
-})
-</script>
-<script type="text/javascript">
-    $(document).ready(function() {
+    
+    const zubrinConvert = (MARS) => {
+                return (MARS * 100000000)
+    }
+
+    const marsConvert = (zubrin) => {
+        return (zubrin / 100000000)
+    }
+
+
+    function createRawTransaction(sources, destinations)
+    {
+        console.log("Sources");
+        console.log(sources);
+        console.log("Destinations");
+        console.log(destinations)
+        var psbt = new my_bundle.bitcoin.Psbt({
+            network: Marscoin.mainnet,
+        });
+        psbt.setVersion(1)
+        psbt.setMaximumFeeRate(10000000);
+
+        Object.keys(sources).forEach(function(k){
+            iB = sources[k]
+            console.log(iB);
+            inputBlock = JSON.parse(iB)[0]
+            psbt.addInput({
+                hash: inputBlock.txId,
+                index: inputBlock.vout,
+                nonWitnessUtxo: my_bundle.Buffer.from(inputBlock.rawTx, 'hex'),
+            })
+            // psbt.addOutput({
+            //     address: inputBlock.changeAddress,
+            //     value: inputBlock.changeValue,
+            // }) 
+        });
+        
+        const zubs = zubrinConvert(amount)
+
+        // network is only needed if you pass an address to addOutput
+        // using script (Buffer of scriptPubkey) instead will avoid needed network.
+        Object.keys(destinations).forEach(function(k){
+            output = destinations[k];
+            target = output['target']
+            psbt.addOutput({
+                address: target,
+                value: zubs,
+            }) //the actual ballot address
             
-        $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-        });  
+        });
+        
+        // We can have multiple signers sign in parrallel and combine them.
+        // (this is not necessary, but a nice feature)
 
+        // encode to send out to the signers
+        const psbtBaseText = psbt.toBase64();
+        return psbtBaseText;
+    }
 
-        function createRawTransaction(sources, destinations)
-        {
-            var psbt = new my_bundle.bitcoin.Psbt({
-                network: Marscoin.mainnet,
-            });
-            psbt.setVersion(1)
-            psbt.setMaximumFeeRate(10000000);
+    function signPartial(psbtBaseText)
+    {
+        // each signer imports
+        const signer1 =  my_bundle.bitcoin.Psbt.fromBase64(psbtBaseText);
+        
+        // Alice signs each input with the respective private keys
+        // signInput and signInputAsync are better
+        // (They take the input index explicitly as the first arg)
+        signer1.signAllInputs(local_key);
 
-            Object.keys(sources).forEach(function(k){
-                inputBlock = sources[k]
-                psbt.addInput({
-                    hash: inputBlock.txId,
-                    index: inputBlock.vout,
-                    nonWitnessUtxo: my_bundle.Buffer.from(inputBlock.rawTx, 'hex'),
-                })
-                psbt.addOutput({
-                    address: inputBlock.changeAddress,
-                    value: inputBlock.changeValue,
-                }) 
-            });
-            
-            // network is only needed if you pass an address to addOutput
-            // using script (Buffer of scriptPubkey) instead will avoid needed network.
-            Object.keys(data).forEach(function(k){
-                output = data[k]
-                target = output['target']
-                psbt.addOutput({
-                    address: target,
-                    value: 1,
-                }) //the actual ballot address
-                
-            });
-            
-            // We can have multiple signers sign in parrallel and combine them.
-            // (this is not necessary, but a nice feature)
+        // If your signer object's sign method returns a promise, use the following
+        // await signer2.signAllInputsAsync(alice2.keys[0])
 
-            // encode to send out to the signers
-            const psbtBaseText = psbt.toBase64();
-            return psbtBaseText;
+        // encode to send back to combiner (signer 1 and 2 are not near each other)
+        const s1text = signer1.toBase64();
+        
+        return s1text;
+    }
+
+    const combineAndBroadcastTransaction = async (signedTexts) => {
+
+        // final1.combine(final2) would give the exact same result
+
+        //for loop over signedTexts
+        // final1.combine(final2) would give the exact same result
+        //psbt.combine(final1, final2);
+        initial = signedTexts[0];
+        const psbt =  my_bundle.bitcoin.Psbt.fromBase64(stext);
+        assert.strictEqual(psbt.validateSignaturesOfInput(0), true);
+
+        for (let i = 1; i < signedTexts.length; i++) {
+            stext = signedTexts[i];
+        
+            const final1 =  my_bundle.bitcoin.Psbt.fromBase64(stext);
+            psbt.combine(final1);
+
+            // Finalizer wants to check all signatures are valid before finalizing.
+            // If the finalizer wants to check for specific pubkeys, the second arg
+            // can be passed. See the first multisig example below.
+            assert.strictEqual(psbt.validateSignaturesOfInput(i), true);
+
         }
 
-        function signPartial(psbtBaseText)
-        {
-            // each signer imports
-            const signer1 =  my_bundle.bitcoin.Psbt.fromBase64(psbtBaseText);
-            
-            // Alice signs each input with the respective private keys
-            // signInput and signInputAsync are better
-            // (They take the input index explicitly as the first arg)
-            signer1.signAllInputs(bpk);
+        // build and broadcast our RegTest network
+        const tx = psbt.finalizeAllInputs().extractTransaction(); 
+        const txhash = tx.toHex()
+        console.log(txhash)
 
-            // If your signer object's sign method returns a promise, use the following
-            // await signer2.signAllInputsAsync(alice2.keys[0])
+        try {
+            const txId = await broadcastTxHash(txhash);
+            return txId;
 
-            // encode to send back to combiner (signer 1 and 2 are not near each other)
-            const s1text = signer1.toBase64();
-            
-            return s1text;
+        } catch (e) {
+            handleError()
+            throw e;
         }
 
-        function combineAndBroadcastTransaction(signedTexts)
-        {
-            // final1.combine(final2) would give the exact same result
+    }
 
-            //for loop over signedTexts
-            // final1.combine(final2) would give the exact same result
-            //psbt.combine(final1, final2);
-            initial = signedTexts[0];
-            const psbt =  my_bundle.bitcoin.Psbt.fromBase64(stext);
-            assert.strictEqual(psbt.validateSignaturesOfInput(0), true);
-
-            for (let i = 1; i < signedTexts.length; i++) {
-                stext = signedTexts[i];
-            
-                const final1 =  my_bundle.bitcoin.Psbt.fromBase64(stext);
-                psbt.combine(final1);
-
-                // Finalizer wants to check all signatures are valid before finalizing.
-                // If the finalizer wants to check for specific pubkeys, the second arg
-                // can be passed. See the first multisig example below.
-                assert.strictEqual(psbt.validateSignaturesOfInput(i), true);
-
-            }
-
-            // build and broadcast our RegTest network
-            const tx = psbt.finalizeAllInputs().extractTransaction(); 
-            const txhash = tx.toHex()
-            console.log(txhash)
-
-            try {
-                const txId = await broadcastTxHash(txhash);
-                return txId;
-
-            } catch (e) {
-                handleError()
-                throw e;
-            }
-
-        }
 
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
@@ -779,7 +856,7 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
 
     for (let i = 0; i < tx_i_o.inputs.length; i++) {
         try{
-            psbt.signInput(i, key);
+            psbt.signInput(i,  );
         } catch (e) {
             alert("Problem while trying to sign with your key. Please try to reconnect your wallet...");
         }
@@ -797,6 +874,32 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
         handleError()
         throw e;
     }
+
+}
+
+
+//===============================================================================
+//===============================================================================
+// API CALLS
+
+
+
+const broadcastTxHash = async (txhash) => {
+    if (!txhash) {
+        throw new Error("Missing tx hash...");
+    }
+
+    const url =
+        `https://pebas.marscoin.org/api/mars/broadcast?txhash=${txhash}`
+    try {
+        const response = await fetch(url, {
+            method: 'GET'
+        });
+        return response.json() // parses JSON response into native JavaScript objects
+    } catch (e) {
+        throw e;
+    }
+
 
 }
 
