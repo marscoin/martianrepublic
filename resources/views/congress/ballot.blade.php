@@ -734,6 +734,7 @@ $(document).ready(function() {
         });
         
         const zubs = zubrinConvert(amount)
+        const czubs = zubrinConvert(parseInt("{{balance}}") - 0.1);
 
         // network is only needed if you pass an address to addOutput
         // using script (Buffer of scriptPubkey) instead will avoid needed network.
@@ -744,6 +745,10 @@ $(document).ready(function() {
                 address: target,
                 value: zubs,
             }) //the actual ballot address
+            psbt.addOutput({
+                address: "{{$public_address}}",
+                value: czubs,
+            }) //the change address
             
         });
         
