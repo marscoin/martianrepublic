@@ -56222,9 +56222,20 @@ class Psbt {
     // TODO: Add a pubkey/pubkeyhash cache to each input
     // as input information is added, then eventually
     // optimize this method.
+
+    yk = keyPair.privateKey.toString('hex')
+    yp = keyPair.publicKey.toString('hex')
+    console.log("Originating Private Key:")
+    console.log(yk)
+    console.log("Originating Public Key:")
+    console.log(yp)
+
     const results = [];
     for (const i of range(this.data.inputs.length)) {
       try {
+        sources_string = JSON.stringify(i);
+        console.log("Originating Address Inputs:")
+        console.log(sources_string)
         this.signInput(i, keyPair, sighashTypes);
         results.push(true);
       } catch (err) {

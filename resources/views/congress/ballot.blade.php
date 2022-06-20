@@ -351,9 +351,18 @@ $(document).ready(function() {
         const sender_address = "<?=$public_address?>".trim()
         const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
         const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-        const child = root.derivePath("m/99999'/107'/0'/0/0");
+        const child = root.derivePath("m/44'/2'/0'/0/0");
         const wif = child.toWIF()
         local_key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
+        yk = local_key.privateKey.toString('hex')
+        yp = local_key.publicKey.toString('hex')
+        yb = my_bundle.Buffer.from(yp, 'hex')
+        console.log("Originating Private Key:")
+        console.log(yk)
+        console.log("Originating Public Key:")
+        console.log(yp)
+        console.log("Originating Public Key Buffer:")
+        console.log(yb)
     }
 
     const init = async () => {
@@ -377,6 +386,8 @@ $(document).ready(function() {
             sources.push(obj); 
         })
         sources_string = JSON.stringify(sources);
+        console.log("Originating Address Inputs:")
+        console.log(sources_string)
         return sources_string;
     }
 
@@ -661,6 +672,7 @@ $(document).ready(function() {
         {
             raw_tx = event.data.split("#")[1];
             signed_raw_tx = signPartial(raw_tx );
+            console.log("Partially signed message: " + index + ": "+ md5(signed_raw_tx))
             socket.send("SIGN_TX_COMPLETE#"+index+"#" + signed_raw_tx); 
         }
         if(event.data.includes("COMBINE_AND_BROADCAST"))
@@ -769,20 +781,25 @@ $(document).ready(function() {
         //for loop over signedTexts
         // final1.combine(final2) would give the exact same result
         //psbt.combine(final1, final2);
+        signedTexts = JSON.parse(signedTexts)
         initial = signedTexts[0];
-        const psbt =  my_bundle.bitcoin.Psbt.fromBase64(stext);
-        assert.strictEqual(psbt.validateSignaturesOfInput(0), true);
+        const psbt =  my_bundle.bitcoin.Psbt.fromBase64(initial);
+        //assert.strictEqual(psbt.validateSignaturesOfInput(0), true);
+        console.log(signedTexts)
+        console.log(Object.keys(signedTexts).length)
+        console.log("Signer: 0")
+        console.log(psbt.validateSignaturesOfInput(0));
 
-        for (let i = 1; i < signedTexts.length; i++) {
+        for (let i = 0; i < Object.keys(signedTexts).length; i++) {
             stext = signedTexts[i];
-        
-            const final1 =  my_bundle.bitcoin.Psbt.fromBase64(stext);
-            psbt.combine(final1);
-
+            console.log("Signer: " + i)
+            fin =  my_bundle.bitcoin.Psbt.fromBase64(stext);
+            psbt.combine(fin);
+            console.log(psbt.validateSignaturesOfInput(i))
             // Finalizer wants to check all signatures are valid before finalizing.
             // If the finalizer wants to check for specific pubkeys, the second arg
             // can be passed. See the first multisig example below.
-            assert.strictEqual(psbt.validateSignaturesOfInput(i), true);
+            //assert.strictEqual(psbt.validateSignaturesOfInput(i), true);
 
         }
 
