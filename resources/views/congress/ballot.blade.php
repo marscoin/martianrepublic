@@ -806,7 +806,7 @@ $(document).ready(function() {
         }
 
         // build and broadcast our RegTest network
-        const tx = psbt.finalizeAllInputs().extractTransaction(); 
+        const tx = psbt.finalizeAllInputs().extractTransaction(true); 
         const txhash = tx.toHex()
         console.log(txhash)
 
