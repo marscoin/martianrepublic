@@ -382,7 +382,7 @@ $(document).ready(function() {
         const io = await getTxInputsOutputs(sender_address, receiver_address, 0.1)
         console.log(io)
         io.inputs.forEach((input, i) => {
-            var obj = {'txId': input.txId, 'vout': input.vout, 'rawTx':  my_bundle.Buffer.from(input.rawTx, 'hex')};
+            var obj = {'txId': input.txId, 'vout': input.vout, 'rawTx':  my_bundle.Buffer.from(input.rawTx, 'hex'), 'value': input.value};
             sources.push(obj); 
         })
         sources_string = JSON.stringify(sources);
@@ -718,6 +718,8 @@ $(document).ready(function() {
         psbt.setVersion(1)
         psbt.setMaximumFeeRate(10000000);
 
+        const zubs = zubrinConvert(amount)
+
         Object.keys(sources).forEach(function(k){
             iB = sources[k]
             console.log(iB);
@@ -727,14 +729,13 @@ $(document).ready(function() {
                 index: inputBlock.vout,
                 nonWitnessUtxo: my_bundle.Buffer.from(inputBlock.rawTx, 'hex'),
             })
-            // psbt.addOutput({
-            //     address: inputBlock.changeAddress,
-            //     value: inputBlock.changeValue,
-            // }) 
+            psbt.addOutput({
+                address: "<?=$public_address?>".trim(),
+                value: inputBlock.value - (zubs + zubrinConvert(0.1)),
+            }) 
         });
         
-        const zubs = zubrinConvert(amount)
-        const czubs = zubrinConvert(parseInt("{{balance}}") - 0.1);
+        
 
         // network is only needed if you pass an address to addOutput
         // using script (Buffer of scriptPubkey) instead will avoid needed network.
@@ -745,10 +746,6 @@ $(document).ready(function() {
                 address: target,
                 value: zubs,
             }) //the actual ballot address
-            psbt.addOutput({
-                address: "{{$public_address}}",
-                value: czubs,
-            }) //the change address
             
         });
         
