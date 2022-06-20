@@ -8,6 +8,7 @@ import os
 import ast
 from dotenv import load_dotenv
 from ballot_shuffle import CoinShuffleServer
+import hashlib
 
 load_dotenv("../.env")
 BALLOT_SERVER_HOST = os.getenv('BALLOT_SERVER_HOST')
@@ -196,15 +197,17 @@ async def client_handler(websocket, path):
         if "SIGN_TX_COMPLETE" in message:
             peer_index = int(message.split("#")[1])
             SIGNATURES[peer_index] = message.split("#")[2]
+            print("Peer: " + str(peer_index))
+            print(hashlib.md5(SIGNATURES[peer_index].encode()).hexdigest())
 
             PEER_NUM = len(rooms[room].items())
-            print(SIGNATURES)
-            print(PEER_NUM)
+            # print(SIGNATURES)
+            # print(PEER_NUM)
             print(len(SIGNATURES))
             if len(SIGNATURES) == PEER_NUM:
                 #Send to all clients for combining and broadcasting...
                 for client, _ in rooms[room].items():
-                    await client.send('SIGN_TX#' + json.dumps(SIGNATURES))
+                    await client.send('COMBINE_AND_BROADCAST#' + json.dumps(SIGNATURES))
 
         # Send message to all clients
         #for client, _ in clients.items():
