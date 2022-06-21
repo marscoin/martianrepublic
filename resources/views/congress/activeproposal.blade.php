@@ -59,8 +59,8 @@
 
         <div class="feed-actions">
             
-            <a href='/forum/t/{{ $proposal->discussion }}' class="pull-left discussion-link">
-               Discuss! <i class="fa fa-external-link"></i></a>
+                <a href='/forum/t/{{ $proposal->discussion }}' class="pull-left discussion-link">
+                Discuss! <i class="fa fa-external-link"></i></a>
 
             <a href="https://explore.marscoin.org/tx/{{ $proposal->txid }}" class="pull-right"><i class="fa fa-clock-o"></i>
                 {{ $proposal->created_at }} <i class=" fa-check-square"></i>Notarized: {{ substr($proposal->txid, 0, 16) }}...</a> 

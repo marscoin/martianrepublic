@@ -273,6 +273,27 @@ img.payment {
 
                         </div> 
                     </div>
+                    <div id="conf-ballot" style="display: none; margin-top: 50px;">
+
+
+                            <h3 class="content-title"><u>You are voting on Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
+                            <div class="well" style="padding: 40px;">
+                                <ul class="icons-list">
+                                <li>
+                                    <i class="icon-li fa fa-quote-left"></i>
+                                    <p style="font-size: 2rem">
+                                        {{ $proposal->title }}
+                                    </p>
+                                    <a href='/forum/t/{{ $proposal->discussion }}' class="pull-right discussion-link">Citizen's discussion <i class="fa fa-external-link"></i></a>
+                                </li>
+                                </ul>
+                            </div>
+                            <div class="alert alert-warning">
+                                <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
+                                <strong>Attention!</strong> <h4 class="noticebar-empty-title">YOUR PRIVATE BALLOT IS BEING REGISTERED ON THE BLOCKCHAIN. PLEASE WAIT A MOMENT...</h4>
+                                <p>Voting will start in a moment...</p>
+                            </div>
+                    </div>
                     <div id="post-ballot" style="display: none; margin-top: 50px;">
 
 
@@ -435,8 +456,7 @@ $(document).ready(function() {
         console.log(receiver_address)
         console.log(amount)
 
-        const url =
-            `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
+        const url = `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
 
         try {
             const response = await fetch(url, {
@@ -451,6 +471,20 @@ $(document).ready(function() {
     }
 
     init();
+
+    function pollConfirmation(txId) {
+        
+        const url = `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
+
+        $.get("https://pebas.marscoin.org/api/mars/confirmation="+txId, {}, function(data) {
+				if(data == "1"){
+                    $("#pre-ballot").hide();
+                    $("#conf-ballot").hide();
+                    $("#post-ballot").show();
+                }
+		});
+        setTimeout(pollConfirmation, 30000);
+    }
 
     function parseHexString(str) { 
         var result = [];
@@ -777,10 +811,6 @@ $(document).ready(function() {
             
         });
         
-        
-
-        // network is only needed if you pass an address to addOutput
-        // using script (Buffer of scriptPubkey) instead will avoid needed network.
         Object.keys(destinations).forEach(function(k){
             output = destinations[k];
             target = output['target']
@@ -791,10 +821,7 @@ $(document).ready(function() {
             
         });
         
-        // We can have multiple signers sign in parrallel and combine them.
-        // (this is not necessary, but a nice feature)
-
-        // encode to send out to the signers
+        // We have multiple signers sign in parallel and combine them.
         const psbtBaseText = psbt.toBase64();
         return psbtBaseText;
     }
@@ -803,32 +830,16 @@ $(document).ready(function() {
     {
         // each signer imports
         const signer1 =  my_bundle.bitcoin.Psbt.fromBase64(psbtBaseText);
-        
-        // Alice signs each input with the respective private keys
-        // signInput and signInputAsync are better
-        // (They take the input index explicitly as the first arg)
         signer1.signAllInputs(local_key);
-
-        // If your signer object's sign method returns a promise, use the following
-        // await signer2.signAllInputsAsync(alice2.keys[0])
-
-        // encode to send back to combiner (signer 1 and 2 are not near each other)
         const s1text = signer1.toBase64();
         
         return s1text;
     }
 
     const combineAndBroadcastTransaction = async (signedTexts) => {
-
-        // final1.combine(final2) would give the exact same result
-
-        //for loop over signedTexts
-        // final1.combine(final2) would give the exact same result
-        //psbt.combine(final1, final2);
         signedTexts = JSON.parse(signedTexts)
         initial = signedTexts[0];
         const psbt =  my_bundle.bitcoin.Psbt.fromBase64(initial);
-        //assert.strictEqual(psbt.validateSignaturesOfInput(0), true);
         console.log(signedTexts)
         console.log(Object.keys(signedTexts).length)
         console.log("Signer: 0")
@@ -840,11 +851,6 @@ $(document).ready(function() {
             fin =  my_bundle.bitcoin.Psbt.fromBase64(stext);
             psbt.combine(fin);
             console.log(psbt.validateSignaturesOfInput(i))
-            // Finalizer wants to check all signatures are valid before finalizing.
-            // If the finalizer wants to check for specific pubkeys, the second arg
-            // can be passed. See the first multisig example below.
-            //assert.strictEqual(psbt.validateSignaturesOfInput(i), true);
-
         }
 
         // build and broadcast our RegTest network
@@ -854,6 +860,10 @@ $(document).ready(function() {
 
         try {
             const txId = await broadcastTxHash(txhash);
+            console.log("Ballot issued and broadcasted... awaiting confirmation....");
+            $("#pre-ballot").hide();
+            $("#conf-ballot").show();
+            pollConfirmation(txId);
             return txId;
 
         } catch (e) {
@@ -868,34 +878,24 @@ $(document).ready(function() {
 const signMARS = async (message, mars_amount, tx_i_o) => {
     const mnemonic = localStorage.getItem("key").trim();
     const sender_address = "<?=$public_address?>".trim()
-
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-
     const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-
     const child = root.derivePath("m/99999'/107'/0'/0/0");
-
     const wif = child.toWIF()
-
     const zubs = zubrinConvert(mars_amount)
-
     var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-    
     var psbt = new my_bundle.bitcoin.Psbt({
         network: Marscoin.mainnet,
     });
     psbt.setVersion(1)
     psbt.setMaximumFeeRate(10000000);
-
     unspent_vout = 0
     var data = my_bundle.Buffer(message)
     const embed = my_bundle.bitcoin.payments.embed({ data: [data] });
-    
     psbt.addOutput({
     script: embed.output,
     value: 0,
     })
-    
     tx_i_o.inputs.forEach((input, i) => {
         psbt.addInput({
             hash: input.txId,
@@ -903,18 +903,15 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
             nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex'),
         })
     })
-
     tx_i_o.outputs.forEach(output => {
         if (!output.address) {
             output.address = sender_address
         }
-
         psbt.addOutput({
             address: output.address,
             value: output.value,
         })
     })
-
     for (let i = 0; i < tx_i_o.inputs.length; i++) {
         try{
             psbt.signInput(i,  );
@@ -922,20 +919,17 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
             alert("Problem while trying to sign with your key. Please try to reconnect your wallet...");
         }
     }
-
     const tx = psbt.finalizeAllInputs().extractTransaction(); 
     const txhash = tx.toHex()
     console.log(txhash)
-
     try {
         const txId = await broadcastTxHash(txhash);
+        console.log(txId);
         return txId;
-
     } catch (e) {
         handleError()
         throw e;
     }
-
 }
 
 const handleError = (str) => {
