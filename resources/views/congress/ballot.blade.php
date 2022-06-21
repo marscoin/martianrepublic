@@ -255,9 +255,8 @@ img.payment {
                         
                     <h3 class="content-title"><u>Ballot acquisition for Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
 
-
-                        <p>Citizen name, public address, your ballot request for an auditable yet private ballot has been received by the ballot coordination server.</p>
                         <p>You can monitor the ballot acquisition process on this page</p>
+                        <p>As soon as enough voters are present the ballot issuing process will begin. Once you receive your ballot, you will be able to cast your vote from this page.</p>
                     
                         <div id="messages" style="padding: 25px; border: 1px dotted; ">
 
@@ -620,7 +619,9 @@ $(document).ready(function() {
     };
 
     socket.onmessage = function(event) {
-        $("#messages").prepend(`<br>[BALLOT SERVER]: ${event.data}`);
+        if(!event.data.includes("#"))
+            $("#messages").prepend(`<br>[BALLOT SERVER]: ${event.data}`);
+        
         if(event.data == "JOINED_ACK")
         {
             //Generate a new receive address for the ballot
