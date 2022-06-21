@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import asyncio
 import json
 import logging
@@ -33,7 +33,18 @@ PEER_NUM = 0
 CURRENT_SHUFFLE_PEER = 0
 response = {}
 server = CoinShuffleServer()
+max_voters_required = 3
 
+print("========================================================================")
+print("")
+print("                 MARTIAN REPUBLIC - BALLOT SHUFFLE SERVER")
+print("")
+print("========================================================================")
+print("")
+print("MAX_VOTERS_REQUIRED: " + str(max_voters_required))
+print("BALLOT_SERVER_HOST: " + str(BALLOT_SERVER_HOST))
+print("BALLOT_SERVER_PORT: " + str(BALLOT_SERVER_PORT))
+print("")
 async def ballotserver_start(room):
         global response
         response, dostart = server.start()
@@ -123,11 +134,11 @@ clients = {} #: {websocket: name}
 rooms = {}  #: {websocket: proposalname}
 entity = {}
 
-
 async def client_handler(websocket, path):
-    print('New client', websocket)
-    print(' ({} existing clients)'.format(len(clients)))
-
+    print('New voter: '+ str(websocket.remote_address[0])+":"+str(websocket.remote_address[1]))
+    current = len(clients.items()) + 1
+    print(' ({} existing clients)'.format(current))
+    print("...waiting for " + str(max_voters_required - current) + " more voters to request ballot before shuffle commences...")
     # The first line from the client is the name
     name_prop = await websocket.recv()
     name = name_prop.split("_")[0]
@@ -159,7 +170,7 @@ async def client_handler(websocket, path):
             key = message.split("#")[1]
             server.submit_public_key(key, str(websocket.remote_address[0])+":"+str(websocket.remote_address[1]))
             # Do we have enough ballot requests pending for a given proposal "polling station" (room)
-            if len(rooms[room].items()) >= 3:
+            if len(rooms[room].items()) >= max_voters_required:
                 # Let the most recent client that joined kick the shuffle process off
                 await ballotserver_start(rooms[room])
 
