@@ -875,22 +875,29 @@
 
             }
 
-            const broadcastTxHash = async (txhash) => {
-                if (!txhash) {
+            const broadcastTxHash = async (txhashstring) => {
+                if (!txhashstring) {
                     throw new Error("Missing tx hash...");
                 }
-
-                const url =
-                    `https://pebas.marscoin.org/api/mars/broadcast?txhash=${txhash}`
+                const url = "https://pebas.marscoin.org/api/mars/broadcast"
                 try {
-                    const response = await fetch(url, {
-                        method: 'GET'
-                    });
-                    return response.json() // parses JSON response into native JavaScript objects
-                } catch (e) {
-                    throw e;
+                    const config = {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({a: 1, txhash: txhashstring})
+                    }
+                    const response = await fetch(url, config)
+                    if (response.ok) { 
+                        return response.json()
+                    } else {
+                        console.log(response)
+                    }
+                } catch (error) {
+                    console.log(error)
                 }
-
 
             }
 
