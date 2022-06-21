@@ -153,6 +153,8 @@ async def client_handler(websocket, path):
     #let everyone else in the room know
     for client, _ in rooms[room].items():
         await client.send(name + ' has joined the Ballot issuance procedures for proposal ' + str(room))
+        await client.send("...waiting for " + str(max_voters_required - current) + " more voters to join before ballot shuffle commences...")
+        await client.send("Please wait...")
 
     # Handle messages from this client
     while True:
@@ -162,7 +164,7 @@ async def client_handler(websocket, path):
             del clients[websocket]
             print('Client closed connection', websocket)
             for client, _ in clients.items():
-                await client.send(their_name + ' has left the chat')
+                await client.send(their_name + ' has left, restart shuffle...')
             break
 
         if "SUBMIT_KEY" in message:
