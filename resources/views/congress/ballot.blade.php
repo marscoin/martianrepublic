@@ -381,7 +381,7 @@ $(document).ready(function() {
         const io = await getTxInputsOutputs(sender_address, receiver_address, 0.1)
         console.log(io)
         io.inputs.forEach((input, i) => {
-            var obj = {'txId': input.txId, 'vout': input.vout, 'rawTx':  my_bundle.Buffer.from(input.rawTx, 'hex'), 'value': input.value};
+            var obj = {'txId': input.txId, 'vout': input.vout, 'rawTx':  my_bundle.Buffer.from(input.rawTx, 'hex'), 'value': input.value, 'originator': "{{$public_address}}"};
             sources.push(obj); 
         })
         sources_string = JSON.stringify(sources);
@@ -687,8 +687,6 @@ $(document).ready(function() {
     if (event.wasClean) {
         alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
     } else {
-        // e.g. server process killed or network down
-        // event.code is usually 1006 in this case
         $("#messages").prepend('<br>[close] Connection died');
     }
     };
@@ -720,6 +718,7 @@ $(document).ready(function() {
         psbt.setMaximumFeeRate(10000000);
 
         const zubs = zubrinConvert(amount)
+        origins = []
 
         Object.keys(sources).forEach(function(k){
             iB = sources[k]
@@ -730,10 +729,16 @@ $(document).ready(function() {
                 index: inputBlock.vout,
                 nonWitnessUtxo: my_bundle.Buffer.from(inputBlock.rawTx, 'hex'),
             })
-            psbt.addOutput({
-                address: "<?=$public_address?>".trim(),
-                value: inputBlock.value - (zubs + zubrinConvert(0.1)),
-            }) 
+            //change addresses back to citizen address, one per input(s)
+            if (!origins.includes(inputBlock.originator)) {
+                origins.push(inputBlock.originator);
+            }else{
+                psbt.addOutput({
+                    address: inputBlock.originator,
+                    value: inputBlock.value - (zubs + zubrinConvert(0.1)),
+                }) 
+            }
+            
         });
         
         
@@ -746,7 +751,7 @@ $(document).ready(function() {
             psbt.addOutput({
                 address: target,
                 value: zubs,
-            }) //the actual ballot address
+            }) 
             
         });
         
