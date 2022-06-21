@@ -217,11 +217,6 @@ img.payment {
     min-height: 968px;
 }
 
-/* #messages {
-  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-  overflow-y: scroll;
-} */
     </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
 </head>
@@ -232,15 +227,12 @@ img.payment {
             <div class="container">
                 <div class="navbar-header">
                     @include('wallet.header')
-                </div> <!-- /.navbar-header -->
+                </div>
                 <nav class="collapse navbar-collapse" role="navigation">
                     @include('wallet.navbarleft')
-                    @include('wallet.navbarright')
                 </nav>
-            </div> <!-- /.container -->
+            </div>
         </header>
-        @include('wallet.mainnav', array('active'=>'congress'))
-
         
         <div class="content">
             <div class="container">
@@ -248,23 +240,67 @@ img.payment {
                 <div class="portlet">
                     <div class="portlet-body">
 
-                    <div class="alert alert-danger">
-                        <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
-                        <strong>Attention!</strong> <h4 class="noticebar-empty-title">DO NOT CLOSE THIS TAB AND BROWSER UNTIL YOUR BALLOT HAS BEEN RECEIVED.</h4>
-                    </div>
-                        
-                    <h3 class="content-title"><u>Ballot acquisition for Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
+                    <div id="pre-ballot" style="display: show; margin-top: 50px;">
 
-                        <p>You can monitor the ballot acquisition process on this page</p>
-                        <p>As soon as enough voters are present the ballot issuing process will begin. Once you receive your ballot, you will be able to cast your vote from this page.</p>
-                    
-                        <div id="messages" style="padding: 25px; border: 1px dotted; ">
+                        <h3 class="content-title"><u>You are voting on Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
+                            <div class="well" style="padding: 40px;">
+                                <ul class="icons-list">
+                                <li>
+                                    <i class="icon-li fa fa-quote-left"></i>
+                                    <p style="font-size: 2rem">
+                                        {{ $proposal->title }}
+                                    </p>
+                                    <a href='/forum/t/{{ $proposal->discussion }}' class="pull-right discussion-link">Citizen's discussion <i class="fa fa-external-link"></i></a>
+                                </li>
+                                </ul>
+                            </div>
 
+                        <div class="alert alert-danger">
+                            <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
+                            <strong>Attention!</strong> <h4 class="noticebar-empty-title">DO NOT CLOSE THIS TAB AND BROWSER UNTIL YOUR BALLOT HAS BEEN RECEIVED.</h4>
                         </div>
+                            
+                        <h3 class="content-title"><u>Ballot acquisition for Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
 
-                        <a target="_blank" href="https://marscoin.gitbook.io/marscoin-documentation/martian-republic/congress/ballot" style="margin-top: 35px;" class="btn btn-info btn-lg">Learn More</a>
+                            <p>You can monitor the ballot acquisition process on this page</p>
+                            <p>As soon as enough voters are present the ballot issuing process will begin. Once you receive your ballot, you will be able to cast your vote from this page. Do NOT close this page until you received your secret ballot and cast your vote!</p>
+                        
+                            <div id="messages" style="padding: 25px; border: 1px dotted; ">
 
-                    </div> 
+                            </div>
+
+                            <a target="_blank" href="https://marscoin.gitbook.io/marscoin-documentation/martian-republic/congress/ballot" style="margin-top: 35px;" class="btn btn-info btn-lg">Learn More</a>
+
+                        </div> 
+                    </div>
+                    <div id="post-ballot" style="display: none; margin-top: 50px;">
+
+
+                            <h3 class="content-title"><u>You are voting on Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
+                            <div class="well" style="padding: 40px;">
+                                <ul class="icons-list">
+                                <li>
+                                    <i class="icon-li fa fa-quote-left"></i>
+                                    <p style="font-size: 2rem">
+                                        {{ $proposal->title }}
+                                    </p>
+                                    <a href='/forum/t/{{ $proposal->discussion }}' class="pull-right discussion-link">Citizen's discussion <i class="fa fa-external-link"></i></a>
+                                </li>
+                                </ul>
+                            </div>
+                            <div class="alert alert-success">
+                                <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
+                                <strong>Attention!</strong> <h4 class="noticebar-empty-title">YOUR PRIVATE BALLOT HAS BEEN ISSUED. PLEASE CAST YOUR VOTE NOW:</h4>
+                            </div>
+                            <a target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-success btn-lg" >YES</a>
+                            <a target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-danger btn-lg" >NO</a>
+                            <a target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-warning btn-lg" >ABSTAIN</a>
+                        
+                            <h4 class="content-title" style="margin-top: 100px;"><u></u></h4>
+                            <p>Your vote will be notarized on the blockchain. Due to the nature of your secret ballot, your vote WILL NOT be traceable back to you. At the same time, as your ballot originated indirectly from a citizen address it will be fully auditable and
+                                provide evidence that all votes cast originate only from citizens found in the voter registry. One voter, one vote. End-to-end auditable. Immutable. Transparent. A Congress by the people for the people.</p>
+
+                    </div>
                 </div>
                 <?php }else{ ?>
                 <div class="portlet">
