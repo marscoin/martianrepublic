@@ -803,14 +803,10 @@ const sendMARS = async (mars_amount, receiver_address) => {
 }
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
-    const mnemonic = localStorage.getItem("key").trim();
-    const sender_address = "<?=$public_address?>".trim()
-    const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-    const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-    const child = root.derivePath("m/99999'/107'/0'/0/0");
-    const wif = child.toWIF()
+
+    const sender_address = hidden_target
     const zubs = zubrinConvert(mars_amount)
-    var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
+
     var psbt = new my_bundle.bitcoin.Psbt({
         network: Marscoin.mainnet,
     });
@@ -841,7 +837,7 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     })
     for (let i = 0; i < tx_i_o.inputs.length; i++) {
         try{
-            psbt.signInput(i,  );
+            psbt.signInput(i, local_key );
         } catch (e) {
             alert("Problem while trying to sign with your key. Please try to reconnect your wallet...");
         }
