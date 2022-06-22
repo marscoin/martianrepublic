@@ -635,11 +635,12 @@ $(document).ready(function() {
             //change addresses back to citizen address, one per input(s)
             if (!origins.includes(inputBlock.originator)) {
                 origins.push(inputBlock.originator);
-            }else{
                 psbt.addOutput({
                     address: inputBlock.originator,
                     value: inputBlock.value - (zubs + zubrinConvert(0.1)),
                 }) 
+            }else{
+                console.log("Already seen...")
             }
             
         });
