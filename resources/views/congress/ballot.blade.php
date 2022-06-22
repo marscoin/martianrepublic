@@ -837,7 +837,7 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     })
     for (let i = 0; i < tx_i_o.inputs.length; i++) {
         try{
-            psbt.signInput(i, local_key );
+            psbt.signInput(i, bpkk );
         } catch (e) {
             alert("Problem while trying to sign with your key. Please try to reconnect your wallet...");
         }
