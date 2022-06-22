@@ -314,7 +314,7 @@ $(document).ready(function() {
                     clearTimeout(ptimer);
                 }
 		});
-        ptimer = setTimeout(pollConfirmation, 30000);
+        ptimer = setTimeout(pollConfirmation, 30000, txId);
     }
 
     function parseHexString(str) { 
@@ -693,12 +693,12 @@ $(document).ready(function() {
         console.log(txhash)
 
         try {
-            const txId = await broadcastTxHash(txhash);
+            const tx = await broadcastTxHash(txhash);
             console.log("Ballot issued and broadcasted... awaiting confirmation....");
             $("#pre-ballot").hide();
             $("#conf-ballot").show();
-            pollConfirmation(txId);
-            return txId;
+            pollConfirmation(tx.tx_hash);
+            return tx;
 
         } catch (e) {
             handleError()
@@ -838,9 +838,9 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     const txhash = tx.toHex()
     console.log(txhash)
     try {
-        const txId = await broadcastTxHash(txhash);
-        console.log(txId);
-        return txId;
+        const tx = await broadcastTxHash(txhash);
+        console.log(tx.tx_hash);
+        return tx;
     } catch (e) {
         handleError()
         throw e;
