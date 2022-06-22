@@ -23,201 +23,8 @@
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="stylesheet" href="/assets/wallet/css/voting/voting.css">
     <link rel="stylesheet" href="/assets/wallet/css/simplemde.min.css">
+    <link rel="stylesheet" href="/assets/wallet/css/ballot.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
-    <style>
-        span.qrcodeicon span {
-            position: absolute;
-            display: block;
-            top: 7px;
-            right: 21px;
-            width: 18px;
-            height: 18px;
-            background: url('/assets/wallet/img/qrcode.png');
-            cursor: pointer;
-            z-index: 1;
-        }
-
-
-        .price-box {
-    margin: 0 auto;
-	background: #E9E9E9;
-	border-radius: 10px;
-	padding: 40px 15px;
-	width: 500px;
-}
-
-.ui-widget-content {
-	border: 1px solid #bdc3c7;
-	background: #e1e1e1;
-	color: #222222;
-	margin-top: 4px;
-}
-
-.ui-slider .ui-slider-handle {
-	position: absolute;
-	z-index: 2;
-	width: 5.2em;
-	height: 2.2em;
-	cursor: default;
-	margin: 0 -40px auto !important;
-	text-align: center;	
-	line-height: 30px;
-	color: #FFFFFF;
-	font-size: 15px;
-}
-
-.ui-slider .ui-slider-handle .glyphicon {
-	color: #FFFFFF;
-	margin: 0 3px; 
-	font-size: 11px;
-	opacity: 0.5;
-}
-
-.ui-corner-all {
-	border-radius: 20px;
-}
-
-.ui-slider-horizontal .ui-slider-handle {
-	top: -.9em;
-}
-
-.ui-state-default,
-.ui-widget-content .ui-state-default {
-	border: 1px solid #f9f9f9;
-	background: #3498db;
-}
-
-.ui-slider-horizontal .ui-slider-handle {
-	margin-left: -0.5em;
-}
-
-.ui-slider .ui-slider-handle {
-	cursor: pointer;
-}
-
-.ui-slider a,
-.ui-slider a:focus {
-	cursor: pointer;
-	outline: none;
-}
-
-.price, .lead p {
-	font-weight: 600;
-	font-size: 32px;
-	display: inline-block;
-	line-height: 60px;
-}
-
-h4.great {
-	background: #00ac98;
-	margin: 0 0 25px 0px;
-	padding: 7px 15px;
-	color: #ffffff;
-	font-size: 18px;
-	font-weight: 600;
-	border-radius: 5px;
-	display: inline-block;
-	-moz-box-shadow:    2px 4px 5px 0 #ccc;
-  	-webkit-box-shadow: 2px 4px 5px 0 #ccc;
-  	box-shadow:         2px 4px 5px 0 #ccc;
-}
-
-.total {
-	border-bottom: 1px solid #7f8c8d;
-	/*display: inline;
-	padding: 10px 5px;*/
-	position: relative;
-	padding-bottom: 20px;
-}
-
-.total:before {
-	content: "";
-	display: inline;
-	position: absolute;
-	left: 0;
-	bottom: 5px;
-	width: 100%;
-	height: 3px;
-	background: #7f8c8d;
-	opacity: 0.5;
-}
-
-.price-slider {
-	margin-bottom: 70px;
-}
-
-.price-slider span {
-	font-weight: 200;
-	display: inline-block;
-	color: #7f8c8d;
-	font-size: 13px;
-}
-
-.form-pricing {
-	background: #ffffff;
-	padding: 20px;
-	border-radius: 4px;
-}
-
-.price-form {
-	background: #ffffff;
-	margin-bottom: 10px;
-	padding: 20px;
-	border: 1px solid #eeeeee;
-	border-radius: 4px;
-	/*-moz-box-shadow:    0 5px 5px 0 #ccc;
-  	-webkit-box-shadow: 0 5px 5px 0 #ccc;
-  	box-shadow:         0 5px 5px 0 #ccc;*/
-}
-
-.form-group {
-	margin-bottom: 0;
-}
-
-.form-group span.price {
-	font-weight: 200;
-	display: inline-block;
-	color: #7f8c8d;
-	font-size: 14px;
-}
-
-.help-text {
-	display: block;
-	margin-top: 32px;
-	margin-bottom: 10px;
-	color: #737373;
-	position: absolute;
-	/*margin-left: 20px;*/
-	font-weight: 200;
-	text-align: right;
-	width: 188px;
-}
-
-.price-form label {
-	font-weight: 200;
-	font-size: 21px;
-}
-
-img.payment {
-	display: block;
-    margin-left: auto;
-    margin-right: auto
-}
-
-.ui-slider-range-min {
-	background: #2980b9;
-}
-
-.editor-toolbar.fullscreen {
-    z-index: 2470 !important;
-}
-
-.CodeMirror,
-.CodeMirror-scroll {
-    min-height: 968px;
-}
-
-    </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
 </head>
 
@@ -317,13 +124,34 @@ img.payment {
                                 </ul>
                             </div>
 
-                            <a target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-success btn-lg" >YES</a>
-                            <a target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-danger btn-lg" >NO</a>
-                            <a target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-warning btn-lg" >ABSTAIN</a>
+                            <a id="pry" target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-success btn-lg" >YES</a>
+                            <a id="prn" target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-danger btn-lg" >NO</a>
+                            <a id="pra" target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-warning btn-lg" >ABSTAIN</a>
                         
                             <h4 class="content-title" style="margin-top: 100px;"><u></u></h4>
                             <p>Your vote will be notarized on the blockchain. Due to the nature of your secret ballot, your vote WILL NOT be traceable back to you. At the same time, as your ballot originated indirectly from a citizen address it will be fully auditable and
                                 provide evidence that all votes cast originate only from citizens found in the voter registry. One voter, one vote. End-to-end auditable. Immutable. Transparent. A Congress by the people for the people.</p>
+
+                    </div>
+                    <div id="post-cast" style="display: none; margin-top: 50px;">
+
+                            <div class="alert alert-success">
+                                <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
+                                <strong>Attention!</strong> <h4 class="noticebar-empty-title">YOUR PRIVATE BALLOT WAS CAST: <a id="cast_confirmation" href="" ></a></h4>
+                            </div>
+
+                            <h3 class="content-title"><u>You voted successfully on Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
+                            <div class="well" style="padding: 40px;">
+                                <ul class="icons-list">
+                                <li>
+                                    <i class="icon-li fa fa-quote-left"></i>
+                                    <p style="font-size: 2rem">
+                                        {{ $proposal->title }}
+                                    </p>
+                                    <a href='/forum/t/{{ $proposal->discussion }}' class="pull-right discussion-link">Citizen's discussion <i class="fa fa-external-link"></i></a>
+                                </li>
+                                </ul>
+                            </div>
 
                     </div>
                 </div>
@@ -397,6 +225,7 @@ $(document).ready(function() {
     var bpkk = "";
     var local_key = "";
     var inputBlock = {}
+    var ptimer = null
     //var messageKey = ""
 
     //test()
@@ -464,7 +293,7 @@ $(document).ready(function() {
 
         try {
             const response = await fetch(url, {
-                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                method: 'GET', 
             });
 
             return response.json()
@@ -477,17 +306,15 @@ $(document).ready(function() {
     init();
 
     function pollConfirmation(txId) {
-        
-        const url = `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
-
-        $.get("https://pebas.marscoin.org/api/mars/confirmation="+txId, {}, function(data) {
-				if(data == "1"){
+        $.get("https://pebas.marscoin.org/api/mars/confirmation?txid="+txId, {}, function(data) {
+				if(data && data.confirmations && data.confirmations > 1){
                     $("#pre-ballot").hide();
                     $("#conf-ballot").hide();
                     $("#post-ballot").show();
+                    clearTimeout(ptimer);
                 }
 		});
-        setTimeout(pollConfirmation, 30000);
+        ptimer = setTimeout(pollConfirmation, 30000);
     }
 
     function parseHexString(str) { 
@@ -700,10 +527,8 @@ $(document).ready(function() {
         {
             //Generate a new receive address for the ballot
             $("#messages").prepend('<br>Generating ballot for proposal');
-
             //generate ephemeral public key and shuffling keypair
             socket.send("SUBMIT_KEY#"+ek+"#")
-
         }
         if(event.data.includes("INITIATE_SHUFFLE_"))
         {
@@ -877,6 +702,87 @@ $(document).ready(function() {
 
     }
 
+//YES vote with ballot
+$("#pry").click(async (e) => {
+    event.preventDefault();
+    message = "PRY_<?=$proposal->ipfs_hash?>";
+    const io = await sendMARS(0.09, hidden_target);
+    const fee = 0.09
+    const mars_amount = 0.01
+    const total_amount = fee + parseInt(mars_amount)
+    console.log("Fee for casting ballot (miner incentive): " + fee)
+    console.log("ballot spent amount: " + mars_amount)
+
+    try {
+        const tx = await signMARS(message, mars_amount, io);
+        $("#pre-ballot").hide();
+        $("#conf-ballot").hide();
+        $("#post-ballot").hide();
+        $("#post-cast").show();
+        $("#cast_confirmation").text(tx.tx_hash);
+        $("#cast_confirmation").attr("href", "https://explore.marscoin.org/tx/"+ tx.tx_hash);
+        const data = await doAjax("/api/setfeed", {"type": "PRY", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+        if(data.Hash){
+            alert('Submitted to Marscoin Blockchain successfully');
+        }
+    } catch (e) {
+        throw e;
+    }
+})
+//NO vote with ballot
+$("#prn").click(async (e) => {
+    event.preventDefault();
+    message = "PRN_<?=$proposal->ipfs_hash?>";
+    const io = await sendMARS(0.09, hidden_target);
+    const fee = 0.09
+    const mars_amount = 0.01
+    const total_amount = fee + parseInt(mars_amount)
+    console.log("Fee for casting ballot (miner incentive): " + fee)
+    console.log("ballot spent amount: " + mars_amount)
+
+    try {
+        const tx = await signMARS(message, mars_amount, io);
+        $("#pre-ballot").hide();
+        $("#conf-ballot").hide();
+        $("#post-ballot").hide();
+        $("#post-cast").show();
+        $("#cast_confirmation").text(tx.tx_hash);
+        $("#cast_confirmation").attr("href", "https://explore.marscoin.org/tx/"+ tx.tx_hash);
+        const data = await doAjax("/api/setfeed", {"type": "PRN", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+        if(data.Hash){
+            alert('Submitted to Marscoin Blockchain successfully');
+        }
+    } catch (e) {
+        throw e;
+    }
+})
+//ABSTAIN vote with ballot
+$("#pra").click(async (e) => {
+    event.preventDefault();
+    message = "PRA_<?=$proposal->ipfs_hash?>";
+    const io = await sendMARS(0.09, hidden_target);
+    const fee = 0.09
+    const mars_amount = 0.01
+    const total_amount = fee + parseInt(mars_amount)
+    console.log("Fee for casting ballot (miner incentive): " + fee)
+    console.log("ballot spent amount: " + mars_amount)
+
+    try {
+        const tx = await signMARS(message, mars_amount, io);
+        $("#pre-ballot").hide();
+        $("#conf-ballot").hide();
+        $("#post-ballot").hide();
+        $("#post-cast").show();
+        $("#cast_confirmation").text(tx.tx_hash);
+        $("#cast_confirmation").attr("href", "https://explore.marscoin.org/tx/"+ tx.tx_hash);
+        const data = await doAjax("/api/setfeed", {"type": "PRA", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+        if(data.Hash){
+            alert('Submitted to Marscoin Blockchain successfully');
+        }
+    } catch (e) {
+        throw e;
+    }
+})
 
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
