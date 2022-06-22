@@ -307,7 +307,7 @@ $(document).ready(function() {
 
     function pollConfirmation(txId) {
         $.get("https://pebas.marscoin.org/api/mars/txdetails?txid="+txId, {}, function(data) {
-				if(data && data.confirmations && data.confirmations > 1){
+				if(data && data.confirmations && data.confirmations > 0){
                     $("#pre-ballot").hide();
                     $("#conf-ballot").hide();
                     $("#post-ballot").show();
