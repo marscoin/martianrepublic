@@ -520,7 +520,7 @@ $(document).ready(function() {
     };
 
     socket.onmessage = function(event) {
-        if(!event.data.includes("#"))
+        if(!event.data.includes("#") && !event.data.includes("_"))
             $("#messages").prepend(`<br>[BALLOT SERVER]: ${event.data}`);
         
         if(event.data == "JOINED_ACK")
@@ -532,6 +532,7 @@ $(document).ready(function() {
         }
         if(event.data.includes("INITIATE_SHUFFLE_"))
         {
+            $("#messages").prepend('<br>Initiating ballot shuffle...');
             json = event.data.split("_")[2]
             data = JSON.parse(json);
             start_called = true
@@ -547,6 +548,7 @@ $(document).ready(function() {
         }
         if(event.data.includes("PERFORM_SHUFFLE"))
         {
+            $("#messages").prepend('<br>Performing ballot shuffle...');
             json = event.data.split("#")[1]
             data = JSON.parse(json);
             json = event.data.split("#")[2]
@@ -561,6 +563,7 @@ $(document).ready(function() {
             sources[index] = inputBlock; 
             data =  shuffle_data(data)
             if (index == num_peers - 1){
+                $("#messages").prepend('<br>Collecting signatures...');
                 raw_tx = createRawTransaction(sources, data)
                 socket.send("COLLECT_SIGNATURES#" + raw_tx)
             }
@@ -577,6 +580,7 @@ $(document).ready(function() {
         }
         if(event.data.includes("COMBINE_AND_BROADCAST"))
         {
+            $("#messages").prepend('<br>Combining signatures and broadcasting...');
             raw_tx = event.data.split("#")[1];
             signed_raw_tx = combineAndBroadcastTransaction(raw_tx);
         }
