@@ -789,6 +789,18 @@ $("#pra").click(async (e) => {
     }
 })
 
+const sendMARS = async (mars_amount, receiver_address) => {
+    const sender_address = receiver_address;
+    try {
+        const io = await getTxInputsOutputs(sender_address, receiver_address,
+            mars_amount)
+        return io
+    } catch (e) {
+        handleError()
+        throw e;
+    }
+    return null
+}
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
     const mnemonic = localStorage.getItem("key").trim();
