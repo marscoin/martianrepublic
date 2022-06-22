@@ -242,6 +242,11 @@ img.payment {
 
                     <div id="pre-ballot" style="display: show; margin-top: 50px;">
 
+                        <div class="alert alert-danger">
+                            <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
+                            <strong>Attention!</strong> <h4 class="noticebar-empty-title">DO NOT CLOSE THIS TAB AND BROWSER UNTIL YOUR BALLOT HAS BEEN RECEIVED.</h4>
+                        </div>
+
                         <h3 class="content-title"><u>You are voting on Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
                             <div class="well" style="padding: 40px;">
                                 <ul class="icons-list">
@@ -255,10 +260,7 @@ img.payment {
                                 </ul>
                             </div>
 
-                        <div class="alert alert-danger">
-                            <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
-                            <strong>Attention!</strong> <h4 class="noticebar-empty-title">DO NOT CLOSE THIS TAB AND BROWSER UNTIL YOUR BALLOT HAS BEEN RECEIVED.</h4>
-                        </div>
+                       
                             
                         <h3 class="content-title"><u>Ballot acquisition for Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
 
@@ -275,27 +277,11 @@ img.payment {
                     </div>
                     <div id="conf-ballot" style="display: none; margin-top: 50px;">
 
-
-                            <h3 class="content-title"><u>You are voting on Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
-                            <div class="well" style="padding: 40px;">
-                                <ul class="icons-list">
-                                <li>
-                                    <i class="icon-li fa fa-quote-left"></i>
-                                    <p style="font-size: 2rem">
-                                        {{ $proposal->title }}
-                                    </p>
-                                    <a href='/forum/t/{{ $proposal->discussion }}' class="pull-right discussion-link">Citizen's discussion <i class="fa fa-external-link"></i></a>
-                                </li>
-                                </ul>
-                            </div>
-                            <div class="alert alert-warning">
+                             <div class="alert alert-warning">
                                 <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
                                 <strong>Attention!</strong> <h4 class="noticebar-empty-title">YOUR PRIVATE BALLOT IS BEING REGISTERED ON THE BLOCKCHAIN. PLEASE WAIT A MOMENT...</h4>
                                 <p>Voting will start in a moment...</p>
                             </div>
-                    </div>
-                    <div id="post-ballot" style="display: none; margin-top: 50px;">
-
 
                             <h3 class="content-title"><u>You are voting on Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
                             <div class="well" style="padding: 40px;">
@@ -309,10 +295,28 @@ img.payment {
                                 </li>
                                 </ul>
                             </div>
+
+                    </div>
+                    <div id="post-ballot" style="display: none; margin-top: 50px;">
+                        
                             <div class="alert alert-success">
                                 <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
                                 <strong>Attention!</strong> <h4 class="noticebar-empty-title">YOUR PRIVATE BALLOT HAS BEEN ISSUED. PLEASE CAST YOUR VOTE NOW:</h4>
                             </div>
+
+                            <h3 class="content-title"><u>You are voting on Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
+                            <div class="well" style="padding: 40px;">
+                                <ul class="icons-list">
+                                <li>
+                                    <i class="icon-li fa fa-quote-left"></i>
+                                    <p style="font-size: 2rem">
+                                        {{ $proposal->title }}
+                                    </p>
+                                    <a href='/forum/t/{{ $proposal->discussion }}' class="pull-right discussion-link">Citizen's discussion <i class="fa fa-external-link"></i></a>
+                                </li>
+                                </ul>
+                            </div>
+
                             <a target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-success btn-lg" >YES</a>
                             <a target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-danger btn-lg" >NO</a>
                             <a target="_blank" href="#" style="margin-top: 35px; font-size: 72px; margin-right: 50px;" class="btn btn-warning btn-lg" >ABSTAIN</a>
