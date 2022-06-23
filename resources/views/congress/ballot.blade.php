@@ -389,7 +389,7 @@ $(document).ready(function() {
         console.log(bpkk2)
         const resp = {
             address: addy,
-            pubKey: publicKey,
+            pubKey: bpkk2.publicKey.toString('hex'),
             xprv: root.toBase58(),
             mnemonic: mnemonic
         }
