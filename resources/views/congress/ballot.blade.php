@@ -87,8 +87,9 @@
                              <div class="alert alert-warning">
                                 <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
                                 <strong>Attention!</strong> <h4 class="noticebar-empty-title">YOUR PRIVATE BALLOT IS BEING REGISTERED ON THE BLOCKCHAIN. PLEASE WAIT A MOMENT...</h4>
-                                <p>Voting will start in a moment...</p>
+                                <p>Voting will start shortly...</p>
                             </div>
+                            <img src="/assets/wallet/img/blockchain.gif" style="width: 223px;float: right;margin-top: -19px;">
 
                             <h3 class="content-title"><u>You are voting on Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</u></h3>
                             <div class="well" style="padding: 40px;">
@@ -374,11 +375,11 @@ $(document).ready(function() {
         root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
         child = root.derivePath("m/999999'/107'/<?=$propid?>'");
         wif2 = child.toWIF()
-        bpkk2 = my_bundle.bitcoin.ECPair.fromWIF(wif2, Marscoin.mainnet);
-        yk = bpkk2.privateKey.toString('hex')
-        yp = bpkk2.publicKey.toString('hex')
+        bpkk = my_bundle.bitcoin.ECPair.fromWIF(wif2, Marscoin.mainnet);
+        yk = bpkk.privateKey.toString('hex')
+        yp = bpkk.publicKey.toString('hex')
         yb = my_bundle.Buffer.from(yp, 'hex')
-        addy = nodeToLegacyAddress(bpkk2)
+        addy = nodeToLegacyAddress(bpkk)
         console.log("Ballot Private Key:")
         console.log(yk)
         console.log("Ballot Public Key:")
@@ -386,10 +387,10 @@ $(document).ready(function() {
         console.log("Ballot Public Key Buffer:")
         console.log(yb)
         console.log("Ballot EC Pair:")
-        console.log(bpkk2)
+        console.log(bpkk)
         const resp = {
             address: addy,
-            pubKey: bpkk2.publicKey.toString('hex'),
+            pubKey: bpkk.publicKey.toString('hex'),
             xprv: root.toBase58(),
             mnemonic: mnemonic
         }
