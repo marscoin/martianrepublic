@@ -710,7 +710,7 @@ $(document).ready(function() {
 $("#pry").click(async (e) => {
     event.preventDefault();
     message = "PRY_<?=str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash)?>";
-    const io = await sendMARS(0.09, hidden_target);
+    const io = await sendMARS(0.01, hidden_target);
     const fee = 0.09
     const mars_amount = 0.01
     const total_amount = fee + parseInt(mars_amount)
@@ -737,7 +737,7 @@ $("#pry").click(async (e) => {
 $("#prn").click(async (e) => {
     event.preventDefault();
     message = "PRN_<?=str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash)?>";
-    const io = await sendMARS(0.09, hidden_target);
+    const io = await sendMARS(0.01, hidden_target);
     const fee = 0.09
     const mars_amount = 0.01
     const total_amount = fee + parseInt(mars_amount)
@@ -764,7 +764,7 @@ $("#prn").click(async (e) => {
 $("#pra").click(async (e) => {
     event.preventDefault();
     message = "PRA_<?=str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash)?>";
-    const io = await sendMARS(0.09, hidden_target);
+    const io = await sendMARS(0.01, hidden_target);
     const fee = 0.09
     const mars_amount = 0.01
     const total_amount = fee + parseInt(mars_amount)
