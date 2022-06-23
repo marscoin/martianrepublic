@@ -824,15 +824,7 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
             nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex'),
         })
     })
-    tx_i_o.outputs.forEach(output => {
-        if (!output.address) {
-            output.address = sender_address
-        }
-        psbt.addOutput({
-            address: output.address,
-            value: output.value,
-        })
-    })
+    //we burn the outputs as fee for the miners. this is a data-only tx
     for (let i = 0; i < tx_i_o.inputs.length; i++) {
         try{
             psbt.signInput(i, bpkk );
