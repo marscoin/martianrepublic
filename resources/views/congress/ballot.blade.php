@@ -288,16 +288,12 @@ $(document).ready(function() {
         console.log(sender_address)
         console.log(receiver_address)
         console.log(amount)
-
         const url = `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
-
         try {
             const response = await fetch(url, {
                 method: 'GET', 
             });
-
             return response.json()
-
         } catch (e) {
             throw e;
         }
@@ -351,19 +347,19 @@ $(document).ready(function() {
         seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
         root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
         child = root.derivePath("m/999999'/107'/<?=$propid?>'");
-        let tpub = child.toBase58()
-        hdNode = my_bundle.bip32.fromBase58(tpub, Marscoin.mainnet)
-        node = hdNode.derive(0)
+        tpub = child.toBase58()
+        node = my_bundle.bip32.fromBase58(tpub, Marscoin.mainnet)
+        //node = hdNode.derive(0)
         addy = nodeToLegacyAddress(node.derive(0))
         publicKey = node.publicKey.toString('hex')
         bpk = node.privateKey.toString('hex')
-        console.log("PrivateKey")
+        console.log("PrivateKey For BallotAddress")
         console.log(bpk)
-
         wif2 = child.toWIF()
         bpkk = my_bundle.bitcoin.ECPair.fromWIF(wif2, Marscoin.mainnet);
-        //bpkk = my_bundle.bitcoin.ECPair.fromPrivateKey(my_bundle.Buffer.from(bpk, 'hex'), Marscoin.mainnet);
+        bpkk2 = my_bundle.bitcoin.ECPair.fromPrivateKey(my_bundle.Buffer.from(bpk, 'hex'), Marscoin.mainnet);
         console.log(bpkk)
+        console.log(bpkk2)
         const resp = {
             address: addy,
             pubKey: publicKey,
@@ -713,7 +709,7 @@ $(document).ready(function() {
 //YES vote with ballot
 $("#pry").click(async (e) => {
     event.preventDefault();
-    message = "PRY_<?=$proposal->ipfs_hash?>";
+    message = "PRY_<?=str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash)?>";
     const io = await sendMARS(0.09, hidden_target);
     const fee = 0.09
     const mars_amount = 0.01
@@ -740,7 +736,7 @@ $("#pry").click(async (e) => {
 //NO vote with ballot
 $("#prn").click(async (e) => {
     event.preventDefault();
-    message = "PRN_<?=$proposal->ipfs_hash?>";
+    message = "PRN_<?=str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash)?>";
     const io = await sendMARS(0.09, hidden_target);
     const fee = 0.09
     const mars_amount = 0.01
@@ -767,7 +763,7 @@ $("#prn").click(async (e) => {
 //ABSTAIN vote with ballot
 $("#pra").click(async (e) => {
     event.preventDefault();
-    message = "PRA_<?=$proposal->ipfs_hash?>";
+    message = "PRA_<?=str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash)?>";
     const io = await sendMARS(0.09, hidden_target);
     const fee = 0.09
     const mars_amount = 0.01
@@ -795,8 +791,7 @@ $("#pra").click(async (e) => {
 const sendMARS = async (mars_amount, receiver_address) => {
     const sender_address = receiver_address;
     try {
-        const io = await getTxInputsOutputs(sender_address, receiver_address,
-            mars_amount)
+        const io = await getTxInputsOutputs(sender_address, receiver_address,mars_amount)
         return io
     } catch (e) {
         handleError()
