@@ -241,6 +241,7 @@ $(document).ready(function() {
         const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
         const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
         const child = root.derivePath("m/44'/2'/0'/0/0");
+        console.log(child)
         const wif = child.toWIF()
         local_key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
         yk = local_key.privateKey.toString('hex')
@@ -252,6 +253,8 @@ $(document).ready(function() {
         console.log(yp)
         console.log("Originating Public Key Buffer:")
         console.log(yb)
+        console.log("Originating EC Pair:")
+        console.log(local_key)
     }
 
     const init = async () => {
@@ -344,21 +347,45 @@ $(document).ready(function() {
     }
 
     function genSeed(mnemonic){
-        seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
-        root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
+        // seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
+        // root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
+        // child = root.derivePath("m/999999'/107'/<?=$propid?>'");
+        // tpub = child.toBase58()
+        // node = my_bundle.bip32.fromBase58(tpub, Marscoin.mainnet)
+        // //node = hdNode.derive(0)
+        // addy = nodeToLegacyAddress(node.derive(0))
+        // publicKey = node.publicKey.toString('hex')
+        // bpk = node.privateKey.toString('hex')
+        // console.log("PrivateKey For BallotAddress")
+        // console.log(bpk)
+        // wif2 = child.toWIF()
+        // bpkk = my_bundle.bitcoin.ECPair.fromWIF(wif2, Marscoin.mainnet);
+        // //bpkk2 = my_bundle.bitcoin.ECPair.fromPrivateKey(my_bundle.Buffer.from(bpk, 'hex'), Marscoin.mainnet);
+        // console.log(bpkk)
+        // //console.log(bpkk2)
+        // const resp = {
+        //     address: addy,
+        //     pubKey: publicKey,
+        //     xprv: root.toBase58(),
+        //     mnemonic: mnemonic
+        // }
+        // return resp;
+        seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
+        root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
         child = root.derivePath("m/999999'/107'/<?=$propid?>'");
-        tpub = child.toBase58()
-        node = my_bundle.bip32.fromBase58(tpub, Marscoin.mainnet)
-        //node = hdNode.derive(0)
-        addy = nodeToLegacyAddress(node.derive(0))
-        publicKey = node.publicKey.toString('hex')
-        bpk = node.privateKey.toString('hex')
-        console.log("PrivateKey For BallotAddress")
-        console.log(bpk)
         wif2 = child.toWIF()
-        bpkk = my_bundle.bitcoin.ECPair.fromWIF(wif2, Marscoin.mainnet);
-        bpkk2 = my_bundle.bitcoin.ECPair.fromPrivateKey(my_bundle.Buffer.from(bpk, 'hex'), Marscoin.mainnet);
-        console.log(bpkk)
+        bpkk2 = my_bundle.bitcoin.ECPair.fromWIF(wif2, Marscoin.mainnet);
+        yk = bpkk2.privateKey.toString('hex')
+        yp = bpkk2.publicKey.toString('hex')
+        yb = my_bundle.Buffer.from(yp, 'hex')
+        addy = nodeToLegacyAddress(bpkk2)
+        console.log("Ballot Private Key:")
+        console.log(yk)
+        console.log("Ballot Public Key:")
+        console.log(yp)
+        console.log("Ballot Public Key Buffer:")
+        console.log(yb)
+        console.log("Ballot EC Pair:")
         console.log(bpkk2)
         const resp = {
             address: addy,
