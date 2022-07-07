@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
+
 <head>
     <title>Marscoin Wallet</title>
     <meta charset="utf-8">
@@ -9,7 +10,8 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
@@ -29,7 +31,6 @@
             cursor: pointer;
             z-index: 1;
         }
-
     </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
 </head>
@@ -45,21 +46,21 @@
 
                 <div class="navbar-header">
                     @include('wallet.header')
-                </div> 
+                </div>
                 <nav class="collapse navbar-collapse" role="navigation">
                     @include('wallet.navbarleft')
                     @include('wallet.navbarright')
                 </nav>
             </div> <!-- /.container -->
         </header>
-        @include('wallet.mainnav', array('active'=>'wallet'))
+        @include('wallet.mainnav', ['active' => 'wallet'])
 
         <div class="content">
 
             <div class="container">
 
                 <div class="row">
-                    
+
 
                     <div class="col-md-7 col-sm-7">
                         <div class="portlet">
@@ -72,10 +73,12 @@
 
                                 <div>
                                     <span for="name">Destination Address</span>
-                                    <input type="text" name="recipient" id="recipient" class="form-control destination-address" style="width: 90%"
-                                        data-required="true" placeholder="Marscoin Address">
+                                    <input type="text" name="recipient" id="recipient"
+                                        class="form-control destination-address" style="width: 90%" data-required="true"
+                                        placeholder="Marscoin Address">
 
-                                    <a style="float: right; margin-top: -35px;margin-right: 67px;" href="#" onclick="scan();" class="btn btn-primary">Scan <i class="fa fa-qrcode "></i></a>
+                                    <a style="float: right; margin-top: -35px;margin-right: 67px;" href="#"
+                                        onclick="scan();" class="btn btn-primary">Scan <i class="fa fa-qrcode "></i></a>
 
                                     <span id="address-error" style="display: none;" class="error-message">Enter a valid
                                         MARS address</span>
@@ -88,7 +91,7 @@
                                         <div class="col-md-6 col-sm-5">
 
                                             <div id="amount-cont" class="">
-                                                <input type="number" min="1" step="any" name="amount" 
+                                                <input type="number" min="1" step="any" name="amount"
                                                     class="form-control input-placeholder " data-required="true"
                                                     placeholder="0.0 MARS">
                                                 <span id="amount-error" style="display: none;"
@@ -135,24 +138,27 @@
 
                         <div class="portlet" style="margin-top: 160px;">
 
-                                <h3 class="portlet-title">
-                                    <u>Mobile Marscoin Wallet</u>
-                                </h3>
+                            <h3 class="portlet-title">
+                                <u>Mobile Marscoin Wallet</u>
+                            </h3>
 
-                                <div class="portlet-body" style="float:left">
+                            <div class="portlet-body" style="float:left">
 
-                                <div >
-                                                <a href="https://apps.apple.com/app/id1569062610" target="_blank" class="">
-                                                    <img style="width: 200px;" src="/assets/landing/img/apple.png" alt="" loading="lazy"></a>
-                               
-                                
-                                                <a href="https://play.google.com/store/apps/details?id=io.bytewallet.bytewallet" target="_blank" class="">
-                                                    <img style="width: 200px;" src="/assets/landing/img/google.png" alt="" loading="lazy"></a>
-                          
+                                <div>
+                                    <a href="https://apps.apple.com/app/id1569062610" target="_blank" class="">
+                                        <img style="width: 200px;" src="/assets/landing/img/apple.png" alt=""
+                                            loading="lazy"></a>
+
+
+                                    <a href="https://play.google.com/store/apps/details?id=io.bytewallet.bytewallet"
+                                        target="_blank" class="">
+                                        <img style="width: 200px;" src="/assets/landing/img/google.png"
+                                            alt="" loading="lazy"></a>
+
                                 </div>
 
 
-                                </div>
+                            </div>
                         </div>
 
 
@@ -168,11 +174,10 @@
                             </h3>
 
                             <div class="portlet-body">
-                                <div
-                                    style="display: flex; align-items: center;  ">
+                                <div style="display: flex; align-items: center;  ">
 
                                     <h2>
-                                        {{ $balance }}  MARS
+                                        {{ $balance }} MARS
                                     </h2>
 
 
@@ -276,6 +281,15 @@
 
                 </div> --}}
 
+                <div class="col-md-12 col-sm-12"
+                    style="display: flex; align-items: center; justify-content: center; height: 15rem">
+                    <button type="button" class="btn btn-primary " class="download-wallet" onclick="onDownloadWallet();">
+                        <i class="fa fa-download"></i>
+                        Download Wallet
+                    </button>
+                </div>
+
+
             </div>
 
 
@@ -288,8 +302,7 @@
                     <div class="modal-content">
 
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal"
-                                aria-hidden="true">×</button>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                             <div style="display: flex; align-itmes: center; justify-content: center">
 
                                 <h3 class="modal-title">Confirm Transaction</h3>
@@ -361,25 +374,25 @@
 
 
 
-
         </div> <!-- .content -->
 
     </div> <!-- /#wrapper -->
 
 
 
-<div class="modal scan-popup" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-           <div id="app">
-            <div class="sidebar">
-            </div>
-           <canvas hidden="" style="height: 100%; width: 100%; padding: 5px;" id="qr-canvas"></canvas>
+    <div class="modal scan-popup" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div id="app">
+                    <div class="sidebar">
+                    </div>
+                    <canvas hidden="" style="height: 100%; width: 100%; padding: 5px;" id="qr-canvas"></canvas>
 
-          </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
     <footer class="footer">
         @include('footer')
     </footer>
@@ -735,7 +748,7 @@
             $('#basicModal').on('hidden.bs.modal', function() {
                 location.reload();
             })
-           
+
 
             const sendMARS = async (mars_amount, receiver_address) => {
                 //console.log("send mars running...")
@@ -887,10 +900,13 @@
                             'Accept': 'application/json',
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({a: 1, txhash: txhashstring})
+                        body: JSON.stringify({
+                            a: 1,
+                            txhash: txhashstring
+                        })
                     }
                     const response = await fetch(url, config)
-                    if (response.ok) { 
+                    if (response.ok) {
                         return response.json()
                     } else {
                         console.log(response)
@@ -968,83 +984,121 @@
                 return resp;
 
             };
+
+
+
+
         });
 
-var qr = new QRious({
-          element: document.getElementById('qrious'),
-          value: '{{ $public_addr }}',
-          size: '250'
+        var qr = new QRious({
+            element: document.getElementById('qrious'),
+            value: '{{ $public_addr }}',
+            size: '250'
         });
 
-function scan(){
-  $('.scan-popup').modal('show');
-}
+        function scan() {
+            $('.scan-popup').modal('show');
+        }
 
-const video = document.createElement("video");
-const canvasElement = document.getElementById("qr-canvas");
-const canvas = canvasElement.getContext("2d");
-const outputData = document.getElementById("outputData");
-const btnScanQR = document.getElementById("btn-scan-qr");
+        const video = document.createElement("video");
+        const canvasElement = document.getElementById("qr-canvas");
+        const canvas = canvasElement.getContext("2d");
+        const outputData = document.getElementById("outputData");
+        const btnScanQR = document.getElementById("btn-scan-qr");
 
-let scanning = false;
+        let scanning = false;
 
-$('.scan-popup').on('shown.bs.modal', function (e) {
-  
-  console.log("Here");
-  navigator.mediaDevices
-    .getUserMedia({ video: { facingMode: "environment" } })
-    .then(function(stream) {
-      scanning = true;
-      canvasElement.hidden = false;
-      video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
-      video.srcObject = stream;
-      video.play();
-      tick();
-      scan2();
-    });
+        $('.scan-popup').on('shown.bs.modal', function(e) {
 
-});
+            console.log("Here");
+            navigator.mediaDevices
+                .getUserMedia({
+                    video: {
+                        facingMode: "environment"
+                    }
+                })
+                .then(function(stream) {
+                    scanning = true;
+                    canvasElement.hidden = false;
+                    video.setAttribute("playsinline",
+                        true); // required to tell iOS safari we don't want fullscreen
+                    video.srcObject = stream;
+                    video.play();
+                    tick();
+                    scan2();
+                });
 
-
-
-
-qrcode.callback = res => {
-  if (res) {
-    res = res.replace("bitcoin:", "");
-    $("#recipient").val(res);
-    scanning = false;
-    $('.scan-popup').modal('hide');
-
-    video.srcObject.getTracks().forEach(track => {
-      track.stop();
-    });
-
- 
-    canvasElement.hidden = true;
-    btnScanQR.hidden = false;
-    $('.scan-popup').modal('hide');
-
-  }
-};
+        });
 
 
-function tick() {
-  canvasElement.height = video.videoHeight;
-  canvasElement.width = video.videoWidth;
-  canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
 
-  scanning && requestAnimationFrame(tick);
-}
 
-function scan2() {
-  try {
-    qrcode.decode();
-  } catch (e) {
-    setTimeout(scan2, 300);
-  }
-}
+        qrcode.callback = res => {
+            if (res) {
+                res = res.replace("bitcoin:", "");
+                $("#recipient").val(res);
+                scanning = false;
+                $('.scan-popup').modal('hide');
 
-</script>
+                video.srcObject.getTracks().forEach(track => {
+                    track.stop();
+                });
+
+
+                canvasElement.hidden = true;
+                btnScanQR.hidden = false;
+                $('.scan-popup').modal('hide');
+
+            }
+        };
+
+
+        function tick() {
+            canvasElement.height = video.videoHeight;
+            canvasElement.width = video.videoWidth;
+            canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+            scanning && requestAnimationFrame(tick);
+        }
+
+        function scan2() {
+            try {
+                qrcode.decode();
+            } catch (e) {
+                setTimeout(scan2, 300);
+            }
+        }
+
+
+
+        function download(content, fileName, contentType) {
+            // function to download wallet keys as json export...
+            console.log("downloading....")
+
+
+            const a = document.createElement("a");
+            const file = new Blob([content], {
+                type: contentType
+            });
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+        }
+
+        function onDownloadWallet() {
+            download(JSON.stringify(localStorage.getItem("key").trim()), "marswallet-key.json", "text/plain")
+        }
+
+        function constructJSONKey (){
+            let json = {}
+
+
+        }
+
+        // $(".download-wallet").click(() => {
+        //     console.log("downloading...")
+        // })
+    </script>
 </body>
 
 </html>
