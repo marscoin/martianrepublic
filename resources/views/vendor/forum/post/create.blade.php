@@ -20,7 +20,7 @@
                 <textarea name="content" class="form-control">{{ old('content') }}</textarea>
             </div>
 
-            <div class="text-end">
+            <div class="text-end" style="margin-top: 5px;">
                 <a href="{{ URL::previous() }}" class="btn btn-link">{{ trans('forum::general.cancel') }}</a>
                 <button type="submit" class="btn btn-primary px-5">{{ trans('forum::general.reply') }}</button>
             </div>
