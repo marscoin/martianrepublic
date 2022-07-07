@@ -1,10 +1,10 @@
 <div @if (! $post->trashed())id="post-{{ $post->sequence }}"@endif
     class="post card mb-2 {{ $post->trashed() || $thread->trashed() ? 'deleted' : '' }}"
-    :class="{ 'border-primary': selectedPosts.includes({{ $post->id }}) }">
+    :class="{ 'border-primary': selectedPosts.includes({{ $post->id }}) }" style="margin-top: 10px;">
     <div class="card-header">
         @if (! isset($single) || ! $single)
             <span class="float-end">
-                <a href="{{ Forum::route('thread.show', $post) }}">#{{ $post->sequence }}</a>
+                <!-- <a href="{{ Forum::route('thread.show', $post) }}">#{{ $post->sequence }}</a> -->
                 @if ($post->sequence != 1)
                     @can ('deletePosts', $post->thread)
                         @can ('delete', $post)
@@ -21,6 +21,10 @@
             @if ($post->hasBeenUpdated())
                 ({{ trans('forum::general.last_updated') }} @include ('forum::partials.timestamp', ['carbon' => $post->updated_at]))
             @endif
+            |
+        </span>
+        <span class="text-muted">
+            <a href="{{ Forum::route('post.show', $post) }}" class="card-link text-muted">{{ trans('forum::general.permalink') }}</a>
         </span>
     </div>
     <div class="card-body">
@@ -39,9 +43,8 @@
         @endif
 
         @if (! isset($single) || ! $single)
-            <div class="text-end">
+            <div class="text-end" style="margin-top: 5px;">
                 @if (! $post->trashed())
-                    <a href="{{ Forum::route('post.show', $post) }}" class="card-link text-muted">{{ trans('forum::general.permalink') }}</a>
                     @if ($post->sequence != 1)
                         @can ('deletePosts', $post->thread)
                             @can ('delete', $post)
@@ -49,11 +52,12 @@
                             @endcan
                         @endcan
                     @endif
+                    <br>
                     @can ('edit', $post)
                         <a href="{{ Forum::route('post.edit', $post) }}" class="card-link">{{ trans('forum::general.edit') }}</a>
                     @endcan
                     @can ('reply', $post->thread)
-                        <a href="{{ Forum::route('post.create', $post) }}" class="card-link">{{ trans('forum::general.reply') }}</a>
+                       <a style="float: left;" href="{{ Forum::route('post.create', $post) }}" class="card-link">{{ trans('forum::general.reply') }}</a>
                     @endcan
                 @else
                     @can ('restorePosts', $post->thread)
