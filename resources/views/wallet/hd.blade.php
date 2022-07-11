@@ -909,7 +909,7 @@
             $(document).on("mousemove", ".mouse-box", function(e) {
 
                 var mnemonic;
-                const percent_increase = 5
+                const percent_increase = 1
                 var increase = percent_increase * entropy.length
 
                 //=============================================================================
