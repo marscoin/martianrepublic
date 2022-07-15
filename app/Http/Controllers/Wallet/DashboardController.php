@@ -122,6 +122,7 @@ class DashboardController extends Controller
 						$email,
 						$key
 					);
+
 					$writer = new Writer(
 						new ImageRenderer(
 							new RendererStyle(300),
@@ -242,6 +243,8 @@ class DashboardController extends Controller
 			try{
 
 				if ($wallet) {
+					// echo $wallet['public_addr'];
+					// die();
 					$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
 					$view->balance = ($cur_balance * 0.00000001);
 					$view->public_addr = $wallet->public_addr;
@@ -740,11 +743,11 @@ class DashboardController extends Controller
 	}
 
 
-
 	private function file_get_contents_curl($url)
 	{
 		$ch = curl_init();
 
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-CMC_PRO_API_KEY: cf191ba7-4840-4a9a-bee4-617608afd8a4'));
