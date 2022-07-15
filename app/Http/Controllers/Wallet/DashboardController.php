@@ -72,6 +72,7 @@ class DashboardController extends Controller
 					$profile->twofaset = 1;
 					$profile->save();
 					$view->isvalid = "Success";
+					return redirect('wallet/dashboard');
 
 				} else {
 					$view->isvalid = "Failed";
@@ -116,6 +117,7 @@ class DashboardController extends Controller
 						$key
 					);
 
+					$profile->userid = $uid;
 					$profile->twofakey = $key;
 					$profile->save();
 
