@@ -1070,7 +1070,6 @@
         }
 
 
-
         function download(content, fileName, contentType) {
             // function to download wallet keys as json export...
             console.log("downloading....")
@@ -1084,6 +1083,8 @@
             a.download = fileName;
             a.click();
         }
+
+
 
         function onDownloadWallet() {
             download(JSON.stringify(localStorage.getItem("key").trim()), "marswallet-key.json", "text/plain")
