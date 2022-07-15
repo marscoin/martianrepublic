@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Models\Voucher;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
+use App\Models\CivicWallet;
 
 class DashboardController extends Controller
 {
@@ -68,6 +69,9 @@ class DashboardController extends Controller
 				$profile = Profile::where('userid', '=', Auth::user()->id)->first();
 				$google2fa_secret = $profile->twofakey;
 				$valid = $google2fa->verifyKey($google2fa_secret, $secret);
+
+
+
 				if ($valid) {
 					$profile->twofaset = 1;
 					$profile->save();
@@ -90,6 +94,9 @@ class DashboardController extends Controller
 						$email,
 						$key
 					);
+
+
+
 					$profile = new Profile;
 					$profile->userid = $uid;
 					$profile->twofaset = 0;
@@ -109,7 +116,7 @@ class DashboardController extends Controller
 				} else if ($profile && $profile->twofaset == 0) {
 
 
-					$key = $profile->twofakey;
+					$key = $google2fa->generateSecretKey();
 					$g2faUrl = $google2fa->getQRCodeUrl(
 						'marscoinwallet',
 						$email,
@@ -124,6 +131,7 @@ class DashboardController extends Controller
 					$view = View::make('wallet.hello2fa');
 					$view->isvalid = NULL;
 					$view->qrcode_image = base64_encode($writer->writeString($g2faUrl));
+
 					return $view;
 				}
 				// else
@@ -204,13 +212,14 @@ class DashboardController extends Controller
 		}
 	}
 
-
 	protected function showDashboard()
 	{
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$civic = CivicWallet::where('user_id', '=', $uid)->first();
+
 
 			if (!$profile) {
 				return redirect('/twofa');
@@ -223,6 +232,13 @@ class DashboardController extends Controller
 			$view = View::make('wallet.dashboard');
 			$view->gravtar_link  = $gravtar_link;
 			$view->public_addr = "";
+
+			// 3 States of Wallets: 
+			// 1) NO civic + No wallets
+			// 2) Civic + No wallets
+			// 3) Civic + wallets
+
+
 			try{
 
 				if ($wallet) {
@@ -491,8 +507,12 @@ class DashboardController extends Controller
 
 
 
+	// all wallets must have backup now.. 
+	// password must be provided on send func. 
+
 	// POST
 	// Create Wallet
+
 	public function postCreateWallet(Request $request)
 	{
 		if (Auth::check()) 
@@ -502,6 +522,21 @@ class DashboardController extends Controller
 			$profile = Profile::where('userid', '=', $uid)->first();
 
 			$hd_wallet = HDWallet::where('user_id', '=', $uid)->get();
+
+			
+			$civic = CivicWallet::where('user_id', '=', $uid)->first();
+
+
+			// if user has civic wallet
+
+
+
+
+
+
+
+
+
 
 
 
@@ -519,7 +554,6 @@ class DashboardController extends Controller
 					$wallet->backup = 0;
 				else
 					$wallet->backup = 1;
-
 
 				$wallet->user_id = $uid;
 				$wallet->wallet_type = "MARS";
