@@ -116,6 +116,9 @@ class DashboardController extends Controller
 						$key
 					);
 
+					$profile->twofakey = $key;
+					$profile->save();
+
 					$writer = new Writer(
 						new ImageRenderer(
 							new RendererStyle(300),
