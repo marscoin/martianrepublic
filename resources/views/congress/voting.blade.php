@@ -571,7 +571,7 @@ $(document).ready(function() {
     const handleFormFilled = () => {
 
         let title = $("#title").val()
-        let desc = $("#description").val()
+        let desc = simplemde.value();
         let discussion = $("#discussion").val()
 
         if (title === "") {

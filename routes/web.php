@@ -92,6 +92,7 @@ Route::post('/api/importPK/{account?}', 'Wallet\ApiController@importPK');
 Route::post('/api/redeem', 'Wallet\ApiController@redeem');
 Route::post('/api/permapinpic', 'Wallet\ApiController@permapinpic');
 Route::post('/api/permapinvideo', 'Wallet\ApiController@permapinvideo');
+Route::post('/api/permapinlog', 'Wallet\ApiController@permapinlog');
 Route::post('/api/permapinjson', 'Wallet\ApiController@permapinjson');
 Route::post('/api/setfeed', 'Wallet\ApiController@setfeed');
 Route::post('/api/getTransactions', 'Wallet\ApiController@getTransactions');

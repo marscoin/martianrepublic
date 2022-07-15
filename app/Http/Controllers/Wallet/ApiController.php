@@ -97,6 +97,60 @@ class ApiController extends Controller {
 	}
 
 
+	public function permapinlog(Request $request){
+
+		if (Auth::check()) {
+			$hash = "";
+			$public_address = $request->input('address');
+			$title = $request->input('title');
+			$entry = $request->input('entry');
+
+
+			$file_path = "./assets/citizen/" . $public_address . "/logbook/".md5($title);
+			echo $file_path;
+			if (!file_exists($file_path)) {
+				echo "making folder";
+				mkdir($file_path, 0777, true);
+			}
+			$file_path = "./assets/citizen/" . $public_address . "/logbook/".md5($title);
+			$hash = "";
+
+			$file = $file_path."/log.markdown";
+			file_put_contents($file, $title."\n\n".$entry);
+			echo  "has file?";
+			// if ($request->hasFile('file'))
+			// {
+				echo "yes";
+				$files = $request->file('filenames');
+				echo count($files);
+				foreach ($files as $f) {
+					print_r($f);
+					$name = $f->hashName(); // Generate a unique, random name...
+					echo "n: " . $name;
+					$extension = $f->extension(); // Determine the file's extension based on the file's MIME type...
+					echo "f: ". $name.".".$extension;
+
+					$f->store("./assets/citizen/" . $public_address . "/logbook/".md5($title), $name.".".$extension );
+				}
+			//}
+
+			
+			
+			//$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+
+			return (new Response(json_encode(array("Hash" => $hash, "Path" => $file_path)), 200))
+			->header('Content-Type', "application/json;");
+		
+			
+
+		
+		}else{
+            return redirect('/login');
+        }
+			
+	}
+
+
 
 	public function permapinjson(Request $request)
 	{
