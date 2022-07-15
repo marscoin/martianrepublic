@@ -122,15 +122,19 @@ class ApiController extends Controller {
 			// {
 				echo "yes";
 				$files = $request->file('filenames');
-				echo count($files);
-				foreach ($files as $f) {
-					print_r($f);
-					$name = $f->hashName(); // Generate a unique, random name...
-					echo "n: " . $name;
-					$extension = $f->extension(); // Determine the file's extension based on the file's MIME type...
-					echo "f: ". $name.".".$extension;
+				if(!is_null($files))
+				{
+					echo count($files);
+					foreach ($files as $f) {
+						print_r($f);
+						$name = $f->hashName(); // Generate a unique, random name...
+						echo "n: " . $name;
+						// $extension = $f->extension(); // Determine the file's extension based on the file's MIME type...
+						// echo "f: ". $name.".".$extension;
 
-					$f->store("./assets/citizen/" . $public_address . "/logbook/".md5($title), $name.".".$extension );
+						//$f->store("./assets/citizen/" . $public_address . "/logbook/".md5($title), $name );
+						$f->move($file_path, $name );
+					}
 				}
 			//}
 
