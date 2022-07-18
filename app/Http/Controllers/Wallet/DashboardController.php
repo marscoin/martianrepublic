@@ -36,14 +36,13 @@ class DashboardController extends Controller
 
 	protected function showLogout()
 	{
-		
+
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 
 			$profile->wallet_open = 0;
 			$profile->save();
-
 		}
 
 		Auth::logout();
@@ -52,7 +51,7 @@ class DashboardController extends Controller
 	}
 
 
-	
+
 
 
 	protected function show2FA(Request $request)
@@ -76,7 +75,7 @@ class DashboardController extends Controller
 					$profile->twofaset = 1;
 					$profile->save();
 					$view->isvalid = "Success";
-
+					return redirect('wallet/dashboard');
 				} else {
 					$view->isvalid = "Failed";
 				}
@@ -123,6 +122,10 @@ class DashboardController extends Controller
 						$key
 					);
 
+					$profile->userid = $uid;
+					$profile->twofakey = $key;
+					$profile->save();
+
 					$writer = new Writer(
 						new ImageRenderer(
 							new RendererStyle(300),
@@ -163,13 +166,12 @@ class DashboardController extends Controller
 				if ($valid) {
 					$local = $request->input('local');
 
-					if($local == "true"){
+					if ($local == "true") {
 						$profile->wallet_open = 1;
-					}
-					else if($local == "false"){
+					} else if ($local == "false") {
 						$profile->wallet_open = 0;
 					}
-				
+
 
 					$profile->openchallenge = 0;
 					$profile->save();
@@ -219,7 +221,7 @@ class DashboardController extends Controller
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$wallet = HDWallet::where('user_id', '=', $uid)->first();
-			$civic = CivicWallet::where('user_id', '=', $uid)->first();
+			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
 
 			if (!$profile) {
@@ -238,13 +240,17 @@ class DashboardController extends Controller
 			// 1) NO civic + No wallets
 			// 2) Civic + No wallets
 			// 3) Civic + wallets
+			try {
+
+				if (!$civic_wallet && !$wallet) {
+					$view->balance = 0;
+					$view->received = 0;
+					$view->sent = 0;
 
 
-			try{
+				}else
+				{
 
-				if ($wallet) {
-					// echo $wallet['public_addr'];
-					// die();
 					$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
 					$view->balance = ($cur_balance * 0.00000001);
 					$view->public_addr = $wallet->public_addr;
@@ -254,17 +260,39 @@ class DashboardController extends Controller
 					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalSent");
 					$sent = json_decode($json, true);
 					$view->sent = ($sent * 0.00000001);
-				} else {
-					$view->balance = 0;
-					$view->received = 0;
-					$view->sent = 0;
+
 				}
+
+
+
+
+
+
+
+
+				// if ($wallet) {
+				// 	// echo $wallet['public_addr'];
+				// 	// die();
+				// 	$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
+				// 	$view->balance = ($cur_balance * 0.00000001);
+				// 	$view->public_addr = $wallet->public_addr;
+				// 	$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalReceived");
+				// 	$received = json_decode($json, true);
+				// 	$view->received = ($received * 0.00000001);
+				// 	$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalSent");
+				// 	$sent = json_decode($json, true);
+				// 	$view->sent = ($sent * 0.00000001);
+				// } else {
+				// 	$view->balance = 0;
+				// 	$view->received = 0;
+				// 	$view->sent = 0;
+				// }
 
 
 				$view->transactions = array();
 				$cur_price = json_decode(file_get_contents("https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd"));
 				$view->mars_price = $cur_price->marscoin->usd;
-				
+
 				$view->wallet_open = $profile->wallet_open;
 
 				// $json = $this->file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
@@ -276,14 +304,14 @@ class DashboardController extends Controller
 				else
 					$view->coincount = 35000000;
 
-				$incomes = array();
-				$expenses = array();
-				$balances = array();
-				$balance = 0;
-				$firstdate = "";
-				$lastdate = 0;
-				$a = 0;
-				$b = 0;
+				// $incomes = array();
+				// $expenses = array();
+				// $balances = array();
+				// $balance = 0;
+				// $firstdate = "";
+				// $lastdate = 0;
+				// $a = 0;
+				// $b = 0;
 
 				$view->voucher = false;
 				$voucher = Voucher::where('user_account', '=', Auth::user()->email)->first();
@@ -291,14 +319,11 @@ class DashboardController extends Controller
 					$view->voucher = true;
 
 				return $view;
-			} 
-			catch (Exception $e)
-			{
+			} catch (Exception $e) {
 				$view = View::make('wallet.downtime');
 				$view->gravtar_link  = $gravtar_link;
 				return $view;
 			}
-
 		} else {
 			return redirect('/login');
 		}
@@ -334,6 +359,8 @@ class DashboardController extends Controller
 				}
 			}
 
+			// if profile + wallet open 
+
 			if ($profile->wallet_open == 1 && !is_null($wallet)) {
 				return redirect('wallet/dashboard/hd-open');
 			} else {
@@ -365,7 +392,7 @@ class DashboardController extends Controller
 				$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
 				$network = json_decode($json, true);
 				$view->network = $network;
-				if(is_null($wallet))
+				if (is_null($wallet))
 					$view->wallet_open = 0;
 				else
 					$view->wallet_open = $profile->wallet_open;
@@ -437,7 +464,7 @@ class DashboardController extends Controller
 
 
 
-		}else{
+		} else {
 			return redirect('/login');
 		}
 	}
@@ -503,7 +530,7 @@ class DashboardController extends Controller
 
 
 
-		}else{
+		} else {
 			return redirect('/login');
 		}
 	}
@@ -518,27 +545,17 @@ class DashboardController extends Controller
 
 	public function postCreateWallet(Request $request)
 	{
-		if (Auth::check()) 
-		{
+		if (Auth::check()) {
 			$uid = Auth::user()->id;
 
 			$profile = Profile::where('userid', '=', $uid)->first();
 
 			$hd_wallet = HDWallet::where('user_id', '=', $uid)->get();
 
-			
+
 			$civic = CivicWallet::where('user_id', '=', $uid)->first();
 
-
 			// if user has civic wallet
-
-
-
-
-
-
-
-
 
 
 
@@ -573,18 +590,16 @@ class DashboardController extends Controller
 			// 	return redirect('wallet/dashboard/hd')->with('message', 'The following errors occurred')->withErrors($validator->messages())->withInput();
 			// }
 
-		}else{
+		} else {
 			return redirect('/login');
 		}
-
 	}
 
 	// GET
 	// Open Pre-Existing Wallet
 	public function getWallet()
 	{
-		if (Auth::check()) 
-		{
+		if (Auth::check()) {
 
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
@@ -593,13 +608,13 @@ class DashboardController extends Controller
 			$profile->save();
 
 			return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Open!');
-
-		}else{
+		} else {
 			return redirect('/login');
 		}
 	}
 
-	public function failWallet(){
+	public function failWallet()
+	{
 
 
 		return redirect('wallet/dashboard/hd')->with('message', 'Wallet Unsuccessful!');
@@ -639,7 +654,7 @@ class DashboardController extends Controller
 		}
 	}
 
-	
+
 	protected function showChart()
 	{
 		$json = $this->file_get_contents_curl('https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/historical?id=154');
@@ -648,7 +663,7 @@ class DashboardController extends Controller
 		die();
 	}
 
-	
+
 
 	protected function showReports()
 	{
@@ -679,7 +694,7 @@ class DashboardController extends Controller
 
 	protected function anchor()
 	{
-		
+
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
@@ -707,12 +722,9 @@ class DashboardController extends Controller
 				$view->public_address = "";
 			}
 			return $view;
-
-
-		}else{
-            return redirect('/login');
-        }
-		
+		} else {
+			return redirect('/login');
+		}
 	}
 
 	protected function showCamera()
