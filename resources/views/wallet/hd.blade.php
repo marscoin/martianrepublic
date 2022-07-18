@@ -30,6 +30,7 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="/assets/wallet/js/plugins/magnific/magnific-popup.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
+    <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin-extended.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="stylesheet" href="/assets/wallet/css/jquery.steps.css">
 
@@ -81,14 +82,51 @@
 
             <div class="container">
 
+
+
+
                 <div class="portlet">
 
                     <h3 class="portlet-title">
-                        <u>Wallet</u>
+                        <u>Select Wallet</u>
                     </h3>
 
+                    @if ($encrypted_seed)
+                        <div class="row">
+                            <div class="col-md-5 col-sm-7">
+
+                                <div class="icon-stat">
+
+                                    <div class="row">
+                                        <div class="col-xs-8 text-left">
+                                            <h4>Civic Wallet</h4>
+                                            <span class="icon-stat-label">{{ $public_addr }}</span>
+                                            <!-- /.icon-stat-label -->
+                                            <span class="icon-stat-value">$5,367</span> <!-- /.icon-stat-value -->
+                                        </div><!-- /.col-xs-8 -->
+
+                                        <div class="col-xs-4 text-center">
+                                            <i class="fa fa-dollar icon-stat-visual bg-primary"></i>
+                                            <!-- /.icon-stat-visual -->
+                                        </div><!-- /.col-xs-4 -->
+                                    </div><!-- /.row -->
+
+                                    <div class="icon-stat-footer">
+                                        <i class="fa fa-clock-o"></i> Opened: 07/18/22
+                                    </div>
+
+                                </div> <!-- /.icon-stat -->
+
+                            </div>
+
+                        </div>
+                    @endif
+
+
+
+
                     <div class="portlet-body"
-                        style="display: flex; justify-content: center; align-items: center; flex-direction: column">
+                        style="display: flex; justify-content: center; align-items: center; flex-direction: column; background: transparent">
 
 
 
@@ -766,10 +804,9 @@
 
             const hashPasswordWithRounds = (passcode, rounds) => {
 
-                for(let i = 0; i < rounds; i++)
-                {
+                for (let i = 0; i < rounds; i++) {
                     console.log(`hash round: ${i}`)
-                    
+
                 }
 
 
