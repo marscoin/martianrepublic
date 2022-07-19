@@ -23,11 +23,12 @@
 
                     <div class="form-group">
 
-                        <div class="file-upload">
+                        <!-- <div class="file-upload">
                         <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add Image / File</button>
 
                         <div class="image-upload-wrap">
                             <input class="file-upload-input" type='file'  name="filenames[]" onchange="readURL(this);" />
+                            <input type="file" id="uploadform-imagefile" name="UploadForm[imageFile]" class="dropify" />
                             <div class="drag-text">
                             <h3>Drag and drop a file or select add Image</h3>
                             </div>
@@ -38,20 +39,19 @@
                             <button type="button" onclick="removeUpload()" class="remove-image">Remove <span class="image-title">Uploaded Image</span></button>
                             </div>
                         </div>
-                        </div>
+                        </div> -->
 
 
+                        <input type="file" 
+                            class="my-pond"
+                            name="filenames[]"
+                            multiple
+                            data-max-file-size="3MB"
+                            data-max-files="3" />
                     </div> 
 
 
 
-                    <!-- <div class="form-group">
-                        <form id="uploadimage" action="/api/upload" method="post" enctype="multipart/form-data">
-                            <input type="file" id="uploadform-imagefile" name="UploadForm[imageFile]" class="dropify" />
-                            <input type="hidden" name="UploadForm[imageFile]" value="">
-                            <button type="submit" class="btn waves-effect waves-light btn-success" style="float: right; margin-top: 10px;"><i id="update_animation2" class="fa fa-spinner fa-spin" style="display: none"></i> Upload</button>
-                        </form>
-                    </div>  -->
 
 
                     </div>

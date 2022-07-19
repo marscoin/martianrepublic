@@ -1,11 +1,5 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
 <html lang="en" class="no-js">
-<!--<![endif]-->
-
 <head>
     <title>Martian Republic - Logbook</title>
     <meta charset="utf-8">
@@ -24,8 +18,9 @@
     <link rel="stylesheet" href="/assets/wallet/css/upload.css">
     <link rel="stylesheet" href="/assets/wallet/css/dropify.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
 </head>
-
 <body class=" ">
     <div id="wrapper">
         <header class="navbar navbar-inverse" role="banner">
@@ -37,7 +32,7 @@
                     @include('wallet.navbarleft', array('info' => $network ))
                     @include('wallet.navbarright')
                 </nav>
-            </div> <!-- /.container -->
+            </div> 
         </header>
         @include('wallet.mainnav', array('active'=>'logbook', 'info'=>$network, 'balance' => $balance))
         <div class="content">
@@ -99,46 +94,37 @@
     <script src="/assets/wallet/js/sha256.js"></script>
     <script src="/assets/wallet/js/dropify.js"></script>
 
-    <script>
+    <!-- include jQuery library -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script> -->
+<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+<script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+
+<script>
         var simplemde = new SimpleMDE({ element: document.getElementById("description") });
-
-
-        function readURL(input) {
-            if (input.files && input.files[0]) {
-
-                var reader = new FileReader();
-
-                reader.onload = function(e) {
-                $('.image-upload-wrap').hide();
-
-                $('.file-upload-image').attr('src', e.target.result);
-                $('.file-upload-content').show();
-
-                $('.image-title').html(input.files[0].name);
-                };
-
-                reader.readAsDataURL(input.files[0]);
-
-            } else {
-                removeUpload();
-            }
-            }
-
-            function removeUpload() {
-            $('.file-upload-input').replaceWith($('.file-upload-input').clone());
-            $('.file-upload-content').hide();
-            $('.image-upload-wrap').show();
-            }
-            $('.image-upload-wrap').bind('dragover', function () {
-                    $('.image-upload-wrap').addClass('image-dropping');
-                });
-                $('.image-upload-wrap').bind('dragleave', function () {
-                    $('.image-upload-wrap').removeClass('image-dropping');
-        });
-
-
-
 </script>
+
+
+<script>
+  $(function(){
+  
+    // First register any plugins
+    $.fn.filepond.registerPlugin(FilePondPluginImagePreview);
+
+    // Turn input element into a pond
+    $('.my-pond').filepond();
+
+    // Set allowMultiple property to true
+    $('.my-pond').filepond('allowMultiple', true);
+  
+    // Listen for addfile event
+    $('.my-pond').on('FilePond:addfile', function(e) {
+        console.log('file added event', e);
+    });
+  
+  });
+</script>
+
 <script>
 $(document).ready(function() {
 
@@ -166,51 +152,24 @@ headers: {
     }
 }
 
-// Basic
-$('.dropify').dropify();
 
-// Translated
-$('.dropify-fr').dropify({
-    messages: {
-        default: 'Glissez-déposez un fichier ici ou cliquez',
-        replace: 'Glissez-déposez un fichier ou cliquez pour remplacer',
-        remove: 'Supprimer',
-        error: 'Désolé, le fichier trop volumineux'
-    }
-});
-
-var drEvent = $('#input-file-events').dropify();
-
-drEvent.on('dropify.beforeClear', function(event, element) {
-    return confirm("Do you really want to delete \"" + element.file.name + "\" ?");
-});
-
-drEvent.on('dropify.afterClear', function(event, element) {
-    alert('File deleted');
-});
-
-drEvent.on('dropify.errors', function(event, element) {
-    console.log('Has Errors');
-});
-
-var drDestroy = $('#input-file-to-destroy').dropify();
-drDestroy = drDestroy.data('dropify')
-$('#toggleDropify').on('click', function(e) {
-    e.preventDefault();
-    if (drDestroy.isDropified()) {
-        drDestroy.destroy();
-    } else {
-        drDestroy.init();
-    }
-})
 
 
 $("#saveLogLocalBtn").click(function() {
     event.preventDefault();
     var formData = new FormData()
-    $.each($("input[type='file']")[0].files, function(i, file) {
-        formData.append('filenames[]', file);
-    });
+    // $.each($("input[type='file']")[0].files, function(i, file) {
+    //     formData.append('filenames[]', file);
+    // });
+    var files = $('.my-pond').filepond('getFiles');
+	$(files).each(function (index) {
+		console.log(files[index].fileExtension);
+        formData.append('filenames[]', files[index].file);
+	});
+    // pondFiles = pond.getFiles();
+    // for (var i = 0; i < pondFiles.length; i++) {
+    //     formData.append('filenames[]', pondFiles[i].file);
+    // }
 
     formData.append('address', '<?=$public_address?>')
     formData.append('title', $("#title").val())
