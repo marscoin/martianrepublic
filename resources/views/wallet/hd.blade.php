@@ -91,41 +91,81 @@
                         <u>Select Wallet</u>
                     </h3>
 
-                    @if ($encrypted_seed)
-                        <div class="row">
-                            <div class="col-md-5 col-sm-7">
 
-                                <div class="icon-stat">
+                    @if ($wallets)
+                        @foreach ($wallets as $wallet)
+                            <div class="row">
+                                <div class="col-md-5 col-sm-7">
 
-                                    <div class="row">
-                                        <div class="col-xs-8 text-left">
-                                            <h4>Civic Wallet</h4>
-                                            <span class="icon-stat-label">{{ $public_addr }}</span>
-                                            <!-- /.icon-stat-label -->
-                                            <span class="icon-stat-value">$5,367</span> <!-- /.icon-stat-value -->
-                                        </div><!-- /.col-xs-8 -->
+                                    <div class="icon-stat">
 
-                                        <div class="col-xs-4 text-center">
-                                            <i class="fa fa-dollar icon-stat-visual bg-primary"></i>
-                                            <!-- /.icon-stat-visual -->
-                                        </div><!-- /.col-xs-4 -->
-                                    </div><!-- /.row -->
+                                        <div class="row">
+                                            <div class="col-xs-8 text-left">
+                                                <h4>{{$wallet->wallet_type}}</h4>
+                                                <span class="icon-stat-label">{{ $wallet->public_addr }}</span>
+                                                <!-- /.icon-stat-label -->
+                                                <span class="icon-stat-value">$5,367</span> <!-- /.icon-stat-value -->
+                                            </div><!-- /.col-xs-8 -->
 
-                                    <div class="icon-stat-footer">
-                                        <i class="fa fa-clock-o"></i> Opened: 07/18/22
-                                    </div>
+                                            <div class="col-xs-4 text-center">
+                                                <i class="fa fa-dollar icon-stat-visual bg-primary"></i>
+                                                <!-- /.icon-stat-visual -->
+                                            </div><!-- /.col-xs-4 -->
+                                        </div><!-- /.row -->
 
-                                </div> <!-- /.icon-stat -->
+                                        <div class="icon-stat-footer">
+                                            <i class="fa fa-clock-o"></i> Opened: 07/18/22
+                                        </div>
+
+                                    </div> <!-- /.icon-stat -->
+
+                                </div>
 
                             </div>
+                        @endforeach
 
-                        </div>
                     @endif
 
+                    <div class="row">
+                        <div class="col-md-5 col-sm-7">
+
+                            <div class="icon-stat">
+
+                                <div class="row">
+                                    <div class="col-xs-8 text-left">
+                                        <h4>Add Wallet</h4>
+                                        <span class="icon-stat-label"> <a data-toggle="modal" href="#styledModal"
+                                                class="btn-lg btn-primary demo-element" data-backdrop="static"
+                                                data-keyboard="false">New Wallet</a></span>
+                                        <!-- /.icon-stat-label -->
+                                        <span class="icon-stat-value"> <a data-backdrop="static" data-keyboard="false"
+                                                data-toggle="modal" href="#modalLogin"
+                                                class="btn-lg btn-primary demo-element">Connect Wallet</a>
 
 
+                                        </span> <!-- /.icon-stat-value -->
+                                    </div><!-- /.col-xs-8 -->
 
-                    <div class="portlet-body"
+                                    <div class="col-xs-4 text-center">
+                                        <i class="fa fa-plus icon-stat-visual bg-secondary"></i>
+                                        <!-- /.icon-stat-visual -->
+                                    </div><!-- /.col-xs-4 -->
+                                </div><!-- /.row -->
+
+                                {{-- <div class="icon-stat-footer">
+                                    <i class="fa fa-clock-o"></i> Opened: 07/18/22
+                                </div> --}}
+
+                            </div> <!-- /.icon-stat -->
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- render this if !civic_wallet && !hd_wallet --}}
+
+                    {{-- <div class="portlet-body"
                         style="display: flex; justify-content: center; align-items: center; flex-direction: column; background: transparent">
 
 
@@ -154,7 +194,7 @@
 
 
 
-                    </div> <!-- /.portlet-body -->
+                    </div> <!-- /.portlet-body --> --}}
 
 
                 </div> <!-- /.portlet -->
