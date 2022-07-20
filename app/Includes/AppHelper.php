@@ -115,6 +115,45 @@ class AppHelper{
 		}
 
 
+		public static function uploadFolder($filepath, $url)
+		{
+			$directory = basename($filepath);
+			echo "dir: ". $directory;
+			$files = scandir($filepath);
+			//print_r($files);
+			$data = array();
+			$headers = "";
+			$ch = curl_init($url);
+			foreach ($files as $filep)
+			{
+				$filename = realpath($filepath."/".$filep);
+				//echo "path: " . $filename;
+				$finfo = new \finfo(FILEINFO_MIME_TYPE);
+				$mimetype = $finfo->file($filename);
+				$cfile = curl_file_create($directory.'%2F'.$filename, $mimetype, basename($filename));
+				//print_r($cfile);
+				//array_push($data, array('file' => $cfile));
+				$data = ['file' => $cfile];
+				$headers = array("Content-Type" => $mimetype);
+			}
+			
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$result = curl_exec($ch);
+			$r = curl_getinfo($ch);
+			if ($r["http_code"] != 200) {
+				$details = json_decode($result, true);
+				print_r($r);
+			}
+			$details = json_decode($result, true);
+			print_r($details);
+			//return $details['Hash'];
+		}
+
+
 		public static function file_post_content($url, $data)
 		{
 
