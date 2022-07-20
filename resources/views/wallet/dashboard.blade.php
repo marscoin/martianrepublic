@@ -68,7 +68,7 @@
                                             <td class="kv-key"><i title="{{ $public_addr }}"
                                                     class="fa fa-money kv-icon kv-icon-primary"></i> Balance</td>
                                             <td class="kv-value">♂ <span
-                                                    id="balance">{{ number_format($balance, 4) }}</span> MARS</td>
+                                                    id="balance">{{ number_format($balance ?? '', 4) }}</span> MARS</td>
                                         </tr>
                                         <tr>
                                             <td class="kv-key"><i
