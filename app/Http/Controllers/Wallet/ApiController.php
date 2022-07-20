@@ -104,7 +104,7 @@ class ApiController extends Controller {
 			$public_address = $request->input('address');
 			$title = $request->input('title');
 			$entry = $request->input('entry');
-
+			$uid = Auth::user()->id;
 
 			$file_path = "./assets/citizen/" . $public_address . "/logbook/".md5($title);
 			echo $file_path;
@@ -117,30 +117,19 @@ class ApiController extends Controller {
 
 			$file = $file_path."/log.markdown";
 			file_put_contents($file, $title."\n\n".$entry);
-			echo  "has file?";
-			// if ($request->hasFile('file'))
-			// {
-				echo "yes";
-				$files = $request->file('filenames');
-				if(!is_null($files))
-				{
-					echo count($files);
-					foreach ($files as $f) {
-						print_r($f);
-						$name = $f->hashName(); // Generate a unique, random name...
-						echo "n: " . $name;
-						// $extension = $f->extension(); // Determine the file's extension based on the file's MIME type...
-						// echo "f: ". $name.".".$extension;
-
-						//$f->store("./assets/citizen/" . $public_address . "/logbook/".md5($title), $name );
-						$f->move($file_path, $name );
-					}
+			$files = $request->file('filenames');
+			if(!is_null($files))
+			{
+				echo count($files);
+				foreach ($files as $f) {
+					print_r($f);
+					$name = $f->hashName(); // Generate a unique, random name...
+					$f->move($file_path, $name );
 				}
-			//}
-
+			}
 			
-			
-			//$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+			$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+			AppHelper::insertPublicationCache($uid, $file_path, $hash);
 
 			return (new Response(json_encode(array("Hash" => $hash, "Path" => $file_path)), 200))
 			->header('Content-Type', "application/json;");
