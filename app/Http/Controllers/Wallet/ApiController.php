@@ -128,7 +128,7 @@ class ApiController extends Controller {
 				}
 			}
 			
-			$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+			$hash = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&wrap-with-directory=true");
 			AppHelper::insertPublicationCache($uid, $file_path, $hash);
 
 			return (new Response(json_encode(array("Hash" => $hash, "Path" => $file_path)), 200))
