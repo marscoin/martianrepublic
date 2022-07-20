@@ -3,6 +3,7 @@
 
 namespace App\Includes;
 use App\Models\Feed;
+use App\Models\Publication;
 use DateTime;
 
 
@@ -206,6 +207,18 @@ class AppHelper{
 			$feed->embedded_link = $embedded_link;
 			$feed->txid = $txid;
 			$feed->save();
+			return TRUE;
+		}
+
+
+		public static function insertPublicationCache($uid, $local_path, $ipfs_hash)
+		{
+			$pub = new Publication;
+			if($uid)
+				$pub->userid = $uid;
+			$pub->ipfs_hash = $ipfs_hash;
+			$pub->local_path = $local_path;
+			$pub->save();
 			return TRUE;
 		}
 
