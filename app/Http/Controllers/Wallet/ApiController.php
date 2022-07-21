@@ -107,7 +107,7 @@ class ApiController extends Controller {
 			$uid = Auth::user()->id;
 
 			$file_path = "./assets/citizen/" . $public_address . "/logbook/".md5($title);
-			echo $file_path;
+			//echo $file_path;
 			if (!file_exists($file_path)) {
 				echo "making folder";
 				mkdir($file_path, 0777, true);
@@ -118,17 +118,20 @@ class ApiController extends Controller {
 			$file = $file_path."/log.markdown";
 			file_put_contents($file, $title."\n\n".$entry);
 			$files = $request->file('filenames');
+			//print_r($files);
+			//die();
 			if(!is_null($files))
 			{
-				echo count($files);
+				//echo count($files);
 				foreach ($files as $f) {
-					print_r($f);
+					//print_r($f);
 					$name = $f->hashName(); // Generate a unique, random name...
+					//echo "New: " . $name;
 					$f->move($file_path, $name );
 				}
 			}
 			
-			$hash = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&wrap-with-directory=true");
+			$hash = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true");
 			AppHelper::insertPublicationCache($uid, $file_path, $hash);
 
 			return (new Response(json_encode(array("Hash" => $hash, "Path" => $file_path)), 200))

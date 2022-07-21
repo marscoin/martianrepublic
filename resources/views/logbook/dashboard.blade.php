@@ -166,11 +166,6 @@ $("#saveLogLocalBtn").click(function() {
 		console.log(files[index].fileExtension);
         formData.append('filenames[]', files[index].file);
 	});
-    // pondFiles = pond.getFiles();
-    // for (var i = 0; i < pondFiles.length; i++) {
-    //     formData.append('filenames[]', pondFiles[i].file);
-    // }
-
     formData.append('address', '<?=$public_address?>')
     formData.append('title', $("#title").val())
     formData.append('entry', simplemde.value())
