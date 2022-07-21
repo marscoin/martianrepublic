@@ -19,29 +19,7 @@
             <div class="col-lg-4">
                 <div class="row">
                     <div class="col-lg-12">
-
-
                     <div class="form-group">
-
-                        <!-- <div class="file-upload">
-                        <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add Image / File</button>
-
-                        <div class="image-upload-wrap">
-                            <input class="file-upload-input" type='file'  name="filenames[]" onchange="readURL(this);" />
-                            <input type="file" id="uploadform-imagefile" name="UploadForm[imageFile]" class="dropify" />
-                            <div class="drag-text">
-                            <h3>Drag and drop a file or select add Image</h3>
-                            </div>
-                        </div>
-                        <div class="file-upload-content">
-                            <img class="file-upload-image" src="#" alt="your image" />
-                            <div class="image-title-wrap">
-                            <button type="button" onclick="removeUpload()" class="remove-image">Remove <span class="image-title">Uploaded Image</span></button>
-                            </div>
-                        </div>
-                        </div> -->
-
-
                         <input type="file" 
                             class="my-pond"
                             name="filenames[]"
@@ -49,17 +27,8 @@
                             data-max-file-size="3MB"
                             data-max-files="3" />
                     </div> 
-
-
-
-
-
                     </div>
-
-
                 </div>
-
-
             </div>
         </fieldset>
 
@@ -70,8 +39,7 @@
     <div>
         <span id="form-message" style="color:#d74b4b; font-weight: 600"> </span>
     </div>
-    <a data-toggle="modal" href="#" id="saveLogLocalBtn" class="btn-lg btn-success demo-element pull-left">Save</a>
-    <a data-toggle="modal" href="#logModal" id="logModalBtn" class="btn-lg btn-primary demo-element ">Publish to IPFS and Notarize</a>
+    <a data-toggle="modal" href="#" id="saveLogLocalBtn" class="btn-lg btn-success demo-element pull-left">Publish to IPFS</a>
     <input type="hidden" id="ipfs_path" value="">
 
     <div id="logModal" class="modal fade">
