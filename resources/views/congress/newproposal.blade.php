@@ -127,8 +127,7 @@
     <div>
         <span id="form-message" style="color:#d74b4b; font-weight: 600"> </span>
     </div>
-    <a data-toggle="modal" href="#proposalModal" id="proposalModalBtn"
-        class="btn-lg btn-primary demo-element">Confirm</a>
+    <a data-toggle="modal" href="#proposalModal" id="proposalModalBtn" class="btn-lg btn-primary demo-element">Confirm</a>
 
 
     <div id="proposalModal" class="modal fade">
