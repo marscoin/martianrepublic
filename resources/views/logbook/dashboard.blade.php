@@ -187,16 +187,13 @@ $("#saveLogLocalBtn").click(function() {
 
 
 // Click on confirm
-$("#logModalBtn").click(async (e) => {
-
-        handleFormFilled()
-
-        let ipfs_path = $("#ipfs_path").val()
-
+$(".notarizemeModalBtn").click(async (e) => 
+{
         const fee = 1;
+        $("#modal-document").text($(this).attr('rel'));
 
         if ("{{ $balance }}" < fee) {
-            $("#submit-log").prop("disabled", true)
+            $("#submit-notarization").prop("disabled", true)
             $("#modal-message-error").text("Not enough MARS to submit log entry")
             $(".modal-message").show()
             console.log("unable to confirm...")
@@ -204,10 +201,10 @@ $("#logModalBtn").click(async (e) => {
 
         } else {
             $(".modal-message").hide()
-
             console.log("able to confirm..")
-            $("#submit-log").prop("disabled", false)
-            $("#submit-log").click(async () => {
+            $("#submit-notarization").prop("disabled", false)
+            
+            $("#submit-notarization").click(async () => {
 
                 $("#loading").show()
                 try {
@@ -215,23 +212,21 @@ $("#logModalBtn").click(async (e) => {
                     var obj = new Object();
                     obj.data = {};
                     obj.meta = {};
-                    obj.data.title = $("#title").val();
-                    obj.data.description = simplemde.value();
-    
-
+                    obj.data.title = $("#modal-document").val();
+                    
                     var jsonString = JSON.stringify(obj.data);
                     var m = sha256(jsonString);
                     obj.meta.hash = m;
                     var jsonString = JSON.stringify(obj);
                     utcnow = new Date().getTime();
-                    const data = await doAjax("/api/permapinjson", {"type": "proposal_"+utcnow, "payload": jsonString, "address": '<?=$public_address?>'});
+                    const data = await doAjax("/api/permapinjson", {"type": "logbook_"+utcnow, "payload": jsonString, "address": '<?=$public_address?>'});
                     if(data.Hash == "Error"){
                         alert("Pinning data failed. Check IPFS connection and try again later.")
                         return false;
                     }
                     cid = data.Hash;
 
-                    message = "PR_"+cid;
+                    message = "LB_"+cid;
                     const io = await sendMARS(1, "<?=$public_address?>");
                     const fee = 0.01
                     const mars_amount = 0.01
@@ -241,16 +236,8 @@ $("#logModalBtn").click(async (e) => {
                         const tx = await signMARS(message, mars_amount, io);
                         $(".transaction-hash").text("" + tx.tx_hash)
                         $(".transaction-hash-link").attr("href","https://explore.marscoin.org/tx/" + tx.tx_hash)
-                        const data = await doAjax("/api/setfeed", {"type": "PR", "txid": tx.tx_hash, message: $("#title").val(), "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
-                        if(data.Hash){
-                            $("#modal-message-success").show()
-                            $("#loading").hide()
-                            $(".modal-footer").hide();
-                            const data = await doAjax("/api/cacheproposal", {"type": "PR", "txid": tx.tx_hash, message: jsonString, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
-                            if(data.Discussion){
-                                //if(!alert('Submitted to Blockchain successfully')){location.href = '/forum/'+data.Discussion;}
-                            }
-                        }
+                        const data = await doAjax("/api/setfeed", {"type": "LB", "txid": tx.tx_hash, message: $("#modal-document").val(), "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+                        
                     } catch (e) {
                         throw e;
                     }
@@ -266,26 +253,6 @@ $("#logModalBtn").click(async (e) => {
 
     })
 
-    const handleFormFilled = () => {
-
-        let title = $("#title").val()
-        let desc = $("#description").val()
-
-        if (title === "") {
-            //title is blank
-            $("#modal-message-error").text("Title is required...")
-            $("#submit-log").prop("disabled", true)
-            $(".modal-message").show()
-            return false
-        } else if (desc === "") {
-            //desc is blank
-            $("#modal-message-error").text("Entry is required...")
-            $("#submit-log").prop("disabled", true)
-            $(".modal-message").show()
-
-            return false
-        }
-    }
 
 
 
