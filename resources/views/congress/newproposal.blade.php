@@ -129,52 +129,39 @@
     </div>
     <a data-toggle="modal" href="#proposalModal" id="proposalModalBtn" class="btn-lg btn-primary demo-element">Confirm</a>
 
-
     <div id="proposalModal" class="modal fade">
-
         <div class="modal-dialog">
-
             <div class="modal-content">
-
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                     <h3 class="modal-title">Basic Modal</h3>
-                </div> <!-- /.modal-header -->
-
+                </div>
                 <div class="modal-body">
                     <div class="modal-body-box">
                         <h5>Category: </h5>
                         <p class="modal-category"> </p>
                     </div>
-
-
                     <div class="modal-body-box">
                         <h5> Description: </h5>
                         <p class="modal-description"></p>
                     </div>
-
                     <div class="modal-body-box">
                         <h5> Configuration: </h5>
                         <p class="modal-configuration"></p>
                     </div>
-
                     <div class="modal-message" style="display: none">
                         <i class="fa fa-times-circle"></i>
                         <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
                         <span id="modal-message-success" style="font-weight: 600"> </span>
                     </div>
-                </div> <!-- /.modal-body -->
+                </div>
                 <h5 class="transaction-hash" style="text-align: center;"></h5>
-
                 <div class="modal-footer">
                     <button id="submit-proposal" type="submit" class="btn btn-primary">Submit Proposal</button>
                     <img src="https://i.stack.imgur.com/FhHRx.gif" alt="enter image description here" style="display: none" id="loading">
-                </div> <!-- /.modal-footer -->
-
-            </div> <!-- /.modal-content -->
-
-        </div><!-- /.modal-dialog -->
-
+                </div>
+            </div> 
+        </div>
     </div>
 
 

@@ -81,6 +81,7 @@
     <footer class="footer">
         @include('footer')
     </footer>
+    <script src="/assets/wallet/js/dist/my_bundle.js"></script>
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
     <script src="/assets/wallet/js/plugins/flot/jquery.flot.js"></script>
@@ -107,17 +108,9 @@
 
 <script>
   $(function(){
-  
-    // First register any plugins
     $.fn.filepond.registerPlugin(FilePondPluginImagePreview);
-
-    // Turn input element into a pond
     $('.my-pond').filepond();
-
-    // Set allowMultiple property to true
     $('.my-pond').filepond('allowMultiple', true);
-  
-    // Listen for addfile event
     $('.my-pond').on('FilePond:addfile', function(e) {
         console.log('file added event', e);
     });
@@ -128,17 +121,14 @@
 <script>
 $(document).ready(function() {
 
-
 $.ajaxSetup({
-headers: {
-    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-}
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
 });  
 
-
-    async function doAjax(ajaxurl, args) {
-    let result;
-
+async function doAjax(ajaxurl, args) {
+let result;
     try {
         result = await $.ajax({
             url: ajaxurl,
@@ -152,15 +142,9 @@ headers: {
     }
 }
 
-
-
-
 $("#saveLogLocalBtn").click(function() {
     event.preventDefault();
     var formData = new FormData()
-    // $.each($("input[type='file']")[0].files, function(i, file) {
-    //     formData.append('filenames[]', file);
-    // });
     var files = $('.my-pond').filepond('getFiles');
 	$(files).each(function (index) {
 		console.log(files[index].fileExtension);
@@ -178,6 +162,7 @@ $("#saveLogLocalBtn").click(function() {
         success:function(data){
             cid = data.Hash;
             $("#ipfs_path").val(cid);
+            alert("Successfully saved to the planetary file system!")
         },
         error: function(data){
             console.log(data);
@@ -185,12 +170,12 @@ $("#saveLogLocalBtn").click(function() {
     });
 });
 
-
-// Click on confirm
 $(".notarizemeModalBtn").click(async (e) => 
 {
-        const fee = 1;
-        $("#modal-document").text($(this).attr('rel'));
+        const fee = 0.1;
+        var publication = $(e.currentTarget).attr('rel');
+        $(".modal-document").text(publication);
+        $(".transaction-hash-link").text("");
 
         if ("{{ $balance }}" < fee) {
             $("#submit-notarization").prop("disabled", true)
@@ -201,31 +186,15 @@ $(".notarizemeModalBtn").click(async (e) =>
 
         } else {
             $(".modal-message").hide()
+            $(".modal-footer").show();
             console.log("able to confirm..")
             $("#submit-notarization").prop("disabled", false)
-            
             $("#submit-notarization").click(async () => {
 
                 $("#loading").show()
                 try {
 
-                    var obj = new Object();
-                    obj.data = {};
-                    obj.meta = {};
-                    obj.data.title = $("#modal-document").val();
-                    
-                    var jsonString = JSON.stringify(obj.data);
-                    var m = sha256(jsonString);
-                    obj.meta.hash = m;
-                    var jsonString = JSON.stringify(obj);
-                    utcnow = new Date().getTime();
-                    const data = await doAjax("/api/permapinjson", {"type": "logbook_"+utcnow, "payload": jsonString, "address": '<?=$public_address?>'});
-                    if(data.Hash == "Error"){
-                        alert("Pinning data failed. Check IPFS connection and try again later.")
-                        return false;
-                    }
-                    cid = data.Hash;
-
+                    cid = publication;
                     message = "LB_"+cid;
                     const io = await sendMARS(1, "<?=$public_address?>");
                     const fee = 0.01
@@ -234,8 +203,10 @@ $(".notarizemeModalBtn").click(async (e) =>
 
                     try {
                         const tx = await signMARS(message, mars_amount, io);
-                        $(".transaction-hash").text("" + tx.tx_hash)
+                        $(".transaction-hash-link").text("" + tx.tx_hash)
                         $(".transaction-hash-link").attr("href","https://explore.marscoin.org/tx/" + tx.tx_hash)
+                        $(".modal-message").show();
+                        $(".modal-footer").hide();
                         const data = await doAjax("/api/setfeed", {"type": "LB", "txid": tx.tx_hash, message: $("#modal-document").val(), "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
                         
                     } catch (e) {
@@ -272,8 +243,6 @@ const Marscoin = {
         wif: 0x80,
     }
 };
-
-
 const sendMARS = async (mars_amount, receiver_address) => {
     const sender_address = "<?=$public_address?>".trim()
 
