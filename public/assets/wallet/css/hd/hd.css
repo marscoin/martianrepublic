@@ -106,3 +106,15 @@
 .connect-wallet:hover{
 
 }
+
+.wallet-card:hover{
+    box-shadow: 8px 10px 20px  #00000020;
+    background-color: rgba(233, 235, 243, 0.493);
+    cursor:pointer
+}
+
+.wallet-card-link
+{
+    text-decoration: none;
+    color: inherit;
+}
