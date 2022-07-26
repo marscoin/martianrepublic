@@ -121,7 +121,7 @@
                                                     </p>
 
                                                     <p
-                                                    style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin: 0; width: 50%;">
+                                                        style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin: 0; width: 50%;">
                                                         General Public:<i
                                                             class="fa fa-{{ $general_public ? 'check bg-success' : 'times bg-primary' }} "
                                                             style="padding: .6rem; margin: .5rem; border-radius: 4px">
@@ -129,7 +129,7 @@
                                                     </p>
 
                                                     <p
-                                                    style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin: 0; width: 50%;">
+                                                        style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin: 0; width: 50%;">
                                                         Citizen:<i
                                                             class="fa fa-{{ $citizen ? 'check bg-success' : 'times bg-primary' }} "
                                                             style="padding: .6rem; margin: .5rem; border-radius: 4px">
@@ -326,7 +326,7 @@
 
                         <div class="row d-flex justify-content-center text-center" style="padding-top: 5rem;">
 
-                            <button id="make-wallet" type="submit" class="btn btn-primary"
+                            <button id="unlock-wallet" type="submit" class="btn btn-primary"
                                 style="">Unlock</button>
                         </div>
                     </div>
@@ -726,7 +726,7 @@
                             </form>
 
                         </div>
-                        @if (empty($encrypted_seed))
+                        {{-- @if (empty($encrypted_seed))
                             <div class="tab-pane fade" id="passwordLogin">
                                 <form class="form account-form wallet-getter" method="GET"
                                     action="/wallet/getwallet">
@@ -739,7 +739,7 @@
 
 
                             </div>
-                        @endif
+                        @endif --}}
 
 
                         <div class="tab-pane fade in" id="importWallet">
@@ -819,25 +819,32 @@
         // ===================================================================
         // =================== Handle Unlock Wallet Modal ====================
         // ===================================================================
-        $('.wallet-card-link').on("click", function(e) {
 
-            var data = JSON.parse($(this).attr('data-wallet'))
-
-            console.table(data)
-
-            // now... handle data on the modal that popped open....
-
-            $("#unlockWalletModal .unlock-name").text(data.wallet_type)
-            $("#unlockWalletModal .unlock-addy").text(data.public_addr)
-
-
-
-        })
 
         $(document).ready(function() {
 
+
             let iv = "{{ json_encode($iv) }}".replace("]", "").replace("[", "").split(",");
             iv = new Uint8Array(iv);
+
+
+
+            let selected_wallet = null;
+
+
+            $('.wallet-card-link').on("click", function(e) {
+
+                var data = JSON.parse($(this).attr('data-wallet'))
+
+                selected_wallet = data
+                // now... handle data on the modal that popped open....
+
+                $("#unlockWalletModal .unlock-name").text(data.wallet_type)
+                $("#unlockWalletModal .unlock-addy").text(data.public_addr)
+
+
+
+            })
 
             // ===================================================================
             // =================== Handle Modal Tabs Logic =======================
@@ -963,6 +970,8 @@
 
                     encrypted_mnem = my_bundle.encrypt(mnem, hashed_password, iv)
 
+                    // console.log("enc:", encrypted_mnem)
+
 
                 });
 
@@ -986,8 +995,8 @@
                 });
 
 
-
-                $("#make-wallet").click(() => {
+                // set the input as the encryption.
+                $("#next-mnemonic").click(() => {
                     $("#password").val(encrypted_mnem);
                     $("#re-password").val(hashed_re_password);
 
@@ -1394,6 +1403,47 @@
 
             })
 
+
+
+            // UNLOCK WALLET...
+            $('#unlock-password').click(() => {
+                // console.log("SALT: {{ $SALT }}")
+                // compile mnemonic
+
+                var wallet_password = $("#unlock-password").val().replace(/\s+/g, '');
+                // console.log(wallet_password)
+
+                const hashed = hashPassword(wallet_password);
+
+
+                const user_wallet = selected_wallet
+                //console.log("hashed:", hashed)
+
+                const encrypted_mnem = user_wallet.encrypted_seed.replace(/\s+/g, '');
+                //const encrypted = my_bundle.encrypt("face they lemon ignore link crop above thing buffalo tide category soup", hashed)
+                //console.log("Encrypted: ", encrypted)
+
+                const decrypted = my_bundle.decrypt(encrypted_mnem, hashed, iv).trim()
+
+                // console.log("Encrypted SEED: {{ $encrypted_seed }}")
+                // console.log("MNEM:", decrypted)
+
+
+                const response = genSeed(decrypted)
+
+                // console.log("response:", response)
+                if (response.address == user_wallet.public_addr) {
+                    // Logging in was successful... Opening wallet...
+                    localStorage.setItem("key", decrypted)
+                    //      console.error("Item Succesfully locally stored")
+                } else {
+                    $(".wallet-getter").attr("action", "/wallet/failwallet")
+
+
+                }
+                // Logging in was NOT-successful... Prompting user to retry login.
+
+            })
 
 
 

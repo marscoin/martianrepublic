@@ -222,7 +222,7 @@ class DashboardController extends Controller
 			$profile = Profile::where('userid', '=', $uid)->first();
 
 
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$wallet = HDWallet::where('user_id', '=', $uid)->get();
 			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
 
@@ -250,8 +250,8 @@ class DashboardController extends Controller
 					$view->sent = 0;
 
 					// important state.
-					$view->civic_wallet = false;
-					$view->wallet = false;
+					$view->has_civic_wallet = false;
+					$view->has_wallet = false;
 				} else if ($civic_wallet && !$wallet) {
 
 					$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/balance");
@@ -266,22 +266,22 @@ class DashboardController extends Controller
 
 
 					// important state.
-					$view->civic_wallet = true;
-					$view->wallet = false;
+					$view->has_civic_wallet = true;
+					$view->has_wallet = false;
 				} else if ($civic_wallet && $wallet) {
-					$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
+					$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/balance");
 					$view->balance = ($cur_balance * 0.00000001);
-					$view->public_addr = $wallet->public_addr;
-					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalReceived");
+					$view->public_addr = $civic_wallet->public_addr;
+					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/totalReceived");
 					$received = json_decode($json, true);
 					$view->received = ($received * 0.00000001);
-					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalSent");
+					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/totalSent");
 					$sent = json_decode($json, true);
 					$view->sent = ($sent * 0.00000001);
 
 					// important state.
-					$view->civic_wallet = true;
-					$view->wallet = true;
+					$view->has_civic_wallet = true;
+					$view->has_wallet = true;
 				}
 
 
@@ -291,23 +291,6 @@ class DashboardController extends Controller
 
 
 
-				// if ($wallet) {
-				// 	// echo $wallet['public_addr'];
-				// 	// die();
-				// 	$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				// 	$view->balance = ($cur_balance * 0.00000001);
-				// 	$view->public_addr = $wallet->public_addr;
-				// 	$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalReceived");
-				// 	$received = json_decode($json, true);
-				// 	$view->received = ($received * 0.00000001);
-				// 	$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalSent");
-				// 	$sent = json_decode($json, true);
-				// 	$view->sent = ($sent * 0.00000001);
-				// } else {
-				// 	$view->balance = 0;
-				// 	$view->received = 0;
-				// 	$view->sent = 0;
-				// }
 
 				$view->transactions = array();
 				$cur_price = json_decode(file_get_contents("https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd"));
@@ -415,24 +398,20 @@ class DashboardController extends Controller
 			$view->applied = $profile->has_application;
 
 
+
+
+
 			if (is_null($civic_wallet)) {
 				$view->wallet_open = 0;
 				$view->wallets = null;
 				$view->encrypted_seed = null;
 				$view->civic_wallet = null;
-
-				// echo "<pre>";
-				// print_r(is_null($wallets));
-				// echo "</pre>";
-				// die();
-
 			} else {
 				$view->civic_wallet = $civic_wallet;
 				$view->wallet_open = $profile->wallet_open;
 				$view->encrypted_seed = $civic_wallet->encrypted_seed;
 				$view->wallets = $wallets;
 			}
-
 
 
 			// blade constants
@@ -513,7 +492,7 @@ class DashboardController extends Controller
 	}
 
 
-	// Show HD Wallet (Open)
+	// Show HD Wallet (Close)
 	protected function showHDClose()
 	{
 		if (Auth::check()) {
