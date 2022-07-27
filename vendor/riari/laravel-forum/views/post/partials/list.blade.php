@@ -23,6 +23,11 @@
                 ({{ trans('forum::general.last_updated') }} @include ('forum::partials.timestamp', ['carbon' => $post->updated_at]))
             @endif
         </span>
+        <span class="text-muted">
+                @can ('reply', $post->thread)
+                        <a href="{{ Forum::route('post.create', $post) }}" class="card-link">{{ trans('forum::general.reply') }}</a>
+                @endcan
+        </span>
     </div>
     <div class="card-body">
         @if ($post->parent !== null)
