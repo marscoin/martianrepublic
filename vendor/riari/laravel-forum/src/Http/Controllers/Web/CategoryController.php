@@ -16,57 +16,8 @@ use TeamTeaTime\Forum\Models\Category;
 use TeamTeaTime\Forum\Support\CategoryPrivacy;
 use TeamTeaTime\Forum\Support\Web\Forum;
 
-use Illuminate\Support\Facades\Auth;
-use App\Models\Profile;
-use App\Includes\AppHelper;
-use App\Models\HDWallet;
-
 class CategoryController extends BaseController
 {
-
-    public function check($view)
-    {
-        if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
-
-			if (!$profile) {
-				return redirect('/twofa');
-			} else {
-				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-					return redirect('/twofachallenge');
-				}
-			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-			$view->gravtar_link  = $gravtar_link;
-			$view->network = AppHelper::stats()['network'];
-			$view->coincount = AppHelper::stats()['coincount'];
-			$view->balance = 0; //for now, could move to stats helper function as well
-
-
-            if ($wallet) {
-				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$view->balance = ($cur_balance * 0.00000001);
-				$view->public_address = $wallet->public_addr;
-			} else {
-				$view->balance = 0;
-			}
-
-			$view->gravtar_link  = $gravtar_link;
-			$view->fullname = Auth::user()->fullname;
-			$view->isCitizen = $profile->citizen;
-			$view->isGP  = $profile->general_public;
-			$view->wallet_open = $profile->wallet_open;
-
-			return $view;
-
-
-		}else{
-            return view('auth.login');
-        }
-    }
-
     public function index(Request $request): View
     {
         $categories = CategoryPrivacy::getFilteredTreeFor($request->user());
@@ -74,8 +25,8 @@ class CategoryController extends BaseController
         if ($request->user() !== null) {
             UserViewingIndex::dispatch($request->user());
         }
-        return $this->check(ViewFactory::make('forum::category.index', compact('categories')));
 
+        return ViewFactory::make('forum::category.index', compact('categories'));
     }
 
     public function show(Request $request, Category $category): View
@@ -135,9 +86,7 @@ class CategoryController extends BaseController
             }
         }
 
-        return $this->check(ViewFactory::make('forum::category.show', compact('privateAncestor', 'categories', 'category', 'threads', 'selectableThreadIds')));
-
-
+        return ViewFactory::make('forum::category.show', compact('privateAncestor', 'categories', 'category', 'threads', 'selectableThreadIds'));
     }
 
     public function store(CreateCategory $request): RedirectResponse
@@ -176,6 +125,6 @@ class CategoryController extends BaseController
         $categories = Category::defaultOrder()->get();
         $categories->makeHidden(['_lft', '_rgt', 'thread_count', 'post_count']);
 
-        return $this->check(ViewFactory::make('forum::category.manage', ['categories' => $categories->toTree()]));
+        return ViewFactory::make('forum::category.manage', ['categories' => $categories->toTree()]);
     }
 }

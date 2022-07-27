@@ -15,18 +15,13 @@
             </span>
         @endif
 
-        AA {{ $post->authorName }}
+        {{ $post->authorName }}
 
         <span class="text-muted">
             @include ('forum::partials.timestamp', ['carbon' => $post->created_at])
             @if ($post->hasBeenUpdated())
                 ({{ trans('forum::general.last_updated') }} @include ('forum::partials.timestamp', ['carbon' => $post->updated_at]))
             @endif
-        </span>
-        <span class="text-muted">
-                @can ('reply', $post->thread)
-                        <a href="{{ Forum::route('post.create', $post) }}" class="card-link">{{ trans('forum::general.reply') }}</a>
-                @endcan
         </span>
     </div>
     <div class="card-body">
