@@ -27,6 +27,7 @@ class CreatePost extends BaseAction
         $post = $this->thread->posts()->create([
             'post_id' => $this->parent === null ? null : $this->parent->id,
             'author_id' => $this->author->getKey(),
+            'authorName' => $this->author->fullname,
             'sequence' => $this->thread->posts->count() + 1,
             'content' => $this->content,
         ]);
