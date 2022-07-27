@@ -20,7 +20,6 @@ class Thread extends BaseModel
     protected $fillable = [
         'category_id',
         'author_id',
-        'authorName',
         'title',
         'locked',
         'pinned',

@@ -17,7 +17,6 @@ class Post extends BaseModel
     protected $fillable = [
         'thread_id',
         'author_id',
-        'authorName',
         'post_id',
         'sequence',
         'content',
