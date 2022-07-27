@@ -12,6 +12,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="csrf-token" content="{{ Session::token() }}">
+
     <!-- Google Font: Open Sans -->
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
@@ -306,32 +308,37 @@
                 </div> <!-- /.modal-header -->
 
 
-                {{-- <form class="form account-form" method="POST" action="/wallet/getwallet"> --}}
+                <form class="form account-form " id="wallet-unlocker" method="POST"
+                    action="/wallet/dashboard/hd-open">
+                    @csrf
 
-                <div class=""
-                    style="padding: 5rem; display: flex; justify-content: center; align-items: center; flex-direction: column">
-                    <div class="row">
+                    <div class=""
+                        style="padding: 5rem; display: flex; justify-content: center; align-items: center; flex-direction: column">
+                        <div class="row">
 
-                        <h4 class="unlock-name" style="text-align: center"></h4>
-                        <h2 class="unlock-addy"></h2>
-                    </div>
-
-
-                    <div class="row" style="width: 50%;">
-
-                        <label for="name">Wallet Password</label>
-                        <input type="password" id="unlock-password" name="unlock-password" class="form-control"
-                            data-required="true" style="width: 100%">
-
-
-                        <div class="row d-flex justify-content-center text-center" style="padding-top: 5rem;">
-
-                            <button id="unlock-wallet" type="submit" class="btn btn-primary"
-                                style="">Unlock</button>
+                            <h4 class="unlock-name" style="text-align: center"></h4>
+                            <h2 class="unlock-addy"></h2>
                         </div>
-                    </div>
 
-                </div>
+
+                        <div class="row" style="width: 50%;">
+
+
+
+                            <label for="name">Wallet Password</label>
+                            <input type="password" id="unlock-password" name="unlock-password" class="form-control"
+                                data-required="true" style="width: 100%">
+
+
+                            <div class="row d-flex justify-content-center text-center" style="padding-top: 5rem;">
+
+                                <button id="unlock-wallet" type="submit" class="btn btn-primary"
+                                    style="">Unlock</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
 
             </div>
 
@@ -1186,6 +1193,9 @@
                 var w = elem.width;
                 var h = elem.height;
 
+
+
+
                 var cell_dim = w / Math.sqrt(word_list_length);
                 var cell_count = (w / cell_dim)
 
@@ -1284,7 +1294,11 @@
 
                 });
                 // =====================================================================
-                // =====================================================================
+                // if (!validation) {
+                //     e.preventDefault();
+                //     return false;
+                // }
+
 
 
 
@@ -1397,7 +1411,6 @@
                 } else {
                     $(".wallet-getter").attr("action", "/wallet/failwallet")
 
-
                 }
                 // Logging in was NOT-successful... Prompting user to retry login.
 
@@ -1405,10 +1418,64 @@
 
 
 
-            // UNLOCK WALLET...
-            $('#unlock-password').click(() => {
-                // console.log("SALT: {{ $SALT }}")
-                // compile mnemonic
+            // UNLOCK WALLET from list of wallets......
+            // $('#unlock-wallet').click(() => {
+            //     // console.log("SALT: {{ $SALT }}")
+            //     // compile mnemonic
+            //     console.log("unlocking...")
+
+            //     var wallet_password = $("#unlock-password").val().replace(/\s+/g, '');
+            //     // console.log(wallet_password)
+
+            //     const hashed = hashPassword(wallet_password);
+
+
+            //     const user_wallet = selected_wallet
+            //     //console.log("hashed:", hashed)
+
+            //     const encrypted_mnem = user_wallet.encrypted_seed.replace(/\s+/g, '');
+            //     //const encrypted = my_bundle.encrypt("face they lemon ignore link crop above thing buffalo tide category soup", hashed)
+            //     //console.log("Encrypted: ", encrypted)
+
+            //     const decrypted = my_bundle.decrypt(encrypted_mnem, hashed, iv).trim()
+
+            //     // console.log("Encrypted SEED: {{ $encrypted_seed }}")
+            //     // console.log("MNEM:", decrypted)
+
+
+            //     const response = genSeed(decrypted)ion
+
+
+
+
+            //     // console.log("response:", response)
+            //     if (response.address == user_wallet.public_addr) {
+            //         // Logging in was successful... Opening wallet...
+            //         // localStorage.setItem("key", decrypted)
+            //         localStorage.setItem("key", encrypted_mnem)
+
+
+            //         //      console.error("Item Succesfully locally stored")
+            //     } else {
+
+
+            //         $(".wallet-getter").attr("action", "/wallet/failwallet")
+
+
+            //     }
+            //     // Logging in was NOT-successful... Prompting user to retry login.
+
+            // })
+
+
+            $("#unlock-wallet").click(function(e) {
+                // do your validation here ...
+
+
+                var validated = false;
+
+
+                console.log("unlocking...")
 
                 var wallet_password = $("#unlock-password").val().replace(/\s+/g, '');
                 // console.log(wallet_password)
@@ -1431,19 +1498,61 @@
 
                 const response = genSeed(decrypted)
 
+
+
+
+
+
                 // console.log("response:", response)
                 if (response.address == user_wallet.public_addr) {
                     // Logging in was successful... Opening wallet...
-                    localStorage.setItem("key", decrypted)
+
+                    flushLocalStorage()
+                    console.log("success...")
+                    localStorage.setItem("key", encrypted_mnem)
+
+
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+
+                    $.ajax({
+                        url: '/wallet/dashboard/hd-open',
+                        method: 'post',
+                        data: selected_wallet, // prefer use serialize method
+                        success: function(data) {
+                            if(data.status == "ok")
+                            {
+                                console.log("wallet unlocked...")
+                                window.location.replace(data.url)
+                            }
+                        }
+                    });
+
+
+
+                    return true;
                     //      console.error("Item Succesfully locally stored")
                 } else {
-                    $(".wallet-getter").attr("action", "/wallet/failwallet")
 
+                    console.log("failure...")
 
+                    validated = false
+                    e.preventDefault();
+                    window.location.reload()
+
+                    return false;
+                    // $(".wallet-getter").attr("action", "/wallet/failwallet")
                 }
-                // Logging in was NOT-successful... Prompting user to retry login.
 
-            })
+                // if (!validation) {
+
+                // }
+
+
+            });
 
 
 
@@ -1468,7 +1577,19 @@
             // =================================================================================================
             // ================================================================================================= 
 
+            function flushLocalStorage() {
 
+
+                localStorage.clear();
+                localStorage.removeItem('key');
+
+
+                // fallback double check if key exists...
+                if ("key" in localStorage)
+                    localStorage.clear()
+
+                return
+            }
 
 
         });
