@@ -312,32 +312,33 @@
                     action="/wallet/dashboard/hd-open">
                     @csrf
 
-                    <div class=""
-                        style="padding: 5rem; display: flex; justify-content: center; align-items: center; flex-direction: column">
-                        <div class="row">
+                <div class=""
+                    style="padding: 5rem; display: flex; justify-content: center; align-items: center; flex-direction: column">
+                    <div class="row">
 
-                            <h4 class="unlock-name" style="text-align: center"></h4>
-                            <h2 class="unlock-addy"></h2>
-                        </div>
-
-
-                        <div class="row" style="width: 50%;">
-
-
-
-                            <label for="name">Wallet Password</label>
-                            <input type="password" id="unlock-password" name="unlock-password" class="form-control"
-                                data-required="true" style="width: 100%">
-
-
-                            <div class="row d-flex justify-content-center text-center" style="padding-top: 5rem;">
-
-                                <button id="unlock-wallet" type="submit" class="btn btn-primary"
-                                    style="">Unlock</button>
-                            </div>
-                        </div>
-
+                        <h4 class="unlock-name" style="text-align: center"></h4>
+                        <h2 class="unlock-addy"></h2>
                     </div>
+
+
+                    <div class="row" style="width: 50%;">
+
+
+                        <input name="wallet" hidden id="selected_wallet"/>
+
+                        <label for="name">Wallet Password</label>
+                        <input type="password" id="unlock-password" name="unlock-password" class="form-control"
+                            data-required="true" style="width: 100%">
+
+
+                        <div class="row d-flex justify-content-center text-center" style="padding-top: 5rem;">
+
+                            <button id="unlock-wallet" type="submit" class="btn btn-primary"
+                                style="">Unlock</button>
+                        </div>
+                    </div>
+
+                </div>
                 </form>
 
             </div>
@@ -1501,35 +1502,47 @@
 
 
 
-
-
                 // console.log("response:", response)
                 if (response.address == user_wallet.public_addr) {
                     // Logging in was successful... Opening wallet...
 
                     flushLocalStorage()
                     console.log("success...")
+                    // console.table(selected_wallet)
                     localStorage.setItem("key", encrypted_mnem)
 
 
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        }
-                    });
+                    $("#selected_wallet").val(JSON.stringify(selected_wallet))
 
-                    $.ajax({
-                        url: '/wallet/dashboard/hd-open',
-                        method: 'post',
-                        data: selected_wallet, // prefer use serialize method
-                        success: function(data) {
-                            if(data.status == "ok")
-                            {
-                                console.log("wallet unlocked...")
-                                window.location.replace(data.url)
-                            }
-                        }
-                    });
+                    // $.ajaxSetup({
+                    //     headers: {
+                    //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    //     }
+                    // });
+
+                    // $.ajax({
+                    //     url: '/wallet/dashboard/hd-open',
+                    //     method: 'post',
+                    //     data: {
+                    //         wallet: JSON.stringify(selected_wallet)
+                    //     }, // prefer use serialize method
+                    //     success: function(data) {
+
+                    //         if (data) {
+                    //             console.log("wallet unlocked...")
+
+                    //             console.table(data)
+
+                    //             // setTimeout(function() {
+
+                    //             //     window.location.replace("/wallet/dashboard/hd-open")
+                    //             // }, 3000);
+                    //         }
+                    //     },
+                    //     error: function(data) {
+                    //         console.log("err: ", data)
+                    //     }
+                    // });
 
 
 

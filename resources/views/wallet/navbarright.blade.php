@@ -91,7 +91,7 @@
 
 
       localStorage.clear();
-      localStorage.removeKey('key');
+      localStorage.removeItem('key');
 
 
       // fallback double check if key exists...
