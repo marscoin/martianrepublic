@@ -306,10 +306,10 @@
 
                                                 <label for="name">Password</label>
                                                 <input type="password" id="password" name="password"
-                                                    class="form-control parsley-validated" data-required="true">
+                                                    class="form-control parsley-validated" data-required="true" autocomplete="new-password">
                                                 <label for="name">Re-Type Password</label>
                                                 <input type="password" id="re-password" name="re-password"
-                                                    class="form-control parsley-validated" data-required="true">
+                                                    class="form-control parsley-validated" data-required="true"  autocomplete="new-password">
                                             </div>
 
                                         </div>
