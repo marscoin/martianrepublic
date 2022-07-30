@@ -96,7 +96,7 @@
 
         <div class="form-group">
           <label for="login-password" class="placeholder-hidden">Password</label>
-          <input type="password" name="password" class="form-control" id="password" placeholder="Password" tabindex="4">
+          <input type="password" name="password" class="form-control" id="password" placeholder="Password" autocomplete="new-password" tabindex="4">
         </div> <!-- /.form-group -->
 
         <div class="form-group">
