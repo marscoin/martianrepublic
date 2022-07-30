@@ -78,7 +78,7 @@
             <strong>{{Session::get('message')}}</strong>
           </div>
 @endif
-      <h5>Please sign in to access to congress.</h5>
+      <h5>Please sign in to access.</h5>
  <!-- 
       <div class="row">
 
