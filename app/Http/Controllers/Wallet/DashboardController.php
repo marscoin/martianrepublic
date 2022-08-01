@@ -470,7 +470,7 @@ class DashboardController extends Controller
 
 				// $view->wallet = $request->data;
 
-				$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/balance");
+				$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$data->public_addr}/balance");
 				$cur_price = json_decode(file_get_contents("https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd"));
 
 				$view->mars_price = $cur_price->marscoin->usd;
