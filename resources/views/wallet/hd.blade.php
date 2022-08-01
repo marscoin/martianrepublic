@@ -1514,37 +1514,6 @@
 
                     $("#selected_wallet").val(JSON.stringify(selected_wallet))
 
-                    // $.ajaxSetup({
-                    //     headers: {
-                    //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    //     }
-                    // });
-
-                    // $.ajax({
-                    //     url: '/wallet/dashboard/hd-open',
-                    //     method: 'post',
-                    //     data: {
-                    //         wallet: JSON.stringify(selected_wallet)
-                    //     }, // prefer use serialize method
-                    //     success: function(data) {
-
-                    //         if (data) {
-                    //             console.log("wallet unlocked...")
-
-                    //             console.table(data)
-
-                    //             // setTimeout(function() {
-
-                    //             //     window.location.replace("/wallet/dashboard/hd-open")
-                    //             // }, 3000);
-                    //         }
-                    //     },
-                    //     error: function(data) {
-                    //         console.log("err: ", data)
-                    //     }
-                    // });
-
-
 
                     return true;
                     //      console.error("Item Succesfully locally stored")

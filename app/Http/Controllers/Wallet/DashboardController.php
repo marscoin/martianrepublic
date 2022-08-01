@@ -455,11 +455,13 @@ class DashboardController extends Controller
 				$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 
 
-				
 
 				$view = View::make('wallet.hd-open');
 				$view->gravtar_link  = $gravtar_link;
 
+				$codes = json_decode(file_get_contents("/home/mars/constitution/marswallet.json"), true);
+				$view->SALT = $codes['salt'];
+				$view->iv = $codes['iv'];
 
 
 				$json = $this->file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
