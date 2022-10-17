@@ -355,6 +355,21 @@ class DashboardController extends Controller
 			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
 
+			// get balance of wallets.
+			foreach($wallets as $wallet)
+			{
+				$bal = (file_get_contents("https://explore.marscoin.org/api/addr/{$wallet->public_addr}/balance")  * 0.00000001);
+				$wallet->balance = $bal;
+
+			}
+
+// 			echo "<pre>";
+// 			print_r($wallets);
+// 			echo "</pre>";
+// die();
+
+
+
 			// handle redirects...
 			if (!$profile) {
 				return redirect('/twofa');
@@ -388,7 +403,7 @@ class DashboardController extends Controller
 
 
 
-			$view->balance = 0;
+			$view->civic_balance = (file_get_contents("https://explore.marscoin.org/api/addr/{$civic_wallet->public_addr}/balance")  * 0.00000001);
 			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
 			$network = json_decode($json, true);
 			$view->network = $network;

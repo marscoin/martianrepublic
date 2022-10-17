@@ -358,7 +358,7 @@
                                 <input type="password" id="unlock-password-tx" name="unlock-password-tx"
                                     class="form-control" data-required="true" style="width: 100%">
 
-                                <p class="error-unlocking"></p>
+                                <p class="error-unlocking-tx"></p>
 
 
                             </div>
@@ -822,7 +822,8 @@
                         }
 
                     } else {
-                        $(".error-unlocking").text("Incorrect Password")
+                        $(".error-unlocking-tx").text("Incorrect Password")
+                        $(".error-unlocking-tx").css('color', 'red')
 
                     }
 
