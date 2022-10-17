@@ -389,8 +389,6 @@ class DashboardController extends Controller
 			// if profile + wallet open 
 
 
-
-
 			if ($profile->wallet_open == 1 && !is_null($wallet)) {
 				return redirect('wallet/dashboard/hd-open');
 			}
@@ -411,18 +409,13 @@ class DashboardController extends Controller
 			$view->SALT = $data['salt'];
 			$view->iv = $data['iv'];
 
-
-
-
-			if ($wallets) {
+			if (!$wallets->isEmpty()) {
 				$view->encrypted_seed = $wallets[0]->encrypted_seed;
 				$view->public_addr = $wallets[0]->public_addr;
 			} else {
 				$view->encrypted_seed = null;
 				$view->public_addr = null;
 			}
-
-
 
 			$view->balance = 0;
 			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
