@@ -56,7 +56,7 @@
       
       <li class="divider"></li> -->
       <li>
-        <a href="/wallet/dashboard/hd-close">
+        <a href="/wallet/dashboard/hd">
           <i class="fa fa-window-close-o"></i>
           &nbsp;&nbsp;Disconnect Wallet
         </a>
@@ -77,7 +77,7 @@
 
 
       localStorage.clear();
-      localStorage.removeKey('key');
+      localStorage.removeItem('key');
 
 
       // fallback double check if key exists...
