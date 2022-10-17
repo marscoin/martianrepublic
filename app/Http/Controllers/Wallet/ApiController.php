@@ -12,6 +12,7 @@ use App\Models\Profile;
 use App\Models\User;
 use App\Models\Proposals;
 use App\Models\Threads;
+use App\Models\Citizen;
 
 class ApiController extends Controller {
 
@@ -37,6 +38,7 @@ class ApiController extends Controller {
 	public function permapinpic(Request $request){
 
 		if (Auth::check()) {
+			$uid = Auth::user()->id;
 			$hash = "";
 			$dataPic = $request->input('picture');
 			$type = $request->input('type');
@@ -55,6 +57,12 @@ class ApiController extends Controller {
 			file_put_contents($file_path, $dataPic);
 			$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
 
+			$citcache = Citizen::where('userid', '=', $uid)->first();
+			if(is_null($citcache)) $citcache = new Citizen;	
+			$citcache->userid = $uid;
+			$citcache->avatar_link = "https://ipfs.marscoin.org/ipfs/".$hash;
+			$citcache->save();
+
 			return (new Response(json_encode(array("Hash" => $hash)), 200))
               ->header('Content-Type', "application/json;");
 
@@ -69,6 +77,7 @@ class ApiController extends Controller {
 	public function permapinvideo(Request $request){
 
 		if (Auth::check()) {
+			$uid = Auth::user()->id;
 			$hash = "";
 			$dataPic = $request->input('file');
 			$type = $request->input('type');
@@ -83,6 +92,12 @@ class ApiController extends Controller {
 				$request->file('file')->move($file_path, "profile_video.webm" );
 				$file_path = $file_path . "profile_video.webm";
 				$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+
+				$citcache = Citizen::where('userid', '=', $uid)->first();
+				if(is_null($citcache)) $citcache = new Citizen;	
+				$citcache->userid = $uid;
+				$citcache->liveness_link = "https://ipfs.marscoin.org/ipfs/".$hash;
+				$citcache->save();
 
 				return (new Response(json_encode(array("Hash" => $hash)), 200))
 				->header('Content-Type', "application/json;");
@@ -232,9 +247,38 @@ class ApiController extends Controller {
 
 			$fullname = $firstname . " " . $lastname;
 
+			$citcache = Citizen::where('userid', '=', $uid)->first();
+			if(is_null($citcache)) $citcache = new Citizen;	
+			
+			$citcache->userid = $uid;
+			$citcache->firstname = $firstname;
+			$citcache->lastname = $lastname;
+			$citcache->save();
+
 			$user = User::where('id', '=', $uid)->first();
 			$user->fullname = $fullname;
 			$user->save();
+			return;
+		}
+	}
+
+	public function cacheonboarding(Request $request)
+	{
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$shortbio = $request->input('shortbio');
+			$displayname = $request->input('displayname');
+			$publicaddress = $request->input('publicaddress');
+			
+			$citcache = Citizen::where('userid', '=', $uid)->first();
+			if(is_null($citcache)) $citcache = new Citizen;	
+			
+			$citcache->userid = $uid;
+			$citcache->shortbio = $shortbio;
+			$citcache->displayname = $displayname;
+			$citcache->public_address = $publicaddress;
+			$citcache->save();
+
 			return;
 		}
 	}
