@@ -16,29 +16,15 @@
 
                     <ul class="dropdown-menu" role="menu">
                         <li>
-                            <a target="_blank" href="https://www.finexbox.com/market/pair/MARS-BTC.html">
-                                <i class="fa fa-area-chart"></i>
-                                FinexBox
-                            </a>
-                        </li>
-                        <li>
                             <a target="_blank" href="https://dex-trade.com/spot/trading/MARSUSDT">
                                 <i class="fa fa-area-chart"></i>
                                 Dex-Trade
                             </a>
                         </li>
                         <li>
-                            <a target="_blank" href="https://www.xt.com/trade/mars_usdt">
+                            <a target="_blank" href="https://www.finexbox.com/market/pair/MARS-BTC.html">
                                 <i class="fa fa-area-chart"></i>
-                                Xt.com
-                            </a>
-                        </li>
-
-
-                        <li>
-                            <a target="_blank" href="https://ex.udonex.com/market/marsusdt">
-                                <i class="fa fa-area-chart"></i>
-                                Udonex
+                                FinexBox
                             </a>
                         </li>
 
