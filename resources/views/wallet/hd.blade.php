@@ -16,7 +16,8 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap"
+        rel="stylesheet">
     <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
     <!-- Bootstrap CSS -->
@@ -29,6 +30,7 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="/assets/wallet/js/plugins/magnific/magnific-popup.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
+    <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin-extended.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="stylesheet" href="/assets/wallet/css/jquery.steps.css">
 
@@ -57,7 +59,6 @@
             cursor: pointer;
             z-index: 1;
         } */
-
     </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
 </head>
@@ -75,20 +76,97 @@
                 </nav>
             </div> <!-- /.container -->
         </header>
-        @include('wallet.mainnav', array('active'=>'wallet'))
+        @include('wallet.mainnav', ['active' => 'wallet'])
 
         <div class="content">
 
             <div class="container">
 
+
+
+
                 <div class="portlet">
 
                     <h3 class="portlet-title">
-                        <u>Wallet</u>
+                        <u>Select Wallet</u>
                     </h3>
 
-                    <div class="portlet-body"
-                        style="display: flex; justify-content: center; align-items: center; flex-direction: column">
+
+                    @if ($wallets)
+                        @foreach ($wallets as $wallet)
+                            <div class="row">
+                                <div class="col-md-5 col-sm-7">
+
+                                    <div class="icon-stat">
+
+                                        <div class="row">
+                                            <div class="col-xs-8 text-left">
+                                                <h4>{{$wallet->wallet_type}}</h4>
+                                                <span class="icon-stat-label">{{ $wallet->public_addr }}</span>
+                                                <!-- /.icon-stat-label -->
+                                                <span class="icon-stat-value">$5,367</span> <!-- /.icon-stat-value -->
+                                            </div><!-- /.col-xs-8 -->
+
+                                            <div class="col-xs-4 text-center">
+                                                <i class="fa fa-dollar icon-stat-visual bg-primary"></i>
+                                                <!-- /.icon-stat-visual -->
+                                            </div><!-- /.col-xs-4 -->
+                                        </div><!-- /.row -->
+
+                                        <div class="icon-stat-footer">
+                                            <i class="fa fa-clock-o"></i> Opened: 07/18/22
+                                        </div>
+
+                                    </div> <!-- /.icon-stat -->
+
+                                </div>
+
+                            </div>
+                        @endforeach
+
+                    @endif
+
+                    <div class="row">
+                        <div class="col-md-5 col-sm-7">
+
+                            <div class="icon-stat">
+
+                                <div class="row">
+                                    <div class="col-xs-8 text-left">
+                                        <h4>Add Wallet</h4>
+                                        <span class="icon-stat-label"> <a data-toggle="modal" href="#styledModal"
+                                                class="btn-lg btn-primary demo-element" data-backdrop="static"
+                                                data-keyboard="false">New Wallet</a></span>
+                                        <!-- /.icon-stat-label -->
+                                        <span class="icon-stat-value"> <a data-backdrop="static" data-keyboard="false"
+                                                data-toggle="modal" href="#modalLogin"
+                                                class="btn-lg btn-primary demo-element">Connect Wallet</a>
+
+
+                                        </span> <!-- /.icon-stat-value -->
+                                    </div><!-- /.col-xs-8 -->
+
+                                    <div class="col-xs-4 text-center">
+                                        <i class="fa fa-plus icon-stat-visual bg-secondary"></i>
+                                        <!-- /.icon-stat-visual -->
+                                    </div><!-- /.col-xs-4 -->
+                                </div><!-- /.row -->
+
+                                {{-- <div class="icon-stat-footer">
+                                    <i class="fa fa-clock-o"></i> Opened: 07/18/22
+                                </div> --}}
+
+                            </div> <!-- /.icon-stat -->
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- render this if !civic_wallet && !hd_wallet --}}
+
+                    {{-- <div class="portlet-body"
+                        style="display: flex; justify-content: center; align-items: center; flex-direction: column; background: transparent">
 
 
 
@@ -102,11 +180,11 @@
                             style="display: flex; justify-content: space-evenly; align-items: center; width: 40%; margin: 40px">
 
 
-                                <a data-toggle="modal" href="#styledModal" class="btn-lg btn-primary demo-element"
-                                    data-backdrop="static" data-keyboard="false">New Wallet</a>
-                                <h4>OR</h4>
-                                <a data-backdrop="static" data-keyboard="false" data-toggle="modal" href="#modalLogin"
-                                    class="btn-lg btn-primary demo-element">Connect Wallet</a>
+                            <a data-toggle="modal" href="#styledModal" class="btn-lg btn-primary demo-element"
+                                data-backdrop="static" data-keyboard="false">New Wallet</a>
+                            <h4>OR</h4>
+                            <a data-backdrop="static" data-keyboard="false" data-toggle="modal" href="#modalLogin"
+                                class="btn-lg btn-primary demo-element">Connect Wallet</a>
 
 
 
@@ -116,7 +194,7 @@
 
 
 
-                    </div> <!-- /.portlet-body -->
+                    </div> <!-- /.portlet-body --> --}}
 
 
                 </div> <!-- /.portlet -->
@@ -140,8 +218,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"
-                        aria-hidden="true">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h3 class="modal-title">Open MARS Wallet</h3>
                 </div> <!-- /.modal-header -->
 
@@ -217,8 +294,8 @@
 
                                     <div class="progress progress-striped active">
                                         <div id="entropy-progress" class="progress-bar progress-bar-primary"
-                                            role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-                                            style="width: 0%">
+                                            role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                                            aria-valuemax="100" style="width: 0%">
                                             <span class="sr-only">0% Complete (primary)</span>
                                         </div>
                                     </div>
@@ -235,8 +312,8 @@
                                 </div>
 
                                 <div class="next-btn">
-                                    <button href="#mnemonic" id="next-entropy" type="button" class="btn btn-primary"
-                                        style="display: none">Next</button>
+                                    <button href="#mnemonic" id="next-entropy" type="button"
+                                        class="btn btn-primary" style="display: none">Next</button>
                                 </div>
 
 
@@ -254,11 +331,11 @@
 
                                         <h2> Mnemonic </h2>
 
-                                        <a class="btn btn-default left-margin  demo-element ui-popover" data-toggle="tooltip"
-                                            data-placement="right" data-trigger="hover"
+                                        <a class="btn btn-default left-margin  demo-element ui-popover"
+                                            data-toggle="tooltip" data-placement="right" data-trigger="hover"
                                             data-content="This seed phrase is the key to your wallet. Write it down and store it somewhere safely or you can lose your funds."
-                                            title="" data-original-title="Mnemonic = Seed Phrase" href="#"><i
-                                                class="fa fa-question-circle"></i></a>
+                                            title="" data-original-title="Mnemonic = Seed Phrase"
+                                            href="#"><i class="fa fa-question-circle"></i></a>
 
 
 
@@ -276,12 +353,12 @@
 
                                     <div class="title-help">
                                         <h2> Backup Wallet </h2>
-                                        <a class="btn btn-default left-margin demo-element ui-popover" data-toggle="tooltip"
-                                            data-placement="right" data-trigger="hover"
+                                        <a class="btn btn-default left-margin demo-element ui-popover"
+                                            data-toggle="tooltip" data-placement="right" data-trigger="hover"
                                             data-content="We will encrypt your mnemonic with a password you create in your browser. MartianRepublic.org will never have access to your wallet."
                                             title="" data-original-title="Backup Your Wallet" href="#"><i
                                                 class="fa fa-question-circle"></i></a>
-                                        <span> (Optional) </span>
+                                        {{-- <span> (Optional) </span> --}}
 
                                     </div>
                                     <div>
@@ -293,9 +370,10 @@
                                                 style="width: 125px;">
                                                 <input type="radio" name="options" id="option1"> Backup Phrase
                                             </label>
-                                            <label id="no-backup-phrase" class="btn btn-default" style="width: 125px;">
+                                            {{-- <label id="no-backup-phrase" class="btn btn-default"
+                                                style="width: 125px;">
                                                 <input type="radio" name="options" id="option2"> No Backup
-                                            </label>
+                                            </label> --}}
                                         </div>
 
 
@@ -334,8 +412,7 @@
 
                                 <h2>Wallet Complete</h2>
 
-                                <input class="addr" id="public_addr" name="public_addr"
-                                    style="display: none" />
+                                <input class="addr" id="public_addr" name="public_addr" style="display: none" />
 
                                 <p>Send MARS to This Address: </p>
 
@@ -384,8 +461,7 @@
 
 
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"
-                        aria-hidden="true">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h3 class="modal-title">Marscoin Wallet Login</h3>
                 </div> <!-- /.modal-header -->
 
@@ -409,6 +485,11 @@
                                     </a>
                                 </li>
                             @endif
+                            <li>
+                                <a href="#importWallet" data-toggle="tab"><i class="fa fa-upload"></i>
+                                    &nbsp;&nbsp;Import wallet
+                                </a>
+                            </li>
 
                         </ul>
 
@@ -432,36 +513,36 @@
                                         style='width: 100%; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; margin: 30px'>
 
                                         {{-- <label for="wallet-login-1">1</label> --}}
-                                        <input name="wallet-login-1" id="wallet-login-1" class="seed-input" style=""
-                                            placeholder="1." />
+                                        <input name="wallet-login-1" id="wallet-login-1" class="seed-input"
+                                            style="" placeholder="1." />
 
                                         {{-- <label for="wallet-login-2">2</label> --}}
-                                        <input name="wallet-login-2" id="wallet-login-2" class="seed-input" style=""
-                                            placeholder="2." />
+                                        <input name="wallet-login-2" id="wallet-login-2" class="seed-input"
+                                            style="" placeholder="2." />
 
                                         {{-- <label for="wallet-login-1">3</label> --}}
-                                        <input name="wallet-login-3" id="wallet-login-3" class="seed-input" style=""
-                                            placeholder="3." />
+                                        <input name="wallet-login-3" id="wallet-login-3" class="seed-input"
+                                            style="" placeholder="3." />
 
                                         {{-- <label for="wallet-login-1">4</label> --}}
-                                        <input name="wallet-login-4" id="wallet-login-4" class="seed-input" style=""
-                                            placeholder="4." />
+                                        <input name="wallet-login-4" id="wallet-login-4" class="seed-input"
+                                            style="" placeholder="4." />
 
                                         {{-- <label for="wallet-login-1">5</label> --}}
-                                        <input name="wallet-login-5" id="wallet-login-5" class="seed-input" style=""
-                                            placeholder="5." />
+                                        <input name="wallet-login-5" id="wallet-login-5" class="seed-input"
+                                            style="" placeholder="5." />
 
                                         {{-- <label for="wallet-login-1">6</label> --}}
-                                        <input name="wallet-login-6" id="wallet-login-6" class="seed-input" style=""
-                                            placeholder="6." />
+                                        <input name="wallet-login-6" id="wallet-login-6" class="seed-input"
+                                            style="" placeholder="6." />
 
                                         {{-- <label for="wallet-login-1">7</label> --}}
-                                        <input name="wallet-login-7" id="wallet-login-7" class="seed-input" style=""
-                                            placeholder="7." />
+                                        <input name="wallet-login-7" id="wallet-login-7" class="seed-input"
+                                            style="" placeholder="7." />
 
                                         {{-- <label for="wallet-login-1">8</label> --}}
-                                        <input name="wallet-login-8" id="wallet-login-8" class="seed-input" style=""
-                                            placeholder="8." />
+                                        <input name="wallet-login-8" id="wallet-login-8" class="seed-input"
+                                            style="" placeholder="8." />
 
                                         {{-- <label for="wallet-login-1">9</label> --}}
                                         <input name="wallet-login-9" id="wallet-login-9" class="seed-input"
@@ -497,7 +578,8 @@
                         </div>
                         @if ($encrypted_seed)
                             <div class="tab-pane fade" id="passwordLogin">
-                                <form class="form account-form wallet-getter" method="GET" action="/wallet/getwallet">
+                                <form class="form account-form wallet-getter" method="GET"
+                                    action="/wallet/getwallet">
                                     <label for="name">Password</label>
                                     <input type="password" id="wallet-password" name="password"
                                         class="form-control parsley-validated" data-required="true">
@@ -508,6 +590,16 @@
 
                             </div>
                         @endif
+
+
+                        <div class="tab-pane fade in" id="importWallet">
+                            <h2>Upload Marswallet JSON Key</h2>
+                            <div>
+                                <p>upload</p>
+                                <i class="fa fa-upload"> </i>
+                            </div>
+
+                        </div>
 
 
 
@@ -562,7 +654,7 @@
     <script src="/assets/wallet/js/plugins/magnific/jquery.magnific-popup.min.js"></script>
     <script src="/assets/wallet/js/plugins/dataTables/jquery.dataTables.js"></script>
     <script src="/assets/wallet/js/plugins/dataTables/dataTables.bootstrap.js"></script>
-    <script src="/assets/wallet/js/plugins/magnific/jquery.magnific-popup.js"> </script>
+    <script src="/assets/wallet/js/plugins/magnific/jquery.magnific-popup.js"></script>
 
     <!-- App JS -->
     <script src="/assets/wallet/js/mvpready-core.js"></script>
@@ -699,7 +791,7 @@
 
                     hashed_password = hashPassword(password)
 
-                   // console.log("hashed-pass: ", hashed_password)
+                    // console.log("hashed-pass: ", hashed_password)
 
                     encrypted_mnem = my_bundle.encrypt(mnem, hashed_password, iv)
 
@@ -720,9 +812,9 @@
 
                     hashed_re_password = hashPassword(re_password)
 
-                 //   console.log("HASHED RE-pass:", hashed_re_password)
-                 //   console.log("enc-mnem:", encrypted_mnem)
-                 //   console.log("dec-mnem:", my_bundle.decrypt(encrypted_mnem, hashed_re_password, iv))
+                    //   console.log("HASHED RE-pass:", hashed_re_password)
+                    //   console.log("enc-mnem:", encrypted_mnem)
+                    //   console.log("dec-mnem:", my_bundle.decrypt(encrypted_mnem, hashed_re_password, iv))
                 });
 
 
@@ -748,6 +840,24 @@
 
                 return ret
             }
+
+
+            const hashPasswordWithRounds = (passcode, rounds) => {
+
+                for (let i = 0; i < rounds; i++) {
+                    console.log(`hash round: ${i}`)
+
+                }
+
+
+                const ret = my_bundle.pbkdf2.pbkdf2Sync(
+                    passcode,
+                    "{{ $SALT }}", 1, 16, 'sha512').toString('hex')
+
+                return ret
+            }
+
+
 
             //          hashed: 3272ef82de36a61f12c93f823781a928
             //          hd:1314 Encrypted SEED: a7MVqMKaxLlA7NXfkuFb+ENw6qp/XytJSVbgZMnZoQndzdeYmqRcjtre8LxJ8hy09WXQblUVDoZy8JUbdgEXs5gtxYjYD34=
@@ -795,7 +905,7 @@
             // ADDRESS FOR SBS3128 Testing123
             //
             // address: "MSCG9f78gHw6UYb1ukpv3KBL1TPBdcwxy3"
-            // menmonic: "element expose garden swing denial expand member cat need float daring gloom"
+            // mnemonic: "element expose garden swing denial expand member cat need float daring gloom"
             // prvKey: "KxzXmhDfvKCVR7Z5bfrBfdKqzVc1KLjDwjjszTSM5q8nkzDKrn6M"
             // pubKey: "035f16de6c8381bfaf4ed37ab17aa9f0fe1ea3d3eef6c3255a81a9f9b9a746ef51"
             // xprv: "tprv8ZgxMBicQKsPd4XcZQ1afgScyJybBL6DEH5sQp1tkbbFrzG2iw3mBn1ZfxS3UmX4rgvEQP83TYqhqjw7aaaitQ7rY8no2i78ZqvGVgEC4f2"
@@ -807,11 +917,11 @@
             //VERSION 2!
             // Given a mnemonic gen seed
             const genSeed = (mnemonic) => {
-               // console.log("SALT: {{ $SALT }}")
+                // console.log("SALT: {{ $SALT }}")
                 //mnemonic = "invite feature forget axis radar stone bind squirrel dog crash trap equip"
 
                 //const mnemonic = my_bundle.bip39.generateMnemonic();
-              //  console.log(mnemonic)
+                //  console.log(mnemonic)
 
                 //const root = new my_bundle.BIP84.fromMnemonic(mnemonic, null, false, 107);
 
@@ -876,7 +986,7 @@
             $(document).on("mousemove", ".mouse-box", function(e) {
 
                 var mnemonic;
-                const percent_increase = 5
+                const percent_increase = 1
                 var increase = percent_increase * entropy.length
 
                 //=============================================================================
@@ -1068,19 +1178,18 @@
                     localStorage.setItem("key", decrypted)
                     //console.error("Item Succesfully locally stored")
 
-                }
-                else{
+                } else {
                     $(".wallet-getter-mnem").attr("action", "/wallet/failwallet")
                 }
             })
 
             // LOGIN USING PASSWORD INPUT
             $('#login-wallet-password').click(() => {
-               // console.log("SALT: {{ $SALT }}")
+                // console.log("SALT: {{ $SALT }}")
                 // compile mnemonic
 
                 var wallet_password = $("#wallet-password").val().replace(/\s+/g, '');
-               // console.log(wallet_password)
+                // console.log(wallet_password)
 
                 const hashed = hashPassword(wallet_password);
                 //console.log("hashed:", hashed)
@@ -1091,19 +1200,18 @@
 
                 const decrypted = my_bundle.decrypt(encrypted_mnem, hashed, iv).trim()
 
-               // console.log("Encrypted SEED: {{ $encrypted_seed }}")
-               // console.log("MNEM:", decrypted)
+                // console.log("Encrypted SEED: {{ $encrypted_seed }}")
+                // console.log("MNEM:", decrypted)
 
 
                 const response = genSeed(decrypted)
 
-               // console.log("response:", response)
+                // console.log("response:", response)
                 if (response.address == "{{ $public_addr }}") {
                     // Logging in was successful... Opening wallet...
                     localStorage.setItem("key", decrypted)
-              //      console.error("Item Succesfully locally stored")
-                }
-                else{
+                    //      console.error("Item Succesfully locally stored")
+                } else {
                     $(".wallet-getter").attr("action", "/wallet/failwallet")
 
 

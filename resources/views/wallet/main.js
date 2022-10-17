@@ -28,8 +28,8 @@ const encrypt = ((val, password, iv) => {
     let decrypted = decipher.update(encrypted, 'base64', 'utf8');
     return (decrypted + decipher.final('utf8'));
   });
-  
 
+  
 module.exports = {
     IPFS: IPFS,
     ElectrumCli: ElectrumCli,

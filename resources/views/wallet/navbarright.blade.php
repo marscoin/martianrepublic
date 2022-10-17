@@ -76,7 +76,7 @@
         </a>
       </li>
       <li>
-        <a href="/logout">
+        <a href="/logout" onclick="flushLocalStorage();">
           <i class="fa fa-sign-out"></i>
           &nbsp;&nbsp;Logout
         </a>
@@ -85,3 +85,19 @@
   </li>
 
 </ul>
+
+<script type="text/javascript">
+  function flushLocalStorage () {
+
+
+      localStorage.clear();
+      localStorage.removeKey('key');
+
+
+      // fallback double check if key exists...
+      if("key" in localStorage)
+        localStorage.clear()
+
+      return
+  }
+</script>
