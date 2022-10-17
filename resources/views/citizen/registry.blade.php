@@ -137,10 +137,11 @@ function imgError(image) {
 
 $(document).ready(function() {
 
-var mem = localStorage.getItem("key").trim();
-if (!mem || mem == ""){
-    alert("Coul not retrieve wallet key. Please disconnect and reconnect your wallet.")
-}
+// let's do that before wallet action, not by default
+// var mem = localStorage.getItem("key").trim();
+// if (!mem || mem == ""){
+//     alert("Coul not retrieve wallet key. Please disconnect and reconnect your wallet.")
+// }
 
 
 $.ajaxSetup({
@@ -175,6 +176,7 @@ $("#saveprofilebutton").click(function() {
 
 
 
+
 $("#lastname").blur(function() {
     firstname = $("#firstname").val();
     lastname = $("#lastname").val();
@@ -182,6 +184,16 @@ $("#lastname").blur(function() {
         
     });
 });
+
+$(".cacheme").blur(function() {
+    displayname = $("#displayname").val();
+    shortbio = $("#shortbio").val();
+    $.post("/api/cacheonboarding", {displayname: displayname, shortbio: shortbio, publicaddress: '<?=$public_address?>'} , function(data) {
+        
+    });
+});
+
+cacheonboarding
 
 
 $("#savevideo").click(function() {
@@ -476,7 +488,15 @@ const sendMARS = async (mars_amount, receiver_address) => {
 }
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
-    const mnemonic = localStorage.getItem("key").trim();
+
+    if(!localStorage.getItem("key"))
+    {
+        //unencrypt key first
+        alert("Unencrypt first");
+        return;
+    }
+
+    const mnemonic = localStorage.getItem("key");
     const sender_address = "<?=$public_address?>".trim()
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
     const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
