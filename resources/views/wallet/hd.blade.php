@@ -109,7 +109,7 @@
                                                 <h4>Civic Wallet: {{ $civic_wallet->wallet_type }}</h4>
                                                 <span class="icon-stat-label">{{ $civic_wallet->public_addr }}</span>
                                                 <!-- /.icon-stat-label -->
-                                                <span class="icon-stat-value">$0.00</span> <!-- /.icon-stat-value -->
+                                                <span class="icon-stat-value">${{$civic_balance}}</span> <!-- /.icon-stat-value -->
 
                                                 <div style="display: flex; flex-direction: column;">
 
@@ -184,7 +184,7 @@
                                                     <h4>{{ $wallet->wallet_type }}</h4>
                                                     <span class="icon-stat-label">{{ $wallet->public_addr }}</span>
                                                     <!-- /.icon-stat-label -->
-                                                    <span class="icon-stat-value">$0.00</span>
+                                                    <span class="icon-stat-value">${{$wallet->balance}}</span>
                                                     <!-- /.icon-stat-value -->
                                                 </div><!-- /.col-xs-8 -->
 
@@ -1021,7 +1021,7 @@
 
                 const ret = my_bundle.pbkdf2.pbkdf2Sync(
                     passcode,
-                    "{{ $SALT }}", 1, 16, 'sha512').toString('hex')
+                    "{{ $SALT }}", 105, 16, 'sha512').toString('hex')
 
                 return ret
             }
