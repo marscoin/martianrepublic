@@ -19,6 +19,7 @@ use App\Models\Voucher;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
 use App\Models\CivicWallet;
+use Exception;
 
 class DashboardController extends Controller
 {
@@ -222,7 +223,7 @@ class DashboardController extends Controller
 			$profile = Profile::where('userid', '=', $uid)->first();
 
 
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$wallet = HDWallet::where('user_id', '=', $uid)->get();
 			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
 
@@ -250,8 +251,8 @@ class DashboardController extends Controller
 					$view->sent = 0;
 
 					// important state.
-					$view->civic_wallet = false;
-					$view->wallet = false;
+					$view->has_civic_wallet = false;
+					$view->has_wallet = false;
 				} else if ($civic_wallet && !$wallet) {
 
 					$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/balance");
@@ -266,22 +267,22 @@ class DashboardController extends Controller
 
 
 					// important state.
-					$view->civic_wallet = true;
-					$view->wallet = false;
+					$view->has_civic_wallet = true;
+					$view->has_wallet = false;
 				} else if ($civic_wallet && $wallet) {
-					$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
+					$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/balance");
 					$view->balance = ($cur_balance * 0.00000001);
-					$view->public_addr = $wallet->public_addr;
-					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalReceived");
+					$view->public_addr = $civic_wallet->public_addr;
+					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/totalReceived");
 					$received = json_decode($json, true);
 					$view->received = ($received * 0.00000001);
-					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalSent");
+					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/totalSent");
 					$sent = json_decode($json, true);
 					$view->sent = ($sent * 0.00000001);
 
 					// important state.
-					$view->civic_wallet = true;
-					$view->wallet = true;
+					$view->has_civic_wallet = true;
+					$view->has_wallet = true;
 				}
 
 
@@ -291,23 +292,6 @@ class DashboardController extends Controller
 
 
 
-				// if ($wallet) {
-				// 	// echo $wallet['public_addr'];
-				// 	// die();
-				// 	$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				// 	$view->balance = ($cur_balance * 0.00000001);
-				// 	$view->public_addr = $wallet->public_addr;
-				// 	$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalReceived");
-				// 	$received = json_decode($json, true);
-				// 	$view->received = ($received * 0.00000001);
-				// 	$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$wallet['public_addr']}/totalSent");
-				// 	$sent = json_decode($json, true);
-				// 	$view->sent = ($sent * 0.00000001);
-				// } else {
-				// 	$view->balance = 0;
-				// 	$view->received = 0;
-				// 	$view->sent = 0;
-				// }
 
 				$view->transactions = array();
 				$cur_price = json_decode(file_get_contents("https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd"));
@@ -364,20 +348,29 @@ class DashboardController extends Controller
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 
-			// users created wallet and civic wallet..
-			
 			// list of all user wallets.
 			$wallets = HDWallet::where('user_id', '=', $uid)->get();
-
-			// echo "<pre>";
-			// print_r($wallet[0]->user_id);
-			// echo "</pre>";
-			// die();
 
 			// only one civic wallet ever...
 			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
 
+			// get balance of wallets.
+			foreach($wallets as $wallet)
+			{
+				$bal = (file_get_contents("https://explore.marscoin.org/api/addr/{$wallet->public_addr}/balance")  * 0.00000001);
+				$wallet->balance = $bal;
+
+			}
+
+// 			echo "<pre>";
+// 			print_r($wallets);
+// 			echo "</pre>";
+// die();
+
+
+
+			// handle redirects...
 			if (!$profile) {
 				return redirect('/twofa');
 			} else {
@@ -385,46 +378,63 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-
-			// if profile + wallet open 
-
-
-			if ($profile->wallet_open == 1 && !is_null($wallet)) {
+			if ($profile->wallet_open == 1 && !is_null($wallets)) {
 				return redirect('wallet/dashboard/hd-open');
 			}
 
 
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
+
+
 
 			$view = View::make('wallet.hd');
+			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			$view->gravtar_link  = $gravtar_link;
-			
-			// send all wallets to view
-
-			$view->wallets = $wallets;
-			$view->civic_wallet = $civic_wallet; 
 
 
+
+
+			// if ($wallets) {
+			// 	$view->encrypted_seed = $wallets->encrypted_seed;
+			// 	$view->public_addr = $wallets->public_addr;
+			// } else {
+			// 	$view->encrypted_seed = null;
+			// 	$view->public_addr = null;
+			// }
+
+
+
+			$view->civic_balance = (file_get_contents("https://explore.marscoin.org/api/addr/{$civic_wallet->public_addr}/balance")  * 0.00000001);
+			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
+			$network = json_decode($json, true);
+			$view->network = $network;
+			$view->public_addr = null;
+
+			$view->general_public = $profile->general_public;
+			$view->citizen = $profile->citizen;
+			$view->applied = $profile->has_application;
+
+
+
+
+
+			if (is_null($civic_wallet)) {
+				$view->wallet_open = 0;
+				$view->wallets = null;
+				$view->encrypted_seed = null;
+				$view->civic_wallet = null;
+			} else {
+				$view->civic_wallet = $civic_wallet;
+				$view->wallet_open = $profile->wallet_open;
+				$view->encrypted_seed = $civic_wallet->encrypted_seed;
+				$view->wallets = $wallets;
+			}
+
+
+			// blade constants
 			$data = json_decode(file_get_contents("/home/mars/constitution/marswallet.json"), true);
 			$view->SALT = $data['salt'];
 			$view->iv = $data['iv'];
 
-			if (!$wallets->isEmpty()) {
-				$view->encrypted_seed = $wallets[0]->encrypted_seed;
-				$view->public_addr = $wallets[0]->public_addr;
-			} else {
-				$view->encrypted_seed = null;
-				$view->public_addr = null;
-			}
-
-			$view->balance = 0;
-			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
-			if (is_null($wallets))
-				$view->wallet_open = 0;
-			else
-				$view->wallet_open = $profile->wallet_open;
 
 			return $view;
 		} else {
@@ -433,17 +443,13 @@ class DashboardController extends Controller
 	}
 
 	// Show HD Wallet (Open)
-	protected function showHDOpen()
+	protected function showHDOpen(Request $request)
 	{
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
-
-			// echo "<pre>";
-			// print_r($uid);
-			// echo "</pre>";
-			// die();
+			$wallets = HDWallet::where('user_id', '=', $uid)->get();
+			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
 			if (!$profile) {
 				return redirect('/twofa');
@@ -457,29 +463,43 @@ class DashboardController extends Controller
 			// Start Rendering open wallet data!
 			//
 
-			if ($profile->wallet_open == 1 && $wallet) {
+
+			$data = json_decode($request->input("wallet"));
+
+			if ($data && ($wallets || $civic_wallet)) {
 				$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
+
+
 
 				$view = View::make('wallet.hd-open');
 				$view->gravtar_link  = $gravtar_link;
-				// echo "Hello, World";
-				// die();
+
+				$codes = json_decode(file_get_contents("/home/mars/constitution/marswallet.json"), true);
+				$view->SALT = $codes['salt'];
+				$view->iv = $codes['iv'];
+
+
 				$json = $this->file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
 				$network = json_decode($json, true);
 
-				$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
+
+				// $view->wallet = $request->data;
+
+				$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$data->public_addr}/balance");
 				$cur_price = json_decode(file_get_contents("https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd"));
 
 				$view->mars_price = $cur_price->marscoin->usd;
 				$view->balance = ($cur_balance * 0.00000001);
 				$view->network = $network;
-				$view->public_addr = $wallet->public_addr;
-				$view->encrypted_seed = $wallet->encrypted_seed;
+				$view->public_addr = $data->public_addr;
+				$view->encrypted_seed = $data->encrypted_seed;
 				$view->fullname = Auth::user()->fullname;
 				$view->wallet_open = $profile->wallet_open;
 
+
+
 				return $view;
-			} else if ($profile->wallet_open == 0 || is_null($wallet)) {
+			} else if (is_null($civic_wallet) || is_null($wallets)) {
 
 				$profile->wallet_open = 0;
 				return redirect('wallet/dashboard/hd');
@@ -498,7 +518,7 @@ class DashboardController extends Controller
 	}
 
 
-	// Show HD Wallet (Open)
+	// Show HD Wallet (Close)
 	protected function showHDClose()
 	{
 		if (Auth::check()) {
@@ -603,7 +623,7 @@ class DashboardController extends Controller
 				$new_civic_wallet->backup = 1;
 
 				$new_civic_wallet->user_id = $uid;
-				$new_civic_wallet->wallet_type = "MARS";
+				$new_civic_wallet->wallet_type = $request->input('wallet_name');
 				$new_civic_wallet->save();
 
 				$profile->civic_wallet_open = 1;
@@ -622,7 +642,7 @@ class DashboardController extends Controller
 				$new_wallet->backup = 1;
 
 				$new_wallet->user_id = $uid;
-				$new_wallet->wallet_type = "MARS";
+				$new_wallet->wallet_type = $request->input('wallet_name');;
 				$new_wallet->save();
 
 				$profile->wallet_open = 1;
@@ -678,7 +698,7 @@ class DashboardController extends Controller
 
 	// GET
 	// Open Pre-Existing Wallet
-	public function getWallet()
+	public function getWallet(Request $request)
 	{
 		if (Auth::check()) {
 
@@ -687,6 +707,15 @@ class DashboardController extends Controller
 			$hd_wallet = HDWallet::where('user_id', '=', $uid)->get();
 			$profile->wallet_open = 1;
 			$profile->save();
+
+
+
+
+			// echo "Hello, World";
+			// die();
+			// $view->req = $request;
+			// $view->public_addr = $request->public_addr;
+
 
 			return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Open!');
 		} else {
