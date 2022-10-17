@@ -23,18 +23,17 @@
                 </div>
 
                 @else
-                <div class="wallet-is-not-open" >
+                {{-- <div class="wallet-is-not-open" >
                     <a href="/wallet/dashboard/hd" style="text-decoration:none; color: white" class="connect-wallet">
 
                         <h5 style="background-color: #2f4354; color: white; padding: 9px; border-radius: 8px; text-align: center"
                             class="nav-wallet-connect">
                             <img src="/assets/wallet/img/marscoin-350x350.png" width="20" height="20" />
-
                             Connect Wallet
                         </h5>
                     </a>
 
-                </div>
+                </div> --}}
 
 
                 @endif

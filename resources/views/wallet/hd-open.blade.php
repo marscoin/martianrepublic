@@ -57,6 +57,7 @@
 
         <div class="content">
 
+
             <div class="container">
 
                 <div class="row">
@@ -283,10 +284,11 @@
 
                 <div class="col-md-12 col-sm-12"
                     style="display: flex; align-items: center; justify-content: center; height: 15rem">
-                    <button type="button" class="btn btn-primary " class="download-wallet" onclick="onDownloadWallet();">
+                    <a data-toggle="modal" type="button" class="btn btn-primary " class="download-wallet"
+                        href="#unlockWalletModal">
                         <i class="fa fa-download"></i>
                         Download Wallet
-                    </button>
+                    </a>
                 </div>
 
 
@@ -347,12 +349,27 @@
                                 </div>
                             </div>
 
+                            <div class="row" style="padding: 20px">
 
+
+                                {{-- <input name="wallet" hidden id="selected_wallet" /> --}}
+
+                                <label for="name">Wallet Password</label>
+                                <input type="password" id="unlock-password-tx" name="unlock-password-tx"
+                                    class="form-control" data-required="true" style="width: 100%">
+
+                                <p class="error-unlocking-tx"></p>
+
+
+                            </div>
                         </div> <!-- /.modal-body -->
 
                         <div class="modal-footer"
                             style="display: flex; align-itmes: center; justify-content: center;">
                             <button type="button" class="btn-lg btn-primary" id="send-mars">Send MARS</button>
+
+
+
                             <img src="/assets/citizen/loading.gif" alt="enter image description here"
                                 style="display: none" id="loading">
                             <div class="success-message" style="display: none">
@@ -371,6 +388,9 @@
             </div>
             <!---- THE BASIC MODAL IN ACTION!!!!!!!!!!!! -->
             <!-------------------------------------------------------------------------->
+
+
+
 
 
 
@@ -393,6 +413,68 @@
             </div>
         </div>
     </div>
+
+
+
+
+
+    <!--------------------------------------->
+    <!------------- UNLOCK WALLET ----------->
+    <div id="unlockWalletModal" class="modal modal-styled fade">
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+
+                <div class="modal-header">
+                    <h3 class="modal-title">Unlock Wallet</h3>
+                </div> <!-- /.modal-header -->
+
+                {{-- <form class="form account-form " id="wallet-unlocker" method="POST"
+                    action="/wallet/dashboard/hd-open">
+                    @csrf --}}
+
+                <div class=""
+                    style="padding: 5rem; display: flex; justify-content: center; align-items: center; flex-direction: column">
+                    <div class="row">
+
+                        <h4 class="unlock-name" style="text-align: center">Input Password to Export Wallet</h4>
+                        <h2 class="unlock-addy"></h2>
+                    </div>
+
+
+                    <div class="row" style="width: 50%;">
+
+
+                        <input name="wallet" hidden id="selected_wallet" />
+
+                        <label for="name">Wallet Password</label>
+                        <input type="password" id="unlock-password" name="unlock-password" class="form-control"
+                            data-required="true" style="width: 100%">
+
+                        <p class="error-unlocking"></p>
+
+                        <div class="row d-flex justify-content-center text-center" style="padding-top: 5rem;">
+
+                            <button id="unlock-wallet" type="submit" class="btn btn-primary" style=""
+                                onclick="onDownloadWallet()">Unlock</button>
+                        </div>
+                    </div>
+
+                </div>
+                {{-- </form> --}}
+
+            </div>
+
+        </div>
+
+
+
+
+
+
+    </div>
+
     <footer class="footer">
         @include('footer')
     </footer>
@@ -713,25 +795,44 @@
 
                     // console.log("SENDING MARS: ", sending_mars);
                     // console.log("Sendin TO: ", receiver_address)
+                    const encrypted_seed = localStorage.getItem("key").trim();
+                    const user_password = $("#unlock-password-tx").val()
+                    const unlockedWallet = unlockWallet(user_password, encrypted_seed)
 
-                    $("#send-mars").hide()
-                    $("#loading").show()
+                    if (unlockedWallet) {
+                        console.log("successfully unlocked..")
 
-                    //await sendMARS(sending_mars, receiver_address);
-                    try {
-                        const tx = await signMARS(mars_amount, io)
-                        $("#loading").hide()
-                        $(".success-message").show()
-                        $(".transaction-hash-link").attr("href",
-                            "https://explore.marscoin.org/tx/" + tx.tx_hash)
-                        $(".transaction-hash").text("" + tx.tx_hash)
+                        $("#send-mars").hide()
+                        $("#loading").show()
+
+                        //await sendMARS(sending_mars, receiver_address);
+                        try {
+                            const tx = await signMARS(mars_amount, io, unlockedWallet)
+                            $("#loading").hide()
+                            $(".success-message").show()
+                            $(".transaction-hash-link").attr("href",
+                                "https://explore.marscoin.org/tx/" + tx.tx_hash)
+                            $(".transaction-hash").text("" + tx.tx_hash)
 
 
 
-                    } catch (e) {
-                        handleError("unable to sign")
-                        throw e;
+                        } catch (e) {
+                            handleError("unable to sign")
+                            throw e;
+                        }
+
+                    } else {
+                        $(".error-unlocking-tx").text("Incorrect Password")
+                        $(".error-unlocking-tx").css('color', 'red')
+
                     }
+
+
+
+
+
+
+
 
 
 
@@ -772,8 +873,9 @@
                 return null
             }
 
-            const signMARS = async (mars_amount, tx_i_o) => {
-                const mnemonic = localStorage.getItem("key").trim();
+            const signMARS = async (mars_amount, tx_i_o, mnemonic) => {
+                // const mnemonic = localStorage.getItem("key").trim();
+
                 const sender_address = "{{ $public_addr }}".trim()
 
                 //const mnemonic = "business tattoo current news edit bronze ketchup wrist thought prize mistake supply"
@@ -1072,16 +1174,38 @@
 
         function download(content, fileName, contentType) {
             // function to download wallet keys as json export...
-            console.log("downloading....")
 
 
-            const a = document.createElement("a");
-            const file = new Blob([content], {
-                type: contentType
-            });
-            a.href = URL.createObjectURL(file);
-            a.download = fileName;
-            a.click();
+            const password = $("#unlock-password").val().replace(/\s+/g, '');
+
+
+            var unlockedSeed = unlockWallet(password, content)
+
+
+            if (unlockedSeed) {
+                $(".error-unlocking").text("Success!")
+
+                let json = {
+                    key: unlockedSeed
+                }
+
+
+                const a = document.createElement("a");
+                const file = new Blob([JSON.stringify(json)], {
+                    type: contentType
+                });
+                a.href = URL.createObjectURL(file);
+                a.download = fileName;
+                a.click();
+
+                window.location.reload()
+
+            } else {
+                $(".error-unlocking").text("invalid password...")
+                return false
+            }
+
+
         }
 
 
@@ -1090,11 +1214,145 @@
             download(JSON.stringify(localStorage.getItem("key").trim()), "marswallet-key.json", "text/plain")
         }
 
-        function constructJSONKey (){
+        function constructJSONKey() {
             let json = {}
 
 
         }
+
+        // grab user input password. unlock wallet...
+
+        function unlockWallet(user_password, encrypted_seed) {
+
+            const hashed = hashPassword(user_password);
+
+
+            const user_wallet = "{{ $public_addr }}"
+            let iv = "{{ json_encode($iv) }}".replace("]", "").replace("[", "").split(",");
+            //console.log("hashed:", hashed)
+
+            //const encrypted = my_bundle.encrypt("face they lemon ignore link crop above thing buffalo tide category soup", hashed)
+            //console.log("Encrypted: ", encrypted)
+
+            const decrypted = my_bundle.decrypt(encrypted_seed, hashed, iv).trim()
+
+            // console.log("Encrypted SEED: {{ $encrypted_seed }}")
+            // console.log("MNEM:", decrypted)
+
+
+            const response = genSeed(decrypted)
+
+
+
+
+            // console.log("response:", response)
+            if (response.address == user_wallet) {
+
+                console.log("success...")
+
+
+                return decrypted;
+                //      console.error("Item Succesfully locally stored")
+            } else {
+
+                console.log("failure...")
+
+                // validated = false
+                // e.preventDefault();
+                // window.location.reload()
+
+                return false;
+                // $(".wallet-getter").attr("action", "/wallet/failwallet")
+            }
+
+
+
+        }
+
+
+
+
+        const hashPassword = (passcode) => {
+
+            const ret = my_bundle.pbkdf2.pbkdf2Sync(
+                passcode,
+                "{{ $SALT }}", 1, 16, 'sha512').toString('hex')
+
+            return ret
+        }
+
+
+
+        // LTC Derivation Path
+        const Marscoin = {
+            mainnet: {
+                messagePrefix: "\x19Marscoin Signed Message:\n",
+                bech32: "M",
+                bip44: 2,
+                bip32: {
+                    public: 0x043587cf,
+                    private: 0x04358394,
+                },
+                pubKeyHash: 0x32,
+                scriptHash: 0x32,
+                wif: 0x80,
+            },
+        };
+
+
+        function nodeToLegacyAddress(hdNode) {
+            return my_bundle.bitcoin.payments.p2pkh({
+                pubkey: hdNode.publicKey,
+                network: Marscoin.mainnet,
+            }).address;
+        }
+        const genSeed = (mnemonic) => {
+            // console.log("SALT: {{ $SALT }}")
+            //mnemonic = "invite feature forget axis radar stone bind squirrel dog crash trap equip"
+
+            //const mnemonic = my_bundle.bip39.generateMnemonic();
+            //  console.log(mnemonic)
+
+            //const root = new my_bundle.BIP84.fromMnemonic(mnemonic, null, false, 107);
+
+            const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
+
+
+            // ROOT === xprv
+            const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
+
+
+            //private key
+            const child = root.derivePath("m/44'/2'/0'").neutered();
+            //console.log("child: ", child)
+
+            // tpub == tpub
+            let tpub = child.toBase58()
+
+
+            const hdNode = my_bundle.bip32.fromBase58(tpub, Marscoin.mainnet)
+            const node = hdNode.derive(0)
+
+            // Marscoin addy here
+            const addy = nodeToLegacyAddress(node.derive(0))
+
+
+            const publicKey = node.publicKey.toString('hex')
+
+            //console.log("addy: ", addy)
+
+            const resp = {
+                address: addy,
+                pubKey: publicKey,
+                xprv: root.toBase58(),
+                mnemonic: mnemonic
+            }
+
+
+            return resp;
+
+        };
+
 
         // $(".download-wallet").click(() => {
         //     console.log("downloading...")
