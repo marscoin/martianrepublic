@@ -1171,7 +1171,7 @@
             $(document).on("mousemove", ".mouse-box", function(e) {
 
                 var mnemonic;
-                const percent_increase = 1
+                const percent_increase = 5
                 var increase = percent_increase * entropy.length
 
                 //=============================================================================
@@ -1509,8 +1509,8 @@
                     flushLocalStorage()
                     console.log("success...")
                     // console.table(selected_wallet)
-                    localStorage.setItem("key", encrypted_mnem)
-
+                    //localStorage.setItem("key", encrypted_mnem)
+                    localStorage.setItem("key", decrypted)
 
                     $("#selected_wallet").val(JSON.stringify(selected_wallet))
 
