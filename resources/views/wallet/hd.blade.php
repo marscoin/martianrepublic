@@ -1021,7 +1021,7 @@
 
                 const ret = my_bundle.pbkdf2.pbkdf2Sync(
                     passcode,
-                    "{{ $SALT }}", 105, 16, 'sha512').toString('hex')
+                    "{{ $SALT }}", 1, 16, 'sha512').toString('hex')
 
                 return ret
             }
