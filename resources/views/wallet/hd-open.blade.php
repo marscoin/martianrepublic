@@ -195,11 +195,11 @@
                                 <u>Receive Marscoin</u>
                             </h3>
 
-                            <div class="portlet-body" style="float:left">
+                            <div class="portlet-body" >
 
                                 <div class="pub-addr" style="height: 50px;">
 
-                                    <h3 class="pub-addr-text" style="font-size: 21px;"><a
+                                    <h3 class="pub-addr-text" style="font-size: 21px;    margin-left: -40px;"><a
                                             href="https://explore.marscoin.org/address/{{ $public_addr }}"
                                             target="_blank">{{ $public_addr }}</a></h3>
 
@@ -210,13 +210,28 @@
                                     <img id="qrious" height="200" width="200" class=" float: right;">
                                 </div>
 
-
+                                
 
                             </div>
 
                         </div>
 
+                        <div class="portlet">
+
+                            <h3 class="portlet-title">
+                                <u>Security</u>
+                            </h3>
+
+                            <div class="portlet-body" >
+                                <a data-toggle="modal" type="button" class="btn btn-primary " class="download-wallet" href="#unlockWalletModal"><i class="fa fa-download"></i> Download Wallet</a>
+                                <a class="btn btn-secondary" class="download-wallet" href="http://martianrepublic.local/wallet/dashboard/hd-close"><i class="fa fa-lock"></i> Lock Wallet</a>
+                                
+                            </div>
+                        </div>
+                  
+
                     </div>
+
 
 
                 </div>
@@ -281,15 +296,6 @@
 
 
                 </div> --}}
-
-                <div class="col-md-12 col-sm-12"
-                    style="display: flex; align-items: center; justify-content: center; height: 15rem">
-                    <a data-toggle="modal" type="button" class="btn btn-primary " class="download-wallet"
-                        href="#unlockWalletModal">
-                        <i class="fa fa-download"></i>
-                        Download Wallet
-                    </a>
-                </div>
 
 
             </div>
