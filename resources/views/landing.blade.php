@@ -506,6 +506,8 @@
 
         <div class="row-divider"></div> <!-- /.row-divider -->
 
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQFJLAKZc6YWBlqFxsCI3y9g0XkpB-k-_zIFxbtfey6EI3ck3ljOH7eUnwxz9Z6rrCN1VfV6VL0kpHV/embed?start=true&loop=true&delayms=5000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+
 
         <div class="carousel-container">
         <div class="row">
