@@ -497,6 +497,8 @@ class DashboardController extends Controller
 				$view->encrypted_seed = $data->encrypted_seed;
 				$view->fullname = Auth::user()->fullname;
 				$view->wallet_open = 1;
+				$profile->wallet_open = 1;
+				$profile->save();
 
 
 				// echo '<pre>';
