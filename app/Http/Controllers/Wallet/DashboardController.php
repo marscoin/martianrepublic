@@ -348,6 +348,11 @@ class DashboardController extends Controller
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 
+			//if wallet currently open, redirect to hd-open
+			if($profile->wallet_open > 0){
+				return redirect('wallet/dashboard/hd-open');
+			}
+
 			// list of all user wallets.
 			$wallets = HDWallet::where('user_id', '=', $uid)->get();
 
