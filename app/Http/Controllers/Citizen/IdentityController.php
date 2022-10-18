@@ -9,6 +9,7 @@ use App\Models\Profile;
 use App\Models\Feed;
 use App\Models\User;
 use App\Models\HDWallet;
+use App\Models\Citizen;
 use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
@@ -38,6 +39,7 @@ class IdentityController extends Controller
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$citcache = Citizen::where('userid', '=', $uid)->first();
 
 
 			if (!$profile) {
@@ -54,6 +56,7 @@ class IdentityController extends Controller
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;
+			$view->citcache = $citcache;
 			//print_r($view->isCitizen);
 			//die();
 			$view->isGP  = $profile->general_public;
