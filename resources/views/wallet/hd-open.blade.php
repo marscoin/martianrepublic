@@ -492,6 +492,19 @@
             // ================================================================
             // ================================================================
             // CONSTANTS....
+            const unlockedWallet = localStorage.getItem("key")
+            console.log("[unlockedWallet]", unlockedWallet)
+
+            if(!unlockedWallet)
+            {
+                console.log("No Wallet Found.")
+                window.location.replace("hd")
+            }
+            else
+                console.log("Wallet found.")
+
+
+
 
             let cur_currency = "MARS";
             var mars_price = "{{ $mars_price }}";
@@ -795,9 +808,15 @@
 
                     // console.log("SENDING MARS: ", sending_mars);
                     // console.log("Sendin TO: ", receiver_address)
-                    const encrypted_seed = localStorage.getItem("key").trim();
-                    const user_password = $("#unlock-password-tx").val()
-                    const unlockedWallet = unlockWallet(user_password, encrypted_seed)
+
+
+                    // ToDo: Changed the password encryption on the decryption
+
+                    // const encrypted_seed = localStorage.getItem("key").trim();
+                    // const user_password = $("#unlock-password-tx").val()
+                    // const unlockedWallet = unlockWallet(user_password, encrypted_seed)
+
+                    const unlockedWallet = localStorage.getItem("key").trim();
 
                     if (unlockedWallet) {
                         console.log("successfully unlocked..")
@@ -826,17 +845,6 @@
                         $(".error-unlocking-tx").css('color', 'red')
 
                     }
-
-
-
-
-
-
-
-
-
-
-
 
                 })
 
