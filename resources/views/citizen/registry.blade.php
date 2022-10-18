@@ -192,8 +192,6 @@ $(".cacheme").blur(function() {
     });
 });
 
-cacheonboarding
-
 
 $("#savevideo").click(function() {
     vid = $("#finished-video").attr("src");
