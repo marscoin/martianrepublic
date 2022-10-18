@@ -466,6 +466,11 @@ class DashboardController extends Controller
 
 			$data = json_decode($request->input("wallet"));
 
+
+			// echo '<pre>';
+			// print_r( $data);
+			// echo "</pre>";
+			// die();
 			if ($data && ($wallets || $civic_wallet)) {
 				$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 
@@ -495,6 +500,8 @@ class DashboardController extends Controller
 				$view->encrypted_seed = $data->encrypted_seed;
 				$view->fullname = Auth::user()->fullname;
 				$view->wallet_open = $profile->wallet_open;
+
+
 
 
 
