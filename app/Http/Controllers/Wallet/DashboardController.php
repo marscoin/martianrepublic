@@ -468,10 +468,13 @@ class DashboardController extends Controller
 
 
 
-			if ($data && ($wallets || $civic_wallet)) {
+			if ($data || ($wallets || $civic_wallet)) {
 				$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 
-
+				//fetch wallet info of open wallet from profile if this is not a newly unlocked wallet
+				if(is_null($data)){
+					$data = HDWallet::where('id', '=', $profile->wallet_open)->first();
+				}
 
 				$view = View::make('wallet.hd-open');
 				$view->gravtar_link  = $gravtar_link;
@@ -497,7 +500,7 @@ class DashboardController extends Controller
 				$view->encrypted_seed = $data->encrypted_seed;
 				$view->fullname = Auth::user()->fullname;
 				$view->wallet_open = 1;
-				$profile->wallet_open = 1;
+				$profile->wallet_open = $data->id;
 				$profile->save();
 
 
