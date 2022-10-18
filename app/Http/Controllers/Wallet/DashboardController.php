@@ -348,6 +348,11 @@ class DashboardController extends Controller
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 
+			//if wallet currently open, redirect to hd-open
+			if($profile->wallet_open > 0){
+				return redirect('wallet/dashboard/hd-open');
+			}
+
 			// list of all user wallets.
 			$wallets = HDWallet::where('user_id', '=', $uid)->get();
 
@@ -538,12 +543,6 @@ class DashboardController extends Controller
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
-
-			// echo "<pre>";
-			// print_r($uid);
-			// echo "</pre>";
-			// die();
 
 			if (!$profile) {
 				return redirect('/twofa');
@@ -552,45 +551,12 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			// ===============================================================================================
-			// ===============================================================================================
-			// Start Rendering open wallet data!
-			//
+			//set open wallet to zero
+			$profile->wallet_open = 0;
+			$profile->save();
 
-			if ($profile->wallet_open == 1 && $wallet) {
-				$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-
-				$view = View::make('wallet.hd-close');
-				$view->gravtar_link  = $gravtar_link;
-				// echo "Hello, World";
-				// die();
-				$json = $this->file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
-				$network = json_decode($json, true);
-
-				$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$cur_price = json_decode(file_get_contents("https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd"));
-
-				$view->mars_price = $cur_price->marscoin->usd;
-				$view->balance = ($cur_balance * 0.00000001);
-				$view->network = $network;
-				$view->public_addr = $wallet->public_addr;
-				$view->encrypted_seed = $wallet->encrypted_seed;
-				$view->fullname = Auth::user()->fullname;
-				$view->wallet_open = $profile->wallet_open;
-
-				return $view;
-			} else if ($profile->wallet_open == 0 || is_null($wallet)) {
-
-				$profile->wallet_open = 0;
-				return redirect('wallet/dashboard/hd');
-			}
-
-
-			// ===============================================================================================
-			// ===============================================================================================
-			// ===============================================================================================
-
-
+			return redirect('wallet/dashboard/hd');
+			
 
 		} else {
 			return redirect('/login');
