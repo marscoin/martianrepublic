@@ -510,6 +510,8 @@ class DashboardController extends Controller
 
 				$profile->wallet_open = 0;
 				return redirect('wallet/dashboard/hd');
+			}else{
+				return redirect('wallet/dashboard/hd');
 			}
 
 
