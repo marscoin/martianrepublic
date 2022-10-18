@@ -137,11 +137,10 @@ function imgError(image) {
 
 $(document).ready(function() {
 
-// let's do that before wallet action, not by default
-// var mem = localStorage.getItem("key").trim();
-// if (!mem || mem == ""){
-//     alert("Coul not retrieve wallet key. Please disconnect and reconnect your wallet.")
-// }
+var mem = localStorage.getItem("key").trim();
+if (!mem || mem == ""){
+    alert("Coul not retrieve wallet key. Please disconnect and reconnect your wallet.")
+}
 
 
 $.ajaxSetup({
