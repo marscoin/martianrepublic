@@ -283,6 +283,12 @@ class DashboardController extends Controller
 					// important state.
 					$view->has_civic_wallet = true;
 					$view->has_wallet = true;
+				} else{
+					$view->balance = 0;
+					$view->received = 0;
+					$view->sent = 0;
+					$view->has_civic_wallet = false;
+					$view->has_wallet = false;
 				}
 
 
