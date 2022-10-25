@@ -413,17 +413,18 @@ class DashboardController extends Controller
 			// }
 
 
+			if(!is_null($civic_wallet))
+			{
+				$view->civic_balance = (file_get_contents("https://explore.marscoin.org/api/addr/{$civic_wallet->public_addr}/balance")  * 0.00000001);
+				$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
+				$network = json_decode($json, true);
+				$view->network = $network;
+				$view->public_addr = null;
 
-			$view->civic_balance = (file_get_contents("https://explore.marscoin.org/api/addr/{$civic_wallet->public_addr}/balance")  * 0.00000001);
-			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
-			$view->public_addr = null;
-
-			$view->general_public = $profile->general_public;
-			$view->citizen = $profile->citizen;
-			$view->applied = $profile->has_application;
-
+				$view->general_public = $profile->general_public;
+				$view->citizen = $profile->citizen;
+				$view->applied = $profile->has_application;
+			}
 
 
 
