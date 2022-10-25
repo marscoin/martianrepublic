@@ -389,7 +389,7 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			if ($profile->wallet_open == 1 && !is_null($wallets)) {
+			if ($profile->wallet_open >= 1 && !is_null($wallets)) {
 				return redirect('wallet/dashboard/hd-open');
 			}
 
