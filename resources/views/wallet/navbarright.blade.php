@@ -82,7 +82,10 @@
 
       // fallback double check if key exists...
       if("key" in localStorage)
-        localStorage.clear()
+      {
+          localStorage.clear()
+          localStorage.removeItem('key');
+      }
 
       return
   }

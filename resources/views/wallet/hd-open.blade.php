@@ -223,8 +223,8 @@
                             </h3>
 
                             <div class="portlet-body" >
-                                <a data-toggle="modal" type="button" class="btn btn-primary " class="download-wallet" href="#unlockWalletModal"><i class="fa fa-download"></i> Download Wallet</a>
-                                <a class="btn btn-secondary" class="download-wallet" href="http://martianrepublic.local/wallet/dashboard/hd-close"><i class="fa fa-lock"></i> Lock Wallet</a>
+                                <a data-toggle="modal" type="button" class="btn btn-primary " class="download-wallet" onclick="onDownloadWallet()"><i class="fa fa-download"></i> Download Wallet</a>
+                                <a class="btn btn-secondary" class="download-wallet" href="/wallet/dashboard/hd-close"><i class="fa fa-lock"></i> Lock Wallet</a>
                                 
                             </div>
                         </div>
@@ -499,7 +499,6 @@
             // ================================================================
             // CONSTANTS....
             const unlockedWallet = localStorage.getItem("key")
-            console.log("[unlockedWallet]", unlockedWallet)
 
             if(!unlockedWallet)
             {
@@ -654,46 +653,7 @@
                 }
             };
 
-            /*
-              
-                                          **====================================================================================================================
-                                          
-                                          ADDRESS FOR SBS3128 Testing123
-                                          
-                                          address: "MSCG9f78gHw6UYb1ukpv3KBL1TPBdcwxy3"
-                                          menmonic: "element expose garden swing denial expand member cat need float daring gloom"
-                                          prvKey: "KxzXmhDfvKCVR7Z5bfrBfdKqzVc1KLjDwjjszTSM5q8nkzDKrn6M"
-                                          pubKey: "035f16de6c8381bfaf4ed37ab17aa9f0fe1ea3d3eef6c3255a81a9f9b9a746ef51"
-                                          xprv: "tprv8ZgxMBicQKsPd4XcZQ1afgScyJybBL6DEH5sQp1tkbbFrzG2iw3mBn1ZfxS3UmX4rgvEQP83TYqhqjw7aaaitQ7rY8no2i78ZqvGVgEC4f2"
-                                          
-                                          ADDRESS FOR Sebastian@byte...
-                                          
-                                          address: "MP5Lrzt22axX7EgCe1W5zoDqRbFSK84HTK"
-                                          menmonic: "club slot ocean gadget predict orchard burst among say zone mesh aspect"
-                                          prvKey: "L1b5c3Km7wfUjeLgukBbFs9KtrTVxrrcrzMZGFi7qwYshC1PAyZh"
-                                          pubKey: "02ae0ab754dbd49ebb1ed97cc48e580ee88652906d9e937eaafa399bad14f76ad6"
-                                          xprv: "tprv8ZgxMBicQKsPeE79vh39p7kkF3Xr3tvwVSGx3EQtapGrpjWCbHKW4vNHmPFdRTP2jwcWcFCzCS7jpSm5vkvpnkPCuRoARowCiwxhxrLsAbx"
-
-                                          **======================================================================================================================
-                                      
-                                        
-                                    ATTEMPT 3
-                                    sbs3128...
-                                    address: "M9ySTdcVCkvfzn6o6m48Y5VGy54TgxVYu7"
-                                    mnemonic: "invite feature forget axis radar stone bind squirrel dog crash trap equip"
-                                    pubKey: "03506118ac7a4d71ed23e8cf7bf7b8e687f06d08820b9dee5db69491618dff6c6b"
-                                    xprv: "tprv8ZgxMBicQKsPdAsTJwwcQLgJTCBx1Jk1kY6AbgRZFZYCtjFqckLV5sRwCo3kVQgFFqbk7sXW2dznRsHafaiNDNP4cLJXhk4wqYkjivPn5G2"
-
-                                    sebs@byte
-                                    address: "M8hzdznobkpd2QHoXrD1biraQijZhULawa"
-                                    mnemonic: "face they lemon ignore link crop above thing buffalo tide category soup"
-                                    pubKey: "02c651998179afa0becde99d609b58385cc98a9cd311ce535c446b47102c200ce2"
-                                    xprv: "tprv8ZgxMBicQKsPe6qoCZKjqHNj8Abrygb4MpPkspmQ1NGW2XyLQt23QgFGumQmFUN9Z8DYKuJzrXtSyqfTvX5jFKt2gkhjAtiu48osJa7bWVy"          
-
-                                    // userid: 5702
-                                    mnem: business tattoo current news edit bronze ketchup wrist thought prize mistake supply
-                                      
-            */
+          
 
             // Get Seed given menmonic
             function getSeed(mnemonic) {
@@ -803,24 +763,6 @@
 
                 $("#send-mars").click(async () => {
 
-                    // var sending_mars;
-                    // var receiver_address = $(".destination-address").val();
-
-                    // if (cur_currency == "MARS") {
-                    //     sending_mars = $(".input-placeholder").val();
-                    // } else if (cur_currency == "USD") {
-                    //     sending_mars = $(".conversion-rate").text();
-                    // }
-
-                    // console.log("SENDING MARS: ", sending_mars);
-                    // console.log("Sendin TO: ", receiver_address)
-
-
-                    // ToDo: Changed the password encryption on the decryption
-
-                    // const encrypted_seed = localStorage.getItem("key").trim();
-                    // const user_password = $("#unlock-password-tx").val()
-                    // const unlockedWallet = unlockWallet(user_password, encrypted_seed)
 
                     const unlockedWallet = localStorage.getItem("key").trim();
 
@@ -866,10 +808,6 @@
 
 
             const sendMARS = async (mars_amount, receiver_address) => {
-                //console.log("send mars running...")
-                //let mnemonic = "invite feature forget axis radar stone bind squirrel dog crash trap equip"
-                //const mnemonic = localStorage.getItem("key").trim();
-
 
                 // obtain utxo i/o
                 const sender_address = "{{ $public_addr }}".trim()
@@ -1190,17 +1128,17 @@
             // function to download wallet keys as json export...
 
 
-            const password = $("#unlock-password").val().replace(/\s+/g, '');
+            // const password = $("#unlock-password").val().replace(/\s+/g, '');
 
 
-            var unlockedSeed = unlockWallet(password, content)
+            // var unlockedSeed = unlockWallet(password, content)
+            // console.log(content/)
 
-
-            if (unlockedSeed) {
+            if (content) {
                 $(".error-unlocking").text("Success!")
 
                 let json = {
-                    key: unlockedSeed
+                    key: content
                 }
 
 
@@ -1215,7 +1153,7 @@
                 window.location.reload()
 
             } else {
-                $(".error-unlocking").text("invalid password...")
+               $(".error-unlocking").text("invalid password...")
                 return false
             }
 
@@ -1225,7 +1163,7 @@
 
 
         function onDownloadWallet() {
-            download(JSON.stringify(localStorage.getItem("key").trim()), "marswallet-key.json", "text/plain")
+            download(localStorage.getItem("key").trim(), "marswallet-key.json", "text/plain")
         }
 
         function constructJSONKey() {
@@ -1259,7 +1197,11 @@
 
 
 
-            // console.log("response:", response)
+            console.log("response:", response.address)
+
+            console.log(decrypted)
+
+            console.log("user_wallet:",user_wallet)
             if (response.address == user_wallet) {
 
                 console.log("success...")
