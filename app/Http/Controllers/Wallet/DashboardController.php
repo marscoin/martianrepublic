@@ -613,8 +613,8 @@ class DashboardController extends Controller
 				$new_civic_wallet->user_id = $uid;
 				$new_civic_wallet->wallet_type = $request->input('wallet_name');
 				$new_civic_wallet->save();
-
-				$profile->civic_wallet_open = 1;
+				
+				$profile->civic_wallet_open = $new_civic_wallet->id;
 				$profile->save();
 				return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Opened!');
 			} else if ($profile->civic_wallet_open == 1) {
@@ -633,19 +633,10 @@ class DashboardController extends Controller
 				$new_wallet->wallet_type = $request->input('wallet_name');;
 				$new_wallet->save();
 
-				$profile->wallet_open = 1;
+				$profile->wallet_open = $new_wallet->id;
 				$profile->save();
 				return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Opened!');
 			}
-
-
-
-
-
-
-
-
-
 
 
 
