@@ -491,6 +491,7 @@ class DashboardController extends Controller
 				if (is_null($data)) {
 
 					$profile->wallet_open = 0;
+					$profile->save();
 					return redirect('wallet/dashboard/hd');
 				}
 
@@ -532,6 +533,7 @@ class DashboardController extends Controller
 			} else if (is_null($civic_wallet) || is_null($wallets)) {
 
 				$profile->wallet_open = 0;
+				$profile->save();
 				return redirect('wallet/dashboard/hd');
 			}else{
 				return redirect('wallet/dashboard/hd');
