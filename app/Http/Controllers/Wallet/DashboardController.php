@@ -488,6 +488,11 @@ class DashboardController extends Controller
 				if(is_null($data)){
 					$data = HDWallet::where('id', '=', $profile->wallet_open)->first();
 				}
+				if (is_null($data)) {
+
+					$profile->wallet_open = 0;
+					return redirect('wallet/dashboard/hd');
+				}
 
 				$view = View::make('wallet.hd-open');
 				$view->gravtar_link  = $gravtar_link;
