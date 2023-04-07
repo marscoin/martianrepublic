@@ -138,26 +138,26 @@
                         <div class="form-group">
                           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <label>First Name: <span class="required">*</span></label>
-                            <input class="form-control input-form" id="firstname" name="name" type="text" value="<?=$citcache['firstname']?>" required="">
+                            <input class="form-control input-form" id="firstname" name="name" type="text" value="<?=$citcache['firstname'] ?? "" ?>" required="">
                           </div>
 
                           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <label>Last Name: <span class="required">*</span></label>
-                            <input class="form-control input-form" id="lastname" name="name" type="text" value="<?=$citcache['lastname']?>" required="">
+                            <input class="form-control input-form" id="lastname" name="name" type="text" value="<?=$citcache['lastname'] ?? ""?>" required="">
                           </div>
                         </div>
 
                         <div class="form-group">
                           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <label>Display Name: <span class="required">*</span></label>
-                            <input class="form-control input-form cacheme" id="displayname" name="displayname" type="text" value="<?=$citcache['displayname']?>" required="">
+                            <input class="form-control input-form cacheme" id="displayname" name="displayname" type="text" value="<?=$citcache['displayname'] ?? ""?>" required="">
                           </div>
                         </div>
 
                         <div class="form-group">
                           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <label>Short Bio: <span class="required">*</span></label>
-                            <textarea class="form-control input-form cacheme" id="shortbio" name="shortbio" rows="6" cols="40" required="" ><?=$citcache['shortbio']?></textarea>
+                            <textarea class="form-control input-form cacheme" id="shortbio" name="shortbio" rows="6" cols="40" required="" ><?=$citcache['shortbio'] ?? ""?></textarea>
                           </div>
                         </div>
 
