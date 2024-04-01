@@ -175,7 +175,7 @@
                             <div class="row">
                                 <div class="col-md-5 col-sm-7">
                                     <a data-toggle="modal" href="#unlockWalletModal" data-keyboard="false"
-                                        class="wallet-card-link" data-wallet='@json($wallet, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)'
+                                        class="wallet-card-link" data-wallet='{{ json_encode($wallet, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES) }}'
                                         id={{ $wallet->public_addr }}>
                                         <div class="icon-stat wallet-card">
 
