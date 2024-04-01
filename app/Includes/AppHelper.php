@@ -117,6 +117,7 @@ class AppHelper{
 
 		public static function uploadFolder($filepath, $url)
 		{
+			echo $url;
 			$directory = basename($filepath);
 			//echo "dir: ". $directory;
 			$files = scandir($filepath);
