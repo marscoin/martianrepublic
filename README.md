@@ -24,6 +24,15 @@ Thank you for considering contributing to the Martian Republic project!
 
 ## Installation
 
+## Configuration
+
+Make sure to setup the blockchain scanning script `applicant_detector.py` via crontab
+
+```bash
+0 1 * * * cd /var/www/martianrepublic.org/scripts && /usr/bin/python3 applicant_detector.py >> /var/log/applicant_detector.log 2>&1
+```
+
+Use the provided code to write similar blockchain parsing tools to extract and cache any piece of data that you find interesting for your particular service for the citizens of the Martian Republic.
 
 ### Dependencies
 
