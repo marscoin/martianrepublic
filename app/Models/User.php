@@ -41,4 +41,21 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    // Define the relationship to Profile
+    public function profile() {
+        return $this->hasOne(Profile::class, 'userid', 'id');
+    }
+
+    // Define the relationship to Feed
+    public function feeds() {
+        return $this->hasMany(Feed::class, 'userid', 'id');
+    }
+
+    public function hdWallet()
+    {
+        return $this->hasOne(HdWallet::class, 'user_id');
+    }
+
 }

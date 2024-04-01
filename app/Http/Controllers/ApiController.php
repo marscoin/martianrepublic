@@ -16,24 +16,44 @@ use App\Models\Citizen;
 
 class ApiController extends Controller
 {
-    // Method for 'allPublic' endpoint
     public function allPublic()
     {
-        $data = DB::select("select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = 'GP' ORDER BY feed.id desc");
-        return response()->json($data);
+        $perPage = 25;
+        $feeds = Feed::with(['user', 'user.profile'])
+            ->whereHas('user.profile', function ($query) {
+                $query->where('tag', 'GP');
+            })
+            ->orderBy('id', 'desc')
+            ->paginate($perPage);
+    
+        return response()->json($feeds);
     }
 
-    // Method for 'allCitizen' endpoint
     public function allCitizen()
     {
-        $data = DB::select("select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = 'CT' ORDER BY feed.id desc");
-        return response()->json($data);
+        $perPage = 25;
+        $feeds = Feed::with(['user.profile'])
+            ->whereHas('user.profile', function ($query) {
+                $query->where('tag', 'CT');
+            })
+            ->orderBy('id', 'desc')
+            ->paginate($perPage);
+    
+        return response()->json($feeds);
     }
+    
 
-    // Method for 'allApplicants' endpoint
     public function allApplicants()
     {
-        $data = DB::select("select profile.userid, users.fullname, hd_wallet.public_addr as address from users, profile, hd_wallet where profile.userid = users.id and users.id = hd_wallet.user_id and profile.has_application = 1 ORDER BY profile.userid DESC");
-        return response()->json($data);
+        $perPage = 25; 
+    
+        $applicants = User::whereHas('profile', function ($query) {
+                $query->where('has_application', 1);
+            })
+            ->with(['profile', 'hdWallet']) 
+            ->orderByDesc('profile.userid') 
+            ->paginate($perPage);
+    
+        return response()->json($applicants);
     }
 }
