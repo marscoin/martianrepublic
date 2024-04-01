@@ -574,8 +574,7 @@
 
                                 <div class="row">
                                     <p>Wallet Name</p>
-                                    <input placeholder="MARS" class="form-control" name="wallet_name"
-                                        value="MARS" />
+                                    <input placeholder="MARS" class="form-control" name="wallet_name" maxlength="500" placeholder="Enter wallet name" value="MARS" />
 
 
                                 </div>
