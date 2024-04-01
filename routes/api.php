@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 //mobile
-Route::get('/feed/public', 'App\Http\Controllers\ApiController@allPublic')->middleware(['auth:sanctum'])->name('api_allpublic');
-Route::get('/feed/citizen', 'App\Http\Controllers\ApiController@allCitizen')->middleware(['auth:sanctum'])->name('api_allcitizen');
-Route::get('/feed/applicant', 'App\Http\Controllers\ApiController@allApplicants')->middleware(['auth:sanctum'])->name('api_allapplicants');
+Route::get('/feed/public', 'App\Http\Controllers\ApiController@allPublic')->name('api_allpublic');
+Route::get('/feed/citizen', 'App\Http\Controllers\ApiController@allCitizen')->name('api_allcitizen');
+Route::get('/feed/applicant', 'App\Http\Controllers\ApiController@allApplicants')->name('api_allapplicants');
 
