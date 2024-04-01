@@ -12,6 +12,11 @@ class Feed extends Model {
 
     protected $table = 'feed';
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'userid'); // Assuming 'userid' is the foreign key in 'feeds' table
+    }
+
 }
 
 ?>
