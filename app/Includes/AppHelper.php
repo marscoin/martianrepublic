@@ -117,6 +117,7 @@ class AppHelper{
 
 		public static function uploadFolder($filepath, $url)
 		{
+			echo $url;
 			$directory = basename($filepath);
 			echo "dir: ". $directory;
 			$files = scandir($filepath);
@@ -127,16 +128,15 @@ class AppHelper{
 			foreach ($files as $filep)
 			{
 				$filename = realpath($filepath."/".$filep);
-				//echo "path: " . $filename;
+				echo "path: " . $filename;
 				$finfo = new \finfo(FILEINFO_MIME_TYPE);
 				$mimetype = $finfo->file($filename);
-				$cfile = curl_file_create($directory.'%2F'.$filename, $mimetype, basename($filename));
+				$cfile = curl_file_create($filename, $mimetype, basename($filename));
 				//print_r($cfile);
 				//array_push($data, array('file' => $cfile));
 				$data = ['file' => $cfile];
-				$headers = array("Content-Type" => $mimetype);
 			}
-			
+			$headers = array("Content-Type" => "multipart/form-data");
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
