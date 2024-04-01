@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Proposals;
 use App\Models\Threads;
 use App\Models\Citizen;
+use App\Models\HDWallet;
 
 class ApiController extends Controller
 {
