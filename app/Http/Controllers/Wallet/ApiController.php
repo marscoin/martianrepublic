@@ -39,6 +39,7 @@ class ApiController extends Controller {
 	 * Internal
 	 *
 	 * @ignore
+	 * @hideFromAPIDocumentation
 	 */
 	public function permapinpic(Request $request){
 
@@ -83,6 +84,7 @@ class ApiController extends Controller {
 	 * Internal
 	 *
 	 * @ignore
+	 * @hideFromAPIDocumentation
 	 */
 	public function permapinvideo(Request $request){
 
@@ -125,7 +127,7 @@ class ApiController extends Controller {
 	/**
 	 * Internal
 	 *
-	 * @ignore
+	 * @hideFromAPIDocumentation
 	 */
 	public function permapinlog(Request $request){
 
@@ -180,7 +182,7 @@ class ApiController extends Controller {
 	/**
 	 * Internal
 	 *
-	 * @ignore
+	 * @hideFromAPIDocumentation
 	 */
 	public function permapinjson(Request $request)
 	{
@@ -212,7 +214,7 @@ class ApiController extends Controller {
 	/**
 	 * Internal
 	 *
-	 * @ignore
+	 * @hideFromAPIDocumentation
 	 */
 	public function setfeed(Request $request)
 	{
@@ -243,7 +245,7 @@ class ApiController extends Controller {
 	/**
 	 * Internal
 	 *
-	 * @ignore
+	 * @hideFromAPIDocumentation
 	 */
 	public function getTransactions(Request $request)
 	{
@@ -264,7 +266,7 @@ class ApiController extends Controller {
 	/**
 	 * Internal
 	 *
-	 * @ignore
+	 * @hideFromAPIDocumentation
 	 */
 	public function setfullname(Request $request)
 	{
@@ -295,9 +297,8 @@ class ApiController extends Controller {
 	}
 
 	/**
-	 * Internal
 	 *
-	 * @ignore
+	 * @hideFromAPIDocumentation
 	 */
 	public function cacheonboarding(Request $request)
 	{
@@ -321,8 +322,6 @@ class ApiController extends Controller {
 	}
 
 	/**
-	 * Internal
-	 *
 	 * @ignore
 	 */
 	public function closewallet(Request $request)
@@ -337,9 +336,7 @@ class ApiController extends Controller {
 	}
 
 	/**
-	 * Internal
-	 *
-	 * @ignore
+	 * @hideFromAPIDocumentation
 	 */
 	public function setendorsed(Request $request)
 	{
@@ -355,9 +352,7 @@ class ApiController extends Controller {
 
 
 	/**
-	 * Internal
-	 *
-	 * @ignore
+	 * @hideFromAPIDocumentation
 	 */
 	public function cacheproposal(Request $request)
 	{
