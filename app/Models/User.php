@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\HDWallet;
 
 class User extends Authenticatable
 {
@@ -55,7 +56,7 @@ class User extends Authenticatable
 
     public function hdWallet()
     {
-        return $this->hasOne(HdWallet::class, 'user_id');
+        return $this->hasOne(HDWallet::class, 'user_id');
     }
 
 }
