@@ -322,7 +322,8 @@ class ApiController extends Controller {
 	}
 
 	/**
-	 * @ignore
+	 *
+	 * @hideFromAPIDocumentation
 	 */
 	public function closewallet(Request $request)
 	{
