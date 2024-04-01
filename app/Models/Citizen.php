@@ -12,6 +12,12 @@ class Citizen extends Model {
 
     protected $table = 'citizen';
 
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'userid');
+    }
+
 }
 
 ?>

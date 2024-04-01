@@ -34,6 +34,7 @@ class ApiController extends Controller
         return response()->json($feeds);
     }
 
+
     public function allCitizen()
     {
         $perPage = 25;
@@ -41,13 +42,15 @@ class ApiController extends Controller
             $query->select('id', 'fullname', 'created_at');
         }, 'user.profile' => function ($query) {
             $query->select('userid', 'general_public'); // only select general_public and the foreign key
+        }, 'user.citizen' => function ($query) {
+            $query->select('userid', 'avatar_link'); // Select the userid and avatar_link
         }])
         ->whereHas('user.profile', function ($query) {
             $query->where('tag', 'CT');
         })
         ->orderByDesc('id')
         ->paginate($perPage);
-    
+
         return response()->json($feeds);
     }
     

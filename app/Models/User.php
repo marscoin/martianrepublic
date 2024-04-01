@@ -59,4 +59,9 @@ class User extends Authenticatable
         return $this->hasOne(HDWallet::class, 'user_id');
     }
 
+    public function citizen()
+    {
+        return $this->hasOne(Citizen::class, 'userid');
+    }
+
 }
