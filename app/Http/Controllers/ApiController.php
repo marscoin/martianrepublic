@@ -66,9 +66,8 @@ class ApiController extends Controller
             // If you only need the public_addr from HdWallet, select it specifically
             $query->select('user_id', 'public_addr');
         }])
-        ->orderByDesc('profile.userid') // Assuming you want to sort by the profile's userid
-        ->paginate($perPage, ['id', 'fullname']); // Specify the columns you want from the users table
-    
+        ->orderByDesc('id')
+        ->paginate($perPage, ['id', 'fullname']); 
         // Customize the result to match the raw query structure, if needed
         $customResult = $applicants->getCollection()->transform(function ($user) {
             return [
