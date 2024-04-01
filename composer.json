@@ -13,7 +13,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "pragmarx/google2fa": "^8.0",
-        "riari/laravel-forum": "~5.0"
+        "sentry/sentry-laravel": "^2.13"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",

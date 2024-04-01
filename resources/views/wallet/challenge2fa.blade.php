@@ -58,14 +58,14 @@
 
         <div class="account-body">
             <h2>Enter 2FA Authentication Code</h2>
-            <form class="form account-form" method="POST" action="/twofachallenge">
+            <form id="form" class="form account-form" method="POST" action="/twofachallenge">
                 @csrf
-                <div class="form-group" style="text-align: center;">
+                <div  class="form-group" style="text-align: center;">
                     <input name="secret" id="secret"
                         style="height: 68px; font-size: 42px; font-weight: 700;  text-align: center;" type="text"
                         class="form-control" id="register-2fa" placeholder="Enter code" tabindex="1" autofocus>
-                    <button type="submit" class="btn btn-success btn-block btn-lg" tabindex="2">Complete 2FA challenge
-                        &nbsp; <i class="fa fa-refresh"></i>
+                    <button type="submit"  class="btn btn-success btn-block btn-lg" tabindex="2">Complete 2FA challenge
+                        &nbsp; <i id="btn" class="fa fa-arrow-right"></i>
                     </button>
                 </div>
                 <input type="hidden" value="meow" class="local" name="local" />
@@ -101,6 +101,19 @@
             }
 
         })
+    </script>
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+
+        $("#secret").keyup(function() {
+            if ($(this).val().length >= 6) {
+                $("#btn").removeClass('fa-arrow-right');
+                $("#btn").addClass('fa-spinner fa-spin');
+                $("#form").submit();
+            }
+        });
+    });
     </script>
 </body>
 

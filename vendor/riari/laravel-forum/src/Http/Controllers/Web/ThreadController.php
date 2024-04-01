@@ -25,7 +25,6 @@ use TeamTeaTime\Forum\Models\Thread;
 use TeamTeaTime\Forum\Support\CategoryPrivacy;
 use TeamTeaTime\Forum\Support\Web\Forum;
 
-
 use Illuminate\Support\Facades\Auth;
 use App\Models\Profile;
 use App\Includes\AppHelper;
@@ -96,7 +95,7 @@ class ThreadController extends BaseController
             UserViewingRecent::dispatch($request->user(), $threads);
         }
 
-        return ViewFactory::make('forum::thread.recent', compact('threads'));
+        return $this->check( ViewFactory::make('forum::thread.show', compact('categories', 'category', 'thread', 'posts', 'selectablePosts')) );
     }
 
     public function unread(Request $request): View
@@ -161,9 +160,6 @@ class ThreadController extends BaseController
             ->orderBy('created_at', 'asc')
             ->paginate();
 
-        // print_r($posts);
-        // die();
-
         $selectablePosts = [];
 
         if ($request->user()) {
@@ -174,8 +170,7 @@ class ThreadController extends BaseController
             }
         }
 
-        return $this->check( ViewFactory::make('forum::thread.show', compact('categories', 'category', 'thread', 'posts', 'selectablePosts')) );
-
+        return $this->check($view = ViewFactory::make('forum::thread.show', compact('categories', 'category', 'thread', 'posts', 'selectablePosts')));
     }
 
     public function create(Request $request, Category $category): View
@@ -190,10 +185,7 @@ class ThreadController extends BaseController
             UserCreatingThread::dispatch($request->user(), $category);
         }
 
-
         return $this->check($view = ViewFactory::make('forum::thread.create', compact('category')));
-
-
     }
 
     public function store(CreateThread $request, Category $category): RedirectResponse

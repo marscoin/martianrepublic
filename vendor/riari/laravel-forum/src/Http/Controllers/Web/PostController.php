@@ -68,6 +68,7 @@ class PostController extends BaseController
         }
     }
 
+
     public function show(Request $request, Thread $thread, string $postSlug, Post $post): View
     {
         if (! $thread->category->isAccessibleTo($request->user())) {
@@ -104,7 +105,7 @@ class PostController extends BaseController
 
         Forum::alert('success', 'general.reply_added');
 
-        return new RedirectResponse(Forum::route('thread.show', $post));
+        return $this->check(ViewFactory::make('forum::post.edit', compact('category', 'thread', 'post')));
     }
 
     public function edit(Request $request, Thread $thread, $threadSlug, Post $post): View
@@ -120,7 +121,7 @@ class PostController extends BaseController
         $thread = $post->thread;
         $category = $post->thread->category;
 
-        return $this->check(ViewFactory::make('forum::post.edit', compact('category', 'thread', 'post')));
+        return $this->check(ViewFactory::make('forum::post.confirm-restore', ['category' => $thread->category, 'thread' => $thread, 'post' => $post]));
     }
 
     public function update(UpdatePost $request, Thread $thread, $threadSlug, Post $post): RedirectResponse
@@ -141,7 +142,7 @@ class PostController extends BaseController
 
     public function confirmRestore(Request $request, Thread $thread, $threadSlug, Post $post): View
     {
-        return $this->check(ViewFactory::make('forum::post.confirm-restore', ['category' => $thread->category, 'thread' => $thread, 'post' => $post]));
+        return ViewFactory::make('forum::post.confirm-restore', ['category' => $thread->category, 'thread' => $thread, 'post' => $post]);
     }
 
     public function delete(DeletePost $request): RedirectResponse
