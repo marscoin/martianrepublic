@@ -726,7 +726,7 @@
                                     <div class="col-sm-12"
                                         style="display: flex; align-items: center; justify-content: center">
                                         <button id="login-wallet-mnemonic" type="submit" class="btn btn-primary"
-                                            style="width: 20%; margin: 30px">Login</button>
+                                            style="width: 20%; margin: 30px">Unlock</button>
 
                                     </div>
                                 </div>

@@ -34,9 +34,7 @@ class IdentityController extends Controller
 	//
     protected function showAll()
 	{
-		
-
-
+	
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
