@@ -14,6 +14,7 @@ use App\Models\Proposals;
 use App\Models\Threads;
 use App\Models\Citizen;
 use App\Models\HDWallet;
+use Illuminate\Support\Facades\DB;
 
 class ApiController extends Controller
 {
