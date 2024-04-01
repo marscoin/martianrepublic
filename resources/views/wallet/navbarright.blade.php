@@ -15,10 +15,10 @@
             </a>
 
                     <ul class="dropdown-menu" role="menu">
-                        <li>
-                            <a target="_blank" href="https://www.finexbox.com/market/pair/MARS-BTC.html">
+                    <li>
+                            <a target="_blank" href="https://www.lbank.info/exchange/mars/usdt">
                                 <i class="fa fa-area-chart"></i>
-                                FinexBox
+                                LBank
                             </a>
                         </li>
                         <li>
@@ -28,21 +28,11 @@
                             </a>
                         </li>
                         <li>
-                            <a target="_blank" href="https://www.xt.com/trade/mars_usdt">
+                            <a target="_blank" href="https://www.finexbox.com/market/pair/MARS-BTC.html">
                                 <i class="fa fa-area-chart"></i>
-                                Xt.com
+                                FinexBox
                             </a>
                         </li>
-
-
-                        <li>
-                            <a target="_blank" href="https://ex.udonex.com/market/marsusdt">
-                                <i class="fa fa-area-chart"></i>
-                                Udonex
-                            </a>
-                        </li>
-
-
 
                     </ul>
                 </li>
@@ -76,7 +66,7 @@
         </a>
       </li>
       <li>
-        <a href="/logout">
+        <a href="/logout" onclick="flushLocalStorage();">
           <i class="fa fa-sign-out"></i>
           &nbsp;&nbsp;Logout
         </a>
@@ -85,3 +75,22 @@
   </li>
 
 </ul>
+
+<script type="text/javascript">
+  function flushLocalStorage () {
+
+
+      localStorage.clear();
+      localStorage.removeItem('key');
+
+
+      // fallback double check if key exists...
+      if("key" in localStorage)
+      {
+          localStorage.clear()
+          localStorage.removeItem('key');
+      }
+
+      return
+  }
+</script>

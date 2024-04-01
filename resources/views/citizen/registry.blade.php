@@ -175,10 +175,19 @@ $("#saveprofilebutton").click(function() {
 
 
 
+
 $("#lastname").blur(function() {
     firstname = $("#firstname").val();
     lastname = $("#lastname").val();
     $.post("/api/setfullname", {firstname: firstname, lastname: lastname} , function(data) {
+        
+    });
+});
+
+$(".cacheme").blur(function() {
+    displayname = $("#displayname").val();
+    shortbio = $("#shortbio").val();
+    $.post("/api/cacheonboarding", {displayname: displayname, shortbio: shortbio, publicaddress: '<?=$public_address?>'} , function(data) {
         
     });
 });
@@ -476,7 +485,15 @@ const sendMARS = async (mars_amount, receiver_address) => {
 }
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
-    const mnemonic = localStorage.getItem("key").trim();
+
+    if(!localStorage.getItem("key"))
+    {
+        //unencrypt key first
+        alert("Unencrypt first");
+        return;
+    }
+
+    const mnemonic = localStorage.getItem("key");
     const sender_address = "<?=$public_address?>".trim()
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
     const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)

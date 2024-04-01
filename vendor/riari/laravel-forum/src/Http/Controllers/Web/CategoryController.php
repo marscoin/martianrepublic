@@ -15,11 +15,11 @@ use TeamTeaTime\Forum\Http\Requests\UpdateCategory;
 use TeamTeaTime\Forum\Models\Category;
 use TeamTeaTime\Forum\Support\CategoryPrivacy;
 use TeamTeaTime\Forum\Support\Web\Forum;
-
 use Illuminate\Support\Facades\Auth;
 use App\Models\Profile;
 use App\Includes\AppHelper;
 use App\Models\HDWallet;
+
 
 class CategoryController extends BaseController
 {
@@ -67,6 +67,7 @@ class CategoryController extends BaseController
         }
     }
 
+    
     public function index(Request $request): View
     {
         $categories = CategoryPrivacy::getFilteredTreeFor($request->user());
@@ -74,8 +75,8 @@ class CategoryController extends BaseController
         if ($request->user() !== null) {
             UserViewingIndex::dispatch($request->user());
         }
-        return $this->check(ViewFactory::make('forum::category.index', compact('categories')));
 
+        return $this->check(ViewFactory::make('forum::category.index', compact('categories')));
     }
 
     public function show(Request $request, Category $category): View
@@ -136,8 +137,6 @@ class CategoryController extends BaseController
         }
 
         return $this->check(ViewFactory::make('forum::category.show', compact('privateAncestor', 'categories', 'category', 'threads', 'selectableThreadIds')));
-
-
     }
 
     public function store(CreateCategory $request): RedirectResponse

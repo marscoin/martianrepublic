@@ -119,24 +119,28 @@ class AppHelper{
 		{
 			echo $url;
 			$directory = basename($filepath);
-			echo "dir: ". $directory;
+			//echo "dir: ". $directory;
 			$files = scandir($filepath);
 			//print_r($files);
 			$data = array();
-			$headers = "";
+			$headers = array("Content-Type" => "multipart/form-data");
 			$ch = curl_init($url);
+			$i = 0;
 			foreach ($files as $filep)
 			{
+				$i = $i + 1;
 				$filename = realpath($filepath."/".$filep);
-				echo "path: " . $filename;
+				if (!is_file($filename))
+        			continue;
+				//echo "path: " . $filename;
 				$finfo = new \finfo(FILEINFO_MIME_TYPE);
 				$mimetype = $finfo->file($filename);
 				$cfile = curl_file_create($filename, $mimetype, basename($filename));
 				//print_r($cfile);
 				//array_push($data, array('file' => $cfile));
-				$data = ['file' => $cfile];
-			}
-			$headers = array("Content-Type" => "multipart/form-data");
+				$data += ['file['.$i.']' => $cfile];
+				
+			}			
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
@@ -145,12 +149,26 @@ class AppHelper{
 			$result = curl_exec($ch);
 			$r = curl_getinfo($ch);
 			if ($r["http_code"] != 200) {
-				$details = json_decode($result, true);
-				print_r($r);
+				$detais = json_decode($result, true);
+				if (isset($detais["msg"])) {
+					throw new \Exception($detais["msg"], 1);
+				} else {
+					return "Error";
+				}
 			}
-			$details = json_decode($result, true);
-			print_r($details);
-			//return $details['Hash'];
+			print_r($result);
+			$result = explode("\n", $result);
+			// $details = json_decode($result, true);
+			// foreach($details as $l){
+			// 	print_r($l);
+			// }
+			$l = count($result);
+			echo $l;
+			if($l > 0){
+				$details = json_decode($result[$l-2], true);
+				return $details['Hash'];
+			}
+			else return "{'Hash':''}";
 		}
 
 
