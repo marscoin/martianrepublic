@@ -23,7 +23,7 @@ class ApiController extends Controller
             ->whereHas('user.profile', function ($query) {
                 $query->where('tag', 'GP');
             })
-            ->orderBy('id', 'desc')
+            ->orderByDesc('id')
             ->paginate($perPage);
     
         return response()->json($feeds);
@@ -36,7 +36,7 @@ class ApiController extends Controller
             ->whereHas('user.profile', function ($query) {
                 $query->where('tag', 'CT');
             })
-            ->orderBy('id', 'desc')
+            ->orderByDesc('id')
             ->paginate($perPage);
     
         return response()->json($feeds);
@@ -51,7 +51,7 @@ class ApiController extends Controller
                 $query->where('has_application', 1);
             })
             ->with(['profile', 'hdWallet']) 
-            ->orderByDesc('profile.userid') 
+            ->orderByDesc('id')
             ->paginate($perPage);
     
         return response()->json($applicants);
