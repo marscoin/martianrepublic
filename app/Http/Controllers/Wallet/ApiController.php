@@ -35,6 +35,11 @@ class ApiController extends Controller {
 	}
 
 
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 */
 	public function permapinpic(Request $request){
 
 		if (Auth::check()) {
@@ -74,6 +79,11 @@ class ApiController extends Controller {
 	}
 
 
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 */
 	public function permapinvideo(Request $request){
 
 		if (Auth::check()) {
@@ -112,6 +122,11 @@ class ApiController extends Controller {
 	}
 
 
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 */
 	public function permapinlog(Request $request){
 
 		if (Auth::check()) {
@@ -162,7 +177,11 @@ class ApiController extends Controller {
 	}
 
 
-
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 */
 	public function permapinjson(Request $request)
 	{
 		if (Auth::check()) {
@@ -190,6 +209,11 @@ class ApiController extends Controller {
 	}
 
 
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 */
 	public function setfeed(Request $request)
 	{
 		if (Auth::check()) {
@@ -216,7 +240,11 @@ class ApiController extends Controller {
 	}
 
 
-
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 */
 	public function getTransactions(Request $request)
 	{
 		if (Auth::check()) {
@@ -233,7 +261,11 @@ class ApiController extends Controller {
         }
 	}
 
-
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 */
 	public function setfullname(Request $request)
 	{
 		if (Auth::check()) {
@@ -262,6 +294,11 @@ class ApiController extends Controller {
 		}
 	}
 
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 */
 	public function cacheonboarding(Request $request)
 	{
 		if (Auth::check()) {
@@ -283,7 +320,11 @@ class ApiController extends Controller {
 		}
 	}
 
-
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 */
 	public function closewallet(Request $request)
 	{
 		if (Auth::check()) {
@@ -295,7 +336,11 @@ class ApiController extends Controller {
 		}
 	}
 
-
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 */
 	public function setendorsed(Request $request)
 	{
 		if (Auth::check()) {
@@ -309,7 +354,11 @@ class ApiController extends Controller {
 	}
 
 
-
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 */
 	public function cacheproposal(Request $request)
 	{
 		if (Auth::check()) {
