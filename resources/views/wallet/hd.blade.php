@@ -100,7 +100,7 @@
 
                             <div class="col-md-5 col-sm-7 ">
                                 <a data-toggle="modal" href="#unlockWalletModal" data-keyboard="false"
-                                    class="wallet-card-link" data-wallet={{ $civic_wallet }}
+                                    class="wallet-card-link" data-wallet=@json($civic_wallet)
                                     id={{ $civic_wallet->public_addr }}>
                                     <div class="icon-stat wallet-card">
 
@@ -175,7 +175,7 @@
                             <div class="row">
                                 <div class="col-md-5 col-sm-7">
                                     <a data-toggle="modal" href="#unlockWalletModal" data-keyboard="false"
-                                        class="wallet-card-link" data-wallet={{ $wallet }}
+                                        class="wallet-card-link" data-wallet=@json($wallet)
                                         id={{ $wallet->public_addr }}>
                                         <div class="icon-stat wallet-card">
 
