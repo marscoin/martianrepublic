@@ -20,13 +20,17 @@ class ApiController extends Controller
     public function allPublic()
     {
         $perPage = 25;
-        $feeds = Feed::with(['user', 'user.profile'])
-            ->whereHas('user.profile', function ($query) {
-                $query->where('tag', 'GP');
-            })
-            ->orderByDesc('id')
-            ->paginate($perPage);
-    
+        $feeds = Feed::with(['user' => function ($query) {
+            $query->select('id', 'fullname', 'email', 'created_at');
+        }, 'user.profile' => function ($query) {
+            $query->select('userid', 'general_public'); // only select general_public and the foreign key
+        }])
+        ->whereHas('user.profile', function ($query) {
+            $query->where('tag', 'GP');
+        })
+        ->orderByDesc('id')
+        ->paginate($perPage);
+
         return response()->json($feeds);
     }
 
