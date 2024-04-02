@@ -33,6 +33,7 @@
         }
     </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
+    @livewireStyles
 </head>
 
 <body class=" ">
@@ -168,26 +169,7 @@
                     <div class="col-md-5 col-sm-5">
 
 
-                        <div class="portlet">
-
-                            <h3 class="portlet-title">
-                                <u>Marscoin Balance</u>
-                            </h3>
-
-                            <div class="portlet-body">
-                                <div style="display: flex; align-items: center;  ">
-
-                                    <h2>
-                                        {{ $balance }} MARS
-                                    </h2>
-
-
-                                </div>
-
-
-                            </div> <!-- /.portlet-body -->
-
-                        </div> <!-- /.portlet -->
+                        @livewire('marscoin-balance', ['address' => $public_addr])
 
                         <div class="portlet">
 
@@ -1314,6 +1296,8 @@
         //     console.log("downloading...")
         // })
     </script>
+
+@livewireScripts    
 </body>
 
 </html>
