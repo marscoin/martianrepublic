@@ -1,4 +1,4 @@
-<div class="portlet"  wire:poll.30000ms="fetchBalance">
+<div class="portlet"  wire:poll.10000ms="fetchBalance">
     <h3 class="portlet-title">
         <u>Marscoin Balance</u>
     </h3>
