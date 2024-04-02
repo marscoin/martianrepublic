@@ -724,10 +724,14 @@
 
 
                         <div class="tab-pane fade in" id="importWallet">
-                            <h2>Upload Marswallet JSON Key</h2>
                             <div>
-                                <p>upload</p>
-                                <i class="fa fa-upload"> </i>
+                            <h2>Upload Marswallet JSON Key</h2>
+                                <div class="form-group">
+
+                                <input class="form-control" type="file" id="jsonFile" accept=".json" />
+                                <button style="margin-top:10px;" class="btn" id="uploadButton"><i class="fa fa-upload"> </i> Upload</button>
+                                </div>
+                                
                             </div>
 
                         </div>
@@ -944,12 +948,6 @@
 
                     mnem = $('.mnemonic-text').html();
                     re_password = $("#re-password").val().replace(/\s+/g, '');
-                    // Supercal77
-                    //2dba919542bf0e3ac825ff3470db282f
-
-                    // hashed_re_password = my_bundle.pbkdf2.pbkdf2Sync(
-                    //     re_password,
-                    //     "{{ $SALT }}", 1, 16, 'sha512').toString('hex')
 
                     hashed_re_password = hashPassword(re_password)
 
@@ -968,10 +966,6 @@
 
             }
             handleMakeWallet()
-
-
-
-
 
             const hashPassword = (passcode) => {
 
@@ -1061,16 +1055,10 @@
                 const percent_increase = 5
                 var increase = percent_increase * entropy.length
 
-                //=============================================================================
-                //=============================================================================
                 // Entropy Logic
-
                 const MAX_LEN = 24; // size of entropy's array
                 const now = Date.now();
                 if (now >= 1 && (now % 10) !== 0) return;
-
-                // ===========================================================
-                // NEW ENTROPY LOGIC
 
                 // mouse movement cords
                 const px = e.pageX;
@@ -1081,9 +1069,6 @@
                 var w = elem.width;
                 var h = elem.height;
 
-
-
-
                 var cell_dim = w / Math.sqrt(word_list_length);
                 var cell_count = (w / cell_dim)
 
@@ -1093,7 +1078,6 @@
                 //var cells = cell_dim * 
 
                 var cell = x_pos + (cell_count * y_pos);
-
                 var ret = Math.round(cell)
 
 
@@ -1213,9 +1197,6 @@
 
             });
 
-            // =================================================================================================
-            // ========================================= WALLET LOGIN ==========================================
-            // =================================================================================================
 
             // Check if the mnemonic is valid and gens a pubaddr.......
             const checkMnemonic = (mnemonic) => {
@@ -1233,9 +1214,7 @@
             }
 
 
-            // test:
-            // mansion raven expect sustain wing stairs kite mimic alpha bleak scene adjust
-            // LOGIN USING MNEMONIC INPUT
+             // LOGIN USING MNEMONIC INPUT
             $('#login-wallet-mnemonic').click(() => {
                 // compile mnemonic
                 var input_mnemonic = "";
@@ -1272,7 +1251,7 @@
                         $.post('/wallet/createwallet', postData)
                         .done(function(data) {
                             localStorage.setItem("key", response.decrypted);
-                            href.location="/wallet/dashboard/hd-open";
+                            location.href="/wallet/dashboard/hd-open";
                         })
                         .fail(function(error) {
                             // Handle errors here
@@ -1286,6 +1265,65 @@
                 }
 
             })
+
+            // LOGIN USING KEYFILE 
+            document.getElementById('uploadButton').addEventListener('click', function() {
+                var fileInput = document.getElementById('jsonFile');
+
+                if (!fileInput.files.length) {
+                    alert('Please select a file.');
+                    return;
+                }
+
+                var file = fileInput.files[0];
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    try {
+                        var jsonData = JSON.parse(e.target.result);
+                        var mnemonic = jsonData.key; // Assuming the JSON structure is { "key": "mnemonic words here" }
+                        processMnemonic(mnemonic);
+                    } catch (error) {
+                        alert('Error reading or parsing the file.');
+                        console.error('Error:', error);
+                    }
+                };
+
+                reader.readAsText(file);
+            });
+
+            function processMnemonic(mnemonic) {
+                // Clean up the mnemonic string if necessary
+                mnemonic = mnemonic.trim();
+
+                // Now, you can use your existing function to generate the seed and handle the rest
+                const response = genSeed(mnemonic);
+
+                if (response && response.address) {
+                    // Redirect or do further processing as needed
+                    
+                    var postData = {
+                        password: '',
+                        public_addr: response.address,
+                        wallet_name: 'Imported' // Set the wallet name to 'Imported'
+                    };
+                    
+                    $.post('/wallet/createwallet', postData)
+                    .done(function(data) {
+                        console.log('Mnemonic processed and key stored in localStorage.');
+                        localStorage.setItem("key", response.decrypted);
+                        location.href="/wallet/dashboard/hd-open";
+                    })
+                    .fail(function(error) {
+                        // Handle errors here
+                        console.error("Error occurred: ", error);
+                    });
+
+                } else {
+                    // Handle error
+                    console.error('Failed to process mnemonic.');
+                }
+            }
 
             // LOGIN USING PASSWORD INPUT
             $('#login-wallet-password').click(() => {
