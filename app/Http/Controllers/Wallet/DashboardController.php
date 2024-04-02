@@ -19,6 +19,7 @@ use App\Models\Voucher;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
 use App\Models\CivicWallet;
+use Illuminate\Support\Facades\Log;
 use Exception;
 
 class DashboardController extends Controller
@@ -43,6 +44,7 @@ class DashboardController extends Controller
 			$profile = Profile::where('userid', '=', $uid)->first();
 
 			$profile->wallet_open = 0;
+			$profile->civic_wallet_open = 0;
 			$profile->save();
 		}
 
@@ -291,14 +293,6 @@ class DashboardController extends Controller
 					$view->has_wallet = false;
 				}
 
-
-
-
-
-
-
-
-
 				$view->transactions = array();
 				$cur_price = json_decode(file_get_contents("https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd"));
 				$view->mars_price = $cur_price->marscoin->usd;
@@ -313,15 +307,6 @@ class DashboardController extends Controller
 					$view->coincount = round($total['txoutsetinfo']['total_amount'], 2);
 				else
 					$view->coincount = 35000000;
-
-				// $incomes = array();
-				// $expenses = array();
-				// $balances = array();
-				// $balance = 0;
-				// $firstdate = "";
-				// $lastdate = 0;
-				// $a = 0;
-				// $b = 0;
 
 				$view->voucher = false;
 				$voucher = Voucher::where('user_account', '=', Auth::user()->email)->first();
@@ -341,18 +326,22 @@ class DashboardController extends Controller
 
 	// Wallet history
 
-
-
-	// ==================================================================================
-	// ==================================================================================
-	// Sebastian F Wallet Updates
-
 	// Show HD Wallet (Not Open)
-	protected function showHDWAllet()
+	protected function showHDWAllet(Request $request)
 	{
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
+
+			$key = $request->input('key');
+			if($key == "none")
+			{
+				Log::debug("Something went wrong with key storage");
+				$profile->wallet_open = 0;
+				$profile->civic_wallet_open = 0;
+				$profile->save();
+				return redirect('/wallet/dashboard');
+			}
 
 			//if wallet currently open, redirect to hd-open
 			if($profile->wallet_open > 0){
@@ -365,7 +354,6 @@ class DashboardController extends Controller
 			// only one civic wallet ever...
 			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
-
 			// get balance of wallets.
 			foreach($wallets as $wallet)
 			{
@@ -373,13 +361,6 @@ class DashboardController extends Controller
 				$wallet->balance = $bal;
 
 			}
-
-// 			echo "<pre>";
-// 			print_r($wallets);
-// 			echo "</pre>";
-// die();
-
-
 
 			// handle redirects...
 			if (!$profile) {
@@ -390,12 +371,8 @@ class DashboardController extends Controller
 				}
 			}
 			if ($profile->wallet_open >= 1 && !is_null($wallets)) {
-				return redirect('wallet/dashboard/hd-open');
+				return redirect('/wallet/dashboard/hd-open');
 			}
-
-
-
-
 
 			$view = View::make('wallet.hd');
 			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
@@ -425,8 +402,6 @@ class DashboardController extends Controller
 				$view->citizen = $profile->citizen;
 				$view->applied = $profile->has_application;
 			}
-
-
 
 
 			if (is_null($civic_wallet)) {
@@ -471,15 +446,8 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			// ===============================================================================================
-			// ===============================================================================================
-			// Start Rendering open wallet data!
-			//
-
-
+			Log::info("Start Rendering open wallet data!");
 			$data = json_decode($request->input("wallet"));
-
-
 
 			if ($data || ($wallets || $civic_wallet)) {
 				$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
@@ -492,7 +460,7 @@ class DashboardController extends Controller
 
 					$profile->wallet_open = 0;
 					$profile->save();
-					return redirect('wallet/dashboard/hd');
+					return redirect('/wallet/dashboard/hd');
 				}
 
 				$view = View::make('wallet.hd-open');
@@ -539,13 +507,6 @@ class DashboardController extends Controller
 				return redirect('wallet/dashboard/hd');
 			}
 
-
-			// ===============================================================================================
-			// ===============================================================================================
-			// ===============================================================================================
-
-
-
 		} else {
 			return redirect('/login');
 		}
@@ -566,7 +527,7 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			//set open wallet to zero
+			Log::info("set open wallet to zero");
 			$profile->wallet_open = 0;
 			$profile->save();
 
@@ -579,28 +540,32 @@ class DashboardController extends Controller
 	}
 
 
+	protected function forgetWallet(Request $request)
+	{
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			
+			$walletid = $request->input('hdwallet_id');
+			
+			$wallet = HDWallet::where('id', $walletid)->where('user_id', $uid)->firstOrFail();
+			
+			$wallet->delete();
+			
+			return response()->json(['success' => 'Wallet deleted successfully']);
+		}
+		return response()->json(['error' => 'Unauthorized'], 403);
+	}
 
-	// all wallets must have backup now.. 
-	// password must be provided on send func. 
-
-	// POST
-	// Create Wallet
 
 	public function postCreateWallet(Request $request)
 	{
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
-
 			$profile = Profile::where('userid', '=', $uid)->first();
-
 			$hd_wallet = HDWallet::where('user_id', '=', $uid)->get();
-
-
 			$civic = CivicWallet::where('user_id', '=', $uid)->first();
 
-
-
-			// if user has civic wallet
+			Log::info("See if user has civic wallet");
 
 			// user must insert password.. no null accepted...
 
@@ -608,9 +573,22 @@ class DashboardController extends Controller
 			// 1) NO civic + No wallets
 			// 2) Civic + No wallets
 			// 3) Civic + wallets
-
-			// first wallet created has to be civic wallet. 
-			if ($profile->civic_wallet_open == 0 && $profile->wallet_open == 0) {
+			if($request->input('wallet_name') == "Imported")
+			{
+				Log::debug("imported wallets are not being stored ... yet");
+				$new_wallet = new HDWallet;
+				$new_wallet->encrypted_seed = "ADHOC";
+				$new_wallet->public_addr = $request->input('public_addr');
+				$new_wallet->backup = 1;
+				$new_wallet->user_id = $uid;
+				$new_wallet->wallet_type = $request->input('wallet_name');;
+				$new_wallet->save();
+				$profile->wallet_open = $new_wallet->id;
+				$profile->save();
+				return redirect('/wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Opened!');
+			}
+			else if ($profile->civic_wallet_open == 0 && $profile->wallet_open == 0) {
+				Log::debug("first wallet created has to be civic wallet");
 				$new_civic_wallet = new CivicWallet;
 				$new_civic_wallet->encrypted_seed = $request->input('password');
 				$new_civic_wallet->public_addr = $request->input('public_addr');
@@ -623,17 +601,23 @@ class DashboardController extends Controller
 				
 				$profile->civic_wallet_open = $new_civic_wallet->id;
 				$profile->save();
-				return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Opened!');
+				return redirect('/wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Opened!');
 			} else if ($profile->civic_wallet_open == 1) {
-
+				Log::debug("non-civic wallet being created");
 				$new_wallet = new HDWallet;
-				$new_wallet->encrypted_seed = $request->input('password');
+
+				//
+				$encseed = $request->input('password');
+				if(empty($encseed))
+				{
+					$new_wallet->encrypted_seed = "ADHOC";
+				}
+				else{
+					$new_wallet->encrypted_seed = $request->input('password');
+				}
 
 				$new_wallet->public_addr = $request->input('public_addr');
 
-				// if (empty($wallet->encrypted_seed))
-				// 	$wallet->backup = 0;
-				// else
 				$new_wallet->backup = 1;
 
 				$new_wallet->user_id = $uid;
@@ -642,42 +626,15 @@ class DashboardController extends Controller
 
 				$profile->wallet_open = $new_wallet->id;
 				$profile->save();
-				return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Opened!');
+				return redirect('/wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Opened!');
+			}
+			else
+			{
+				Log::debug("no wallet entry created in local db cache");
 			}
 
-
-
-			// if ($profile->wallet_open == 1 && count($hd_wallet) >= 1) {
-
-			// 	// Error... User has already opened wallet in the past...
-			// 	return redirect('wallet/dashboard/hd')->with('message', 'Error! Wallet has already been opened.');
-			// } else if (count($hd_wallet) == 0) {
-			// 	$wallet = new HDWallet;
-			// 	$wallet->encrypted_seed = $request->input('password');
-
-			// 	$wallet->public_addr = $request->input('public_addr');
-
-			// 	if (empty($wallet->encrypted_seed))
-			// 		$wallet->backup = 0;
-			// 	else
-			// 		$wallet->backup = 1;
-
-			// 	$wallet->user_id = $uid;
-			// 	$wallet->wallet_type = "MARS";
-			// 	$wallet->save();
-
-			// 	$profile->wallet_open = 1;
-			// 	$profile->save();
-
-			// 	return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Opened!');
-			// }
-			// } 
-			// else 
-			// {
-			// 	return redirect('wallet/dashboard/hd')->with('message', 'The following errors occurred')->withErrors($validator->messages())->withInput();
-			// }
-
 		} else {
+
 			return redirect('/login');
 		}
 	}
@@ -693,15 +650,6 @@ class DashboardController extends Controller
 			$hd_wallet = HDWallet::where('user_id', '=', $uid)->get();
 			$profile->wallet_open = 1;
 			$profile->save();
-
-
-
-
-			// echo "Hello, World";
-			// die();
-			// $view->req = $request;
-			// $view->public_addr = $request->public_addr;
-
 
 			return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Open!');
 		} else {
@@ -720,6 +668,16 @@ class DashboardController extends Controller
 	// Logout of Wallet ONLY
 	public function walletLogout()
 	{
+		if (Auth::check()) {
+
+			$uid = Auth::user()->id;
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$profile->wallet_open = 0;
+			$profile->civic_wallet_open = 0;
+			$profile->save();
+			return redirect('/wallet/dashboard');
+		}
+
 	}
 
 

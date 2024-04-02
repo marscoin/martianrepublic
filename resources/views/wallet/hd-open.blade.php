@@ -503,7 +503,7 @@
             if(!unlockedWallet)
             {
                 console.log("No Wallet Found.")
-                window.location.replace("hd")
+                window.location.replace("hd?key=none");
             }
             else
                 console.log("Wallet found.")
