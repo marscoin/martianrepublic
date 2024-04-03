@@ -566,6 +566,8 @@ class DashboardController extends Controller
 			$civic = CivicWallet::where('user_id', '=', $uid)->first();
 
 			Log::info("See if user has civic wallet");
+			// Check if the user has a Civic wallet already, even if it's not opened
+			$civicExists = CivicWallet::where('user_id', '=', $uid)->exists();
 
 			// user must insert password.. no null accepted...
 
@@ -587,7 +589,8 @@ class DashboardController extends Controller
 				$profile->save();
 				return redirect('/wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Opened!');
 			}
-			else if ($profile->civic_wallet_open == 0 && $profile->wallet_open == 0) {
+			else if (!$civicExists && $profile->civic_wallet_open == 0 && $profile->wallet_open == 0) 
+			{
 				Log::debug("first wallet created has to be civic wallet");
 				$new_civic_wallet = new CivicWallet;
 				if(empty($request->input('password')))
@@ -605,11 +608,12 @@ class DashboardController extends Controller
 				$profile->civic_wallet_open = $new_civic_wallet->id;
 				$profile->save();
 				return redirect('/wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Opened!');
-			} else if ($profile->civic_wallet_open == 1) {
-				Log::debug("non-civic wallet being created");
+			}
+			else if ($civicExists || $profile->civic_wallet_open == 1) 
+			{
+    			Log::debug("non-civic wallet being created");
 				$new_wallet = new HDWallet;
 
-				//
 				$encseed = $request->input('password');
 				if(empty($encseed))
 				{
