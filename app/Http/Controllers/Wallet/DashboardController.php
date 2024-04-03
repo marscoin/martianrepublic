@@ -634,7 +634,9 @@ class DashboardController extends Controller
 			else
 			{
 				Log::debug("no wallet entry created in local db cache");
+				return redirect('/wallet/dashboard/hd');
 			}
+			return redirect('/wallet/dashboard/hd');
 
 		} else {
 
