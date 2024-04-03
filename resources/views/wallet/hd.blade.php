@@ -1,11 +1,5 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
 <html lang="en" class="no-js">
-<!--<![endif]-->
-
 <head>
     <title>Marscoin Wallet</title>
     <meta charset="utf-8">
@@ -13,42 +7,24 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="csrf-token" content="{{ Session::token() }}">
-
-    <!-- Google Font: Open Sans -->
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap"
         rel="stylesheet">
-    <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.css">
-
     <link rel="stylesheet" href="/assets/wallet/css/hd/hd.css">
-
-
-    <!-- App CSS -->
     <link rel="stylesheet" href="/assets/wallet/js/plugins/magnific/magnific-popup.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin-extended.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="stylesheet" href="/assets/wallet/css/jquery.steps.css">
 
-
-
-    <!-- <link href="/assets/wallet/css/custom.css" rel="stylesheet">-->
-    <!-- Favicon -->
     <link rel="shortcut icon" href="/favicon.ico">
 
     <script src="/assets/wallet/js/dist/bundle.js"></script>
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-  <![endif]-->
     <style>
         /* span.qrcodeicon span {
             position: absolute;
@@ -61,6 +37,17 @@
             cursor: pointer;
             z-index: 1;
         } */
+
+        .mouse-box {
+    width: 400px; /* Example width */
+    height: 200px; /* Example height */
+    position: relative; /* Ensures that the canvas can be absolutely positioned within */
+}
+
+.dot {
+    /* ... your existing styles ... */
+    z-index: 1000; /* high value to bring to front */
+}
     </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
 </head>
@@ -83,9 +70,6 @@
         <div class="content">
 
             <div class="container">
-
-
-
 
                 <div class="portlet">
 
@@ -383,18 +367,10 @@
 
                             {{-- <form class="" method="POST" action="/wallet/createwallet"> --}}
 
-
                             <div class="tab-pane fade active in" id="entropy">
-
                                 <div>
-
-
                                     <div class="title-help">
                                         <h2> Generate Entropy </h2>
-
-
-
-
                                         <a class="btn btn-default demo-element ui-popover" data-toggle="tooltip"
                                             data-placement="right" data-trigger="hover"
                                             data-content="Generate randomness by wiggling your mouse inside the box. The more you wiggle the more random your private key will be. The more random your key is, the more secure it will be."
@@ -408,12 +384,13 @@
                                         Wiggle your mouse inside the box to create extra randomness when generating your
                                         wallets
                                         private key
-
                                     </p>
 
                                     <div class="container mouse-box">
-
                                     </div>
+
+                                    <div id="progress-counter" style="font-size: 48px; position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; color: #d74b4b;font-weight: 800">0%</div>
+
 
                                     <div class="progress progress-striped active">
                                         <div id="entropy-progress" class="progress-bar progress-bar-primary"
@@ -1049,6 +1026,26 @@
             let captureStart = true;
             var entropy = [];
 
+
+            let progress = 0;
+            const maxEntropyLength = 24; // Define max entropy length
+
+            // Update the dot styles globally
+            var style = document.createElement('style');
+            document.head.appendChild(style);
+            style.sheet.insertRule(`
+                .dot {
+                    position: absolute;
+                    width: 5px;
+                    height: 5px;
+                    border-radius: 50%;
+                    background: black;
+                    pointer-events: none;
+                    z-index: 1000; // Make sure this is above the modal
+                }`, 0);
+
+
+
             $(document).on("mousemove", ".mouse-box", function(e) {
 
                 var mnemonic;
@@ -1082,10 +1079,22 @@
 
 
                 entropy.push(ret)
-                //entropy.push(pad(ret.toString(2), 11));
 
-                //=============================================================================
-                //=============================================================================
+                if (increase < 100) {
+                    // Create and append dot
+                    var dot = document.createElement('div');
+                    dot.className = 'dot';
+                    dot.style.left = `${e.clientX}px`;
+                    dot.style.top = `${e.clientY}px`;
+                    dot.style.zIndex = 1100;
+                    document.body.appendChild(dot);
+                    document.getElementById('progress-counter').innerText = `${increase.toFixed(1)}%`;
+                }else{
+                    document.getElementById('progress-counter').innerText = "100%";
+                }
+
+
+
 
                 // increase progress bar as entropy increases
                 $("#entropy-progress").css("width", `${increase}%`)
@@ -1162,7 +1171,9 @@
                     $("#entropy").addClass("active in")
                     $("#mnemonic").removeClass("active in")
                     $(".tab-1").addClass("active")
-
+                    progress = 0; // Reset progress
+                    $("#progress-counter").text('0%');
+                    $("#entropy-progress").css("width", `0%`);
 
                 });
                 // =====================================================================
@@ -1192,7 +1203,7 @@
                 }
 
 
-
+            
 
 
             });
@@ -1544,20 +1555,65 @@
     });
 
 
+// let progress = 0;
+// // Add the dot styles to the page
+// var style = document.createElement('style');
+// document.head.appendChild(style);
+// style.sheet.insertRule(`
+// .dot {
+//     position: absolute;
+//     width: 5px;
+//     height: 5px;
+//     border-radius: 50%;
+//     background: black;
+//     pointer-events: none;
+// }`, 0);
+
+// Function to log mouse movements and create dots
+// function trackMouseAndCreateDots(e) {
+//     // Log to console
+//     console.log(`Mouse position: X=${e.clientX}, Y=${e.clientY}`);
+    
+//     // Create and append dot
+//     var dot = document.createElement('div');
+//     dot.className = 'dot';
+//     dot.style.left = `${e.clientX}px`;
+//     dot.style.top = `${e.clientY}px`;
+//     dot.style.zIndex = 1100;
+//     document.body.appendChild(dot);
+//     progress += 0.1;
+//     if (progress > 100) {
+//         progress = 100; // Cap progress at 100%
+//     }
+
+//     // Update the progress counter element's text
+//     document.getElementById('progress-counter').innerText = `${progress.toFixed(1)}%`;
+// }
+
+// // This function should be called when the modal is opened
+// function enableEntropyOnModal(modalElement) {
+//     // Reset progress
+//     progress = 0;
+//     document.getElementById('progress-counter').innerText = '0%';
+
+//     // Start tracking
+//     modalElement.addEventListener('mousemove', trackMouseAndCreateDots);
+// }
+
+// // Assuming 'myModal' is the ID of your modal
+// $('#styledModal').on('shown.bs.modal', function () {
+//     enableEntropyOnModal(this);
+// });
+
 </script>
 
+<script src="/assets/wallet/js/demos/parsley.js"></script>
+<script src="/assets/wallet/js/libs/jquery.steps.js"></script>
+<script src="/assets/wallet/js/mvpready-core.js"></script>
+<script src="/assets/wallet/js/mvpready-helpers.js"></script>
+<script src="/assets/wallet/js/mvpready-admin.js"></script>
 
 
-
-
-    <script src="/assets/wallet/js/demos/parsley.js"></script>
-    <script src="/assets/wallet/js/libs/jquery.steps.js"></script>
-    <script src="/assets/wallet/js/mvpready-core.js"></script>
-    <script src="/assets/wallet/js/mvpready-helpers.js"></script>
-    <script src="/assets/wallet/js/mvpready-admin.js"></script>
-
-
-    <!-- Demo JS -->
 </body>
 
 </html>
