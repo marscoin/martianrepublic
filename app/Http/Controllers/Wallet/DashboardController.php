@@ -590,7 +590,10 @@ class DashboardController extends Controller
 			else if ($profile->civic_wallet_open == 0 && $profile->wallet_open == 0) {
 				Log::debug("first wallet created has to be civic wallet");
 				$new_civic_wallet = new CivicWallet;
-				$new_civic_wallet->encrypted_seed = $request->input('password');
+				if(empty($request->input('password')))
+					$new_civic_wallet->encrypted_seed = "UNSET";
+				else
+					$new_civic_wallet->encrypted_seed = $request->input('password');
 				$new_civic_wallet->public_addr = $request->input('public_addr');
 
 				$new_civic_wallet->backup = 1;

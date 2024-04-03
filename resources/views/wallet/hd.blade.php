@@ -496,7 +496,7 @@
 
                                 </div>
 
-                                <div class="next-btn">
+                                <div class="next-btn" style="margin-top: -10px;">
 
                                     <button id="next-mnemonic" type="button" class="btn btn-primary ">Next</button>
 
@@ -791,11 +791,24 @@
 
             })
 
-            // ===================================================================
-            // =================== Handle Modal Tabs Logic =======================
-            // ===================================================================
-
             $("#next-mnemonic").click(() => {
+
+                $(".dot").hide()
+
+                 // Check if the password fields are empty
+                var password = $('#password').val().trim();
+                var rePassword = $('#re-password').val().trim();
+
+                // If both password fields are empty, show a warning message
+                if (password === '' && rePassword === '') {
+                    var userConfirmed = confirm("Warning: If you do not provide a password, you will not be able to unlock the wallet by password and access may be lost unless you have written down the seed phrase or downloaded the keyfile. Do you want to continue without setting a password?");
+                    
+                    // If user did not confirm, stop the function
+                    if (!userConfirmed) {
+                        return;
+                    }
+                }
+                
                 $(".tab-3").removeClass("disabled").addClass("active")
 
                 $(".tab-2").removeClass("active")
@@ -835,13 +848,7 @@
                     return false;
                 }
             });
-            // ===================================================================
-            // ===================================================================
-            //
-            //
-            //
-            //
-            //
+
             // ===================================================================
             // ================= Handle Password Client Encryption ui logic ======
             // ===================================================================
@@ -876,13 +883,7 @@
                 $('#password').val('');
                 $("#re-password").val('');
             })
-            // ===================================================================
-            // ===================================================================
-            //
-            //
-            //
-            //
-            //
+
             // ===================================================================
             // ============== Handle Make Wallet w/ Password  ====================
             // ===================================================================
@@ -1152,7 +1153,7 @@
                         $("#mnemonic").show()
                         $("#mnemonic").addClass("active in")
                         $("#next-entropy").hide();
-
+                        $(".dot").hide();
 
                     })
                 }
