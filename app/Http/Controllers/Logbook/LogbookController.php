@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Http\Controllers\Controller;
 use App\Models\HDWallet;
+use App\Models\CivicWallet;
 use App\Models\Publication;
 use App\Includes\AppHelper;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +35,7 @@ class LogbookController extends Controller
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 			
 			if (!$profile) {
 				return Redirect::to('/twofa');
@@ -45,7 +46,7 @@ class LogbookController extends Controller
 			}
 			
 			$view = View::make('logbook.dashboard');
-			$view->wallet_open = $profile->wallet_open;
+			$view->wallet_open = $profile->civic_wallet_open;
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;

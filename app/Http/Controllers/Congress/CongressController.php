@@ -9,6 +9,7 @@ use App\Models\Feed;
 use App\Models\IPFSRoot;
 use App\Models\User;
 use App\Models\HDWallet;
+use App\Models\CivicWallet;
 use App\Models\Proposals;
 use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
@@ -37,7 +38,7 @@ class CongressController extends Controller
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
 			if (!$profile) {
 				return redirect('/twofa');
@@ -52,6 +53,7 @@ class CongressController extends Controller
 			$view->balance = 0; //for now, could move to stats helper function as well
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
+			$view->wallet_open = $profile->civic_wallet_open;
 			return $view;
 
 
@@ -71,7 +73,7 @@ class CongressController extends Controller
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 			$proposals = DB::table('proposals')->leftJoin('ballots', 'proposals.id', '=', 'ballots.proposalid')->select('proposals.*', 'ballots.btxid', 'ballots.proposalid')->where('active', '=', '1')->get();
 
 			if (!$profile) {
@@ -96,7 +98,7 @@ class CongressController extends Controller
 			$view->fullname = Auth::user()->fullname;
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
-			$view->wallet_open = $profile->wallet_open;
+			$view->wallet_open = $profile->civic_wallet_open;
 
 
 

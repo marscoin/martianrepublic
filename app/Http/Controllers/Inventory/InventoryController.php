@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Http\Controllers\Controller;
 use App\Models\HDWallet;
+use App\Models\CivicWallet;
 use App\Includes\AppHelper;
 
 class InventoryController extends Controller
@@ -32,7 +33,7 @@ class InventoryController extends Controller
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
 			if (!$profile) {
 				return Redirect::to('/twofa');
@@ -43,7 +44,7 @@ class InventoryController extends Controller
 			}
 			
 			$view = View::make('inventory.dashboard');
-			$view->wallet_open = $profile->wallet_open;
+			$view->wallet_open = $profile->civic_wallet_open;
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;
