@@ -50,10 +50,8 @@ class IdentityController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			$view = View::make('citizen.registry');
 			$view->wallet_open = $profile->civic_wallet_open;
-			$view->gravtar_link  = $gravtar_link;
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;
@@ -213,10 +211,8 @@ class IdentityController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			$view = View::make('citizen.martian');
 			$view->wallet_open = $profile->wallet_open;
-			$view->gravtar_link  = $gravtar_link;
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;

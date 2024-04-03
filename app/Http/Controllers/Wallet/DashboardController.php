@@ -230,9 +230,7 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			$view = View::make('wallet.dashboard');
-			$view->gravtar_link  = $gravtar_link;
 			$view->public_addr = "";
 
 			// 3 States of Wallets: 
@@ -313,7 +311,6 @@ class DashboardController extends Controller
 				return $view;
 			} catch (Exception $e) {
 				$view = View::make('wallet.downtime');
-				$view->gravtar_link  = $gravtar_link;
 				return $view;
 			}
 		} else {
@@ -374,9 +371,7 @@ class DashboardController extends Controller
 			}
 
 			$view = View::make('wallet.hd');
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-			$view->gravtar_link  = $gravtar_link;
-
+			
 
 			if(!is_null($civic_wallet))
 			{
@@ -438,8 +433,7 @@ class DashboardController extends Controller
 			if ($data || ($wallets || $civic_wallet)) {
 			//if($profile->civic_wallet_open || $profile->wallet_open){
 				Log::debug("Attempting loading wallet...");
-				$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-
+				
 				//fetch wallet info of open wallet from profile if this is not a newly unlocked wallet
 				if(is_null($data)){
 					Log::debug("Loading Hd Wallet...");
@@ -458,8 +452,7 @@ class DashboardController extends Controller
 				}
 
 				$view = View::make('wallet.hd-open');
-				$view->gravtar_link  = $gravtar_link;
-
+				
 				$codes = json_decode(file_get_contents("/home/mars/constitution/marswallet.json"), true);
 				$view->SALT = $codes['salt'];
 				$view->iv = $codes['iv'];
@@ -520,6 +513,7 @@ class DashboardController extends Controller
 			}
 			Log::info("set open wallet to zero");
 			$profile->wallet_open = 0;
+			$profile->civic_wallet_open = 0;
 			$profile->save();
 
 			return redirect('wallet/dashboard/hd');
@@ -698,10 +692,8 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			$view = View::make('wallet.profile');
-			$view->gravtar_link  = $gravtar_link;
-
+			
 			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
 			$network = json_decode($json, true);
 			$view->network = $network;
@@ -735,10 +727,8 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			$view = View::make('wallet.reports');
-			$view->gravtar_link  = $gravtar_link;
-
+			
 			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
 			$network = json_decode($json, true);
 			$view->network = $network;
@@ -765,9 +755,7 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			$view = View::make('wallet.anchor');
-			$view->gravtar_link  = $gravtar_link;
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
 
@@ -797,9 +785,7 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			$view = View::make('wallet.camera');
-			$view->gravtar_link  = $gravtar_link;
 			$view->email = Auth::user()->email;
 
 			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');

@@ -41,11 +41,9 @@ class InventoryController extends Controller
 					return Redirect::to('/twofachallenge');
 				}
 			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			
 			$view = View::make('inventory.dashboard');
 			$view->wallet_open = $profile->wallet_open;
-			$view->gravtar_link  = $gravtar_link;
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;
