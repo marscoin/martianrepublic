@@ -11,6 +11,7 @@ use BaconQrCode\Writer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Profile;
 use App\Models\HDWallet;
 use App\Models\IPFSRoot;
@@ -53,6 +54,30 @@ class DashboardController extends Controller
 		return redirect('/login');
 	}
 
+	// Function to get the price from CoinGecko with caching
+	public function getMarscoinPrice()
+	{
+		$url = "https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd";
+
+		// Use the Cache facade with the remember method
+		$marsPriceData = Cache::remember('marscoin_price', 5, function () use ($url) {
+			// Inside the closure, fetch the data from CoinGecko
+			try {
+				$response = file_get_contents($url);
+				return json_decode($response);
+			} catch (\Exception $e) {
+				// Handle the exception if the API call fails
+				return null;
+			}
+		});
+
+		if ($marsPriceData) {
+			return $marsPriceData->marscoin->usd;
+		}
+
+		// Handle the case where the API call was not successful or caching failed
+		return null;
+	}
 
 
 
@@ -294,8 +319,7 @@ class DashboardController extends Controller
 				}
 
 				$view->transactions = array();
-				$cur_price = json_decode(file_get_contents("https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd"));
-				$view->mars_price = $cur_price->marscoin->usd;
+				$view->mars_price = $this->getMarscoinPrice();
 
 				$view->wallet_open = $profile->wallet_open;
 
@@ -478,9 +502,8 @@ class DashboardController extends Controller
 				// $view->wallet = $request->data;
 
 				$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$data->public_addr}/balance");
-				$cur_price = json_decode(file_get_contents("https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd"));
-
-				$view->mars_price = $cur_price->marscoin->usd;
+				
+				$view->mars_price = $this->getMarscoinPrice();
 				$view->balance = ($cur_balance * 0.00000001);
 				$view->network = $network;
 				$view->public_addr = $data->public_addr;
