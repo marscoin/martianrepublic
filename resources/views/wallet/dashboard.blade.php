@@ -1,5 +1,4 @@
 <html>
-
 <head>
     <title>Martian Republic</title>
     <meta charset="utf-8">
@@ -7,28 +6,19 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <!-- Google Font: Open Sans -->
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap"
         rel="stylesheet">
-    <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/wallet/js/plugins/dataTables/dataTables.bootstrap.css">
-    <!-- App CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
-    <!-- <link href="/assets/wallet/css/custom.css" rel="stylesheet">-->
-    <!-- Favicon -->
     <link rel="shortcut icon" href="/assets/favicon.ico">
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-  <![endif]-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 
 <body class=" ">
@@ -117,7 +107,9 @@
                                 <hr>
 
                                 <div class="portlet-body">
-                                    <div id="vertical-chart" class="chart-holder"></div>
+                                <!-- <canvas id="balanceChart" style="width: 100%; height: 260px;"></canvas> -->
+
+                                <div id="chart"></div>
                                 </div> <!-- /.portlet-body -->
                             @else
                                 @if ($has_civic_wallet || $has_wallet)
@@ -164,20 +156,16 @@
                         <div class="col-md-12">
                             <div class="portlet">
                                 <div class="wallet-is-open">
-
                                     <h4 class="portlet-title">
                                         <u>Wallet Transactions</u>
                                     </h4>
-
-
-
                                     <table class="table table-striped table-bordered dataTable" id="table-2"
                                         aria-describedby="table-2">
                                         <thead>
                                             <tr role="row">
-                                                <th style="width: 250px;" class="sorting" role="columnheader"
+                                                <th style="width: 250px;" class="sorting desc" role="columnheader"
                                                     tabindex="0" aria-controls="table-1" rowspan="1"
-                                                    colspan="1" aria-label="">
+                                                    colspan="1" aria-label="" aria-sort="descending">
                                                     Date
                                                 </th>
 
@@ -187,18 +175,18 @@
                                                     aria-label="CSS grade: activate to sort column ascending">
                                                     Recipient Address / Anchored Data Link</th>
                                                 <th style="width: 110px;" class="sorting" role="columnheader"
-                                                    tabindex="0" aria-controls="table-1" rowspan="1"
+                                                    tabindex="1" aria-controls="table-1" rowspan="1"
                                                     colspan="1"
                                                     aria-label="Platform(s): activate to sort column ascending">
                                                     MARS
                                                 </th>
                                                 <th style="width: 110px;" class="text-center sorting"
-                                                    role="columnheader" tabindex="0" aria-controls="table-1"
+                                                    role="columnheader" tabindex="2" aria-controls="table-1"
                                                     rowspan="1" colspan="1"
                                                     aria-label="Engine version: activate to sort column ascending">
                                                     USD</th>
                                                 <th style="width: 110px;" class="sorting_desc sorting"
-                                                    role="columnheader" aria-sort="descending" tabindex="0"
+                                                    role="columnheader" aria-sort="descending" tabindex="3"
                                                     aria-controls="table-1" rowspan="1" colspan="1"
                                                     aria-label="Rendering engine: activate to sort column descending">
                                                     Transaction Id</th>
@@ -289,32 +277,17 @@
     <script src="/assets/wallet/js/plugins/flot/jquery.flot.pie.js"></script>
     <script src="/assets/wallet/js/plugins/flot/jquery.flot.resize.js"></script>
     <script src="/assets/wallet/js/mvpready-core.js"></script>
-    <!--   <script src="/assets/wallet/js/mvpready-admin.js"></script> -->
     @if (count($transactions) <= 0)
         <script src="/assets/wallet/js/demos/flot/line.js"></script>
     @endif
     <script>
-        // okay - make check on localstorage real quick and pass that as another php var...? check local
-        // const key = localStorage.getItem("key");
-        // if(key != null)
-        // {
-        //     $(".wallet-is-open").show()
-        //     $(".wallet-is-not-open").hide()
-
-        // }   
-        // else{
-        //     $(".wallet-is-not-open").show()
-        //     $(".wallet-is-open").hide()
-
-        // }
 
         $(document).ready(function() {
             var mars_price = '{{ $mars_price }}';
             var lastdate = 10000000000;
             var firstdate = 0;
             var d1 = [],
-                d2 = [],
-                d3 = [];
+                d2 = [];
 
             $.ajaxSetup({
                 headers: {
@@ -371,6 +344,9 @@
             }, function(data) {
                 if (data) {
                     var txs = data.txs;
+                    var balance = 0; // Initialize running balance
+                    var balanceData = []; // This will hold our balance over time
+
                     $.each(txs, function(i, item) {
                         if (firstdate < item.time)
                             firstdate = item.time;
@@ -380,7 +356,6 @@
 
 
                         if (item.vout[0].scriptPubKey.type == "nulldata") {
-                            d3.push([item.time * 1000, item.fees])
                             var dataRowContent = "<tr><td>" + format_time(item.time) + "</td><td>" +
                                 dectag(hexToAscii(item.vout[0].scriptPubKey.asm.split("OP_RETURN ")[
                                     1])) + " " + ipfsfy(hexToAscii(item.vout[0].scriptPubKey.asm
@@ -396,11 +371,16 @@
                         } else {
                             c = "";
                             if (item.vout[0].scriptPubKey.addresses[0] == '{{ $public_addr }}') {
-                                d2.push([item.time * 1000, item.vout[0].value])
                                 c = "green";
+                                var value = Number.parseFloat(item.vout[0].value);
+                                balance += value; 
+                                var time = Math.round(item.time * 1000);
+                                balanceData.push({x: time, y: balance});
                             } else {
-                                d1.push([item.time * 1000, item.vout[0].value])
                                 c = "red";
+                                var value = Number.parseFloat(item.vout[0].value);
+                                balance -= value; 
+                                balanceData.push({x: time, y: balance});
                             }
                             var newRowContent = "<tr><td>" + format_time(item.time) +
                                 "</td><td><a target='_blank' href='http://explore.marscoin.org/address/" +
@@ -415,8 +395,9 @@
                                 "...</a></td></tr>";
 
                             $("#table-2 tbody").append(newRowContent);
-                        }
 
+                            
+                        }
                     });
                     firstdate = firstdate - (60 * 60 * 24 * 30);
                     lastdate = lastdate + (60 * 60 * 24 * 30);
@@ -428,108 +409,106 @@
 
                     console.log(d1);
                     console.log(d2);
-                    console.log(d3);
 
-                    var table_1 = $('#table-2').dataTable({
-                        "order": [
-                            [0, "desc"]
-                        ],
-                        "aoColumns": [{
-                                "orderSequence": ["desc"]
-                            },
-                            {
-                                "mData": "recipient"
-                            },
-                            {
-                                "mData": "usd"
-                            },
-                            {
-                                "mData": "mars",
-                                "sClass": "text-center"
-                            },
-                            {
-                                "mData": "time",
-                                "sClass": "text-center"
-                            }
-                        ],
-                        "fnInitComplete": function(oSettings, json) {
-                            $(this).parents('.dataTables_wrapper').find(
-                                    '.dataTables_filter input').prop('placeholder', 'Search...')
-                                .addClass('form-control input-sm')
-                        }
-                    })
-
-
-
-                    $(function() {
-
-                        var data, chartOptions;
-
-                        data = [{
-                            label: 'Expenses',
-                            data: d1
-                        }, {
-                            label: 'Income',
-                            data: d2
-                        }, {
-                            label: 'Notarizations',
-                            data: d3
-                        }];
-
-                        chartOptions = {
-                            xaxis: {
-                                min: firstdate,
-                                max: lastdate,
-                                mode: "time",
-                                tickSize: [1, "month"],
-                                monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
-                                    "Aug", "Sep", "Oct", "Nov", "Dec"
-                                ],
-                                tickLength: 0
-                            },
-                            grid: {
-                                hoverable: true,
-                                clickable: false,
-                                borderWidth: 0
-                            },
-                            bars: {
-                                show: true,
-                                barWidth: 24 * 60 * 60 * 300,
-                                fill: true,
-                                lineWidth: 1,
-                                order: true,
-                                lineWidth: 0,
-                                fillColor: {
-                                    colors: [{
-                                        opacity: 1
-                                    }, {
-                                        opacity: 1
-                                    }]
+                    $('#table-2').DataTable({
+                            "order": [
+                                [0, "desc"]
+                            ],
+                            "columnDefs": [
+                                { type: 'date', 'targets': [0] }
+                            ],
+                            "aoColumns": [{
+                                    "orderSequence": ["desc", "asc"]
+                                },
+                                {
+                                    "mData": "recipient"
+                                },
+                                {
+                                    "mData": "usd"
+                                },
+                                {
+                                    "mData": "mars",
+                                    "sClass": "text-center"
+                                },
+                                {
+                                    "mData": "time",
+                                    "sClass": "text-center"
                                 }
+                            ],
+                            "fnInitComplete": function(oSettings, json) {
+                                $(this).parents('.dataTables_wrapper').find(
+                                        '.dataTables_filter input').prop('placeholder', 'Search...')
+                                    .addClass('form-control input-sm');
+                                $("#table-2 thead th").eq(0).click(); 
                             },
-
-                            tooltip: true,
-                            tooltipOpts: {
-                                content: '%s: %y'
-                            },
-                            colors: mvpready_core.layoutColors
-                        }
-
-
-                        var holder = $('#vertical-chart');
-
-                        if (holder.length) {
-                            $.plot(holder, data, chartOptions);
-                        }
-
-
-                    });
-
-
-
+                     });
 
                 }
+
+                        // Your cleaned and sorted balanceData array
+                    let cleanedBalanceData = balanceData.filter(point => point.x && point.y);
+                    cleanedBalanceData.sort((a, b) => a.x - b.x);
+
+                    // Transform data for ApexCharts
+                    let seriesData = cleanedBalanceData.map(point => {
+                    return { x: new Date(point.x), y: point.y };
+                    });
+
+                    let maxYValue = Math.max(...cleanedBalanceData.map(point => point.y));
+
+                    // ApexCharts options
+                    var options = {
+                    series: [{
+                        name: 'Balance',
+                        data: seriesData
+                    }],
+                    chart: {
+                        type: 'line',
+                        height: 350,
+                        zoom: {
+                        enabled: false
+                        },
+                        toolbar: {
+                        show: false
+                        }
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    stroke: {
+                        curve: 'smooth'
+                    },
+                    xaxis: {
+                        type: 'datetime'
+                    },
+                    tooltip: {
+                        x: {
+                        format: 'dd MMM yyyy'
+                        }
+                    },
+                    yaxis: {
+                            min: 0,
+                            max: maxYValue ,
+                            labels: {
+                            formatter: function (value) {
+                                return value.toFixed(2); // Rounds the label to two decimal places
+                            }
+                            },
+                        }
+                    };
+
+                    // Initialize ApexCharts
+                    var chart = new ApexCharts(document.querySelector("#chart"), options);
+                    chart.render();
+
+
+
             });
+
+
+            
+
+
 
             function format_time(s) {
                 if (s)

@@ -38,7 +38,7 @@ Route::get('/wallet/anchor', 'Wallet\DashboardController@anchor');
 Route::post('/wallet/forget', 'Wallet\DashboardController@forgetWallet');
 
 
-Route::any('/wallet/dashboard/hd', 'Wallet\DashboardController@showHDWallet');
+Route::any('/wallet/dashboard/hd', 'Wallet\DashboardController@listHDWallet');
 Route::any('/wallet/dashboard/hd-open', 'Wallet\DashboardController@showHDOpen');
 Route::any('/wallet/dashboard/hd-close', 'Wallet\DashboardController@showHDClose');
 Route::any('/wallet/getwallet', 'Wallet\DashboardController@getWallet');

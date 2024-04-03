@@ -5,7 +5,7 @@ namespace App\Includes;
 use App\Models\Feed;
 use App\Models\Publication;
 use DateTime;
-
+use Illuminate\Support\Facades\Cache;
 
 class AppHelper{
 
@@ -327,6 +327,62 @@ class AppHelper{
 		    $str = '';
 		    for($i=0;$i<strlen($hex);$i+=2) $str .= chr(hexdec(substr($hex,$i,2)));
 		    return $str;
+		}
+
+
+			// Function to get the price from CoinGecko with caching
+		public static function getMarscoinPrice()
+		{
+			$url = "https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd";
+
+			// Use the Cache facade with the remember method
+			$marsPriceData = Cache::remember('marscoin_price', 5, function () use ($url) {
+				// Inside the closure, fetch the data from CoinGecko
+				try {
+					$response = file_get_contents($url);
+					return json_decode($response);
+				} catch (\Exception $e) {
+					// Handle the exception if the API call fails
+					return null;
+				}
+			});
+
+			if ($marsPriceData) {
+				return $marsPriceData->marscoin->usd;
+			}
+
+			// Handle the case where the API call was not successful or caching failed
+			return null;
+		}
+
+
+		public static function getMarscoinBalance($publicAddr)
+		{
+			$url = "https://explore.marscoin.org/api/addr/{$publicAddr}/balance";
+
+			// Unique cache key to store the balance for each address
+			$cacheKey = 'marscoin_balance_' . $publicAddr;
+
+			// Use the Cache facade with the remember method
+			$curBalance = Cache::remember($cacheKey, 5, function () use ($url) {
+				// Inside the closure, fetch the balance from the explorer
+				try {
+					$response = file_get_contents($url);
+					return $response; // Assuming the response is the balance
+				} catch (\Exception $e) {
+					// Handle the exception if the API call fails
+					return null;
+				}
+			});
+
+			if ($curBalance !== null) {
+				// Assuming the balance is returned in satoshis, convert to Marscoin if necessary
+				// The conversion logic depends on the API's response format
+				return $curBalance * 0.00000001; // Example conversion, adjust based on actual response
+			}
+
+			// Handle the case where the API call was not successful or caching failed
+			return null;
 		}
 
 

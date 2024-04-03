@@ -65,6 +65,13 @@
 
 
                     <div class="col-md-7 col-sm-7">
+
+
+                        @if($is_civic_wallet)
+                            <div class="alert alert-danger" role="alert">
+                                You are currently viewing your Passport Wallet used for civic functions.
+                            </div>
+                        @endif
                         <div class="portlet">
 
                             <h3 class="portlet-title">

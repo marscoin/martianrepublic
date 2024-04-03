@@ -40,25 +40,11 @@
 
   <li class="dropdown navbar-profile">
     <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:;">
-      <img src="{{$gravtar_link}}" class="navbar-profile-avatar" alt="">
+      <img src="https://unavatar.io/{{ Auth::user()->email }}?fallback=https://martianrepublic.org/assets/citizen/generic_profile.jpg" class="navbar-profile-avatar" alt="">
       <span class="navbar-profile-label">{{ Auth::user()->email }} &nbsp;</span>
       <i class="fa fa-caret-down"></i>
     </a>
     <ul class="dropdown-menu" role="menu">
-<!--       <li>
-        <a href="/wallet/profile">
-          <i class="fa fa-user"></i>
-          &nbsp;&nbsp;My Profile
-        </a>
-      </li>
-      <li>
-        <a href="/wallet/reports">
-          <i class="fa fa-cogs"></i>
-          &nbsp;&nbsp;Reports
-        </a>
-      </li>
-      
-      <li class="divider"></li> -->
       <li>
         <a href="/wallet/dashboard/hd-close">
           <i class="fa fa-window-close-o"></i>

@@ -9,6 +9,7 @@ use App\Models\Profile;
 use App\Models\Feed;
 use App\Models\User;
 use App\Models\HDWallet;
+use App\Models\CivicWallet;
 use App\Models\Citizen;
 use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
@@ -38,7 +39,7 @@ class IdentityController extends Controller
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 			$citcache = Citizen::where('userid', '=', $uid)->first();
 
 
@@ -51,7 +52,7 @@ class IdentityController extends Controller
 			}
 			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			$view = View::make('citizen.registry');
-			$view->wallet_open = $profile->wallet_open;
+			$view->wallet_open = $profile->civic_wallet_open;
 			$view->gravtar_link  = $gravtar_link;
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
@@ -73,8 +74,7 @@ class IdentityController extends Controller
 			$view->activity = DB::select('select profile.userid, users.fullname, feed.tag, feed.mined  from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id ORDER BY feed.id DESC limit 3');
 
 			if ($wallet) {
-				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$view->balance = ($cur_balance * 0.00000001);
+				$view->balance = AppHelper::getMarscoinBalance($wallet['public_addr']);
 				$view->public_address = $wallet['public_addr'];
 				$view->endorsed = Feed::where('message', '=', $wallet['public_addr'])->where('tag', '=', "ED")->get();
 			} else {
@@ -115,8 +115,7 @@ class IdentityController extends Controller
 			$view->fullname = Auth::user()->fullname;
 			
 			if ($wallet) {
-				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$view->balance = ($cur_balance * 0.00000001);
+				$view->balance = AppHelper::getMarscoinBalance($wallet->public_addr);
 				$view->public_address = $wallet['public_addr'];
 			} else {
 				$view->balance = 0;
@@ -145,8 +144,7 @@ class IdentityController extends Controller
 			$view->fullname = Auth::user()->fullname;
 			
 			if ($wallet) {
-				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$view->balance = ($cur_balance * 0.00000001);
+				$view->balance = AppHelper::getMarscoinBalance($wallet->public_addr);
 				$view->public_address = $wallet['public_addr'];
 			} else {
 				$view->balance = 0;
@@ -176,8 +174,7 @@ class IdentityController extends Controller
 			$view->fullname = Auth::user()->fullname;
 			
 			if ($wallet) {
-				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$view->balance = ($cur_balance * 0.00000001);
+				$view->balance = AppHelper::getMarscoinBalance($wallet->public_addr);
 				$view->public_address = $wallet['public_addr'];
 			} else {
 				$view->balance = 0;
