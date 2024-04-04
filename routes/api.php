@@ -21,4 +21,5 @@ Route::get('/feed/applicant', 'App\Http\Controllers\ApiController@allApplicants'
 
 Route::get('/citizen/{address}', 'App\Http\Controllers\ApiController@showCitizen')->name('api_show');
 
+Route::post('/token', 'App\Http\Controllers\ApiController@token');
 Route::get('/test', 'App\Http\Controllers\ApiController@test');
