@@ -34,6 +34,7 @@ Ensure the Marscoin CLI is correctly installed and configured, including setting
 Note: This script is part of the Martian Republic project and is tailored for analyzing Marscoin blockchain transactions. It requires access to a running Marscoin node and a configured database for storing transaction data.
 """
 import pymysql as MySQLdb
+from pymysql.cursors import DictCursor
 import sys
 import os
 import json
@@ -49,9 +50,16 @@ load_dotenv("../.env")
 
 # Set up logging
 logger = logging.getLogger(__name__)
-handler = TimedRotatingFileHandler('./track_marscoin.log', when="d", interval=1, backupCount=5)
-logger.addHandler(handler)
 logger.setLevel(logging.INFO)
+
+# File handler
+file_handler = TimedRotatingFileHandler('./track_marscoin.log', when="d", interval=1, backupCount=5)
+logger.addHandler(file_handler)
+
+# Console handler
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setLevel(logging.INFO)
+logger.addHandler(console_handler)
 
 # Database configuration
 DB_CONFIG = {
@@ -305,10 +313,10 @@ def process_block_transactions(db, cur, block_hash):
     """
     Process transactions for a given block hash.
     """
-    block_transactions = get_txs(cur, block_hash)
+    block_transactions = get_txs(block_hash)
     logging.info("Found: %d transactions", len(block_transactions))
     for tx in block_transactions:
-        transaction = get_tx_details(cur, tx)
+        transaction = get_tx_details(tx)
         if transaction:
             process_transaction(cur, db, transaction)
 
@@ -361,3 +369,13 @@ def main_loop():
 
     if db:
         db.close()  # Ensure the database connection is closed properly on exit
+
+
+
+if __name__ == "__main__":
+    try:
+        main_loop()
+    except KeyboardInterrupt:
+        logger.info("Shutting down...")
+    except Exception as e:
+        logger.error("Unexpected error: %s", e)
