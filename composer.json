@@ -12,7 +12,9 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.5",
         "livewire/livewire": "^3.4",
-        "pragmarx/google2fa": "^8.0"
+        "pragmarx/google2fa": "^8.0",
+	 "kalnoy/nestedset": "6.x-dev",
+        "riari/laravel-forum":   "dev-main as 5.6.2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
@@ -65,5 +67,21 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/home/llopin/Projects/martianrepublic/riari/laravel-forum",
+            "options": {
+                "symlink": true
+            }
+        },
+	{
+        "type": "path",
+        "url": "/home/llopin/Projects/martianrepublic/laravel-nestedset",
+        "options": {
+            "symlink": true
+        }
+    }
+    ]
 }
