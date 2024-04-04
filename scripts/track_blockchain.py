@@ -34,7 +34,6 @@ Ensure the Marscoin CLI is correctly installed and configured, including setting
 Note: This script is part of the Martian Republic project and is tailored for analyzing Marscoin blockchain transactions. It requires access to a running Marscoin node and a configured database for storing transaction data.
 """
 import pymysql as MySQLdb
-from MySQLdb.cursors import DictCursor
 import sys
 import os
 import json
@@ -47,7 +46,6 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv("../.env")
-_ssl.PROTOCOL_SSLv23 = _ssl.PROTOCOL_TLSv1
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -334,6 +332,7 @@ def process_transaction(cur, db, transaction):
 
 
 def main_loop():
+    logger.info("Starting...")
     db, cur = db_connect()
     if not db or not cur:  # Check if initial connection failed
         logger.critical("Initial database connection failed. Exiting.")
@@ -362,29 +361,3 @@ def main_loop():
 
     if db:
         db.close()  # Ensure the database connection is closed properly on exit
-
-
-#Get the latest blockhash and count
-#./marscoin-cli getblockchaininfo
-
-#Get the block's transactions
-#./marscoin-cli getblock b484047f180c9210b566df827ff4a258f77bee18b5b099c0a006744f72a28e5e
-
-#Then we do:
-#./marscoin-cli getrawtransaction 827071dc502eae261920dd55e36be0d859e15a313e465d068005941546382252
-#and take that hash and
-
-#./marscoin-cli decoderawtransaction longhash
-
-#and in that we search for any vout that looks like this:
-# "vout": [
-#     {
-#       "value": "0.00000000",
-#       "n": 0,
-#       "scriptPubKey": {
-#         "asm": "OP_RETURN 47505f516d5a39314e4b677778504465427a41753545327a5533505678734b50626d7075776a6b6472446d6a544b4a6168",
-#         "type": "nulldata"
-#       }
-#     },
-#then we grab the nulldata type asm and ascii that hash and analyse it
-
