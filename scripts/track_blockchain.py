@@ -354,7 +354,7 @@ def main_loop():
             height, block_hash, mined = load_latest_block(cur)
             logging.info("Current block height: %s, hash: %s, mined: %s", height, block_hash, mined)
 
-            process_block_transactions(db, cur, block_hash)
+            process_block_transactions(db, cur, block_hash, height, mined)
             time.sleep(10)  # Main loop delay
         except MySQLdb.Error as e:
             logger.error("Database error occurred: %s", e)
