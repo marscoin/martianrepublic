@@ -18,7 +18,7 @@ class CategoryFactory extends Factory
             'thread_count' => 0,
             'post_count' => 0,
             'is_private' => 0,
-            'color' => '#007BFF',
+            'color' => '#d23636',
         ];
     }
 }
