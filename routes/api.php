@@ -20,3 +20,5 @@ Route::get('/feed/citizen', 'App\Http\Controllers\ApiController@allCitizen')->na
 Route::get('/feed/applicant', 'App\Http\Controllers\ApiController@allApplicants')->name('api_allapplicants');
 
 Route::get('/citizen/{address}', 'App\Http\Controllers\ApiController@showCitizen')->name('api_show');
+
+Route::get('/test', 'App\Http\Controllers\ApiController@test');

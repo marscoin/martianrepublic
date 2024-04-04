@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use BitcoinPHP\BitcoinECDSA\BitcoinECDSA;
 
 
@@ -130,27 +131,6 @@ class ApiController extends Controller
     }
 
 
-    /**
-	 * @hideFromAPIDocumentation
-	 */
-	public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'Invalid credentials'], 401);
-        }
-
-        $token = $user->createToken('app-token')->plainTextToken;
-
-        return response()->json(['token' => $token]);
-    }
-
 
     public function token(Request $request) 
     {
@@ -201,6 +181,30 @@ class ApiController extends Controller
         } 
         else {
             return response()->json(['message' => 'couldnt verify message'], 406);
+        }
+    }
+
+    public function test()
+    {
+        $bitcoinECDSA = new BitcoinECDSA(); 
+        $bitcoinECDSA->generateRandomPrivateKey(); //generate new random private key
+        $address = $bitcoinECDSA->getAddress();
+        $message = "Test message";
+        $signedMessage = $bitcoinECDSA->signMessage($message, true);
+        echo "message: " . PHP_EOL . "<br>";
+        echo $message . PHP_EOL . "<br>";
+        echo "signed message: " . PHP_EOL . "<br>";
+        echo $signedMessage . PHP_EOL . "<br>";
+        //$signedMessage = "random";
+
+        //loading Bitcoin crypto library
+        if ($bitcoinECDSA->checkSignatureForMessage($address, $signedMessage, $message))       //verifying signature
+        {
+            Log::debug("True");
+            echo "True<br>";
+        }else{
+            Log::debug("False");
+            echo "False<br>";
         }
     }
 
