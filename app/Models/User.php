@@ -56,12 +56,22 @@ class User extends Authenticatable
 
     public function hdWallet()
     {
-        return $this->hasOne(HDWallet::class, 'user_id');
+        return $this->hasMany(HDWallet::class, 'user_id');
     }
 
     public function citizen()
     {
         return $this->hasOne(Citizen::class, 'userid');
+    }
+
+    /**
+     * Get the user's civic wallet.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function civicWallet()
+    {
+        return $this->hasOne(CivicWallet::class, 'user_id');
     }
 
 }

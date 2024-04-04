@@ -24,4 +24,9 @@ class CivicWallet extends Model
 	public static $rules = array(
 		'password'=>'required|between:6,32'
 		);
+
+	public function user()
+	{
+		return $this->belongsTo(User::class);
+	}
 }

@@ -14,7 +14,13 @@ use App\Models\Proposals;
 use App\Models\Threads;
 use App\Models\Citizen;
 use App\Models\HDWallet;
+use App\Models\CivicWallet;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
+use BitcoinPHP\BitcoinECDSA\BitcoinECDSA;
+
 
 class ApiController extends Controller
 {
@@ -122,6 +128,85 @@ class ApiController extends Controller
 
         return response()->json($response);
     }
+
+
+    /**
+	 * @hideFromAPIDocumentation
+	 */
+	public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
+        }
+
+        $token = $user->createToken('app-token')->plainTextToken;
+
+        return response()->json(['token' => $token]);
+    }
+
+
+    public function token(Request $request) 
+    {
+        $publicAddress = $request->input('a');
+        $msg = $request->input('m');
+        $sig = $request->input('s');
+        $timestamp = $request->input('t');
+
+        if (empty($msg)){
+            $data = $request->json()->all();
+
+            if (isset($data['data'])) {
+                $msg = $data['data']['m'] ?? null;
+                $sig = $data['data']['s'] ?? null;
+                $publicAddress = $data['data']['a'] ?? null;
+                $timestamp = $data['data']['t'] ?? '0';
+            }
+        }
+        // Validate timestamp
+        if (Carbon::now()->diffInSeconds(Carbon::createFromTimestamp($timestamp)) > 600) { // 5 minutes tolerance
+            return response()->json(['error' => 'Request timestamp is too old.'], 401);
+        }
+
+        $bitcoinECDSA = new BitcoinECDSA();                                     //loading Bitcoin crypto library
+        if ($bitcoinECDSA->checkSignatureForMessage($publicAddress, $sig, $msg)) 
+        {
+            $wallet = CivicWallet::where('public_addr', $publicAddress)->first();
+
+            if ($wallet) {
+                // Wallet found, get the associated user
+                $user = $wallet->user;
+            } else {
+                // Wallet not found, create a new user without a wallet
+                $user = User::where('email', $publicAddress . '@martianrepublic.org')->first();
+                if (!$user) {
+                    $user = User::create([
+                        'name' => 'UserWithoutWallet', // Or any other default or generated name
+                        'email' => $publicAddress . '@martianrepublic.org',
+                        'password' => Hash::make(Str::random(10)), // Random password
+                    ]);
+                }
+            }
+            
+            // Generate token for the user
+            $token = $user->createToken('authToken')->plainTextToken;
+            
+            return response()->json(['token' => $token]);
+        } 
+        else {
+            return response()->json(['message' => 'couldnt verify message'], 406);
+        }
+    }
+
+
+
+
 
 
 }
