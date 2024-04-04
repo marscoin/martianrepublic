@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Profile;
 use App\Models\HDWallet;
+use App\Models\Proposals;
 use App\Models\IPFSRoot;
 use App\Models\User;
 use App\Models\Voucher;
@@ -249,31 +250,19 @@ class DashboardController extends Controller
 					$view->has_wallet = false;
 				} else if ($civic_wallet && !$wallet) {
 
-					$view->balance = AppHelper::getMarscoinBalance($civic_wallet['public_addr']);
+					$view->balance = AppHelper::getMarscoinBalance($civic_wallet->public_addr);
 					$view->public_addr = $civic_wallet->public_addr;
-					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/totalReceived");
-					$received = json_decode($json, true);
-					$view->received = ($received * 0.00000001);
-					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/totalSent");
-					$sent = json_decode($json, true);
-					$view->sent = ($sent * 0.00000001);
+					$view->received = AppHelper::getMarscoinTotalReceived($civic_wallet->public_addr);
+					$view->sent = AppHelper::getMarscoinTotalSent($civic_wallet->public_addr);
 
-
-					// important state.
 					$view->has_civic_wallet = true;
 					$view->has_wallet = false;
 				} else if ($civic_wallet && $wallet) {
-					$cur_balance = file_get_contents("https://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/balance");
-					$view->balance = ($cur_balance * 0.00000001);
+					$view->balance = AppHelper::getMarscoinBalance($civic_wallet->public_addr);
 					$view->public_addr = $civic_wallet->public_addr;
-					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/totalReceived");
-					$received = json_decode($json, true);
-					$view->received = ($received * 0.00000001);
-					$json = $this->file_get_contents_curl("http://explore.marscoin.org/api/addr/{$civic_wallet['public_addr']}/totalSent");
-					$sent = json_decode($json, true);
-					$view->sent = ($sent * 0.00000001);
+					$view->received = AppHelper::getMarscoinTotalReceived($civic_wallet->public_addr);
+					$view->sent = AppHelper::getMarscoinTotalSent($civic_wallet->public_addr);
 
-					// important state.
 					$view->has_civic_wallet = true;
 					$view->has_wallet = true;
 				} else{
@@ -292,16 +281,12 @@ class DashboardController extends Controller
 				else if($profile->civic_wallet_open > 0)
 					$view->wallet_open = $profile->civic_wallet_open;
 				else
-				$view->wallet_open = 0;
+					$view->wallet_open = 0;
 				
-					// $json = $this->file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
-				// $network = json_decode($json, true);
-				$json2 = $this->file_get_contents_curl('http://explore.marscoin.org/api/status?q=getTxOutSetInfo');
-				$total = json_decode($json2, true);
-				if ($total && count($total) > 0)
-					$view->coincount = round($total['txoutsetinfo']['total_amount'], 2);
-				else
-					$view->coincount = 35000000;
+				$view->coincount = AppHelper::getMarscoinTotalAmount();
+				$view->forum_count = AppHelper::checkForRecentPosts();
+				$view->proposal_count = Proposals::countOpenProposals();
+				$view->citizen_status = AppHelper::getCitizenStatus($uid)->type;
 
 				$view->voucher = false;
 				$voucher = Voucher::where('user_account', '=', Auth::user()->email)->first();
@@ -376,9 +361,7 @@ class DashboardController extends Controller
 			if(!is_null($civic_wallet))
 			{
 				$view->civic_balance = AppHelper::getMarscoinBalance($civic_wallet->public_addr);
-				$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
-				$network = json_decode($json, true);
-				$view->network = $network;
+				$view->network = AppHelper::getMarscoinNetworkInfo();
 				$view->public_addr = null;
 
 				$view->general_public = $profile->general_public;

@@ -17,8 +17,19 @@ class Proposals extends Model {
 	 *
 	 * @var array
 	 */
-	public static $rules = array(
-		);
+	public static $rules = [];
+
+	/**
+     * Check for open proposals.
+     * 
+     * @return int Number of open proposals.
+     */
+    public static function countOpenProposals()
+    {
+        // Count the number of proposals where 'active' is true (1).
+        return self::where('active', 1)->count();
+    }
+
 }
 
 ?>

@@ -6,6 +6,11 @@ use App\Models\Feed;
 use App\Models\Publication;
 use DateTime;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use TeamTeaTime\Forum\Models\Post;
+use Carbon\Carbon;
+use App\Models\Profile;
+use App\Models\Citizen;
 
 class AppHelper{
 
@@ -384,6 +389,154 @@ class AppHelper{
 			// Handle the case where the API call was not successful or caching failed
 			return null;
 		}
+
+		public static function getMarscoinTotalReceived($publicAddr)
+		{
+			$url = "https://explore.marscoin.org/api/addr/{$publicAddr}/totalReceived";
+			$cacheKey = 'marscoin_total_received_' . $publicAddr;
+
+			$totalReceived = Cache::remember($cacheKey, 5, function () use ($url) {
+				try {
+					$response = file_get_contents($url);
+					return $response; // Assuming the response is the total amount received
+				} catch (\Exception $e) {
+					return null;
+				}
+			});
+
+			if ($totalReceived !== null) {
+				return $totalReceived * 0.00000001; // Convert from satoshis to Marscoin if necessary
+			}
+
+			return null;
+		}
+
+
+		public static function getMarscoinTotalSent($publicAddr)
+		{
+			$url = "https://explore.marscoin.org/api/addr/{$publicAddr}/totalSent";
+			$cacheKey = 'marscoin_total_sent_' . $publicAddr;
+
+			$totalSent = Cache::remember($cacheKey, 5, function () use ($url) {
+				try {
+					$response = file_get_contents($url);
+					return $response; // Assuming the response is the total amount sent
+				} catch (\Exception $e) {
+					return null;
+				}
+			});
+
+			if ($totalSent !== null) {
+				return $totalSent * 0.00000001; // Convert from satoshis to Marscoin if necessary
+			}
+
+			return null;
+		}
+
+
+		public static function getMarscoinTotalAmount()
+		{
+			$url = "https://explore.marscoin.org/api/status?q=getTxOutSetInfo";
+			$cacheKey = 'marscoin_total_amount';
+
+			$totalAmount = Cache::remember($cacheKey, 180, function () use ($url) {
+				try {
+					$response = file_get_contents($url);
+					$data = json_decode($response, true);
+					if ($data && count($data) > 0) {
+						return round($data['txoutsetinfo']['total_amount'], 2);
+					}
+				} catch (\Exception $e) {
+					return 39000000; // Default value in case of an error
+				}
+				return 39000000; // Default value if the API does not return a valid response
+			});
+
+			return $totalAmount;
+		}
+
+		public static function getMarscoinNetworkInfo()
+		{
+			$url = "http://explore2.marscoin.org/api/status?q=getInfo";
+			$cacheKey = 'marscoin_network_info';
+		
+			$networkInfo = Cache::remember($cacheKey, 60, function () use ($url) {
+				try {
+					$response = file_get_contents($url);
+					$data = json_decode($response, true);
+					if (is_array($data)) {
+						return $data; // Return the network info if the response is valid
+					}
+					Log::debug("Set Network status cache");
+				} catch (\Exception $e) {
+					return []; // Return an empty array in case of an error
+				}
+				return []; // Also return an empty array if the API does not return a valid response
+			});
+		
+			return $networkInfo;
+		}
+
+		 /**
+		 * Check for recent posts in the forum.
+		 * 
+		 * @return int Number of recent posts.
+		 */
+		public static function checkForRecentPosts()
+		{
+			// Define the time frame for "recent" posts. For example, within the last 24 hours.
+			$recentThreshold = Carbon::now()->subDay();
+
+			// Count the number of posts created after the recent threshold.
+			$recentPostsCount = Post::where('created_at', '>', $recentThreshold)->count();
+
+			return $recentPostsCount;
+		}
+
+
+		/**
+		 * Determines the Citizen Status of a user.
+		 * 
+		 * @param int $userId The ID of the user.
+		 * @return object An associative array containing the 'status' and 'type'.
+		 */
+		public static function getCitizenStatus(int $userId)
+		{
+			// Default status for users without a profile entry.
+			$statusDetails = [
+				'status' => 'Newcomer',
+				'type' => 'NC',
+			];
+
+			// Attempt to retrieve the user's profile.
+			$profile = Profile::where('userid', $userId)->first();
+
+			if ($profile) {
+				if ($profile->has_application > 0) {
+					$statusDetails = [
+						'status' => 'Applicant',
+						'type' => 'AP',
+					];
+				} elseif ($profile->general_public > 0) {
+					$statusDetails = [
+						'status' => 'General Public',
+						'type' => 'GP',
+					];
+				}
+				
+				// Check if the user is a citizen.
+				$isCitizen = Citizen::where('userid', $userId)->exists();
+				if ($isCitizen) {
+					$statusDetails = [
+						'status' => 'Citizen',
+						'type' => 'CT',
+					];
+				}
+			}
+
+			return (object)$statusDetails;
+		}
+
 
 
 }

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CongressController extends Controller
 {
@@ -64,18 +65,20 @@ class CongressController extends Controller
 		
 	}
 
-
-
-
 	// Show Voting Page
 	protected function showVoting()
 	{
 		if (Auth::check()) {
+			$startTime = microtime(true);
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 			$proposals = DB::table('proposals')->leftJoin('ballots', 'proposals.id', '=', 'ballots.proposalid')->select('proposals.*', 'ballots.btxid', 'ballots.proposalid')->where('active', '=', '1')->get();
 
+			$endTime = microtime(true);
+    		$executionTime = $endTime - $startTime;
+    		Log::info("Execution time: {$executionTime} seconds");
+			
 			if (!$profile) {
 				return redirect('/twofa');
 			} else {
@@ -83,16 +86,31 @@ class CongressController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			
-			$view = View::make('congress.voting');
+
+			$endTime = microtime(true);
+    		$executionTime = $endTime - $startTime;
+    		Log::info("Execution time2: {$executionTime} seconds");
+
+			if(AppHelper::getCitizenStatus($uid)->type != "CT"){
+				$view = View::make('congress.noteligableyet');
+			}else{
+				$view = View::make('congress.voting');
+			}
+
+			$endTime = microtime(true);
+    		$executionTime = $endTime - $startTime;
+    		Log::info("Execution time3: {$executionTime} seconds");
 			
 			if ($wallet) {
-				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$view->balance = ($cur_balance * 0.00000001);
+				$view->balance = AppHelper::getMarscoinBalance($wallet->public_addr);
 				$view->public_address = $wallet->public_addr;
 			} else {
 				$view->balance = 0;
 			}
+
+			$endTime = microtime(true);
+    		$executionTime = $endTime - $startTime;
+    		Log::info("Execution time4: {$executionTime} seconds");
 
 			$view->proposals = $proposals;
 			$view->fullname = Auth::user()->fullname;
@@ -100,13 +118,19 @@ class CongressController extends Controller
 			$view->isGP  = $profile->general_public;
 			$view->wallet_open = $profile->civic_wallet_open;
 
+			$endTime = microtime(true);
+    		$executionTime = $endTime - $startTime;
+    		Log::info("Execution time4a: {$executionTime} seconds");
 
+			$view->network = AppHelper::getMarscoinNetworkInfo();
 
-			// echo "Hello, World";
-			// die();
-			$json = AppHelper::file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
+			$endTime = microtime(true);
+    		$executionTime = $endTime - $startTime;
+    		Log::info("Execution time4b: {$executionTime} seconds");
+			
+			$endTime = microtime(true);
+    		$executionTime = $endTime - $startTime;
+    		Log::info("Execution time5: {$executionTime} seconds");
 
 			return $view;
 		}else{

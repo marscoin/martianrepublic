@@ -41,8 +41,6 @@ class IdentityController extends Controller
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 			$citcache = Citizen::where('userid', '=', $uid)->first();
-
-
 			if (!$profile) {
 				return redirect('/twofa');
 			} else {
@@ -56,16 +54,12 @@ class IdentityController extends Controller
 			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;
 			$view->citcache = $citcache;
-			//print_r($view->isCitizen);
-			//die();
 			$view->isGP  = $profile->general_public;
 			$view->mePublic = Feed::where('userid', '=', $uid)->where('tag', '=', "GP")->first();
 			$view->meCitizen = Feed::where('userid', '=', $uid)->where('tag', '=', "CT")->first();
 			$view->feed = Feed::where('userid', '=', $uid)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
 			$view->endorsed = array();
 			
-			//print_r(is_null($view->meCitizen));
-			//die();
 			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "GP" ORDER BY feed.id desc');
 			$view->everyCitizen = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "CT" ORDER BY feed.id desc');
 			$view->everyApplicant = DB::select('select profile.userid, users.fullname, hd_wallet.public_addr as address from users, profile, hd_wallet where profile.userid = users.id and users.id = hd_wallet.user_id and profile.has_application = 1 ORDER BY profile.userid DESC ');

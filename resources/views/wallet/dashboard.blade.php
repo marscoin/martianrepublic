@@ -78,14 +78,16 @@
                                                     id="sent">{{ number_format($sent, 4) }}</span> MARS</td>
                                         </tr>
                                         <tr>
-                                            <td class="kv-key"><i class="fa fa-pencil kv-icon kv-icon-default"></i> Open
-                                                Proposals</td>
-                                            <td class="kv-value">0</td>
+                                            <td class="kv-key"><a href="/forum"><i class="fa  fa-wechat kv-icon kv-icon-default"></i> Forum Recently</a></td>
+                                            <td class="kv-value">{{$forum_count}}</td>
                                         </tr>
                                         <tr>
-                                            <td class="kv-key"><i class="fa fa-bank kv-icon kv-icon-default"></i> Open
-                                                Bills</td>
-                                            <td class="kv-value">0</td>
+                                            <td class="kv-key"><a href="/congress/voting"><i class="fa fa-bank kv-icon kv-icon-default"></i> Open Proposals</a></td>
+                                            <td class="kv-value">{{$proposal_count}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="kv-key"><a href="/citizen/all"><i class="fa  fa-universal-access kv-icon kv-icon-default"></i> Citizen Status</a></td>
+                                            <td class="kv-value">{{$citizen_status}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
