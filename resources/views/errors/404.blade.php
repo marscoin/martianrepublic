@@ -393,9 +393,14 @@ li a:hover {
           </li>
 
         </ul>
+
       </nav>
+
     </div> 
+
   </header>
+
+        
         <div class="stars">
             <div class="central-body">
                 <img class="image-404" src="/assets/landing/img/404.svg" width="300px">
