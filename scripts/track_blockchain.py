@@ -39,9 +39,7 @@ import sys
 import os
 import json
 import time
-import logging
 from datetime import datetime
-from logging.handlers import TimedRotatingFileHandler
 from subprocess import Popen, PIPE
 from dotenv import load_dotenv
 
@@ -49,17 +47,22 @@ from dotenv import load_dotenv
 load_dotenv("../.env")
 
 # Set up logging
+import logging
+from logging.handlers import TimedRotatingFileHandler
+
+# Configure logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# File handler
-file_handler = TimedRotatingFileHandler('./track_marscoin.log', when="d", interval=1, backupCount=5)
+# File handler for logging into a file
+file_handler = TimedRotatingFileHandler('./track_marscoin.log', when='midnight', interval=1, backupCount=10, encoding='utf-8')
+file_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+# Add the file handler to the logger
 logger.addHandler(file_handler)
 
-# Console handler
-console_handler = logging.StreamHandler(sys.stdout)
-console_handler.setLevel(logging.INFO)
-logger.addHandler(console_handler)
 
 # Database configuration
 DB_CONFIG = {
@@ -157,7 +160,6 @@ def get_tx_details(txid):
     """
     Retrieves the transaction details for a given transaction ID.
     """
-    logger.info("Txid: %s", txid)
     try:
         raw_tx = get_raw_tx(txid)
         if raw_tx:
@@ -165,7 +167,7 @@ def get_tx_details(txid):
             p = Popen(command, stdout=PIPE, stderr=PIPE, encoding='utf8')
             output, errors = p.communicate()
             if p.returncode == 0:
-                print(output)
+                #print(output)
                 return json.loads(output)
             else:
                 logger.error("Error decoding transaction for txid %s: %s", txid, errors)
@@ -176,17 +178,64 @@ def get_tx_details(txid):
     return None
  
 
-def load_latest_block(cur):
+def load_next_block(cur):
     """
-    Loads the latest block information from the database.
+    Fetches the next unprocessed block based on the last entry in feed_log.
     """
     try:
-        cur.execute('SELECT * FROM feed_log ORDER BY id DESC LIMIT 1')
-        b = cur.fetchone()
-        return b['block'], b['hash'], b['mined']
+        cur.execute('SELECT * FROM feed_log ORDER BY block DESC LIMIT 1')
+        last_processed_block = cur.fetchone()
+        
+        next_block_height = last_processed_block['block'] + 1 if last_processed_block else 1
+        
+        # Getting the next block's hash
+        command = [MARSCOIN_EXEC_PATH, "-datadir=" + MARSCOIN_CONF_PATH, "getblockhash", str(next_block_height)]
+        p = Popen(command, stdout=PIPE, stderr=PIPE, encoding='utf8')
+        output, errors = p.communicate()
+        
+        if p.returncode != 0:
+            logger.error(f"Error getting block hash for height {next_block_height}: {errors}")
+            return None, None, None
+
+        next_block_hash = output.strip()
+
+        # Getting details for the next block
+        command = [MARSCOIN_EXEC_PATH, "-datadir=" + MARSCOIN_CONF_PATH, "getblock", next_block_hash]
+        p = Popen(command, stdout=PIPE, stderr=PIPE, encoding='utf8')
+        output, errors = p.communicate()
+        
+        if p.returncode != 0:
+            logger.error(f"Error getting details for block hash {next_block_hash}: {errors}")
+            return None, None, None
+
+        block_details = json.loads(output)
+        mined_date = datetime.fromtimestamp(block_details['time'])
+
+        return block_details['height'], block_details['hash'], mined_date
+
     except Exception as e:
-        logger.error("Error loading the latest block: %s", e)
+        logger.error(f"Error loading the next block: {e}")
         return None, None, None
+
+
+
+def record_block_processed(cur, db, block, block_hash, mined):
+    """
+    Records that a block has been processed.
+    """
+    try:
+        insert_query = """
+        INSERT INTO feed_log (block, hash, mined, processed_at)
+        VALUES (%s, %s, %s, NOW())
+        ON DUPLICATE KEY UPDATE processed_at=NOW();
+        """
+        cur.execute(insert_query, (block, block_hash, mined))
+        db.commit()
+        logger.info(f"Recorded block {block} as processed.")
+    except Exception as e:
+        logger.error(f"Error recording block {block} as processed: {e}")
+        db.rollback()
+
 
 
 def get_user_by_address(cur, address):
@@ -202,11 +251,6 @@ def get_user_by_address(cur, address):
         return None
     
 
-def cacheSignedMessages(head, body, userid, txid, block, blockdate):
-    print("cached online at the moment. to be implemented.")
-    # resp = requests.get(url="https://ipfs.marscoin.org/ipfs/" + body)
-    # sm = resp.json()
-    # print(sm.data.post)
     # insert = "INSERT INTO feed (`address`, `userid`, `tag`, `message`, `embedded_link`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) VALUES ('MRKAuE7k9UhANQ8JjoU5A9KACic5Rt2Diz', userid, 'SP', sm.data.post, 'https://ipfs.marscoin.org/ipfs/'+body, '12a93f3899b58eac1880766d4fde1fd3ffe1fd99dc9eab5c6b40aaffe76a16ec', '1594109', '2022-02-26 17:22:47', NOW(), NOW());"
 
 def cache_vote(cur, db, vote, body, userid, txid, block, blockdate):
@@ -321,10 +365,16 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
     """
     Process a single transaction, checking for OP_RETURN and other criteria.
     """
-    print("Processing transaction")
+    logger.info(f"Processing transaction: {transaction['txid'][:8]} Block: {height}")
     vins = transaction['vin']
-    print(vins)
-    addr = vins[0]['addr']
+    coinbase = vins[0].get('coinbase')
+    addr = vins[0].get('addr')
+
+    if coinbase is not None:
+        logger.info("Miner transaction. Ignoring...")
+        return
+
+    addr = vins[0].get('addr')
     txid = transaction['txid']
     for vo in transaction['vout']:
         script = vo['scriptPubKey']
@@ -349,11 +399,15 @@ def main_loop():
     while True:
         try:
             now = datetime.now()
-            height, block_hash, mined = load_latest_block(cur)
-            logging.info("Current block height: %s, hash: %s, mined: %s", height, block_hash, mined)
-
-            process_block_transactions(db, cur, block_hash, height, mined)
-            time.sleep(10)  # Main loop delay
+            height, block_hash, mined = load_next_block(cur)
+            if height and block_hash and mined:
+                logger.info(f"Next block to process -> Height: {height}, Hash: {block_hash[:8]}, Mined: {mined}")
+                process_block_transactions(db, cur, block_hash, height, mined)
+                record_block_processed(cur, db, height, block_hash, mined)
+                time.sleep(5)
+            else:
+                logger.info("Waiting for next block...")
+                time.sleep(10)  # Delay if there's no new block to process
         except MySQLdb.Error as e:
             logger.error("Database error occurred: %s", e)
             db, cur = db_connect()  # Attempt to reconnect
