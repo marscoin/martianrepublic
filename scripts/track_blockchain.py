@@ -262,7 +262,7 @@ def cache_endorsements(cur, db, head, body, userid, txid, block, blockdate):
 
 
         
-def analyze_embedded_data(cur, db, data, addr, txid, block, blockdate):
+def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_hash):
     # Assuming getUserByAddress function is already defined and takes 'cur' as a parameter
     userid = get_user_by_address(cur, addr)
     if userid is None:
@@ -287,12 +287,12 @@ def analyze_embedded_data(cur, db, data, addr, txid, block, blockdate):
 
     # Directly call cache_vote for relevant operations, avoids repetition and makes future modifications easier
     if head in ["PRY", "PRN", "PRA"]:
-        cache_vote(cur, db, head, body, userid, txid, block, blockdate)
+        cache_vote(cur, db, head, body, userid, txid, height, blockdate)
     elif head == "ED":
         # Future implementation for cacheEndorsements should follow the same parameter structure for consistency
-        cache_endorsements(cur, db, head, body, userid, txid, block, blockdate)
+        cache_endorsements(cur, db, head, body, userid, txid, height, blockdate)
     elif head == "SP":
-        cacheSignedMessages(head, body, userid, txid, block, blockdate)
+        cacheSignedMessages(head, body, userid, txid, height, blockdate)
         
 
 
@@ -309,7 +309,7 @@ def analyze_embedded_data(cur, db, data, addr, txid, block, blockdate):
 ################################################################################
 
 
-def process_block_transactions(db, cur, block_hash):
+def process_block_transactions(db, cur, block_hash, height, mined):
     """
     Process transactions for a given block hash.
     """
@@ -318,12 +318,15 @@ def process_block_transactions(db, cur, block_hash):
     for tx in block_transactions:
         transaction = get_tx_details(tx)
         if transaction:
-            process_transaction(cur, db, transaction)
+            process_transaction(cur, db, transaction, height, mined, block_hash)
 
-def process_transaction(cur, db, transaction):
+
+def process_transaction(cur, db, transaction, height, mined, block_hash):
     """
     Process a single transaction, checking for OP_RETURN and other criteria.
     """
+    vins = transaction['vin']
+    addr = vins[0]['addr']
     txid = transaction['txid']
     for vo in transaction['vout']:
         script = vo['scriptPubKey']
@@ -333,8 +336,7 @@ def process_transaction(cur, db, transaction):
             byte_array = bytearray.fromhex(data)
             plain = byte_array.decode()
             logging.info("Decoded message: %s", plain)
-            # Assuming analyze_embedded_data is improved to handle exceptions internally
-            analyze_embedded_data(cur, db, plain, transaction)
+            analyze_embedded_data(cur, db, plain, addr, txid, height, mined, block_hash)
         else:
             logging.info("Regular output")
 
