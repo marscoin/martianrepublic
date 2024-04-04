@@ -3780,7 +3780,7 @@ table.dataTable-helper td.highlight {
 }
 .navbar-profile-avatar {
   position: absolute;
-  top: 50%;
+  top: 30%;
   left: 12px;
   margin-top: -14px;
 }
