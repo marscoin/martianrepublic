@@ -165,6 +165,7 @@ def get_tx_details(txid):
             p = Popen(command, stdout=PIPE, stderr=PIPE, encoding='utf8')
             output, errors = p.communicate()
             if p.returncode == 0:
+                print(output)
                 return json.loads(output)
             else:
                 logger.error("Error decoding transaction for txid %s: %s", txid, errors)
@@ -227,13 +228,11 @@ def cache_signed_messages(cur, db, head, body, userid, txid, block, blockdate):
     Cache signed messages in the database.
     """
     link = f'https://ipfs.marscoin.org/ipfs/{body}'
-    # Assuming the structure of the 'feed' table accommodates storing signed messages appropriately
     insert_query = """
     INSERT INTO feed (`address`, `userid`, `tag`, `message`, `embedded_link`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) 
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
     """
     try:
-        # Assuming 'addr' is available in this scope or passed as an argument
         cur.execute(insert_query, (addr, userid, head, "Signed Message", link, txid, block, blockdate))
         db.commit()
         logger.info("Successfully cached signed message for txid: %s", txid)
@@ -245,14 +244,12 @@ def cache_endorsements(cur, db, head, body, userid, txid, block, blockdate):
     """
     Cache endorsements in the database.
     """
-    # Assuming the structure for endorsements data is known and we're storing it similarly to votes and signed messages
     endorsement_info = body  # Placeholder for actual data processing, if needed
     insert_query = """
     INSERT INTO feed (`address`, `userid`, `tag`, `message`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) 
     VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
     """
     try:
-        # Assuming 'addr' is determined based on the endorsement context or passed as an argument
         cur.execute(insert_query, (addr, userid, head, endorsement_info, txid, block, blockdate))
         db.commit()
         logger.info("Successfully cached endorsement for txid: %s", txid)
@@ -263,7 +260,6 @@ def cache_endorsements(cur, db, head, body, userid, txid, block, blockdate):
 
         
 def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_hash):
-    # Assuming getUserByAddress function is already defined and takes 'cur' as a parameter
     userid = get_user_by_address(cur, addr)
     if userid is None:
         logger.error("User ID not found for address: %s", addr)
@@ -325,7 +321,9 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
     """
     Process a single transaction, checking for OP_RETURN and other criteria.
     """
+    print("Processing transaction")
     vins = transaction['vin']
+    print(vins)
     addr = vins[0]['addr']
     txid = transaction['txid']
     for vo in transaction['vout']:
