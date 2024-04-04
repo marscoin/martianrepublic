@@ -71,14 +71,14 @@
     "repositories": [
         {
             "type": "path",
-            "url": "/home/llopin/Projects/martianrepublic/riari/laravel-forum",
+            "url": "./riari/laravel-forum",
             "options": {
                 "symlink": true
             }
         },
 	{
         "type": "path",
-        "url": "/home/llopin/Projects/martianrepublic/laravel-nestedset",
+        "url": "./laravel-nestedset",
         "options": {
             "symlink": true
         }
