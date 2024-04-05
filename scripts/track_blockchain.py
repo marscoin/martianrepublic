@@ -253,7 +253,7 @@ def get_user_by_address(cur, address):
 
     # insert = "INSERT INTO feed (`address`, `userid`, `tag`, `message`, `embedded_link`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) VALUES ('MRKAuE7k9UhANQ8JjoU5A9KACic5Rt2Diz', userid, 'SP', sm.data.post, 'https://ipfs.marscoin.org/ipfs/'+body, '12a93f3899b58eac1880766d4fde1fd3ffe1fd99dc9eab5c6b40aaffe76a16ec', '1594109', '2022-02-26 17:22:47', NOW(), NOW());"
 
-def cache_vote(cur, db, vote, body, userid, txid, block, blockdate):
+def cache_vote(cur, db, addr, vote, body, userid, txid, block, blockdate):
     proposal = body[1:8].upper()
     link = f'https://ipfs.marscoin.org/ipfs/{body}'
     insert_query = """
@@ -267,7 +267,7 @@ def cache_vote(cur, db, vote, body, userid, txid, block, blockdate):
     except Exception as e:
         logger.error("Failed to cache vote: %s", e)
 
-def cache_signed_messages(cur, db, head, body, userid, txid, block, blockdate):
+def cache_signed_messages(cur, db, addr, head, body, userid, txid, block, blockdate):
     """
     Cache signed messages in the database.
     """
@@ -284,7 +284,7 @@ def cache_signed_messages(cur, db, head, body, userid, txid, block, blockdate):
         logger.error("Failed to cache signed message for txid %s: %s", txid, e)
         db.rollback()
 
-def cache_endorsements(cur, db, head, body, userid, txid, block, blockdate):
+def cache_endorsements(cur, db, addr, head, body, userid, txid, block, blockdate):
     """
     Cache endorsements in the database.
     """
@@ -327,12 +327,12 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
 
     # Directly call cache_vote for relevant operations, avoids repetition and makes future modifications easier
     if head in ["PRY", "PRN", "PRA"]:
-        cache_vote(cur, db, head, body, userid, txid, height, blockdate)
+        cache_vote(cur, db, addr, head, body, userid, txid, height, blockdate)
     elif head == "ED":
         # Future implementation for cacheEndorsements should follow the same parameter structure for consistency
-        cache_endorsements(cur, db, head, body, userid, txid, height, blockdate)
+        cache_endorsements(cur, db, addr, head, body, userid, txid, height, blockdate)
     elif head == "SP":
-        cacheSignedMessages(head, body, userid, txid, height, blockdate)
+        cache_signed_messages(cur, db, addr, head, body, userid, txid, height, blockdate)
         
 
 
@@ -373,6 +373,8 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
     if coinbase is not None:
         logger.info("Miner transaction. Ignoring...")
         return
+    
+    print(transaction)
 
     addr = vins[0].get('addr')
     txid = transaction['txid']
