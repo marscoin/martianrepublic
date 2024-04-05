@@ -42,6 +42,7 @@ import time
 from datetime import datetime
 from subprocess import Popen, PIPE
 from dotenv import load_dotenv
+import requests
 
 # Load environment variables
 load_dotenv("../.env")
@@ -249,9 +250,57 @@ def get_user_by_address(cur, address):
     except Exception as e:
         logger.error("Error getting user by address %s: %s", address, e)
         return None
+
+
+def mark_application_submitted(cur, db, userid):
+    """
+    Marks in the user's profile that an application has been submitted.
+    """
+    cur.execute("UPDATE profile SET has_application = 1 WHERE userid = %s", (userid,))
+    db.commit() 
+
+
+# IPFS handling
+##################
+
+def fetch_ipfs_data(ipfs_hash):
+    """
+    Fetches data from an IPFS hash and returns it as a dictionary.
+    """
+    ipfs_url = f"https://ipfs.marscoin.org/ipfs/{ipfs_hash}"
+    response = requests.get(ipfs_url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        logger.error(f"Failed to fetch IPFS data for hash: {ipfs_hash}")
+        return None
     
 
-    # insert = "INSERT INTO feed (`address`, `userid`, `tag`, `message`, `embedded_link`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) VALUES ('MRKAuE7k9UhANQ8JjoU5A9KACic5Rt2Diz', userid, 'SP', sm.data.post, 'https://ipfs.marscoin.org/ipfs/'+body, '12a93f3899b58eac1880766d4fde1fd3ffe1fd99dc9eab5c6b40aaffe76a16ec', '1594109', '2022-02-26 17:22:47', NOW(), NOW());"
+def update_or_insert_applicant(cur, db, application_data, userid):
+    """
+    Updates or inserts the applicant data into the citizen table.
+    """
+    # Check if the user already exists in the citizen table
+    cur.execute("SELECT id FROM citizen WHERE userid = %s", (userid,))
+    result = cur.fetchone()
+
+    if result:
+        # Update existing entry
+        cur.execute("""UPDATE citizen SET firstname = %s, lastname = %s, displayname = %s, shortbio = %s, avatar_link = %s, liveness_link = %s, public_address = %s, updated_at = NOW() WHERE userid = %s""",
+                    (application_data['firstName'], application_data['lastName'], application_data['displayname'], application_data['shortbio'], application_data['picture'], application_data['video'], application_data['addr'], userid))
+    else:
+        # Insert new entry
+        cur.execute("""INSERT INTO citizen (userid, firstname, lastname, displayname, shortbio, avatar_link, liveness_link, public_address, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())""",
+                    (userid, application_data['firstName'], application_data['lastName'], application_data['displayname'], application_data['shortbio'], application_data['picture'], application_data['video'], application_data['addr']))
+    
+    mark_application_submitted(cur, db, userid)
+    logger.info("Application cached successfully")
+    db.commit()
+
+
+
+#Caching functions
+##################
 
 def cache_vote(cur, db, addr, vote, body, userid, txid, block, blockdate):
     proposal = body[1:8].upper()
@@ -304,9 +353,10 @@ def cache_endorsements(cur, db, addr, head, body, userid, txid, block, blockdate
 
 def cache_general_applications(cur, db, addr, head, body, userid, txid, height, blockdate):
     """
-    Cache applications
+    Cache general public applications
     """
-    endorsement_info = body  # Placeholder for actual data processing, if needed
+    embedded_link = "https://ipfs.marscoin.org/ipfs/" + body
+    message = "General Application"
     insert_query = """
     INSERT INTO feed (`address`, `userid`, `tag`, `message`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) 
     VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
@@ -314,12 +364,17 @@ def cache_general_applications(cur, db, addr, head, body, userid, txid, height, 
     logger.info(head)
     logger.info(body)
     try:
-        #cur.execute(insert_query, (addr, userid, head, endorsement_info, txid, block, blockdate))
-        #db.commit()
-        logger.info("Successfully cached endorsement for txid: %s", txid)
+        cur.execute(insert_query, (addr, userid, head, message, embedded_link, txid, height, blockdate))
+        db.commit()
+        logger.info("Successfully cached application for user: %s", userid)
+        logger.info("Processing embedded link data...")
+        edata = fetch_ipfs_data(embedded_link)
+        logger.info("IPFS json data fetched...")
+        update_or_insert_applicant(cur, db, edata, userid)
+        logger.info("User application data stored in citizen cache table...")
     except Exception as e:
-        logger.error("Failed to cache endorsement for txid %s: %s", txid, e)
-        #db.rollback()
+        logger.error("Failed to cache application for txid %s: %s", userid, e)
+        db.rollback()
 
         
 def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_hash):
