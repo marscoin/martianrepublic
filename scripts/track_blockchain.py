@@ -327,7 +327,7 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
     if userid is None:
         logger.error("User ID not found for address: %s", addr)
         return
-    else
+    else:
         logger.info("User: " + str(userid))
 
     head, body = data.split("_", 1)  # Safely unpack data with a maxsplit=1
