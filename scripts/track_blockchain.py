@@ -376,8 +376,11 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
     
     print(transaction)
 
-    addr = vins[0].get('addr')
-    txid = transaction['txid']
+    # Initialize variables to find the vout with the max value that's not OP_RETURN
+    # We assume max output is owner of transaction
+    max_value = 0
+    owner_address = None
+
     for vo in transaction['vout']:
         script = vo['scriptPubKey']
         if "OP_RETURN" in script['asm']:
@@ -386,9 +389,19 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
             byte_array = bytearray.fromhex(data)
             plain = byte_array.decode()
             logging.info("Decoded message: %s", plain)
-            analyze_embedded_data(cur, db, plain, addr, txid, height, mined, block_hash)
         else:
-            logging.info("Regular output")
+            # Check if this output has the highest value so far and capture the address
+            if vo['value'] > max_value:
+                max_value = vo['value']
+                # Extract the address from this output, if available
+                addresses = script.get('addresses', [])
+                owner_address = addresses[0] if addresses else None
+
+    if owner_address:
+        logging.info(f"Transaction initiated by: {owner_address}")
+        analyze_embedded_data(cur, db, plain, owner_address, transaction['txid'], height, mined, block_hash)
+    else:
+        logging.info("Unable to determine transaction initiator.")
 
 
 def main_loop():
