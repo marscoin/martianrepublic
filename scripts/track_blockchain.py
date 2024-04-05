@@ -381,7 +381,7 @@ def cache_general_applications(cur, db, addr, head, body, userid, txid, height, 
         logger.info("Processing embedded link data...")
         edata = fetch_ipfs_data(body)
         logger.info("IPFS json data fetched...")
-        update_or_insert_applicant(cur, db, edata, userid)
+        update_or_insert_applicant(cur, db, addr, edata, userid)
         logger.info("User application data stored in citizen cache table...")
     except Exception as e:
         logger.error("Failed to cache application for txid %s: %s", txid, e)
