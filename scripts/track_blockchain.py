@@ -358,8 +358,8 @@ def cache_general_applications(cur, db, addr, head, body, userid, txid, height, 
     embedded_link = "https://ipfs.marscoin.org/ipfs/" + body
     message = "General Application"
     insert_query = """
-    INSERT INTO feed (`address`, `userid`, `tag`, `message`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+    INSERT INTO feed (`address`, `userid`, `tag`, `message`, `embedded_link`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
     """
     logger.info(head)
     logger.info(body)
@@ -373,7 +373,7 @@ def cache_general_applications(cur, db, addr, head, body, userid, txid, height, 
         update_or_insert_applicant(cur, db, edata, userid)
         logger.info("User application data stored in citizen cache table...")
     except Exception as e:
-        logger.error("Failed to cache application for txid %s: %s", userid, e)
+        logger.error("Failed to cache application for txid %s: %s", txid, e)
         db.rollback()
 
         
