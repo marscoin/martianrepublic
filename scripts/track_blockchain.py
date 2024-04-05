@@ -302,12 +302,33 @@ def cache_endorsements(cur, db, addr, head, body, userid, txid, block, blockdate
         db.rollback()
 
 
+def cache_general_applications(cur, db, addr, head, body, userid, txid, height, blockdate):
+    """
+    Cache applications
+    """
+    endorsement_info = body  # Placeholder for actual data processing, if needed
+    insert_query = """
+    INSERT INTO feed (`address`, `userid`, `tag`, `message`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+    """
+    logger.info(head)
+    logger.info(body)
+    try:
+        #cur.execute(insert_query, (addr, userid, head, endorsement_info, txid, block, blockdate))
+        #db.commit()
+        logger.info("Successfully cached endorsement for txid: %s", txid)
+    except Exception as e:
+        logger.error("Failed to cache endorsement for txid %s: %s", txid, e)
+        #db.rollback()
+
         
 def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_hash):
     userid = get_user_by_address(cur, addr)
     if userid is None:
         logger.error("User ID not found for address: %s", addr)
         return
+    else
+        logger.info("User: " + str(userid))
 
     head, body = data.split("_", 1)  # Safely unpack data with a maxsplit=1
 
@@ -333,6 +354,8 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
         cache_endorsements(cur, db, addr, head, body, userid, txid, height, blockdate)
     elif head == "SP":
         cache_signed_messages(cur, db, addr, head, body, userid, txid, height, blockdate)
+    elif head == "GP":
+        cache_general_applications(cur, db, addr, head, body, userid, txid, height, blockdate)
         
 
 
