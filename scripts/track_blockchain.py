@@ -595,59 +595,90 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
     """
     Cache voting proposal in the database and insert corresponding details into the proposals table.
     """
-    embedded_link = f'https://ipfs.marscoin.org/ipfs/{body}'
-    ipfs_data = fetch_ipfs_data(body)
-    
-    if not ipfs_data or 'data' not in ipfs_data:
-        logger.error(f"IPFS data not accessible for hash: {body}. Skipping caching voting proposal.")
-        return
-    
-    proposal_data = ipfs_data['data']
-    author_name = get_author_name_by_user_id(cur, userid) 
-    if not author_name:
-        logger.error(f"Author name not found for user ID {userid}.")
-        return
-
-    # Insert into feed table
-    insert_feed_query = """
-    INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
-    """
     try:
-        cur.execute(insert_feed_query, (addr, userid, head, proposal_data.get('title', 'Voting Proposal'), embedded_link, txid, height, blockdate))
-        db.commit()
-        logger.info(f"Successfully cached voting proposal for txid: {txid}")
-    except Exception as e:
-        logger.error(f"Failed to cache voting proposal for txid {txid}: {e}")
-        db.rollback()
+        embedded_link = f'https://ipfs.marscoin.org/ipfs/{body}'
+        ipfs_data = fetch_ipfs_data(body)
+        
+        if not ipfs_data or 'data' not in ipfs_data:
+            logger.error(f"IPFS data not accessible for hash: {body}. Skipping caching voting proposal.")
+            return
+        
+        proposal_data = ipfs_data['data']
+        author_name = get_author_name_by_user_id(cur, userid) 
+        if not author_name:
+            logger.error(f"Author name not found for user ID {userid}.")
+            return
 
-    # Insert into proposals table
-    insert_proposal_query = """
-    INSERT INTO proposals (user_id, title, description, category, participation, duration, threshold, expiration, txid, public_address, ipfs_hash, created_at, updated_at, mined, author) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s);
-    """
-    try:
-        cur.execute(insert_proposal_query, (
-            userid, 
-            proposal_data.get('title', ''), 
-            proposal_data.get('description', ''), 
-            proposal_data.get('category', ''), 
-            proposal_data.get('participation', 0), 
-            proposal_data.get('duration', 0), 
-            proposal_data.get('threshold', 0), 
-            proposal_data.get('expiration', 0), 
-            txid, 
-            addr, 
-            embedded_link,
-            blockdate,
-            author_name
-        ))
-        db.commit()
-        logger.info(f"Successfully inserted voting proposal into proposals table for txid: {txid}")
-    except Exception as e:
-        logger.error(f"Failed to insert voting proposal into proposals table for txid {txid}: {e}")
-        db.rollback()
+        # Insert into feed table
+        insert_feed_query = """
+        INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+        """
+        try:
+            cur.execute(insert_feed_query, (addr, userid, head, proposal_data.get('title', 'Voting Proposal'), embedded_link, txid, height, blockdate))
+            db.commit()
+            logger.info(f"Successfully cached voting proposal for txid: {txid}")
+        except Exception as e:
+            logger.error(f"Failed to cache voting proposal for txid {txid}: {e}")
+            db.rollback()
 
+        # Attempt to create forum thread
+        try:
+            forum_thread_query = """
+            INSERT INTO forum_threads (category_id, author_id, title, proposal_id, created_at, updated_at) 
+            VALUES (2, %s, %s, NULL, NOW(), NOW());
+            """
+            cur.execute(forum_thread_query, (userid, proposal_data.get('title', 'Voting Proposal')))
+            db.commit()
+            forum_thread_id = cur.lastrowid
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Failed to create forum thread for proposal: {e}")
+            return
+
+        # Attempt to insert proposal with a placeholder for discussion ID
+        try:
+            insert_proposal_query = """
+            INSERT INTO proposals (user_id, title, description, category, participation, duration, threshold, expiration, txid, public_address, ipfs_hash, created_at, updated_at, mined, author, discussion) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, NULL);
+            """
+            cur.execute(insert_proposal_query, (
+                userid,
+                proposal_data.get('title', ''),
+                proposal_data.get('description', ''),
+                proposal_data.get('category', ''),
+                proposal_data.get('participation', 0),
+                proposal_data.get('duration', 0),
+                proposal_data.get('threshold', 0),
+                proposal_data.get('expiration', 0),
+                txid,
+                addr,
+                body,
+                blockdate,
+                author_name
+            ))
+            db.commit()
+            proposal_id = cur.lastrowid
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Failed to insert voting proposal into proposals table: {e}")
+            return
+
+        # Attempt to update forum thread with the proposal ID and proposal with the forum thread ID (discussion)
+        try:
+            cur.execute("UPDATE forum_threads SET proposal_id = %s WHERE id = %s", (proposal_id, forum_thread_id))
+            cur.execute("UPDATE proposals SET discussion = %s WHERE id = %s", (forum_thread_id, proposal_id))
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Failed to update forum thread or proposal with IDs: {e}")
+            return
+
+        logger.info(f"Successfully processed voting proposal and associated forum thread for txid: {txid}")
+
+    except Exception as e:
+        logger.error(f"Unexpected error while processing voting proposal: {e}")
+        db.rollback()
 
         
 def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_hash):
