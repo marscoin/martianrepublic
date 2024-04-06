@@ -35,8 +35,10 @@ Route::get('/wallet/camera', 'Wallet\DashboardController@showCamera');
 Route::get('/wallet/dashboard/transactions', 'Wallet\DashboardController@showTransactions');
 Route::get('/wallet/chart', 'Wallet\DashboardController@showChart');
 Route::get('/wallet/anchor', 'Wallet\DashboardController@anchor');
+Route::post('/wallet/forget', 'Wallet\DashboardController@forgetWallet');
 
-Route::any('/wallet/dashboard/hd', 'Wallet\DashboardController@showHDWallet');
+
+Route::any('/wallet/dashboard/hd', 'Wallet\DashboardController@listHDWallet');
 Route::any('/wallet/dashboard/hd-open', 'Wallet\DashboardController@showHDOpen');
 Route::any('/wallet/dashboard/hd-close', 'Wallet\DashboardController@showHDClose');
 Route::any('/wallet/getwallet', 'Wallet\DashboardController@getWallet');
@@ -72,6 +74,7 @@ Route::get('/inventory/all', 'Inventory\InventoryController@showAll');
 Route::get('/congress/all', 'Congress\CongressController@showAll');
 Route::any('/congress/voting', 'Congress\CongressController@showVoting');
 Route::post('/congress/createproposal', 'Congress\CongressController@postCreateProposal');
+Route::get('/congress/ballot/{propid?}', 'Congress\CongressController@acquireBallot');
 
 
 // 
@@ -91,8 +94,14 @@ Route::post('/api/importPK/{account?}', 'Wallet\ApiController@importPK');
 Route::post('/api/redeem', 'Wallet\ApiController@redeem');
 Route::post('/api/permapinpic', 'Wallet\ApiController@permapinpic');
 Route::post('/api/permapinvideo', 'Wallet\ApiController@permapinvideo');
+Route::post('/api/permapinlog', 'Wallet\ApiController@permapinlog');
 Route::post('/api/permapinjson', 'Wallet\ApiController@permapinjson');
 Route::post('/api/setfeed', 'Wallet\ApiController@setfeed');
 Route::post('/api/getTransactions', 'Wallet\ApiController@getTransactions');
 Route::post('/api/setfullname', 'Wallet\ApiController@setfullname');
 Route::post('/api/closewallet', 'Wallet\ApiController@closewallet');
+Route::post('/api/cacheproposal', 'Wallet\ApiController@cacheproposal');
+Route::post('/api/cacheonboarding', 'Wallet\ApiController@cacheonboarding');
+
+
+Route::post('/api/test', 'Wallet\ApiController@test');

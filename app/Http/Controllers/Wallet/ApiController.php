@@ -10,6 +10,9 @@ use App\Includes\AppHelper;
 use App\Models\Feed;
 use App\Models\Profile;
 use App\Models\User;
+use App\Models\Proposals;
+use App\Models\Threads;
+use App\Models\Citizen;
 
 class ApiController extends Controller {
 
@@ -32,9 +35,16 @@ class ApiController extends Controller {
 	}
 
 
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 * @hideFromAPIDocumentation
+	 */
 	public function permapinpic(Request $request){
 
 		if (Auth::check()) {
+			$uid = Auth::user()->id;
 			$hash = "";
 			$dataPic = $request->input('picture');
 			$type = $request->input('type');
@@ -53,6 +63,12 @@ class ApiController extends Controller {
 			file_put_contents($file_path, $dataPic);
 			$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
 
+			$citcache = Citizen::where('userid', '=', $uid)->first();
+			if(is_null($citcache)) $citcache = new Citizen;	
+			$citcache->userid = $uid;
+			$citcache->avatar_link = "https://ipfs.marscoin.org/ipfs/".$hash;
+			$citcache->save();
+
 			return (new Response(json_encode(array("Hash" => $hash)), 200))
               ->header('Content-Type', "application/json;");
 
@@ -64,9 +80,16 @@ class ApiController extends Controller {
 	}
 
 
+	/**
+	 * Internal
+	 *
+	 * @ignore
+	 * @hideFromAPIDocumentation
+	 */
 	public function permapinvideo(Request $request){
 
 		if (Auth::check()) {
+			$uid = Auth::user()->id;
 			$hash = "";
 			$dataPic = $request->input('file');
 			$type = $request->input('type');
@@ -82,6 +105,12 @@ class ApiController extends Controller {
 				$file_path = $file_path . "profile_video.webm";
 				$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
 
+				$citcache = Citizen::where('userid', '=', $uid)->first();
+				if(is_null($citcache)) $citcache = new Citizen;	
+				$citcache->userid = $uid;
+				$citcache->liveness_link = "https://ipfs.marscoin.org/ipfs/".$hash;
+				$citcache->save();
+
 				return (new Response(json_encode(array("Hash" => $hash)), 200))
 				->header('Content-Type', "application/json;");
 			}
@@ -95,7 +124,66 @@ class ApiController extends Controller {
 	}
 
 
+	/**
+	 * Internal
+	 *
+	 * @hideFromAPIDocumentation
+	 */
+	public function permapinlog(Request $request){
 
+		if (Auth::check()) {
+			$hash = "";
+			$public_address = $request->input('address');
+			$title = $request->input('title');
+			$entry = $request->input('entry');
+			$uid = Auth::user()->id;
+
+			$file_path = "./assets/citizen/" . $public_address . "/logbook/".md5($title);
+			//echo $file_path;
+			if (!file_exists($file_path)) {
+				echo "making folder";
+				mkdir($file_path, 0777, true);
+			}
+			$file_path = "./assets/citizen/" . $public_address . "/logbook/".md5($title);
+			$hash = "";
+
+			$file = $file_path."/log.markdown";
+			file_put_contents($file, $title."\n\n".$entry);
+			$files = $request->file('filenames');
+			//print_r($files);
+			//die();
+			if(!is_null($files))
+			{
+				//echo count($files);
+				foreach ($files as $f) {
+					//print_r($f);
+					$name = $f->hashName(); // Generate a unique, random name...
+					//echo "New: " . $name;
+					$f->move($file_path, $name );
+				}
+			}
+			
+			$hash = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true");
+			AppHelper::insertPublicationCache($uid, $file_path, $hash);
+
+			return (new Response(json_encode(array("Hash" => $hash, "Path" => $file_path)), 200))
+			->header('Content-Type', "application/json;");
+		
+			
+
+		
+		}else{
+            return redirect('/login');
+        }
+			
+	}
+
+
+	/**
+	 * Internal
+	 *
+	 * @hideFromAPIDocumentation
+	 */
 	public function permapinjson(Request $request)
 	{
 		if (Auth::check()) {
@@ -123,6 +211,11 @@ class ApiController extends Controller {
 	}
 
 
+	/**
+	 * Internal
+	 *
+	 * @hideFromAPIDocumentation
+	 */
 	public function setfeed(Request $request)
 	{
 		if (Auth::check()) {
@@ -149,7 +242,11 @@ class ApiController extends Controller {
 	}
 
 
-
+	/**
+	 * Internal
+	 *
+	 * @hideFromAPIDocumentation
+	 */
 	public function getTransactions(Request $request)
 	{
 		if (Auth::check()) {
@@ -166,7 +263,11 @@ class ApiController extends Controller {
         }
 	}
 
-
+	/**
+	 * Internal
+	 *
+	 * @hideFromAPIDocumentation
+	 */
 	public function setfullname(Request $request)
 	{
 		if (Auth::check()) {
@@ -180,6 +281,14 @@ class ApiController extends Controller {
 
 			$fullname = $firstname . " " . $lastname;
 
+			$citcache = Citizen::where('userid', '=', $uid)->first();
+			if(is_null($citcache)) $citcache = new Citizen;	
+			
+			$citcache->userid = $uid;
+			$citcache->firstname = $firstname;
+			$citcache->lastname = $lastname;
+			$citcache->save();
+
 			$user = User::where('id', '=', $uid)->first();
 			$user->fullname = $fullname;
 			$user->save();
@@ -187,7 +296,35 @@ class ApiController extends Controller {
 		}
 	}
 
+	/**
+	 *
+	 * @hideFromAPIDocumentation
+	 */
+	public function cacheonboarding(Request $request)
+	{
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$shortbio = $request->input('shortbio');
+			$displayname = $request->input('displayname');
+			$publicaddress = $request->input('publicaddress');
+			
+			$citcache = Citizen::where('userid', '=', $uid)->first();
+			if(is_null($citcache)) $citcache = new Citizen;	
+			
+			$citcache->userid = $uid;
+			$citcache->shortbio = $shortbio;
+			$citcache->displayname = $displayname;
+			$citcache->public_address = $publicaddress;
+			$citcache->save();
 
+			return;
+		}
+	}
+
+	/**
+	 *
+	 * @hideFromAPIDocumentation
+	 */
 	public function closewallet(Request $request)
 	{
 		if (Auth::check()) {
@@ -199,7 +336,9 @@ class ApiController extends Controller {
 		}
 	}
 
-
+	/**
+	 * @hideFromAPIDocumentation
+	 */
 	public function setendorsed(Request $request)
 	{
 		if (Auth::check()) {
@@ -210,6 +349,58 @@ class ApiController extends Controller {
 			$profile->save();
 			return;
 		}
+	}
+
+
+	/**
+	 * @hideFromAPIDocumentation
+	 */
+	public function cacheproposal(Request $request)
+	{
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$txid = $request->input('txid');
+			$public_address = $request->input('address');
+			$embedded_link = $request->input('embedded_link');
+			$json = $request->input('message');
+			$data = json_decode($json);
+
+			$proposal = new Proposals;	
+			$proposal->user_id = $uid;
+			$proposal->title = $data->data->title;
+			$proposal->description = $data->data->description;
+			$proposal->category = $data->data->category;
+			$proposal->author = Auth::user()->fullname;
+			$proposal->ipfs_hash = $embedded_link;
+			$proposal->participation = $data->data->participation;
+			$proposal->threshold = $data->data->threshold;
+			$proposal->duration = $data->data->duration;
+			$proposal->expiration = $data->data->expiration;
+			$proposal->txid = $txid;
+			$proposal->public_address = $public_address;
+
+
+			$proposal->save();
+			$prop_id = $proposal->id;
+
+			$threads = new Threads;
+			$threads->category_id = 2;
+			$threads->author_id = $uid;
+			$threads->title = $data->data->title;
+			$threads->proposal_id = $prop_id;
+			$threads->save();
+
+			$thd_id = $threads->id;
+			
+			$proposal->where('id', $prop_id)->update(['discussion' => $thd_id]);
+
+			return (new Response(json_encode(array("Proposal" => $prop_id, "Discussion" => $thd_id)), 200))
+              ->header('Content-Type', "application/json;");
+
+		
+		}else{
+            return redirect('/login');
+        }
 	}
 
 

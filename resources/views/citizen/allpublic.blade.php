@@ -18,8 +18,9 @@ use App\Includes\AppHelper;
                     <?php foreach($everyPublic as $gp){?>
                     <tr>
                         <td>
-                            <img id="photo" src="/assets/citizen/<?= $gp->address ?>/profile_pic.png"
-                                class="profile-avatar-img thumbnail" alt="Profile Image">
+                            <object id="photo" data="/assets/citizen/<?= $gp->address ?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image" style="max-height: 100px;"  type="image/png">
+								<img src="/assets/citizen/generic_profile.jpg" class="profile-avatar-img thumbnail">
+							</object>
                         </td>
                         <td class="valign-middle">
                             <a href="javascript:;" title=""><?= $gp->fullname ?> </a>

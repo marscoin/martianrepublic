@@ -11,6 +11,21 @@ use Illuminate\Database\Eloquent\Model;
 class Feed extends Model {
 
     protected $table = 'feed';
+    protected $appends = ['profile_image'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'userid'); // Assuming 'userid' is the foreign key in 'feeds' table
+    }
+
+    public function getProfileImageAttribute()
+    {
+        if (!$this->address) {
+            return null;
+        }
+
+        return 'https://martianrepublic.org/assets/citizen/' . $this->address . '/profile_pic.png';
+    }
 
 }
 

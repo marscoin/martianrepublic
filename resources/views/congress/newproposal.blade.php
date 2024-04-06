@@ -10,7 +10,7 @@
 
                 <label for="textarea-input">Description *</label>
                 <textarea type="description" data-required="true" data-minlength="5" name="description" id="description"
-                    cols="10" rows="20" style="min-height: 260px;" class="form-control"></textarea>
+                    cols="10" rows="180" style="min-height: 986px;" class="form-control"></textarea>
 
                 <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 15px">
 
@@ -22,38 +22,96 @@
                 <div class="row">
                     <div class="col-lg-12">
 
-                        <h4> Proposed by: <strong> {{ $fullname }} </strong></h4>
+                        <h4> Sponsor: <strong> {{ $fullname }} </strong></h4>
 
                         <br />
 
-                        <label for="category">Proposal Category: </label>
-
-                        <select name="category" id="category">
-
-                            <option value="Basic">
-                                Basic
+                        <label for="preset">Proposal Presets: </label>
+                        <select name="preset" id="preset">
+                            <option value="poll">
+                            Certified Poll
                             </option>
-                            <option value="Bill">
-                                Bill
+                            <option value="ordinance">
+                            Ordinance
                             </option>
-                            <option value="Amendment">
-                                Amendment
+                            <option value="regulation">
+                            Regulation  
+                            </option>
+                            <option value="statute">
+                            Statute
+                            </option>
+                            <option value="law">
+                            Law
+                            </option>
+                            <option value="amendment">
+                            Amendment
+                            </option>
+                            <option value="custom">
+                            Custom
                             </option>
                         </select>
+                        <div class="descriptor-text" id="amendment-descriptor" style="display: none;">Amendment: Runtime: 1 Month - Requirement: 90% of Citizenry - Threshold: 75% - Expiration: None.</div>
+                        <div class="descriptor-text" id="law-descriptor" style="display: none;">Law: Runtime: 1 Month - Requirement: 80% of Citizenry - Threshold: 65% - Expiration: 4 years.</div>
+                        <div class="descriptor-text" id="statute-descriptor" style="display: none;">Statute: Runtime: 2 Weeks - Requirement: 75% of Citizenry - Threshold: 60% - Expiration: 2 years.</div>
+                        <div class="descriptor-text" id="regulation-descriptor" style="display: none;">Regulation: Runtime: 2 Weeks - Requirement: 70% of Citizenry - Threshold: 60% - Expiration: 1 year.</div>
+                        <div class="descriptor-text" id="ordinance-descriptor" style="display: none;">Ordinance: Runtime: 2 Weeks - Requirement: 60% of Citizenry - Threshold: 55% - Expiration: 1 year.</div>
+                        <div class="descriptor-text" id="poll-descriptor" style="display: none;">Certified Poll: Runtime: 1 Week - Requirement: 5% of Citizenry - Threshold: 51% - Expiration: None.</div>
 
 
-
-                        <br />
-
-                        <label for="name">Discussion URL *</label>
-                        <div class="" style="display: flex; align-items: center; justify-content: center">
-
-                            <input type="text" id="discussion" name="discussion" class="form-control parsley-validated"
-                                data-required="true" placeholder="www.discussion.example.com">
-
-
+                        <hr>
+                        <div class="">
+                            <h4>Total Citizen Committment</h4>
+                            <p>Citizens can submit proposals to the community. Every citzen endorsed member of the general Martian public ("citizen") can request a ballot to participate in any proposal submitted. </p>
+                            <p>The criteria you selected above require a <b><u><span id="req_amount"></span></u></b> percentage of the entire Martian Republic citizenry to partcipate in this proposal. The duration for casting a vote on this 
+                            proposal is set to <b><u><span id="req_duration"></span></u></b>. To pass successfully and be adopted at least <b><u><span id="req_threshold"></span></u></b> have to vote in favor of this proposal. This would indicate that 
+                            <b><u><span id="req_total"></span></u></b> percentage of the population would support this proposal. It will automatically expire after <b><u><span id="req_expiration"></span></u></b>. Any proposal that reaches the threshold of required participants 
+                            via ballots requested will automatically be considered a bill. Any bill that passes the threshold of required votes becomes part of the Constitution (if it is a code change to the system) or an active piece of legislation. Any such law can 
+                            be amended or terminated with the same or more citizen voting in favor of a change before it naturally expires.</p>
 
                         </div>
+
+                        <label>Custom:</label>
+                        <div class="price-box">
+
+                            <form class="form-horizontal form-pricing" role="form">
+
+                                <div class="price-slider">
+                                    <h4 class="great">Participation</h4>
+                                    <span>Minimum 5% is required</span>
+                                    <div style="margin-left: 20%" class="col-sm-8">
+                                    <div id="slider"></div>
+                                    </div>
+                                </div>
+                                <div class="price-slider">
+                                    <h4 class="great">Duration</h4>
+                                    <span>Minimum 1 day is required</span>
+                                    <div style="margin-left: 20%" class="col-sm-8">
+                                    <div id="slider2"></div>
+                                    </div>
+                                </div>
+                                <div class="price-slider">
+                                    <h4 class="great">Threshold</h4>
+                                    <span>Minimum 51% required to pass</span>
+                                    <div style="margin-left: 20%" class="col-sm-8">
+                                    <div id="slider3"></div>
+                                    </div>
+                                </div>
+                                <div class="price-slider">
+                                    <h4 class="great">Expiration</h4>
+                                    <span>Default: 1 Martian year</span>
+                                    <div style="margin-left: 20%" class="col-sm-8">
+                                    <div id="slider4"></div>
+                                    </div>
+                                </div>
+
+                                <input type="hidden" id="amount" class="form-control">
+                                <input type="hidden" id="duration" class="form-control">
+                                <input type="hidden" id="threshold" class="form-control">
+                                <input type="hidden" id="expiration" class="form-control">
+
+                            </form>
+                        </div>
+                        
 
                     </div>
 
@@ -69,426 +127,43 @@
     <div>
         <span id="form-message" style="color:#d74b4b; font-weight: 600"> </span>
     </div>
-    <a data-toggle="modal" href="#proposalModal" id="proposalModalBtn"
-        class="btn-lg btn-primary demo-element">Confirm</a>
-
-    {{-- <input type="text" id="yes_vote" name="yes_vote" class="form-control parsley-validated" data-required="true"
-        style="display:none">
-    <input type="text" id="no_vote" name="no_vote" class="form-control parsley-validated" data-required="true"
-        style="display:none">
-    <input type="text" id="null_vote" name="null_vote" class="form-control parsley-validated" data-required="true"
-        style="display:none"> --}}
-
+    <a data-toggle="modal" href="#proposalModal" id="proposalModalBtn" class="btn-lg btn-primary demo-element">Confirm</a>
 
     <div id="proposalModal" class="modal fade">
-
         <div class="modal-dialog">
-
             <div class="modal-content">
-
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                     <h3 class="modal-title">Basic Modal</h3>
-                </div> <!-- /.modal-header -->
-
+                </div>
                 <div class="modal-body">
                     <div class="modal-body-box">
                         <h5>Category: </h5>
                         <p class="modal-category"> </p>
                     </div>
-
-
                     <div class="modal-body-box">
                         <h5> Description: </h5>
                         <p class="modal-description"></p>
                     </div>
-
-
                     <div class="modal-body-box">
-                        <h5>Discussion URL: </h5>
-                        <a class="modal-discussion-url" href=""> </a>
+                        <h5> Configuration: </h5>
+                        <p class="modal-configuration"></p>
                     </div>
-
-
-                    <div class="modal-body-box">
-                        <h5>Cost of Proposal: </h5>
-                        <h3 class="modal-cost"></h3>
-                    </div>
-
                     <div class="modal-message" style="display: none">
                         <i class="fa fa-times-circle"></i>
                         <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
                         <span id="modal-message-success" style="font-weight: 600"> </span>
                     </div>
-                </div> <!-- /.modal-body -->
-                <h5 class="transaction-hash">
-
-
-                </h5>
-
+                </div>
+                <h5 class="transaction-hash" style="text-align: center;"></h5>
                 <div class="modal-footer">
                     <button id="submit-proposal" type="submit" class="btn btn-primary">Submit Proposal</button>
-                    <img src="https://i.stack.imgur.com/FhHRx.gif" alt="enter image description here"
-                        style="display: none" id="loading">
-                </div> <!-- /.modal-footer -->
-
-            </div> <!-- /.modal-content -->
-
-        </div><!-- /.modal-dialog -->
-
+                    <img src="https://i.stack.imgur.com/FhHRx.gif" alt="enter image description here" style="display: none" id="loading">
+                </div>
+            </div> 
+        </div>
     </div>
 
 
 
 </form>
-<script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
-<script src="/assets/wallet/js/dist/my_bundle.js"></script>
-
-<script>
-    const Marscoin = {
-        mainnet: {
-            messagePrefix: "\x19Marscoin Signed Message:\n",
-            bech32: "M",
-            bip44: 2,
-            bip32: {
-                public: 0x043587cf,
-                private: 0x04358394,
-            },
-            pubKeyHash: 0x32,
-            scriptHash: 0x32,
-            wif: 0x80,
-        }
-    };
-    // Click on confirm
-    $("#proposalModalBtn").click(async (e) => {
-
-        handleFormFilled()
-
-        let title = $(".modal-title").text($("#title").val())
-        let desc = $(".modal-description").text($("#description").val())
-        let disc = $(".modal-discussion-url").text($("#discussion").val())
-        $(".modal-discussion-url").attr("href", $("#discussion").val());
-        let category = $(".modal-category").text($("#category").val())
-
-        let prop = {
-            Proposal_2: {
-                title: $("#title").val(),
-                description: $("#description").val(),
-                discussion: $("#discussion").val(),
-                category: $("#category").val(),
-                timestamp: Date.now()
-            }
-
-        }
-
-
-        const fee = 1;
-
-        if ("{{ $balance }}" < fee) {
-            $("#submit-proposal").prop("disabled", true)
-            $("#modal-message-error").text("Not enough MARS to submit proposal")
-            $(".modal-message").show()
-            console.log("unable to confirm...")
-            
-            const io = await sendMARS(1, "<?= $public_address ?>");
-
-            //const fee = marsConvert(io.fee);
-            const fee = marsConvert(io.fee)
-            //console.log("THE FEE: ", fee);
-            const mars_amount = 0.001
-            const total_amount = fee + parseInt(mars_amount)
-            $(".modal-cost").text(total_amount + " MARS")
-
-        } else {
-            $(".modal-message").hide()
-
-            console.log("able to confirm..")
-
-            const cid = await addToIPFS(prop)
-
-            console.log("CID:", cid)
-            const message = "PR_" + cid;
-
-
-            const io = await sendMARS(1, "<?= $public_address ?>");
-
-            //const fee = marsConvert(io.fee);
-            const fee = marsConvert(io.fee)
-            //console.log("THE FEE: ", fee);
-            const mars_amount = 0.001
-            const total_amount = fee + parseInt(mars_amount)
-
-            $(".modal-cost").text(total_amount + " MARS")
-
-
-            // click on publish on modal..
-            $("#submit-proposal").click(async () => {
-
-                // Store messages to vote type on DB
-                $("#yes_vote").text(message + "_yes")
-                $("#no_vote").text(message + "_no")
-                $("#null_vote").text(message + "_null")
-
-                $("#loading").show()
-                try {
-                    const tx = await signMARS(message, mars_amount, io)
-                    console.log(tx)
-                    $("#loading").hide()
-                    $("#modal-message-success").show()
-                    $(".transaction-hash-link").attr("href",
-                        "https://explore.marscoin.org/tx/" + tx.tx_hash)
-                    $(".transaction-hash").text("" + tx.tx_hash)
-
-                } catch (e) {
-                    throw e;
-                }
-
-            })
-
-        }
-
-
-    })
-
-    const handleFormFilled = () => {
-
-        let title = $("#title").val()
-        let desc = $("#description").val()
-        let discussion = $("#discussion").val()
-
-        if (title === "") {
-            //title is blank
-            $("#modal-message-error").text("Title is required...")
-            $("#submit-proposal").prop("disabled", true)
-            $(".modal-message").show()
-            return false
-        } else if (desc === "") {
-            //desc is blank
-            $("#modal-message-error").text("Description is required...")
-            $("#submit-proposal").prop("disabled", true)
-            $(".modal-message").show()
-
-            return false
-        } else if (discussion === "") {
-            //discus is blank
-            $("#modal-message-error").text("Discussion link is required...")
-            $("#submit-proposal").prop("disabled", true)
-            $(".modal-message").show()
-
-            return false
-        } else {
-            $("#submit-proposal").prop("disabled", false)
-            $(".modal-message").hide()
-            return true
-        }
-
-
-
-    }
-
-
-
-    ////// Proposal creation Logic..........
-    const sendMARS = async (mars_amount, receiver_address) => {
-        //console.log("send mars running...")
-
-        // obtain utxo i/o
-        const sender_address = "<?= $public_address ?>".trim()
-
-        console.log("amount", mars_amount)
-        console.log("receiver", receiver_address)
-        console.log("sender", sender_address)
-
-        try {
-            const io = await getTxInputsOutputs(sender_address, receiver_address,
-                mars_amount)
-
-            return io
-        } catch (e) {
-            handleError("sending mars")
-            throw e;
-        }
-
-        return null
-    }
-
-    const signMARS = async (message, mars_amount, tx_i_o) => {
-        const mnemonic = localStorage.getItem("key").trim();
-        const sender_address = "<?= $public_address ?>".trim()
-
-        //const mnemonic = "business tattoo current news edit bronze ketchup wrist thought prize mistake supply"
-        //console.log("Mnemonic:", mnemonic)
-
-        const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-
-        // console.log("seed: ", seed)
-
-        // ROOT === xprv
-        const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-
-        //private key
-        const child = root.derivePath("m/44'/2'/0'/0/0");
-        //const child = root.derivePath(getDerivationPath());
-
-        const wif = child.toWIF()
-
-        //=======================================================================
-
-        const zubs = zubrinConvert(mars_amount)
-
-
-        var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-        //console.log("Key:", key)
-
-        var psbt = new my_bundle.bitcoin.Psbt({
-            network: Marscoin.mainnet,
-        });
-        psbt.setVersion(1)
-        psbt.setMaximumFeeRate(100000);
-
-        unspent_vout = 0
-        var data = my_bundle.Buffer(message)
-        const embed = my_bundle.bitcoin.payments.embed({
-            data: [data]
-        });
-        //var dataScript = psbt.script.nullDataOutput(data)
-        psbt.addOutput({
-            script: embed.output,
-            value: 0,
-        })
-        //psbt.addOutput(dataScript, 1000)
-
-        tx_i_o.inputs.forEach((input, i) => {
-            psbt.addInput({
-                hash: input.txId,
-                index: input.vout,
-                nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex'),
-            })
-        })
-
-        tx_i_o.outputs.forEach(output => {
-            // watch out, outputs may have been added that you need to provide
-            // an output address/script for
-            if (!output.address) {
-                output.address = sender_address
-            }
-
-            psbt.addOutput({
-                address: output.address,
-                value: output.value,
-            })
-        })
-
-        //console.log("length:",tx_i_o.inputs.length )
-        for (let i = 0; i < tx_i_o.inputs.length; i++) {
-            psbt.signInput(i, key);
-        }
-
-        // psbt.signInput(0, key);
-
-        const txhash = psbt.finalizeAllInputs().extractTransaction().toHex()
-
-        try {
-            const txId = await broadcastTxHash(txhash);
-            return txId
-
-        } catch (e) {
-            handleError()
-            throw e;
-        }
-
-        return txId;
-
-    }
-
-    const addToIPFS = async (data) => {
-        data = JSON.stringify(data)
-
-        const URL = 'http://127.0.0.1:5001'
-
-        // connect to the default API address http://localhost:5001
-        const client = my_bundle.IPFS.create(URL)
-
-        // connect using a URL
-
-        // call Core API methods
-        const {
-            cid
-        } = await client.add(data)
-
-
-        return cid.toString()
-    }
-
-
-
-    const handleError = (text) => {
-        console.log(text)
-    }
-
-
-    //===============================================================================
-    //===============================================================================
-    // API CALLS
-    const PROD = "https://pebas.marscoin.org"
-    const TEST = "http://127.0.0.1:3001"
-
-    const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
-        // Default options are marked with *
-        if (!sender_address || !receiver_address || !amount) {
-            throw new Error("Missing inputs for tx hash call...");
-        }
-        //console.log(sender_address)
-        //console.log(receiver_address)
-        //console.log(amount)
-
-        const url =
-            `${TEST}/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
-
-        try {
-            const response = await fetch(url, {
-                method: 'GET', // *GET, POST, PUT, DELETE, etc.
-            });
-
-            return response.json()
-
-        } catch (e) {
-            console.log("error with io")
-            throw e;
-        }
-
-
-
-    }
-
-    const broadcastTxHash = async (txhash) => {
-        if (!txhash) {
-            throw new Error("Missing tx hash...");
-        }
-
-        const url =
-            `${TEST}/api/mars/broadcast?txhash=${txhash}`
-        try {
-            const response = await fetch(url, {
-                method: 'GET'
-            });
-            return response.json() // parses JSON response into native JavaScript objects
-        } catch (e) {
-            console.log("error with broadcast")
-            throw e;
-        }
-
-
-    }
-
-
-    const zubrinConvert = (MARS) => {
-        return (MARS * 100000000)
-    }
-
-    const marsConvert = (zubrin) => {
-        return (zubrin / 100000000)
-    }
-
-    // Check if user has enough funds to confirm proposal submission...
-</script>

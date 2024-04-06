@@ -56,11 +56,14 @@
                                 <?php } ?>
                             </li>
                             <li class="">
-                                <a href="#citizens" data-toggle="tab">Citizens</a>
+                                <a href="#citizens" data-toggle="tab">All Citizens</a>
                             </li>
 
                             <li class="">
-                                <a href="#all" data-toggle="tab">Public</a>
+                                <a href="#all" data-toggle="tab">General Public</a>
+                            </li>
+                            <li class="">
+                                <a href="#applicants" data-toggle="tab">Applicants</a>
                             </li>
                         </ul>
                         <div id="myTab1Content" class="tab-content" style="margin-top: 50px;">
@@ -80,6 +83,10 @@
                             <!-- Show the general public -->
                             <div class="tab-pane fade" id="all">
                                 @include('citizen.allpublic')
+                            </div>
+                             <!-- Show the general public -->
+                             <div class="tab-pane fade" id="applicants">
+                                @include('citizen.allapplicants')
                             </div>
                             <!-- New public registration form -->
    
@@ -121,7 +128,20 @@
     <script src="/assets/wallet/js/sha256.js"></script>
 
 <script>
+
+function imgError(image) {
+    image.onerror = "";
+    image.src = "/assets/citizen/generic_profile.jpg";
+    return true;
+}
+
 $(document).ready(function() {
+
+var mem = localStorage.getItem("key").trim();
+if (!mem || mem == ""){
+    alert("Coul not retrieve wallet key. Please disconnect and reconnect your wallet.")
+}
+
 
 $.ajaxSetup({
     headers: {
@@ -155,10 +175,19 @@ $("#saveprofilebutton").click(function() {
 
 
 
+
 $("#lastname").blur(function() {
     firstname = $("#firstname").val();
     lastname = $("#lastname").val();
     $.post("/api/setfullname", {firstname: firstname, lastname: lastname} , function(data) {
+        
+    });
+});
+
+$(".cacheme").blur(function() {
+    displayname = $("#displayname").val();
+    shortbio = $("#shortbio").val();
+    $.post("/api/cacheonboarding", {displayname: displayname, shortbio: shortbio, publicaddress: '<?=$public_address?>'} , function(data) {
         
     });
 });
@@ -256,7 +285,7 @@ $("#publish").click(async (e) => {
         $("#publish_progress_message").show().text(tx.tx_hash);
         const data = await doAjax("/api/setfeed", {"type": "GP", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
         if(data.Hash){
-            if(!alert('Submitted to Blockchain successfully')){window.location.reload();}
+            if(!alert('Submitted to Marscoin Blockchain successfully')){window.location.reload();}
         }
 
     } catch (e) {
@@ -456,21 +485,22 @@ const sendMARS = async (mars_amount, receiver_address) => {
 }
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
-    const mnemonic = localStorage.getItem("key").trim();
+
+    if(!localStorage.getItem("key"))
+    {
+        //unencrypt key first
+        alert("Unencrypt first");
+        return;
+    }
+
+    const mnemonic = localStorage.getItem("key");
     const sender_address = "<?=$public_address?>".trim()
-
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-
     const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-
     const child = root.derivePath("m/44'/2'/0'/0/0");
-
     const wif = child.toWIF()
-
     const zubs = zubrinConvert(mars_amount)
-
     var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-    
     var psbt = new my_bundle.bitcoin.Psbt({
         network: Marscoin.mainnet,
     });

@@ -3,7 +3,7 @@
     <a target="_blank" href="http://marscoin.org/">About Marscoin</a>
   </li>
   <li>
-    <a target="_blank" href="http://www.marscoin.org/community/">Discussion</a>
+    <a target="_blank" href="http://martianrepublic.org/forum/c/1-public-square">Discussion</a>
   </li>
   <li>
     <a target="_blank" href="https://marscoin.gitbook.io/marscoin-documentation/">Documentation</a>
@@ -15,10 +15,16 @@
             </a>
 
                     <ul class="dropdown-menu" role="menu">
-                        <li>
-                            <a target="_blank" href="https://www.xt.com/trade/mars_usdt">
+                    <li>
+                            <a target="_blank" href="https://www.lbank.info/exchange/mars/usdt">
                                 <i class="fa fa-area-chart"></i>
-                                Xt.com
+                                LBank
+                            </a>
+                        </li>
+                        <li>
+                            <a target="_blank" href="https://dex-trade.com/spot/trading/MARSUSDT">
+                                <i class="fa fa-area-chart"></i>
+                                Dex-Trade
                             </a>
                         </li>
                         <li>
@@ -28,40 +34,17 @@
                             </a>
                         </li>
 
-                        <li>
-                            <a target="_blank" href="https://ex.udonex.com/market/marsusdt">
-                                <i class="fa fa-area-chart"></i>
-                                Udonex
-                            </a>
-                        </li>
-
-
-
                     </ul>
                 </li>
 
 
   <li class="dropdown navbar-profile">
     <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:;">
-      <img src="{{$gravtar_link}}" class="navbar-profile-avatar" alt="">
+      <img src="https://unavatar.io/{{ Auth::user()->email }}?fallback=https://martianrepublic.org/assets/citizen/generic_profile.jpg" class="navbar-profile-avatar" alt="">
       <span class="navbar-profile-label">{{ Auth::user()->email }} &nbsp;</span>
       <i class="fa fa-caret-down"></i>
     </a>
     <ul class="dropdown-menu" role="menu">
-<!--       <li>
-        <a href="/wallet/profile">
-          <i class="fa fa-user"></i>
-          &nbsp;&nbsp;My Profile
-        </a>
-      </li>
-      <li>
-        <a href="/wallet/reports">
-          <i class="fa fa-cogs"></i>
-          &nbsp;&nbsp;Reports
-        </a>
-      </li>
-      
-      <li class="divider"></li> -->
       <li>
         <a href="/wallet/dashboard/hd-close">
           <i class="fa fa-window-close-o"></i>
@@ -69,7 +52,7 @@
         </a>
       </li>
       <li>
-        <a href="/logout">
+        <a href="/logout" onclick="flushLocalStorage();">
           <i class="fa fa-sign-out"></i>
           &nbsp;&nbsp;Logout
         </a>
@@ -78,3 +61,22 @@
   </li>
 
 </ul>
+
+<script type="text/javascript">
+  function flushLocalStorage () {
+
+
+      localStorage.clear();
+      localStorage.removeItem('key');
+
+
+      // fallback double check if key exists...
+      if("key" in localStorage)
+      {
+          localStorage.clear()
+          localStorage.removeItem('key');
+      }
+
+      return
+  }
+</script>

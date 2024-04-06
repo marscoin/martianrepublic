@@ -23,7 +23,7 @@
                   <div class="col-md-4">
                     
                       <div class="fileupload-new" style="width: 250px; height: 250px;">
-                        <img id="photo" src="/assets/citizen/generic_profile.jpg" class="profile-avatar-img thumbnail" alt="Profile Image">
+                        <img id="photo" src="/assets/citizen/generic_profile.jpg" class="profile-avatar-img thumbnail" alt="Profile Image" style="max-height: 100px;">
                       </div>
                       <div id="pin_message"></div>
 
@@ -138,26 +138,26 @@
                         <div class="form-group">
                           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <label>First Name: <span class="required">*</span></label>
-                            <input class="form-control input-form" id="firstname" name="name" type="text" value="" required="">
+                            <input class="form-control input-form" id="firstname" name="name" type="text" value="<?=$citcache['firstname'] ?? "" ?>" required="">
                           </div>
 
                           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <label>Last Name: <span class="required">*</span></label>
-                            <input class="form-control input-form" id="lastname" name="name" type="text" value="" required="">
+                            <input class="form-control input-form" id="lastname" name="name" type="text" value="<?=$citcache['lastname'] ?? ""?>" required="">
                           </div>
                         </div>
 
                         <div class="form-group">
                           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <label>Display Name: <span class="required">*</span></label>
-                            <input class="form-control input-form" id="displayname" name="displayname" type="text" value="" required="">
+                            <input class="form-control input-form cacheme" id="displayname" name="displayname" type="text" value="<?=$citcache['displayname'] ?? ""?>" required="">
                           </div>
                         </div>
 
                         <div class="form-group">
                           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <label>Short Bio: <span class="required">*</span></label>
-                            <textarea class="form-control input-form" id="shortbio" name="shortbio" rows="6" cols="40" required="" ></textarea>
+                            <textarea class="form-control input-form cacheme" id="shortbio" name="shortbio" rows="6" cols="40" required="" ><?=$citcache['shortbio'] ?? ""?></textarea>
                           </div>
                         </div>
 
@@ -340,7 +340,7 @@
                       </h4>
                       </div>
                   <div class="col-md-9 col-sm-9" style="border-bottom: 1px solid #e3e3e3;">
-                  <div style="margin-top:16px;">  <span style="font-family: 'Courier Prime', monospace; float:left;" id="s_ipfs_liveness_vid">< IPFS_LINK ></span></div>
+                  <div style="margin-top:16px;">  <span style="font-family: 'Courier Prime', monospace; float:left;" id="s_ipfs_liveness_vid"><?php if(!empty($citcache['liveness_link'])){ echo $citcache['liveness_link']; }else{ ?>< IPFS_LINK ><?php } ?></span></div>
                   </div>
 
                   </div>

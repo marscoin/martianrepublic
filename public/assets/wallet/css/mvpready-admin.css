@@ -2024,13 +2024,11 @@ table.table thead .sorting_desc_disabled,
 .navbar-profile-avatar {
   position: relative;
   top: -1px;
-  width: 30px;
+  width: 50px;
+  height: 50px;
   margin-right: .65em;
   border: 2px solid #fff;
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
+  border-radius: 100%;
 }
 .navbar-profile-label {
   display: inline;

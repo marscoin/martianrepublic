@@ -3,8 +3,14 @@
 
 namespace App\Includes;
 use App\Models\Feed;
+use App\Models\Publication;
 use DateTime;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use TeamTeaTime\Forum\Models\Post;
+use Carbon\Carbon;
+use App\Models\Profile;
+use App\Models\Citizen;
 
 class AppHelper{
 
@@ -105,12 +111,69 @@ class AppHelper{
 				if (isset($detais["msg"])) {
 					throw new \Exception($detais["msg"], 1);
 				} else {
-					throw new \Exception("HTTP Return " . $r["http_code"], 1);
+					return "Error";
 				}
 			}
 			$details = json_decode($result, true);
 			$res = array();
 			return $details['Hash'];
+		}
+
+
+		public static function uploadFolder($filepath, $url)
+		{
+			echo $url;
+			$directory = basename($filepath);
+			//echo "dir: ". $directory;
+			$files = scandir($filepath);
+			//print_r($files);
+			$data = array();
+			$headers = array("Content-Type" => "multipart/form-data");
+			$ch = curl_init($url);
+			$i = 0;
+			foreach ($files as $filep)
+			{
+				$i = $i + 1;
+				$filename = realpath($filepath."/".$filep);
+				if (!is_file($filename))
+        			continue;
+				//echo "path: " . $filename;
+				$finfo = new \finfo(FILEINFO_MIME_TYPE);
+				$mimetype = $finfo->file($filename);
+				$cfile = curl_file_create($filename, $mimetype, basename($filename));
+				//print_r($cfile);
+				//array_push($data, array('file' => $cfile));
+				$data += ['file['.$i.']' => $cfile];
+				
+			}			
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$result = curl_exec($ch);
+			$r = curl_getinfo($ch);
+			if ($r["http_code"] != 200) {
+				$detais = json_decode($result, true);
+				if (isset($detais["msg"])) {
+					throw new \Exception($detais["msg"], 1);
+				} else {
+					return "Error";
+				}
+			}
+			print_r($result);
+			$result = explode("\n", $result);
+			// $details = json_decode($result, true);
+			// foreach($details as $l){
+			// 	print_r($l);
+			// }
+			$l = count($result);
+			echo $l;
+			if($l > 0){
+				$details = json_decode($result[$l-2], true);
+				return $details['Hash'];
+			}
+			else return "{'Hash':''}";
 		}
 
 
@@ -210,6 +273,18 @@ class AppHelper{
 		}
 
 
+		public static function insertPublicationCache($uid, $local_path, $ipfs_hash)
+		{
+			$pub = new Publication;
+			if($uid)
+				$pub->userid = $uid;
+			$pub->ipfs_hash = $ipfs_hash;
+			$pub->local_path = $local_path;
+			$pub->save();
+			return TRUE;
+		}
+
+
 		public static function time_elapsed_string($datetime, $full = false) 
 		{
 			date_default_timezone_set('America/New_York');
@@ -258,6 +333,210 @@ class AppHelper{
 		    for($i=0;$i<strlen($hex);$i+=2) $str .= chr(hexdec(substr($hex,$i,2)));
 		    return $str;
 		}
+
+
+			// Function to get the price from CoinGecko with caching
+		public static function getMarscoinPrice()
+		{
+			$url = "https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd";
+
+			// Use the Cache facade with the remember method
+			$marsPriceData = Cache::remember('marscoin_price', 5, function () use ($url) {
+				// Inside the closure, fetch the data from CoinGecko
+				try {
+					$response = file_get_contents($url);
+					return json_decode($response);
+				} catch (\Exception $e) {
+					// Handle the exception if the API call fails
+					return null;
+				}
+			});
+
+			if ($marsPriceData) {
+				return $marsPriceData->marscoin->usd;
+			}
+
+			// Handle the case where the API call was not successful or caching failed
+			return null;
+		}
+
+
+		public static function getMarscoinBalance($publicAddr)
+		{
+			$url = "https://explore.marscoin.org/api/addr/{$publicAddr}/balance";
+
+			// Unique cache key to store the balance for each address
+			$cacheKey = 'marscoin_balance_' . $publicAddr;
+
+			// Use the Cache facade with the remember method
+			$curBalance = Cache::remember($cacheKey, 5, function () use ($url) {
+				// Inside the closure, fetch the balance from the explorer
+				try {
+					$response = file_get_contents($url);
+					return $response; // Assuming the response is the balance
+				} catch (\Exception $e) {
+					// Handle the exception if the API call fails
+					return null;
+				}
+			});
+
+			if ($curBalance !== null) {
+				// Assuming the balance is returned in satoshis, convert to Marscoin if necessary
+				// The conversion logic depends on the API's response format
+				return $curBalance * 0.00000001; // Example conversion, adjust based on actual response
+			}
+
+			// Handle the case where the API call was not successful or caching failed
+			return null;
+		}
+
+		public static function getMarscoinTotalReceived($publicAddr)
+		{
+			$url = "https://explore.marscoin.org/api/addr/{$publicAddr}/totalReceived";
+			$cacheKey = 'marscoin_total_received_' . $publicAddr;
+
+			$totalReceived = Cache::remember($cacheKey, 5, function () use ($url) {
+				try {
+					$response = file_get_contents($url);
+					return $response; // Assuming the response is the total amount received
+				} catch (\Exception $e) {
+					return null;
+				}
+			});
+
+			if ($totalReceived !== null) {
+				return $totalReceived * 0.00000001; // Convert from satoshis to Marscoin if necessary
+			}
+
+			return null;
+		}
+
+
+		public static function getMarscoinTotalSent($publicAddr)
+		{
+			$url = "https://explore.marscoin.org/api/addr/{$publicAddr}/totalSent";
+			$cacheKey = 'marscoin_total_sent_' . $publicAddr;
+
+			$totalSent = Cache::remember($cacheKey, 5, function () use ($url) {
+				try {
+					$response = file_get_contents($url);
+					return $response; // Assuming the response is the total amount sent
+				} catch (\Exception $e) {
+					return null;
+				}
+			});
+
+			if ($totalSent !== null) {
+				return $totalSent * 0.00000001; // Convert from satoshis to Marscoin if necessary
+			}
+
+			return null;
+		}
+
+
+		public static function getMarscoinTotalAmount()
+		{
+			$url = "https://explore.marscoin.org/api/status?q=getTxOutSetInfo";
+			$cacheKey = 'marscoin_total_amount';
+
+			$totalAmount = Cache::remember($cacheKey, 180, function () use ($url) {
+				try {
+					$response = file_get_contents($url);
+					$data = json_decode($response, true);
+					if ($data && count($data) > 0) {
+						return round($data['txoutsetinfo']['total_amount'], 2);
+					}
+				} catch (\Exception $e) {
+					return 39000000; // Default value in case of an error
+				}
+				return 39000000; // Default value if the API does not return a valid response
+			});
+
+			return $totalAmount;
+		}
+
+		public static function getMarscoinNetworkInfo()
+		{
+			$url = "http://explore2.marscoin.org/api/status?q=getInfo";
+			$cacheKey = 'marscoin_network_info';
+		
+			$networkInfo = Cache::remember($cacheKey, 60, function () use ($url) {
+				try {
+					$response = file_get_contents($url);
+					$data = json_decode($response, true);
+					if (is_array($data)) {
+						return $data; // Return the network info if the response is valid
+					}
+					Log::debug("Set Network status cache");
+				} catch (\Exception $e) {
+					return []; // Return an empty array in case of an error
+				}
+				return []; // Also return an empty array if the API does not return a valid response
+			});
+		
+			return $networkInfo;
+		}
+
+		 /**
+		 * Check for recent posts in the forum.
+		 * 
+		 * @return int Number of recent posts.
+		 */
+		public static function checkForRecentPosts()
+		{
+			// Define the time frame for "recent" posts. For example, within the last 24 hours.
+			$recentThreshold = Carbon::now()->subDay();
+
+			// Count the number of posts created after the recent threshold.
+			$recentPostsCount = Post::where('created_at', '>', $recentThreshold)->count();
+
+			return $recentPostsCount;
+		}
+
+
+		/**
+		 * Determines the Citizen Status of a user.
+		 * 
+		 * @param int $userId The ID of the user.
+		 * @return object An associative array containing the 'status' and 'type'.
+		 */
+		public static function getCitizenStatus(int $userId)
+		{
+			// Default status for users without a profile entry.
+			$statusDetails = [
+				'status' => 'Newcomer',
+				'type' => 'NC',
+			];
+
+			// Attempt to retrieve the user's profile.
+			$profile = Profile::where('userid', $userId)->first();
+
+			if ($profile) {
+				if ($profile->has_application > 0) {
+					$statusDetails = [
+						'status' => 'Applicant',
+						'type' => 'AP',
+					];
+				} elseif ($profile->general_public > 0) {
+					$statusDetails = [
+						'status' => 'General Public',
+						'type' => 'GP',
+					];
+				}
+				
+				// Check if the user is a citizen.
+				$isCitizen = Citizen::where('userid', $userId)->exists();
+				if ($isCitizen) {
+					$statusDetails = [
+						'status' => 'Citizen',
+						'type' => 'CT',
+					];
+				}
+			}
+
+			return (object)$statusDetails;
+		}
+
 
 
 }

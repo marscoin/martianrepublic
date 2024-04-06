@@ -8,7 +8,10 @@ use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Http\Controllers\Controller;
 use App\Models\HDWallet;
+use App\Models\CivicWallet;
+use App\Models\Publication;
 use App\Includes\AppHelper;
+use Illuminate\Support\Facades\DB;
 
 class LogbookController extends Controller
 {
@@ -32,8 +35,8 @@ class LogbookController extends Controller
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
-
+			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
+			
 			if (!$profile) {
 				return Redirect::to('/twofa');
 			} else {
@@ -41,15 +44,15 @@ class LogbookController extends Controller
 					return Redirect::to('/twofachallenge');
 				}
 			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
 			
 			$view = View::make('logbook.dashboard');
-			$view->wallet_open = $profile->wallet_open;
-			$view->gravtar_link  = $gravtar_link;
+			$view->wallet_open = $profile->civic_wallet_open;
 			$view->network = AppHelper::stats()['network'];
 			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
+			$view->myPublications = Publication::where('userid', '=', $uid)->get();
+			$view->allPublications = DB::select('select * from publications order by id desc');
 			$view->balance = 0; //for now, could move to stats helper function as well
 			
 			if ($wallet) {

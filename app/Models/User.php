@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\HDWallet;
 
 class User extends Authenticatable
 {
@@ -41,4 +42,36 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    // Define the relationship to Profile
+    public function profile() {
+        return $this->hasOne(Profile::class, 'userid', 'id');
+    }
+
+    // Define the relationship to Feed
+    public function feeds() {
+        return $this->hasMany(Feed::class, 'userid', 'id');
+    }
+
+    public function hdWallet()
+    {
+        return $this->hasMany(HDWallet::class, 'user_id');
+    }
+
+    public function citizen()
+    {
+        return $this->hasOne(Citizen::class, 'userid');
+    }
+
+    /**
+     * Get the user's civic wallet.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function civicWallet()
+    {
+        return $this->hasOne(CivicWallet::class, 'user_id');
+    }
+
 }

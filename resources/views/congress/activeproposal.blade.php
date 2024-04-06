@@ -1,7 +1,7 @@
 <h3 class="content-title"><u>Active Proposals</u></h3>
-<p>The <b>Martian Congressional Republic</b> consists of known <a href="/citizen/all">citizens</a> who discuss public matters ("res publica") in an open and transparent way. They vote on changes - including the very code that runs this application ("<b>The Constitution</b>") - in an equally transparent yet fully anonymous way. Every vote is cryptographically secured and can be audited by everyone. </p> 
+<div class="row">
+  <div class="col-md-9">
 
-<p>Fair, transparent, immutable and auditable votes are the outcome. Our congressional archive lists all passed and failed proposals, bills, amendments and references all discussions. The Martian Congressional Republic embodies democracy as a living organism shared directly by all members of the Republic - allowing better ideas to win out and move Martian civilization forward. </p>
 
 @foreach ($proposals as $proposal)
     <div class="feed-item feed-item-idea">
@@ -10,13 +10,11 @@
             <i class="fa fa-lightbulb-o"></i>
         </div> <!-- /.feed-icon -->
         <div class="feed-subject">
-            <h5>Proposal #{{ $proposal->id }}</h5>
-            <h3><a href="javascript:;">{{ $proposal->author }} </a> proposed: <a
-                href="https://ipfs.io/ipfs/{{{$proposal->ipfs_hash}}}">{{ $proposal->title }} </a></h3>
+            <h5 style="font-size: 30px;"><a href="{{{$proposal->ipfs_hash}}}">Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</a></h5>
+            <h5>Category: {{str_replace("poll", "Certified Poll", $proposal->category)}}</h5>
+            <hr style="border-top: 1px dotted #ccc;">
+            <h3><a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }} </a> @if($proposal->category =='poll') asked: @else proposed: @endif <br><a target="_blank" href="/forum/t/{{ $proposal->discussion }}">{{ $proposal->title }} </a></h3>
         </div> <!-- /.feed-subject -->
-
-
-
         <div class="feed-content">
             <ul class="icons-list">
                 <li>
@@ -27,41 +25,45 @@
                     </p>
                 </li>
             </ul>
-            <span>Vote Threshold: {{$proposal->threshold}}%</span>
-            <div class="progress progress-sm" style="width: 50%">
-                <div class="progress-bar progress-bar-primary" role="progressbar"
-                    aria-valuenow={{$proposal->threshold}} aria-valuemin="0" aria-valuemax="100"
-                    style="width: {{{$proposal->threshold}}}%">
-                    <span class="sr-only">40% Complete (primary)</span>
+            <span>Vote Participation: 0% of {{$proposal->participation}}% required</span>
+            <div class="progress progress-sm" style="width: {{$proposal->threshold}}%">
+                <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow={{$proposal->participation}} aria-valuemin="0" aria-valuemax="100" style="width: {{{$proposal->participation}}}%"> <span class="sr-only"></span>
                 </div>
             </div>
-
+            <span>Vote Threshold: 0% of {{$proposal->threshold}}% required</span>
+            <div class="progress progress-sm" style="width: {{$proposal->threshold}}%">
+                <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow={{$proposal->threshold}} aria-valuemin="0" aria-valuemax="100" style="width: {{{$proposal->threshold}}}%"> <span class="sr-only"></span>
+                </div>
+            </div>
+            <span>Vote Duration: 0 days passed of {{$proposal->duration}} days available</span>
+            <div class="progress progress-sm" style="width: {{$proposal->threshold}}%">
+                <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow={{$proposal->duration}} aria-valuemin="0" aria-valuemax="100" style="width: {{{$proposal->duration}}}%"> <span class="sr-only"></span>
+                </div>
+            </div>
             <div>
             <?php if($isCitizen){?>
-                <a data-toggle="modal" href="#ProposalModal_{{{$proposal->id}}}_yes" id="Y_{{{$proposal->ipfs_hash}}}"
-                class="btn-lg btn-primary demo-element vote-modal-btn-yes">Yes</a>
-
-                <a data-toggle="modal" href="#ProposalModal_{{{$proposal->id}}}_no" id="N_{{{$proposal->ipfs_hash}}}"
-                class="btn-lg btn-primary demo-element vote-modal-btn-no">No</a>
-
-                <a data-toggle="modal" href="#ProposalModal_{{{$proposal->id}}}_null" id="NU_{{{$proposal->ipfs_hash}}}"
-                class="btn-lg btn-primary demo-element vote-modal-btn-null">Null</a>
+                
+                @if($proposal->btxid)
+                    <a data-toggle="modal" href="#ProposalModal" id="" class="btn-lg btn-primary demo-element ">Cast Your Vote</a>
+                @else
+                    <a data-toggle="modal" href="/congress/ballot/{{$proposal->id}}" id="" class="btn-lg btn-secondary demo-element ">Request Ballot</a>
+                @endif
                     
             <?php }else{ ?>
                 <p>To cast a vote, please <a href="/citizen/all">join the voter registry</a> first</p>
             <?php } ?>
             </div>
 
-        </div> <!-- /.feed-content -->
+        </div> 
 
 
         <div class="feed-actions">
             
-            <a href={{ $proposal->discussion }} class="pull-left discussion-link">
-                {{ $proposal->discussion }} <i class="fa fa-external-link"></i></a>
+                <a href='/forum/t/{{ $proposal->discussion }}' class="pull-left discussion-link">
+                Discuss! <i class="fa fa-external-link"></i></a>
 
-            <a href="javascript:;" class="pull-right"><i class="fa fa-clock-o"></i>
-                {{ $proposal->created_at }}</a>
+            <a href="https://explore.marscoin.org/tx/{{ $proposal->txid }}" class="pull-right"><i class="fa fa-clock-o"></i>
+                {{ $proposal->created_at }} <i class=" fa-check-square"></i>Notarized: {{ substr($proposal->txid, 0, 16) }}...</a> 
         </div> <!-- /.feed-actions -->
 
     </div>
@@ -260,6 +262,17 @@
 
     </div>
 @endforeach
+
+  </div>
+  <div class="col-md-3">
+        <p>The <b>Martian Congressional Republic</b> consists of known <a href="/citizen/all">citizens</a> who discuss public matters ("res publica") in an open and transparent way. They vote on changes - including the very code that runs this application ("<b>The Constitution</b>") - in an equally transparent yet fully anonymous way. Every vote is cryptographically secured and can be audited by everyone. </p> 
+
+        <p>Fair, transparent, immutable and auditable votes are the outcome. Our congressional archive lists all passed and failed proposals, bills, amendments and references all discussions. The Martian Congressional Republic embodies democracy as a living organism shared directly by all members of the Republic - allowing better ideas to win out and move Martian civilization forward. </p>
+
+        </div>
+</div>
+
+
 <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
 <script src="/assets/wallet/js/dist/my_bundle.js"></script>
 <script>

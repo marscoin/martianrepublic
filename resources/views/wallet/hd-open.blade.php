@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
+
 <head>
     <title>Marscoin Wallet</title>
     <meta charset="utf-8">
@@ -9,7 +10,8 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
@@ -29,9 +31,9 @@
             cursor: pointer;
             z-index: 1;
         }
-
     </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
+    @livewireStyles
 </head>
 
 <body class=" ">
@@ -45,23 +47,31 @@
 
                 <div class="navbar-header">
                     @include('wallet.header')
-                </div> 
+                </div>
                 <nav class="collapse navbar-collapse" role="navigation">
                     @include('wallet.navbarleft')
                     @include('wallet.navbarright')
                 </nav>
             </div> <!-- /.container -->
         </header>
-        @include('wallet.mainnav', array('active'=>'wallet'))
+        @include('wallet.mainnav', ['active' => 'wallet'])
 
         <div class="content">
+
 
             <div class="container">
 
                 <div class="row">
-                    
+
 
                     <div class="col-md-7 col-sm-7">
+
+
+                        @if($is_civic_wallet)
+                            <div class="alert alert-danger" role="alert">
+                                You are currently viewing your Passport Wallet used for civic functions.
+                            </div>
+                        @endif
                         <div class="portlet">
 
                             <h3 class="portlet-title">
@@ -72,10 +82,12 @@
 
                                 <div>
                                     <span for="name">Destination Address</span>
-                                    <input type="text" name="recipient" id="recipient" class="form-control destination-address" style="width: 90%"
-                                        data-required="true" placeholder="Marscoin Address">
+                                    <input type="text" name="recipient" id="recipient"
+                                        class="form-control destination-address" style="width: 90%" data-required="true"
+                                        placeholder="Marscoin Address">
 
-                                    <a style="float: right; margin-top: -35px;margin-right: 67px;" href="#" onclick="scan();" class="btn btn-primary">Scan <i class="fa fa-qrcode "></i></a>
+                                    <a style="float: right; margin-top: -35px;margin-right: 67px;" href="#"
+                                        onclick="scan();" class="btn btn-primary">Scan <i class="fa fa-qrcode "></i></a>
 
                                     <span id="address-error" style="display: none;" class="error-message">Enter a valid
                                         MARS address</span>
@@ -88,7 +100,7 @@
                                         <div class="col-md-6 col-sm-5">
 
                                             <div id="amount-cont" class="">
-                                                <input type="number" min="1" step="any" name="amount" 
+                                                <input type="number" min="1" step="any" name="amount"
                                                     class="form-control input-placeholder " data-required="true"
                                                     placeholder="0.0 MARS">
                                                 <span id="amount-error" style="display: none;"
@@ -135,24 +147,27 @@
 
                         <div class="portlet" style="margin-top: 160px;">
 
-                                <h3 class="portlet-title">
-                                    <u>Mobile Marscoin Wallet</u>
-                                </h3>
+                            <h3 class="portlet-title">
+                                <u>Mobile Marscoin Wallet</u>
+                            </h3>
 
-                                <div class="portlet-body" style="float:left">
+                            <div class="portlet-body" style="float:left">
 
-                                <div >
-                                                <a href="https://apps.apple.com/app/id1569062610" target="_blank" class="">
-                                                    <img style="width: 200px;" src="/assets/landing/img/apple.png" alt="" loading="lazy"></a>
-                               
-                                
-                                                <a href="https://play.google.com/store/apps/details?id=io.bytewallet.bytewallet" target="_blank" class="">
-                                                    <img style="width: 200px;" src="/assets/landing/img/google.png" alt="" loading="lazy"></a>
-                          
+                                <div>
+                                    <a href="https://apps.apple.com/app/id1569062610" target="_blank" class="">
+                                        <img style="width: 200px;" src="/assets/landing/img/apple.png" alt=""
+                                            loading="lazy"></a>
+
+
+                                    <a href="https://play.google.com/store/apps/details?id=io.bytewallet.bytewallet"
+                                        target="_blank" class="">
+                                        <img style="width: 200px;" src="/assets/landing/img/google.png"
+                                            alt="" loading="lazy"></a>
+
                                 </div>
 
 
-                                </div>
+                            </div>
                         </div>
 
 
@@ -161,27 +176,7 @@
                     <div class="col-md-5 col-sm-5">
 
 
-                        <div class="portlet">
-
-                            <h3 class="portlet-title">
-                                <u>Marscoin Balance</u>
-                            </h3>
-
-                            <div class="portlet-body">
-                                <div
-                                    style="display: flex; align-items: center;  ">
-
-                                    <h2>
-                                        {{ $balance }}  MARS
-                                    </h2>
-
-
-                                </div>
-
-
-                            </div> <!-- /.portlet-body -->
-
-                        </div> <!-- /.portlet -->
+                        @livewire('marscoin-balance', ['address' => $public_addr])
 
                         <div class="portlet">
 
@@ -189,11 +184,11 @@
                                 <u>Receive Marscoin</u>
                             </h3>
 
-                            <div class="portlet-body" style="float:left">
+                            <div class="portlet-body" >
 
                                 <div class="pub-addr" style="height: 50px;">
 
-                                    <h3 class="pub-addr-text" style="font-size: 21px;"><a
+                                    <h3 class="pub-addr-text" style="font-size: 21px;    margin-left: -40px;"><a
                                             href="https://explore.marscoin.org/address/{{ $public_addr }}"
                                             target="_blank">{{ $public_addr }}</a></h3>
 
@@ -204,13 +199,28 @@
                                     <img id="qrious" height="200" width="200" class=" float: right;">
                                 </div>
 
-
+                                
 
                             </div>
 
                         </div>
 
+                        <div class="portlet">
+
+                            <h3 class="portlet-title">
+                                <u>Security</u>
+                            </h3>
+
+                            <div class="portlet-body" >
+                                <a data-toggle="modal" type="button" class="btn btn-primary " class="download-wallet" onclick="onDownloadWallet()"><i class="fa fa-download"></i> Download Wallet</a>
+                                <a class="btn btn-secondary" class="download-wallet" href="/wallet/dashboard/hd-close"><i class="fa fa-lock"></i> Lock Wallet</a>
+                                
+                            </div>
+                        </div>
+                  
+
                     </div>
+
 
 
                 </div>
@@ -276,6 +286,7 @@
 
                 </div> --}}
 
+
             </div>
 
 
@@ -288,8 +299,7 @@
                     <div class="modal-content">
 
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal"
-                                aria-hidden="true">×</button>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                             <div style="display: flex; align-itmes: center; justify-content: center">
 
                                 <h3 class="modal-title">Confirm Transaction</h3>
@@ -334,12 +344,27 @@
                                 </div>
                             </div>
 
+                            <div class="row" style="padding: 20px">
 
+
+                                {{-- <input name="wallet" hidden id="selected_wallet" /> --}}
+
+                                <label for="name">Wallet Password</label>
+                                <input type="password" id="unlock-password-tx" name="unlock-password-tx"
+                                    class="form-control" data-required="true" style="width: 100%">
+
+                                <p class="error-unlocking-tx"></p>
+
+
+                            </div>
                         </div> <!-- /.modal-body -->
 
                         <div class="modal-footer"
                             style="display: flex; align-itmes: center; justify-content: center;">
                             <button type="button" class="btn-lg btn-primary" id="send-mars">Send MARS</button>
+
+
+
                             <img src="/assets/citizen/loading.gif" alt="enter image description here"
                                 style="display: none" id="loading">
                             <div class="success-message" style="display: none">
@@ -362,24 +387,89 @@
 
 
 
+
+
         </div> <!-- .content -->
 
     </div> <!-- /#wrapper -->
 
 
 
-<div class="modal scan-popup" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-           <div id="app">
-            <div class="sidebar">
-            </div>
-           <canvas hidden="" style="height: 100%; width: 100%; padding: 5px;" id="qr-canvas"></canvas>
+    <div class="modal scan-popup" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div id="app">
+                    <div class="sidebar">
+                    </div>
+                    <canvas hidden="" style="height: 100%; width: 100%; padding: 5px;" id="qr-canvas"></canvas>
 
-          </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+
+
+
+
+
+    <!--------------------------------------->
+    <!------------- UNLOCK WALLET ----------->
+    <div id="unlockWalletModal" class="modal modal-styled fade">
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+
+                <div class="modal-header">
+                    <h3 class="modal-title">Unlock Wallet</h3>
+                </div> <!-- /.modal-header -->
+
+                {{-- <form class="form account-form " id="wallet-unlocker" method="POST"
+                    action="/wallet/dashboard/hd-open">
+                    @csrf --}}
+
+                <div class=""
+                    style="padding: 5rem; display: flex; justify-content: center; align-items: center; flex-direction: column">
+                    <div class="row">
+
+                        <h4 class="unlock-name" style="text-align: center">Input Password to Export Wallet</h4>
+                        <h2 class="unlock-addy"></h2>
+                    </div>
+
+
+                    <div class="row" style="width: 50%;">
+
+
+                        <input name="wallet" hidden id="selected_wallet" />
+
+                        <label for="name">Wallet Password</label>
+                        <input type="password" id="unlock-password" name="unlock-password" class="form-control"
+                            data-required="true" style="width: 100%">
+
+                        <p class="error-unlocking"></p>
+
+                        <div class="row d-flex justify-content-center text-center" style="padding-top: 5rem;">
+
+                            <button id="unlock-wallet" type="submit" class="btn btn-primary" style=""
+                                onclick="onDownloadWallet()">Unlock</button>
+                        </div>
+                    </div>
+
+                </div>
+                {{-- </form> --}}
+
+            </div>
+
+        </div>
+
+
+
+
+
+
+    </div>
+
     <footer class="footer">
         @include('footer')
     </footer>
@@ -397,6 +487,18 @@
             // ================================================================
             // ================================================================
             // CONSTANTS....
+            const unlockedWallet = localStorage.getItem("key")
+
+            if(!unlockedWallet)
+            {
+                console.log("No Wallet Found.")
+                window.location.replace("hd?key=none");
+            }
+            else
+                console.log("Wallet found.")
+
+
+
 
             let cur_currency = "MARS";
             var mars_price = "{{ $mars_price }}";
@@ -540,46 +642,7 @@
                 }
             };
 
-            /*
-              
-                                          **====================================================================================================================
-                                          
-                                          ADDRESS FOR SBS3128 Testing123
-                                          
-                                          address: "MSCG9f78gHw6UYb1ukpv3KBL1TPBdcwxy3"
-                                          menmonic: "element expose garden swing denial expand member cat need float daring gloom"
-                                          prvKey: "KxzXmhDfvKCVR7Z5bfrBfdKqzVc1KLjDwjjszTSM5q8nkzDKrn6M"
-                                          pubKey: "035f16de6c8381bfaf4ed37ab17aa9f0fe1ea3d3eef6c3255a81a9f9b9a746ef51"
-                                          xprv: "tprv8ZgxMBicQKsPd4XcZQ1afgScyJybBL6DEH5sQp1tkbbFrzG2iw3mBn1ZfxS3UmX4rgvEQP83TYqhqjw7aaaitQ7rY8no2i78ZqvGVgEC4f2"
-                                          
-                                          ADDRESS FOR Sebastian@byte...
-                                          
-                                          address: "MP5Lrzt22axX7EgCe1W5zoDqRbFSK84HTK"
-                                          menmonic: "club slot ocean gadget predict orchard burst among say zone mesh aspect"
-                                          prvKey: "L1b5c3Km7wfUjeLgukBbFs9KtrTVxrrcrzMZGFi7qwYshC1PAyZh"
-                                          pubKey: "02ae0ab754dbd49ebb1ed97cc48e580ee88652906d9e937eaafa399bad14f76ad6"
-                                          xprv: "tprv8ZgxMBicQKsPeE79vh39p7kkF3Xr3tvwVSGx3EQtapGrpjWCbHKW4vNHmPFdRTP2jwcWcFCzCS7jpSm5vkvpnkPCuRoARowCiwxhxrLsAbx"
-
-                                          **======================================================================================================================
-                                      
-                                        
-                                    ATTEMPT 3
-                                    sbs3128...
-                                    address: "M9ySTdcVCkvfzn6o6m48Y5VGy54TgxVYu7"
-                                    mnemonic: "invite feature forget axis radar stone bind squirrel dog crash trap equip"
-                                    pubKey: "03506118ac7a4d71ed23e8cf7bf7b8e687f06d08820b9dee5db69491618dff6c6b"
-                                    xprv: "tprv8ZgxMBicQKsPdAsTJwwcQLgJTCBx1Jk1kY6AbgRZFZYCtjFqckLV5sRwCo3kVQgFFqbk7sXW2dznRsHafaiNDNP4cLJXhk4wqYkjivPn5G2"
-
-                                    sebs@byte
-                                    address: "M8hzdznobkpd2QHoXrD1biraQijZhULawa"
-                                    mnemonic: "face they lemon ignore link crop above thing buffalo tide category soup"
-                                    pubKey: "02c651998179afa0becde99d609b58385cc98a9cd311ce535c446b47102c200ce2"
-                                    xprv: "tprv8ZgxMBicQKsPe6qoCZKjqHNj8Abrygb4MpPkspmQ1NGW2XyLQt23QgFGumQmFUN9Z8DYKuJzrXtSyqfTvX5jFKt2gkhjAtiu48osJa7bWVy"          
-
-                                    // userid: 5702
-                                    mnem: business tattoo current news edit bronze ketchup wrist thought prize mistake supply
-                                      
-            */
+          
 
             // Get Seed given menmonic
             function getSeed(mnemonic) {
@@ -689,40 +752,36 @@
 
                 $("#send-mars").click(async () => {
 
-                    // var sending_mars;
-                    // var receiver_address = $(".destination-address").val();
 
-                    // if (cur_currency == "MARS") {
-                    //     sending_mars = $(".input-placeholder").val();
-                    // } else if (cur_currency == "USD") {
-                    //     sending_mars = $(".conversion-rate").text();
-                    // }
+                    const unlockedWallet = localStorage.getItem("key").trim();
 
-                    // console.log("SENDING MARS: ", sending_mars);
-                    // console.log("Sendin TO: ", receiver_address)
+                    if (unlockedWallet) {
+                        console.log("successfully unlocked..")
 
-                    $("#send-mars").hide()
-                    $("#loading").show()
+                        $("#send-mars").hide()
+                        $("#loading").show()
 
-                    //await sendMARS(sending_mars, receiver_address);
-                    try {
-                        const tx = await signMARS(mars_amount, io)
-                        $("#loading").hide()
-                        $(".success-message").show()
-                        $(".transaction-hash-link").attr("href",
-                            "https://explore.marscoin.org/tx/" + tx.tx_hash)
-                        $(".transaction-hash").text("" + tx.tx_hash)
+                        //await sendMARS(sending_mars, receiver_address);
+                        try {
+                            const tx = await signMARS(mars_amount, io, unlockedWallet)
+                            $("#loading").hide()
+                            $(".success-message").show()
+                            $(".transaction-hash-link").attr("href",
+                                "https://explore.marscoin.org/tx/" + tx.tx_hash)
+                            $(".transaction-hash").text("" + tx.tx_hash)
 
 
 
-                    } catch (e) {
-                        handleError("unable to sign")
-                        throw e;
+                        } catch (e) {
+                            handleError("unable to sign")
+                            throw e;
+                        }
+
+                    } else {
+                        $(".error-unlocking-tx").text("Incorrect Password")
+                        $(".error-unlocking-tx").css('color', 'red')
+
                     }
-
-
-
-
 
                 })
 
@@ -735,13 +794,9 @@
             $('#basicModal').on('hidden.bs.modal', function() {
                 location.reload();
             })
-           
+
 
             const sendMARS = async (mars_amount, receiver_address) => {
-                //console.log("send mars running...")
-                //let mnemonic = "invite feature forget axis radar stone bind squirrel dog crash trap equip"
-                //const mnemonic = localStorage.getItem("key").trim();
-
 
                 // obtain utxo i/o
                 const sender_address = "{{ $public_addr }}".trim()
@@ -759,8 +814,9 @@
                 return null
             }
 
-            const signMARS = async (mars_amount, tx_i_o) => {
-                const mnemonic = localStorage.getItem("key").trim();
+            const signMARS = async (mars_amount, tx_i_o, mnemonic) => {
+                // const mnemonic = localStorage.getItem("key").trim();
+
                 const sender_address = "{{ $public_addr }}".trim()
 
                 //const mnemonic = "business tattoo current news edit bronze ketchup wrist thought prize mistake supply"
@@ -875,22 +931,32 @@
 
             }
 
-            const broadcastTxHash = async (txhash) => {
-                if (!txhash) {
+            const broadcastTxHash = async (txhashstring) => {
+                if (!txhashstring) {
                     throw new Error("Missing tx hash...");
                 }
-
-                const url =
-                    `https://pebas.marscoin.org/api/mars/broadcast?txhash=${txhash}`
+                const url = "https://pebas.marscoin.org/api/mars/broadcast"
                 try {
-                    const response = await fetch(url, {
-                        method: 'GET'
-                    });
-                    return response.json() // parses JSON response into native JavaScript objects
-                } catch (e) {
-                    throw e;
+                    const config = {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            a: 1,
+                            txhash: txhashstring
+                        })
+                    }
+                    const response = await fetch(url, config)
+                    if (response.ok) {
+                        return response.json()
+                    } else {
+                        console.log(response)
+                    }
+                } catch (error) {
+                    console.log(error)
                 }
-
 
             }
 
@@ -961,83 +1027,284 @@
                 return resp;
 
             };
+
+
+
+
         });
 
-var qr = new QRious({
-          element: document.getElementById('qrious'),
-          value: '{{ $public_addr }}',
-          size: '250'
+        var qr = new QRious({
+            element: document.getElementById('qrious'),
+            value: '{{ $public_addr }}',
+            size: '250'
         });
 
-function scan(){
-  $('.scan-popup').modal('show');
-}
+        function scan() {
+            $('.scan-popup').modal('show');
+        }
 
-const video = document.createElement("video");
-const canvasElement = document.getElementById("qr-canvas");
-const canvas = canvasElement.getContext("2d");
-const outputData = document.getElementById("outputData");
-const btnScanQR = document.getElementById("btn-scan-qr");
+        const video = document.createElement("video");
+        const canvasElement = document.getElementById("qr-canvas");
+        const canvas = canvasElement.getContext("2d");
+        const outputData = document.getElementById("outputData");
+        const btnScanQR = document.getElementById("btn-scan-qr");
 
-let scanning = false;
+        let scanning = false;
 
-$('.scan-popup').on('shown.bs.modal', function (e) {
-  
-  console.log("Here");
-  navigator.mediaDevices
-    .getUserMedia({ video: { facingMode: "environment" } })
-    .then(function(stream) {
-      scanning = true;
-      canvasElement.hidden = false;
-      video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
-      video.srcObject = stream;
-      video.play();
-      tick();
-      scan2();
-    });
+        $('.scan-popup').on('shown.bs.modal', function(e) {
 
-});
+            console.log("Here");
+            navigator.mediaDevices
+                .getUserMedia({
+                    video: {
+                        facingMode: "environment"
+                    }
+                })
+                .then(function(stream) {
+                    scanning = true;
+                    canvasElement.hidden = false;
+                    video.setAttribute("playsinline",
+                        true); // required to tell iOS safari we don't want fullscreen
+                    video.srcObject = stream;
+                    video.play();
+                    tick();
+                    scan2();
+                });
 
-
-
-
-qrcode.callback = res => {
-  if (res) {
-    res = res.replace("bitcoin:", "");
-    $("#recipient").val(res);
-    scanning = false;
-    $('.scan-popup').modal('hide');
-
-    video.srcObject.getTracks().forEach(track => {
-      track.stop();
-    });
-
- 
-    canvasElement.hidden = true;
-    btnScanQR.hidden = false;
-    $('.scan-popup').modal('hide');
-
-  }
-};
+        });
 
 
-function tick() {
-  canvasElement.height = video.videoHeight;
-  canvasElement.width = video.videoWidth;
-  canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
 
-  scanning && requestAnimationFrame(tick);
-}
 
-function scan2() {
-  try {
-    qrcode.decode();
-  } catch (e) {
-    setTimeout(scan2, 300);
-  }
-}
+        qrcode.callback = res => {
+            if (res) {
+                res = res.replace("bitcoin:", "");
+                $("#recipient").val(res);
+                scanning = false;
+                $('.scan-popup').modal('hide');
 
-</script>
+                video.srcObject.getTracks().forEach(track => {
+                    track.stop();
+                });
+
+
+                canvasElement.hidden = true;
+                btnScanQR.hidden = false;
+                $('.scan-popup').modal('hide');
+
+            }
+        };
+
+
+        function tick() {
+            canvasElement.height = video.videoHeight;
+            canvasElement.width = video.videoWidth;
+            canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+            scanning && requestAnimationFrame(tick);
+        }
+
+        function scan2() {
+            try {
+                qrcode.decode();
+            } catch (e) {
+                setTimeout(scan2, 300);
+            }
+        }
+
+
+        function download(content, fileName, contentType) {
+            // function to download wallet keys as json export...
+
+
+            // const password = $("#unlock-password").val().replace(/\s+/g, '');
+
+
+            // var unlockedSeed = unlockWallet(password, content)
+            // console.log(content/)
+
+            if (content) {
+                $(".error-unlocking").text("Success!")
+
+                let json = {
+                    key: content
+                }
+
+
+                const a = document.createElement("a");
+                const file = new Blob([JSON.stringify(json)], {
+                    type: contentType
+                });
+                a.href = URL.createObjectURL(file);
+                a.download = fileName;
+                a.click();
+
+                window.location.reload()
+
+            } else {
+               $(".error-unlocking").text("invalid password...")
+                return false
+            }
+
+
+        }
+
+
+
+        function onDownloadWallet() {
+            download(localStorage.getItem("key").trim(), "marswallet-key.json", "text/plain")
+        }
+
+        function constructJSONKey() {
+            let json = {}
+
+
+        }
+
+        // grab user input password. unlock wallet...
+
+        function unlockWallet(user_password, encrypted_seed) {
+
+            const hashed = hashPassword(user_password);
+
+
+            const user_wallet = "{{ $public_addr }}"
+            let iv = "{{ json_encode($iv) }}".replace("]", "").replace("[", "").split(",");
+            //console.log("hashed:", hashed)
+
+            //const encrypted = my_bundle.encrypt("face they lemon ignore link crop above thing buffalo tide category soup", hashed)
+            //console.log("Encrypted: ", encrypted)
+
+            const decrypted = my_bundle.decrypt(encrypted_seed, hashed, iv).trim()
+
+            // console.log("Encrypted SEED: {{ $encrypted_seed }}")
+            // console.log("MNEM:", decrypted)
+
+
+            const response = genSeed(decrypted)
+
+
+
+
+            console.log("response:", response.address)
+
+            console.log(decrypted)
+
+            console.log("user_wallet:",user_wallet)
+            if (response.address == user_wallet) {
+
+                console.log("success...")
+
+
+                return decrypted;
+                //      console.error("Item Succesfully locally stored")
+            } else {
+
+                console.log("failure...")
+
+                // validated = false
+                // e.preventDefault();
+                // window.location.reload()
+
+                return false;
+                // $(".wallet-getter").attr("action", "/wallet/failwallet")
+            }
+
+
+
+        }
+
+
+
+
+        const hashPassword = (passcode) => {
+
+            const ret = my_bundle.pbkdf2.pbkdf2Sync(
+                passcode,
+                "{{ $SALT }}", 1, 16, 'sha512').toString('hex')
+
+            return ret
+        }
+
+
+
+        // LTC Derivation Path
+        const Marscoin = {
+            mainnet: {
+                messagePrefix: "\x19Marscoin Signed Message:\n",
+                bech32: "M",
+                bip44: 2,
+                bip32: {
+                    public: 0x043587cf,
+                    private: 0x04358394,
+                },
+                pubKeyHash: 0x32,
+                scriptHash: 0x32,
+                wif: 0x80,
+            },
+        };
+
+
+        function nodeToLegacyAddress(hdNode) {
+            return my_bundle.bitcoin.payments.p2pkh({
+                pubkey: hdNode.publicKey,
+                network: Marscoin.mainnet,
+            }).address;
+        }
+        const genSeed = (mnemonic) => {
+            // console.log("SALT: {{ $SALT }}")
+            //mnemonic = "invite feature forget axis radar stone bind squirrel dog crash trap equip"
+
+            //const mnemonic = my_bundle.bip39.generateMnemonic();
+            //  console.log(mnemonic)
+
+            //const root = new my_bundle.BIP84.fromMnemonic(mnemonic, null, false, 107);
+
+            const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
+
+
+            // ROOT === xprv
+            const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
+
+
+            //private key
+            const child = root.derivePath("m/44'/2'/0'").neutered();
+            //console.log("child: ", child)
+
+            // tpub == tpub
+            let tpub = child.toBase58()
+
+
+            const hdNode = my_bundle.bip32.fromBase58(tpub, Marscoin.mainnet)
+            const node = hdNode.derive(0)
+
+            // Marscoin addy here
+            const addy = nodeToLegacyAddress(node.derive(0))
+
+
+            const publicKey = node.publicKey.toString('hex')
+
+            //console.log("addy: ", addy)
+
+            const resp = {
+                address: addy,
+                pubKey: publicKey,
+                xprv: root.toBase58(),
+                mnemonic: mnemonic
+            }
+
+
+            return resp;
+
+        };
+
+
+        // $(".download-wallet").click(() => {
+        //     console.log("downloading...")
+        // })
+    </script>
+
+@livewireScripts    
 </body>
 
 </html>

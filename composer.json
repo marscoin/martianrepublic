@@ -5,23 +5,28 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "php": "^7.3|^8.0",
+        "php": "^8.0",
         "bacon/bacon-qr-code": "^2.0",
-        "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
-        "laravel/framework": "^8.75",
-        "laravel/sanctum": "^2.11",
+        "kalnoy/nestedset": "6.x-dev",
+        "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.0",
+        "laravel/telescope": "^5.0",
         "laravel/tinker": "^2.5",
-        "pragmarx/google2fa": "^8.0"
+        "livewire/livewire": "^3.4",
+        "pragmarx/google2fa": "^8.0",
+        "riari/laravel-forum": "dev-main as 5.6.2",
+        "bitcoin-php/bitcoin-ecdsa": "^1.3"
     },
     "require-dev": {
-        "facade/ignition": "^2.5",
+        "barryvdh/laravel-debugbar": "^3.6",
         "fakerphp/faker": "^1.9.1",
-        "laravel/breeze": "^1.7",
+        "knuckleswtf/scribe": "^4.35",
+        "laravel/breeze": "^2.0",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^5.10",
-        "phpunit/phpunit": "^9.5.10"
+        "nunomaduro/collision": "^8.1",
+        "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
         "psr-4": {
@@ -58,8 +63,27 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./riari/laravel-forum",
+            "options": {
+                "symlink": true
+            }
+        },
+	{
+        "type": "path",
+        "url": "./laravel-nestedset",
+        "options": {
+            "symlink": true
+        }
+    }
+    ]
 }

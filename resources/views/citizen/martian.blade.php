@@ -58,7 +58,7 @@
 <div class="col-md-3 col-sm-5">
 
   <div class="profile-avatar">
-    <img src="/assets/citizen/<?=$public_address?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image. Source <?=$user['data']->data->picture?>">
+    <img src="/assets/citizen/<?=$public_address?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image. Source <?=$user['data']->data->picture?>" >
   </div> <!-- /.profile-avatar -->
 
   <h5 class="content-title"><u>Citizen Engagement</u></h5>
