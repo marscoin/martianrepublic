@@ -329,7 +329,29 @@ def update_or_insert_applicant(cur, db, addr, application_data, userid):
     logger.info("Application cached successfully")
     db.commit()
 
+def get_author_name_by_user_id(cur, user_id):
+    """
+    Fetches the first and last name of a user by their ID from the citizen table.
 
+    Args:
+    cur: Database cursor to execute the query.
+    user_id: The user ID of the citizen.
+
+    Returns:
+    The concatenated first and last name of the user, or None if not found.
+    """
+    try:
+        cur.execute("SELECT firstname, lastname FROM citizen WHERE userid = %s", (user_id,))
+        result = cur.fetchone()
+        if result:
+            # Concatenate first name and last name to form the author's name
+            author_name = f"{result['firstname']} {result['lastname']}".strip()
+            return author_name
+        else:
+            return None
+    except Exception as e:
+        logger.error(f"Error retrieving author name for user ID {user_id}: {e}")
+        return None
 
 
 #Caching functions
@@ -581,7 +603,11 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
         return
     
     proposal_data = ipfs_data['data']
-    
+    author_name = get_author_name_by_user_id(cur, userid) 
+    if not author_name:
+        logger.error(f"Author name not found for user ID {userid}.")
+        return
+
     # Insert into feed table
     insert_feed_query = """
     INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
@@ -597,8 +623,8 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
 
     # Insert into proposals table
     insert_proposal_query = """
-    INSERT INTO proposals (user_id, title, description, category, participation, duration, threshold, expiration, txid, public_address, ipfs_hash, created_at, updated_at, mined) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s);
+    INSERT INTO proposals (user_id, title, description, category, participation, duration, threshold, expiration, txid, public_address, ipfs_hash, created_at, updated_at, mined, author) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s);
     """
     try:
         cur.execute(insert_proposal_query, (
@@ -612,8 +638,9 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
             proposal_data.get('expiration', 0), 
             txid, 
             addr, 
-            body,
-            blockdate
+            embedded_link,
+            blockdate,
+            author_name
         ))
         db.commit()
         logger.info(f"Successfully inserted voting proposal into proposals table for txid: {txid}")
