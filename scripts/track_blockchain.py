@@ -742,7 +742,7 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
         cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, blockdate)
 
 
- def analyze_embedded_anonymous_data(cur, db, data, txid, height, blockdate, block_hash):
+def analyze_embedded_anonymous_data(cur, db, data, txid, height, blockdate, block_hash):
     head, body = data.split("_", 1)  # Safely unpack data with a maxsplit=1
     head_messages = {
         "PRY": "Vote Yes on Proposal",
@@ -752,7 +752,7 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
     logger.info(head_messages.get(head, "Unknown operation"))
     if head in ["PRY", "PRN", "PRA"]:
         cache_vote(cur, db, head, body, userid, txid, height, blockdate)
-    
+
 
 ################################################################################
 #
