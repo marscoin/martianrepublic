@@ -543,6 +543,84 @@ def cache_general_applications(cur, db, addr, head, body, userid, txid, height, 
         logger.error("Failed to cache application for txid %s: %s", txid, e)
         db.rollback()
 
+
+def cache_logbook_entry(cur, db, addr, head, body, userid, txid, height, blockdate):
+    """
+    Cache LogBook entries in the database.
+    """
+    # Construct the IPFS link from the body content
+    embedded_link = f'https://ipfs.marscoin.org/ipfs/{body}'
+    
+
+    # Define the SQL insert query
+    insert_query = """
+    INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+    """
+
+    # Execute the insert query to cache the LogBook entry
+    try:
+        cur.execute(insert_query, (addr, userid, head, "", embedded_link, txid, height, blockdate))
+        db.commit()
+        logger.info(f"Successfully cached LogBook entry for txid: {txid}")
+    except Exception as e:
+        logger.error(f"Failed to cache LogBook entry for txid {txid}: {e}")
+        db.rollback()
+
+
+
+def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, blockdate):
+    """
+    Cache voting proposal in the database and insert corresponding details into the proposals table.
+    """
+    embedded_link = f'https://ipfs.marscoin.org/ipfs/{body}'
+    ipfs_data = fetch_ipfs_data(body)
+    
+    if not ipfs_data or 'data' not in ipfs_data:
+        logger.error(f"IPFS data not accessible for hash: {body}. Skipping caching voting proposal.")
+        return
+    
+    proposal_data = ipfs_data['data']
+    
+    # Insert into feed table
+    insert_feed_query = """
+    INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+    """
+    try:
+        cur.execute(insert_feed_query, (addr, userid, head, proposal_data.get('title', 'Voting Proposal'), embedded_link, txid, height, blockdate))
+        db.commit()
+        logger.info(f"Successfully cached voting proposal for txid: {txid}")
+    except Exception as e:
+        logger.error(f"Failed to cache voting proposal for txid {txid}: {e}")
+        db.rollback()
+
+    # Insert into proposals table
+    insert_proposal_query = """
+    INSERT INTO proposals (user_id, title, description, category, participation, duration, threshold, expiration, txid, public_address, ipfs_hash, created_at, updated_at) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+    """
+    try:
+        cur.execute(insert_proposal_query, (
+            userid, 
+            proposal_data.get('title', ''), 
+            proposal_data.get('description', ''), 
+            proposal_data.get('category', ''), 
+            proposal_data.get('participation', 0), 
+            proposal_data.get('duration', 0), 
+            proposal_data.get('threshold', 0), 
+            proposal_data.get('expiration', 0), 
+            txid, 
+            addr, 
+            body
+        ))
+        db.commit()
+        logger.info(f"Successfully inserted voting proposal into proposals table for txid: {txid}")
+    except Exception as e:
+        logger.error(f"Failed to insert voting proposal into proposals table for txid {txid}: {e}")
+        db.rollback()
+
+
         
 def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_hash):
     userid = get_user_by_address(cur, addr)
@@ -577,7 +655,11 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
         cache_signed_messages(cur, db, addr, head, body, userid, txid, height, blockdate)
     elif head == "GP":
         cache_general_applications(cur, db, addr, head, body, userid, txid, height, blockdate)
-        
+    elif head == "LB":
+        cache_logbook_entry(cur, db, addr, head, body, userid, txid, height, blockdate)
+    elif head == "PR":
+        cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, blockdate)
+     
 
 
 ################################################################################
