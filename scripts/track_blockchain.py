@@ -653,7 +653,7 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
                 proposal_data.get('expiration', 0),
                 txid,
                 addr,
-                body,
+                embedded_link,
                 blockdate,
                 author_name
             ))
@@ -707,6 +707,8 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
 
     # Directly call cache_vote for relevant operations, avoids repetition and makes future modifications easier
     if head in ["PRY", "PRN", "PRA"]:
+        logger.info("Found a vote. Let's stop here.")
+        sys.exit(1)
         cache_vote(cur, db, addr, head, body, userid, txid, height, blockdate)
     elif head == "ED":
         process_endorsement(cur, db, addr, head, body, userid, txid, height, blockdate, block_hash)
