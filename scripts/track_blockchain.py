@@ -356,20 +356,44 @@ def get_author_name_by_user_id(cur, user_id):
 
 #Caching functions
 ##################
+def cache_vote(cur, db, head, body, txid, height, mined):
+    """
+    Cache an anonymous vote in the database.
 
-def cache_vote(cur, db, addr, vote, body, userid, txid, block, blockdate):
-    proposal = body[1:8].upper()
-    link = f'https://ipfs.marscoin.org/ipfs/{body}'
+    Args:
+    cur: Database cursor to execute the query.
+    db: Database connection object for committing the transaction.
+    head: The voting indication (PRY, PRN, PRA).
+    body: The body of the message containing additional information or the actual vote context.
+    txid: Transaction ID of the vote.
+    height: The block height at which the vote was mined.
+    mined: The timestamp when the block was mined.
+    """
+    # Convert head to vote representation
+    vote = None
+    if head == "PRY":
+        vote = 'Y'
+    elif head == "PRN":
+        vote = 'N'
+    elif head == "PRA":
+        vote = 'A'
+
+    if vote is None:
+        logger.error(f"Invalid vote head: {head}")
+        return
+
+    # Prepare the SQL query to insert the vote into the database
     insert_query = """
-    INSERT INTO feed (`address`, `userid`, `tag`, `message`, `embedded_link`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+    INSERT INTO votes (vote, txid, mined, block, created_at) 
+    VALUES (%s, %s, %s, %s, NOW());
     """
     try:
-        # Assuming 'addr' variable should be defined/available in this scope, or passed to this function
-        cur.execute(insert_query, (addr, userid, vote, proposal, link, txid, block, blockdate))
+        cur.execute(insert_query, (vote, txid, mined, height))
         db.commit()
+        logger.info(f"Successfully cached vote for txid: {txid}")
     except Exception as e:
-        logger.error("Failed to cache vote: %s", e)
+        db.rollback()
+        logger.error(f"Failed to cache vote for txid {txid}: {e}")
 
 
 def cache_signed_messages(cur, db, addr, head, body, userid, txid, block, blockdate):
@@ -706,11 +730,7 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
     logger.info(head_messages.get(head, "Unknown operation"))
 
     # Directly call cache_vote for relevant operations, avoids repetition and makes future modifications easier
-    if head in ["PRY", "PRN", "PRA"]:
-        logger.info("Found a vote. Let's stop here.")
-        sys.exit(1)
-        cache_vote(cur, db, addr, head, body, userid, txid, height, blockdate)
-    elif head == "ED":
+    if head == "ED":
         process_endorsement(cur, db, addr, head, body, userid, txid, height, blockdate, block_hash)
     elif head == "SP":
         cache_signed_messages(cur, db, addr, head, body, userid, txid, height, blockdate)
@@ -720,8 +740,19 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
         cache_logbook_entry(cur, db, addr, head, body, userid, txid, height, blockdate)
     elif head == "PR":
         cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, blockdate)
-     
 
+
+ def analyze_embedded_anonymous_data(cur, db, data, txid, height, blockdate, block_hash):
+    head, body = data.split("_", 1)  # Safely unpack data with a maxsplit=1
+    head_messages = {
+        "PRY": "Vote Yes on Proposal",
+        "PRN": "Vote No on Proposal",
+        "PRA": "Vote Abstain on Proposal",
+    }
+    logger.info(head_messages.get(head, "Unknown operation"))
+    if head in ["PRY", "PRN", "PRA"]:
+        cache_vote(cur, db, head, body, userid, txid, height, blockdate)
+    
 
 ################################################################################
 #
@@ -768,16 +799,11 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
     plain = None 
     for vo in transaction['vout']:
         script = vo['scriptPubKey']
-        print(script)
-        print(script['asm'])
         if "OP_RETURN" in script['asm']:
-            print("here")
             logging.info("We found a notarized transaction")
             data = script['asm'].split(" ")[1]
-            print(data)
             byte_array = bytearray.fromhex(data)
             plain = byte_array.decode()
-            print(plain)
             logging.info("Decoded message: %s", plain)
         else:
             print("false")
@@ -791,6 +817,9 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
     if plain and owner_address:
         logging.info(f"Transaction initiated by: {owner_address}")
         analyze_embedded_data(cur, db, plain, owner_address, transaction['txid'], height, mined, block_hash)
+    if plain:
+        logging.info("Anonymous data discovered...analyzing...")
+        analyze_embedded_anonymous_data(cur, db, plain, transaction['txid'], height, mined, block_hash)
     else:
         logging.info("Unable to determine transaction initiator.")
 
