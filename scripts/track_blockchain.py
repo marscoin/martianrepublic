@@ -346,23 +346,58 @@ def cache_signed_messages(cur, db, addr, head, body, userid, txid, block, blockd
         db.rollback()
 
 
-def insert_endorsement(cur, db, addr, tag, message, embedded_link, txid, height, blockdate):
+def insert_endorsement(cur, db, addr, userid, tag, message, embedded_link, txid, height, blockdate):
     insert_query = """INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
     try:
-        cur.execute(insert_query, (addr, None, tag, message, embedded_link, txid, height, blockdate))
+        cur.execute(insert_query, (addr, userid, tag, message, embedded_link, txid, height, blockdate))
         db.commit()
         logger.info(f"Successfully logged endorsement for txid: {txid}")
     except Exception as e:
         logger.error(f"Failed to log endorsement for txid {txid}: {e}")
         db.rollback()
 
-def process_citizenship(cur, db, addr, userid, txid, height, blockdate, block_hash, embedded_link):
+def update_citizenship_status(cur, db, endorsed_address):
+    """
+    Updates the citizenship status of a user identified by their public address.
+    
+    Args:
+    cur: Database cursor to execute the query.
+    db: Database connection object for committing the transaction.
+    endorsed_address: The blockchain address of the endorsed user.
+    """
+    try:
+        # Find the userid associated with the endorsed address in the citizen table
+        cur.execute("SELECT userid FROM citizen WHERE public_address = %s", (endorsed_address,))
+        result = cur.fetchone()
+        
+        if not result or 'userid' not in result:
+            logger.error(f"No user found with the public address: {endorsed_address}")
+            return
+        
+        userid = result['userid']
+        
+        # Update the profile table for the found userid
+        update_query = """
+        UPDATE profile 
+        SET general_public = 1, citizen = 1, has_application = 0
+        WHERE userid = %s
+        """
+        cur.execute(update_query, (userid,))
+        db.commit()
+        logger.info(f"Updated citizenship status for user with ID: {userid}")
+
+    except Exception as e:
+        logger.error(f"Failed to update citizenship status for address {endorsed_address}: {e}")
+        db.rollback()
+
+def process_citizenship(cur, db, endorsed_address, userid, txid, height, blockdate, block_hash, embedded_link):
     # Log citizenship (CT) in the feed, similar to how ED is logged but with CT tag
-    insert_citizenship(cur, db, addr, 'CT', embedded_link, txid, height, blockdate)
+    insert_citizenship(cur, db, endorsed_address, 'CT', embedded_link, txid, height, blockdate)
 
     # Update user's status in the profile table, setting citizenship flag
-    update_citizenship_status(cur, db, userid, True)  # Assuming this function is defined        
+    update_citizenship_status(cur, db, endorsed_address)  
+
 
 def check_for_citizenship_criteria(cur, endorsed_address):
     """
@@ -414,7 +449,7 @@ def process_endorsement(cur, db, addr, head, body, userid, txid, height, blockda
         return
 
     # Insert ED into feed, now with the extracted endorsed address as part of the message
-    insert_endorsement(cur, db, addr, head, endorsed_address, embedded_link, txid, height, blockdate)
+    insert_endorsement(cur, db, addr, userid, head, endorsed_address, embedded_link, txid, height, blockdate)
 
     # Check if the endorsed user meets criteria for citizenship (e.g., enough endorsements)
     if check_for_citizenship_criteria(cur, endorsed_address):
