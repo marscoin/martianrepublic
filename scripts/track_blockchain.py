@@ -393,9 +393,11 @@ def update_citizenship_status(cur, db, endorsed_address):
 
 def process_citizenship(cur, db, endorsed_address, userid, txid, height, blockdate, block_hash, embedded_link):
     # Log citizenship (CT) in the feed, similar to how ED is logged but with CT tag
+    logger.info("Processing citizenship...")
     insert_citizenship(cur, db, endorsed_address, 'CT', embedded_link, txid, height, blockdate)
 
     # Update user's status in the profile table, setting citizenship flag
+    logger.info("Updating citizen status in cached db...")
     update_citizenship_status(cur, db, endorsed_address)  
 
 
@@ -416,8 +418,10 @@ def check_for_citizenship_criteria(cur, endorsed_address):
     Returns:
     A boolean indicating whether the address meets the current criteria for citizenship.
     """
+    logger.info(f"Checking endorsement count for: {endorsed_address}")
     cur.execute("SELECT COUNT(*) FROM feed WHERE address = %s AND tag = 'ED'", (endorsed_address,))
     count = cur.fetchone()[0]
+    logger.info(f"Public ED Count: {count}")
     return count >= 1  # Initially, one endorsement is enough
 
 
