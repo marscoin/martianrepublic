@@ -362,6 +362,60 @@ def cache_endorsements(cur, db, addr, head, body, userid, txid, block, blockdate
         db.rollback()
 
 
+def insert_endorsement(cur, db, addr, tag, message, embedded_link, txid, height, blockdate):
+    insert_query = """INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
+                      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
+    try:
+        cur.execute(insert_query, (addr, None, tag, message, embedded_link, txid, height, blockdate))
+        db.commit()
+        logger.info(f"Successfully logged endorsement for txid: {txid}")
+    except Exception as e:
+        logger.error(f"Failed to log endorsement for txid {txid}: {e}")
+        db.rollback()
+
+def process_citizenship(cur, db, addr, userid, txid, height, blockdate, block_hash, embedded_link):
+    # Log citizenship (CT) in the feed, similar to how ED is logged but with CT tag
+    insert_citizenship(cur, db, addr, 'CT', embedded_link, txid, height, blockdate)
+
+    # Update user's status in the profile table, setting citizenship flag
+    update_citizenship_status(cur, db, userid, True)  # Assuming this function is defined        
+
+def check_for_citizenship_criteria(cur, endorsed_address):
+    """
+    Evaluates if an address meets the criteria for citizenship based on the number of endorsements received.
+    Currently, receiving at least one endorsement is sufficient for attaining citizenship status. This threshold
+    reflects the community's current standards but may be subject to change based on future community proposals or decisions.
+    
+    This approach models the concept of societal integration ("immigration laws"), where an individual's acceptance into a community or nation
+    can be quantified by the endorsements or support they receive from existing members ("time & money equals interactions/endorsements"). 
+    This function translates that notion into a straightforward numerical criterion.
+
+    Args:
+    cur: Database cursor to execute the query.
+    endorsed_address: The blockchain address of the user being evaluated for citizenship.
+
+    Returns:
+    A boolean indicating whether the address meets the current criteria for citizenship.
+    """
+    cur.execute("SELECT COUNT(*) FROM feed WHERE address = %s AND tag = 'ED'", (endorsed_address,))
+    count = cur.fetchone()[0]
+    return count >= 1  # Initially, one endorsement is enough
+
+def process_endorsement(cur, db, addr, head, body, userid, txid, height, blockdate, block_hash):
+    embedded_link = f"https://ipfs.marscoin.org/ipfs/{body}"
+    message = fetch_ipfs_data(body).get('data', {}).get('message', 'Endorsement')
+
+    # Insert ED into feed
+    insert_endorsement(cur, db, addr, head, message, embedded_link, txid, height, blockdate)
+
+    # Check if the endorsed user meets criteria for citizenship (e.g., enough endorsements)
+    if check_for_citizenship_criteria(cur, addr):
+        # If criteria met, process citizenship
+        process_citizenship(cur, db, addr, userid, txid, height, blockdate, block_hash, embedded_link)
+
+
+
+
 def cache_general_applications(cur, db, addr, head, body, userid, txid, height, blockdate):
     """
     Cache general public applications
