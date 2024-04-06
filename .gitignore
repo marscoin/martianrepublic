@@ -22,5 +22,5 @@ Homestead.json
 composer.lock
 
 # cached blockchain data
-public/assets/citizen
+public/assets/citizen/M*
 *.log
