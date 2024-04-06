@@ -33,16 +33,17 @@ Ensure the Marscoin CLI is correctly installed and configured, including setting
 
 Note: This script is part of the Martian Republic project and is tailored for analyzing Marscoin blockchain transactions. It requires access to a running Marscoin node and a configured database for storing transaction data.
 """
-import pymysql as MySQLdb
-from pymysql.cursors import DictCursor
-import sys
+import re
 import os
+import sys
 import json
 import time
-from datetime import datetime
-from subprocess import Popen, PIPE
-from dotenv import load_dotenv
 import requests
+import pymysql as MySQLdb
+from datetime import datetime
+from dotenv import load_dotenv
+from pymysql.cursors import DictCursor
+from subprocess import Popen, PIPE
 
 # Load environment variables
 load_dotenv("../.env")
@@ -344,23 +345,6 @@ def cache_signed_messages(cur, db, addr, head, body, userid, txid, block, blockd
         logger.error("Failed to cache signed message for txid %s: %s", txid, e)
         db.rollback()
 
-def cache_endorsements(cur, db, addr, head, body, userid, txid, block, blockdate):
-    """
-    Cache endorsements in the database.
-    """
-    endorsement_info = body  # Placeholder for actual data processing, if needed
-    insert_query = """
-    INSERT INTO feed (`address`, `userid`, `tag`, `message`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
-    """
-    try:
-        cur.execute(insert_query, (addr, userid, head, endorsement_info, txid, block, blockdate))
-        db.commit()
-        logger.info("Successfully cached endorsement for txid: %s", txid)
-    except Exception as e:
-        logger.error("Failed to cache endorsement for txid %s: %s", txid, e)
-        db.rollback()
-
 
 def insert_endorsement(cur, db, addr, tag, message, embedded_link, txid, height, blockdate):
     insert_query = """INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
@@ -401,18 +385,41 @@ def check_for_citizenship_criteria(cur, endorsed_address):
     count = cur.fetchone()[0]
     return count >= 1  # Initially, one endorsement is enough
 
+
 def process_endorsement(cur, db, addr, head, body, userid, txid, height, blockdate, block_hash):
     embedded_link = f"https://ipfs.marscoin.org/ipfs/{body}"
-    message = fetch_ipfs_data(body).get('data', {}).get('message', 'Endorsement')
+    ipfs_data = fetch_ipfs_data(body)
 
-    # Insert ED into feed
-    insert_endorsement(cur, db, addr, head, message, embedded_link, txid, height, blockdate)
+      
+    # Check if IPFS data was successfully fetched
+    if not ipfs_data or 'data' not in ipfs_data or 'message' not in ipfs_data['data']:
+        logger.error(f"IPFS data not accessible for hash: {body}. Skipping potential endorsement as it might be missing or incomplete.")
+        return
+     
+    message = ipfs_data.get('data', {}).get('message', 'Endorsement')
+    
+    # Assuming the address format is consistent and can be identified by a regular expression
+    # This regex matches the Marscoin address format
+    address_pattern = r'M\w{33}'
+    addresses = re.findall(address_pattern, message)
+
+    endorsed_address = None
+    for address in addresses:
+        if address != addr:  # Find the address in the message that's not the endorser's
+            endorsed_address = address
+            break
+    
+    if not endorsed_address:
+        logger.error("Could not extract endorsed address from message.")
+        return
+
+    # Insert ED into feed, now with the extracted endorsed address as part of the message
+    insert_endorsement(cur, db, addr, head, endorsed_address, embedded_link, txid, height, blockdate)
 
     # Check if the endorsed user meets criteria for citizenship (e.g., enough endorsements)
-    if check_for_citizenship_criteria(cur, addr):
+    if check_for_citizenship_criteria(cur, endorsed_address):
         # If criteria met, process citizenship
-        process_citizenship(cur, db, addr, userid, txid, height, blockdate, block_hash, embedded_link)
-
+        process_citizenship(cur, db, endorsed_address, userid, txid, height, blockdate, block_hash, embedded_link)
 
 
 
@@ -470,8 +477,7 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
     if head in ["PRY", "PRN", "PRA"]:
         cache_vote(cur, db, addr, head, body, userid, txid, height, blockdate)
     elif head == "ED":
-        # Future implementation for cacheEndorsements should follow the same parameter structure for consistency
-        cache_endorsements(cur, db, addr, head, body, userid, txid, height, blockdate)
+        process_endorsement(cur, db, addr, head, body, userid, txid, height, blockdate, block_hash)
     elif head == "SP":
         cache_signed_messages(cur, db, addr, head, body, userid, txid, height, blockdate)
     elif head == "GP":
