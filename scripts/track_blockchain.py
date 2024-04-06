@@ -761,8 +761,6 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
         logger.info("Miner transaction. Ignoring...")
         return
     
-    print(transaction)
-
     # Initialize variables to find the vout with the max value that's not OP_RETURN
     # We assume max output is owner of transaction
     max_value = 0
@@ -770,6 +768,7 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
     plain = None 
     for vo in transaction['vout']:
         script = vo['scriptPubKey']
+        print(script)
         if "OP_RETURN" in script['asm']:
             logging.info("We found a notarized transaction")
             data = script['asm'].split(" ")[1]
@@ -806,7 +805,7 @@ def main_loop():
                 logger.info(f"Next block to process -> Height: {height}, Hash: {block_hash[:8]}, Mined: {mined}")
                 process_block_transactions(db, cur, block_hash, height, mined)
                 record_block_processed(cur, db, height, block_hash, mined)
-                time.sleep(0.5)
+                time.sleep(5)
             else:
                 logger.info("Waiting for next block...")
                 time.sleep(10)  # Delay if there's no new block to process
