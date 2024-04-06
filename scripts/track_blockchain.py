@@ -239,18 +239,38 @@ def record_block_processed(cur, db, block, block_hash, mined):
         db.rollback()
 
 
-
 def get_user_by_address(cur, address):
     """
-    Retrieves a user ID by their wallet address.
+    Fetches the user ID associated with a given public address from multiple tables.
+
+    Args:
+    cur: Database cursor to execute the query.
+    address: The public blockchain address of the user.
+
+    Returns:
+    The user ID associated with the address or None if not found.
     """
-    try:
-        cur.execute('SELECT * FROM hd_wallet WHERE public_addr = %s LIMIT 1', (address,))
-        u = cur.fetchone()
-        return u['user_id'] if u else None
-    except Exception as e:
-        logger.error("Error getting user by address %s: %s", address, e)
-        return None
+    # Define the queries for each table
+    queries = {
+        'citizen': "SELECT userid FROM citizen WHERE public_address = %s",
+        'civic_wallet': "SELECT user_id FROM civic_wallet WHERE public_addr = %s",
+        'hd_wallet': "SELECT user_id FROM hd_wallet WHERE public_addr = %s LIMIT 1"
+    }
+
+    # Iterate over the queries dictionary and try to find the user_id
+    for table, query in queries.items():
+        try:
+            cur.execute(query, (address,))
+            result = cur.fetchone()
+            if result:
+                return result['userid'] if 'userid' in result else result['user_id']
+        except Exception as e:
+            logger.error(f"Error getting user by address {address} from table {table}: {e}")
+            # Optionally, you could decide to continue to the next query or return None / raise an error
+            # For now, we'll just log the error and continue with the next table
+
+    # If the user_id was not found in any of the tables
+    return None
 
 
 def mark_application_submitted(cur, db, userid):
@@ -310,27 +330,6 @@ def update_or_insert_applicant(cur, db, addr, application_data, userid):
     db.commit()
 
 
-def get_user_id_by_address(cur, address):
-    """
-    Fetches the user ID associated with a given public address from the citizen and civic_wallet tables.
-
-    Args:
-    cur: Database cursor to execute the query.
-    address: The public blockchain address of the user.
-
-    Returns:
-    The user ID associated with the address or None if not found.
-    """
-    # First, try to find the userid in the citizen table
-    cur.execute("SELECT userid FROM citizen WHERE public_address = %s", (address,))
-    result = cur.fetchone()
-    if result:
-        return result['userid']
-    
-    # If not found, try the civic_wallet table
-    cur.execute("SELECT user_id FROM civic_wallet WHERE public_addr = %s", (address,))
-    result = cur.fetchone()
-    return result['user_id'] if result else None
 
 
 #Caching functions
@@ -382,7 +381,7 @@ def insert_citizenship(cur, db, endorsed_address, tag, embedded_link, txid, heig
     insert_query = """INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
     # Find the user ID by the endorsed address
-    userid = get_user_id_by_address(cur, endorsed_address)
+    userid = get_user_by_address(cur, endorsed_address)
     
     # If the userid is not found, log an error and return
     if userid is None:
@@ -422,7 +421,7 @@ def update_citizenship_status(cur, db, endorsed_address):
     """
     try:
         # Find the user ID by the endorsed address
-        userid = get_user_id_by_address(cur, endorsed_address)
+        userid = get_user_by_address(cur, endorsed_address)
         
         # If the userid is not found, log an error and return
         if userid is None:
