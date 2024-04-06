@@ -774,8 +774,10 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
             print("here")
             logging.info("We found a notarized transaction")
             data = script['asm'].split(" ")[1]
+            print(data)
             byte_array = bytearray.fromhex(data)
             plain = byte_array.decode()
+            print(plain)
             logging.info("Decoded message: %s", plain)
         else:
             print("false")
