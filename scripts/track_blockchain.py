@@ -420,15 +420,13 @@ def check_for_citizenship_criteria(cur, endorsed_address):
     """
     logger.info(f"Checking endorsement count for: {endorsed_address}")
     try:
-        cur.execute("SELECT COUNT(*) FROM feed WHERE message = %s AND tag = 'ED'", (endorsed_address,))
-        count = cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) as endorsement_count FROM feed WHERE message = %s AND tag = 'ED'", (endorsed_address,))
+        result = cur.fetchone()
+        count = result['endorsement_count'] if result else 0
         logger.info(f"Public ED Count: {count}")
-        if count >= 1:  
-            return True # Initially, one endorsement is enough
+        return count >= 1
     except Exception as e:
-        logger.error(f"Error checking endorsement count for {endorsed_address}: {e}")
-        # Decide how to handle this case. Returning False as a default could be reasonable,
-        # but ensure this decision matches your application's logic and error handling strategy.
+        logger.error(f"Error checking endorsement count for {endorsed_address}: {e.__class__.__name__}, {e.args}")
         return False
 
 
