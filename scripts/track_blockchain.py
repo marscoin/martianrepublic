@@ -751,7 +751,7 @@ def analyze_embedded_anonymous_data(cur, db, data, txid, height, blockdate, bloc
     }
     logger.info(head_messages.get(head, "Unknown operation"))
     if head in ["PRY", "PRN", "PRA"]:
-        cache_vote(cur, db, head, body, userid, txid, height, blockdate)
+        cache_vote(cur, db, head, body, txid, height, blockdate)
 
 
 ################################################################################
