@@ -769,6 +769,7 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
     for vo in transaction['vout']:
         script = vo['scriptPubKey']
         print(script)
+        print(script['asm'])
         if "OP_RETURN" in script['asm']:
             logging.info("We found a notarized transaction")
             data = script['asm'].split(" ")[1]
