@@ -771,12 +771,14 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
         print(script)
         print(script['asm'])
         if "OP_RETURN" in script['asm']:
+            print("here")
             logging.info("We found a notarized transaction")
             data = script['asm'].split(" ")[1]
             byte_array = bytearray.fromhex(data)
             plain = byte_array.decode()
             logging.info("Decoded message: %s", plain)
         else:
+            print("false")
             # Check if this output has the highest value so far and capture the address
             if vo['value'] > max_value:
                 max_value = vo['value']
