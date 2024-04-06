@@ -350,17 +350,27 @@ def cache_vote(cur, db, addr, vote, body, userid, txid, block, blockdate):
     except Exception as e:
         logger.error("Failed to cache vote: %s", e)
 
+
 def cache_signed_messages(cur, db, addr, head, body, userid, txid, block, blockdate):
     """
-    Cache signed messages in the database.
+    Cache signed messages in the database, using the message content from IPFS.
     """
-    link = f'https://ipfs.marscoin.org/ipfs/{body}'
+    ipfs_data = fetch_ipfs_data(body)
+    
+    # If the IPFS fetch is unsuccessful or the 'post' field is missing, log an error and skip caching
+    if not ipfs_data or 'data' not in ipfs_data or 'post' not in ipfs_data['data']:
+        logger.error(f"IPFS data not accessible or incomplete for hash: {body}. Skipping caching signed message.")
+        return
+    
+    post_message = ipfs_data['data']['post']
+    embedded_link = f'https://ipfs.marscoin.org/ipfs/{body}'
+    
     insert_query = """
-    INSERT INTO feed (`address`, `userid`, `tag`, `message`, `embedded_link`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) 
+    INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
     """
     try:
-        cur.execute(insert_query, (addr, userid, head, "Signed Message", link, txid, block, blockdate))
+        cur.execute(insert_query, (addr, userid, head, post_message, embedded_link, txid, block, blockdate))
         db.commit()
         logger.info("Successfully cached signed message for txid: %s", txid)
     except Exception as e:
