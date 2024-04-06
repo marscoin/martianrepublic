@@ -97,14 +97,18 @@
           <h4 class="content-title"><u>Blockchain Notarized Public Activity Feed</u></h4>
 
 
-     <?php foreach($feed as $f){?>
+     <?php 
+     $eds = 0;
+     foreach($feed as $f){?>
 
           <div class="feed-item feed-item-file">
             <div class="feed-icon">
               <i class="fa fa-link"></i>
             </div> <!-- /.feed-icon -->
             <div class="feed-subject">
-              <?php if($f->tag == 'ED'){?>
+              <?php if($f->tag == 'ED'){
+                $eds += 1;
+              ?>
               <p>Endorsement of Citizen</p>
               <?php } ?>
               <?php if($f->tag == 'SP'){?>

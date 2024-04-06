@@ -78,7 +78,8 @@ class IdentityController extends Controller
 				$view->public_address = "";
 			}
 
-			if($profile->general_public ){
+			if($profile->general_public )
+			{
 				try
 				{
 					$view->user = AppHelper::getUserFromCache($wallet['public_addr']);
@@ -227,7 +228,7 @@ class IdentityController extends Controller
 			$view->mePublic = Feed::where('userid', '=', $martian->user_id)->where('tag', '=', "GP")->first();
 			$view->meCitizen = Feed::where('userid', '=', $martian->user_id)->where('tag', '=', "CT")->first();
 			$view->feed = Feed::where('userid', '=', $martian->user_id)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
-			$view->endorsed = array();
+			$view->endorsed = Feed::where('userid', '=', $martian->user_id)->where('tag', '=', "ED")->get();
 			
 			//print_r(is_null($view->meCitizen));
 			//die();
