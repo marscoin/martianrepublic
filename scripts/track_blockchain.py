@@ -346,6 +346,25 @@ def cache_signed_messages(cur, db, addr, head, body, userid, txid, block, blockd
         db.rollback()
 
 
+def insert_citizenship(cur, db, endorsed_address, tag, embedded_link, txid, height, blockdate):
+    insert_query = """INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
+                      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
+    # We need to fetch the userid associated with the endorsed_address from the citizen table.
+    cur.execute("SELECT userid FROM citizen WHERE public_address = %s", (endorsed_address,))
+    result = cur.fetchone()
+    userid = result['userid'] if result else None
+    
+    # Default message for citizenship - you can customize this as needed
+    message = "Citizenship confirmed via blockchain endorsement."
+
+    try:
+        cur.execute(insert_query, (endorsed_address, userid, tag, message, embedded_link, txid, height, blockdate))
+        db.commit()
+        logger.info(f"Successfully logged citizenship for txid: {txid}")
+    except Exception as e:
+        logger.error(f"Failed to log citizenship for txid {txid}: {e}")
+        db.rollback()
+
 def insert_endorsement(cur, db, addr, userid, tag, message, embedded_link, txid, height, blockdate):
     insert_query = """INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
