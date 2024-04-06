@@ -419,10 +419,17 @@ def check_for_citizenship_criteria(cur, endorsed_address):
     A boolean indicating whether the address meets the current criteria for citizenship.
     """
     logger.info(f"Checking endorsement count for: {endorsed_address}")
-    cur.execute("SELECT COUNT(*) FROM feed WHERE address = %s AND tag = 'ED'", (endorsed_address,))
-    count = cur.fetchone()[0]
-    logger.info(f"Public ED Count: {count}")
-    return count >= 1  # Initially, one endorsement is enough
+    try:
+        cur.execute("SELECT COUNT(*) FROM feed WHERE message = %s AND tag = 'ED'", (endorsed_address,))
+        count = cur.fetchone()[0]
+        logger.info(f"Public ED Count: {count}")
+        if count >= 1:  
+            return True # Initially, one endorsement is enough
+    except Exception as e:
+        logger.error(f"Error checking endorsement count for {endorsed_address}: {e}")
+        # Decide how to handle this case. Returning False as a default could be reasonable,
+        # but ensure this decision matches your application's logic and error handling strategy.
+        return False
 
 
 def process_endorsement(cur, db, addr, head, body, userid, txid, height, blockdate, block_hash):
