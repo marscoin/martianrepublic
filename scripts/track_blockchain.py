@@ -597,8 +597,8 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
 
     # Insert into proposals table
     insert_proposal_query = """
-    INSERT INTO proposals (user_id, title, description, category, participation, duration, threshold, expiration, txid, public_address, ipfs_hash, created_at, updated_at) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+    INSERT INTO proposals (user_id, title, description, category, participation, duration, threshold, expiration, txid, public_address, ipfs_hash, created_at, updated_at, mined) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s);
     """
     try:
         cur.execute(insert_proposal_query, (
@@ -612,7 +612,8 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
             proposal_data.get('expiration', 0), 
             txid, 
             addr, 
-            body
+            body,
+            blockdate
         ))
         db.commit()
         logger.info(f"Successfully inserted voting proposal into proposals table for txid: {txid}")
@@ -706,7 +707,7 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
     # We assume max output is owner of transaction
     max_value = 0
     owner_address = None
-
+    plain = None 
     for vo in transaction['vout']:
         script = vo['scriptPubKey']
         if "OP_RETURN" in script['asm']:
@@ -723,7 +724,7 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
                 addresses = script.get('addresses', [])
                 owner_address = addresses[0] if addresses else None
 
-    if owner_address:
+    if plain and owner_address:
         logging.info(f"Transaction initiated by: {owner_address}")
         analyze_embedded_data(cur, db, plain, owner_address, transaction['txid'], height, mined, block_hash)
     else:
