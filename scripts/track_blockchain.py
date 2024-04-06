@@ -310,6 +310,28 @@ def update_or_insert_applicant(cur, db, addr, application_data, userid):
     db.commit()
 
 
+def get_user_id_by_address(cur, address):
+    """
+    Fetches the user ID associated with a given public address from the citizen and civic_wallet tables.
+
+    Args:
+    cur: Database cursor to execute the query.
+    address: The public blockchain address of the user.
+
+    Returns:
+    The user ID associated with the address or None if not found.
+    """
+    # First, try to find the userid in the citizen table
+    cur.execute("SELECT userid FROM citizen WHERE public_address = %s", (address,))
+    result = cur.fetchone()
+    if result:
+        return result['userid']
+    
+    # If not found, try the civic_wallet table
+    cur.execute("SELECT user_id FROM civic_wallet WHERE public_addr = %s", (address,))
+    result = cur.fetchone()
+    return result['user_id'] if result else None
+
 
 #Caching functions
 ##################
@@ -349,10 +371,13 @@ def cache_signed_messages(cur, db, addr, head, body, userid, txid, block, blockd
 def insert_citizenship(cur, db, endorsed_address, tag, embedded_link, txid, height, blockdate):
     insert_query = """INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
-    # We need to fetch the userid associated with the endorsed_address from the citizen table.
-    cur.execute("SELECT userid FROM citizen WHERE public_address = %s", (endorsed_address,))
-    result = cur.fetchone()
-    userid = result['userid'] if result else None
+    # Find the user ID by the endorsed address
+    userid = get_user_id_by_address(cur, endorsed_address)
+    
+    # If the userid is not found, log an error and return
+    if userid is None:
+        logger.error(f"User ID not found for address {endorsed_address}.")
+        return
     
     # Default message for citizenship - you can customize this as needed
     message = "Citizenship confirmed via blockchain endorsement."
@@ -386,15 +411,13 @@ def update_citizenship_status(cur, db, endorsed_address):
     endorsed_address: The blockchain address of the endorsed user.
     """
     try:
-        # Find the userid associated with the endorsed address in the citizen table
-        cur.execute("SELECT userid FROM citizen WHERE public_address = %s", (endorsed_address,))
-        result = cur.fetchone()
+        # Find the user ID by the endorsed address
+        userid = get_user_id_by_address(cur, endorsed_address)
         
-        if not result or 'userid' not in result:
-            logger.error(f"No user found with the public address: {endorsed_address}")
+        # If the userid is not found, log an error and return
+        if userid is None:
+            logger.error(f"User ID not found for address {endorsed_address}.")
             return
-        
-        userid = result['userid']
         
         # Update the profile table for the found userid
         update_query = """
