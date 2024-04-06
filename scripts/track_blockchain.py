@@ -806,7 +806,7 @@ def main_loop():
                 logger.info(f"Next block to process -> Height: {height}, Hash: {block_hash[:8]}, Mined: {mined}")
                 process_block_transactions(db, cur, block_hash, height, mined)
                 record_block_processed(cur, db, height, block_hash, mined)
-                time.sleep(5)
+                time.sleep(0.5)
             else:
                 logger.info("Waiting for next block...")
                 time.sleep(10)  # Delay if there's no new block to process
