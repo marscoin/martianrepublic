@@ -802,7 +802,7 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
     addr = vins[0].get('addr')
 
     if coinbase is not None:
-        logger.info("Miner transaction. Ignoring...")
+        #logger.info("Miner transaction. Ignoring...")
         return
     
     # Initialize variables to find the vout with the max value that's not OP_RETURN
