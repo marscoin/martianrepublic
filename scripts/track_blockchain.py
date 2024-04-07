@@ -55,7 +55,6 @@ from logging.handlers import TimedRotatingFileHandler
 # Configure logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-logger.propagate = False #avoid stdout
 
 # File handler for logging into a file
 file_handler = TimedRotatingFileHandler('./track_marscoin.log', when='midnight', interval=1, backupCount=10, encoding='utf-8')
@@ -224,6 +223,34 @@ def load_next_block(cur):
         logger.error(f"Error loading the next block: {e}")
         return None, None, None
 
+
+def get_specific_block_details(cur, block_height):
+    # Similar logic to load_next_block but for a specific height
+    try:
+        command = [MARSCOIN_EXEC_PATH, "-datadir=" + MARSCOIN_CONF_PATH, "getblockhash", str(block_height)]
+        p = Popen(command, stdout=PIPE, stderr=PIPE, encoding='utf8')
+        output, errors = p.communicate()
+        if p.returncode != 0:
+            logger.error(f"Error getting block hash for height {block_height}: {errors}")
+            return None, None, None
+
+        block_hash = output.strip()
+        command = [MARSCOIN_EXEC_PATH, "-datadir=" + MARSCOIN_CONF_PATH, "getblock", block_hash]
+        p = Popen(command, stdout=PIPE, stderr=PIPE, encoding='utf8')
+        output, errors = p.communicate()
+        
+        if p.returncode != 0:
+            logger.error(f"Error getting details for block hash {block_hash}: {errors}")
+            return None, None, None
+
+        block_details = json.loads(output)
+        mined_date = datetime.fromtimestamp(block_details['time'])
+
+        return block_details['height'], block_details['hash'], mined_date
+
+    except Exception as e:
+        logger.error(f"Error loading block {block_height}: {e}")
+        return None, None, None
 
 
 def record_block_processed(cur, db, block, block_hash, mined):
@@ -845,18 +872,30 @@ def main_loop():
         logger.critical("Initial database connection failed. Exiting.")
         sys.exit(1)
 
+    # Check if a specific block height is provided as an argument
+    specific_block_height = int(sys.argv[1]) if len(sys.argv) > 1 else None
+
     while True:
         try:
-            now = datetime.now()
-            height, block_hash, mined = load_next_block(cur)
-            if height and block_hash and mined:
-                progress = (height / current_height) * 100 if current_height else 0
-                logger.info(f"Next block to process -> Height: {height}, Hash: {block_hash[:8]}, Mined: {mined}. Progress: {progress:.2f}%")
-                process_block_transactions(db, cur, block_hash, height, mined)
-                record_block_processed(cur, db, height, block_hash, mined)
+            if specific_block_height:
+                # Process the specific block
+                height, block_hash, mined = get_specific_block_details(cur, specific_block_height)
+                if height and block_hash and mined:
+                    logger.info(f"Processing specified block -> Height: {height}, Hash: {block_hash[:8]}, Mined: {mined}")
+                    process_block_transactions(db, cur, block_hash, height, mined)
+                    record_block_processed(cur, db, height, block_hash, mined)
+                    break  # Exit after processing the specific block
             else:
-                logger.info("Waiting for next block...")
-                time.sleep(10)  # Delay if there's no new block to process
+                # Continue with the next block processing
+                height, block_hash, mined = load_next_block(cur)
+                if height and block_hash and mined:
+                    progress = (height / current_height) * 100 if current_height else 0
+                    logger.info(f"Next block to process -> Height: {height}, Hash: {block_hash[:8]}, Mined: {mined}. Progress: {progress:.2f}%")
+                    process_block_transactions(db, cur, block_hash, height, mined)
+                    record_block_processed(cur, db, height, block_hash, mined)
+                else:
+                    logger.info("Waiting for next block...")
+                    time.sleep(10)  # Delay if there's no new block to process
         except MySQLdb.Error as e:
             logger.error("Database error occurred: %s", e)
             db, cur = db_connect()  # Attempt to reconnect
