@@ -123,6 +123,7 @@ def get_current_block():
     return None
 
 
+
 def get_txs(block_hash):
     """
     Retrieves transactions for a given block hash.
@@ -826,6 +827,7 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
 
 def main_loop():
     logger.info("Starting...")
+    current_height = get_current_block()  # Get the current network height
     db, cur = db_connect()
     if not db or not cur:  # Check if initial connection failed
         logger.critical("Initial database connection failed. Exiting.")
@@ -836,7 +838,8 @@ def main_loop():
             now = datetime.now()
             height, block_hash, mined = load_next_block(cur)
             if height and block_hash and mined:
-                logger.info(f"Next block to process -> Height: {height}, Hash: {block_hash[:8]}, Mined: {mined}")
+                progress = (height / current_height) * 100 if current_height else 0
+                logger.info(f"Next block to process -> Height: {height}, Hash: {block_hash[:8]}, Mined: {mined}. Progress: {progress:.2f}%")
                 process_block_transactions(db, cur, block_hash, height, mined)
                 record_block_processed(cur, db, height, block_hash, mined)
             else:
