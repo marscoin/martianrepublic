@@ -358,6 +358,14 @@ def get_author_name_by_user_id(cur, user_id):
         logger.error(f"Error retrieving author name for user ID {user_id}: {e}")
         return None
 
+def find_proposal_id_by_ipfs(cur, ipfs_hash):
+    # Note: Adjust the LIKE pattern as needed based on your IPFS URL structure
+    search_pattern = f"%{ipfs_hash}"
+    cur.execute("SELECT id FROM proposals WHERE ipfs_hash LIKE %s LIMIT 1", (search_pattern,))
+    result = cur.fetchone()
+    if result:
+        return result['id']
+    return None
 
 #Caching functions
 ##################
@@ -375,25 +383,26 @@ def cache_vote(cur, db, head, body, txid, height, mined):
     mined: The timestamp when the block was mined.
     """
     # Convert head to vote representation
-    vote = None
-    if head == "PRY":
-        vote = 'Y'
-    elif head == "PRN":
-        vote = 'N'
-    elif head == "PRA":
-        vote = 'A'
+    vote_map = {"PRY": "Y", "PRN": "N", "PRA": "A"}
+    vote = vote_map.get(head)
 
     if vote is None:
         logger.error(f"Invalid vote head: {head}")
         return
 
-    # Prepare the SQL query to insert the vote into the database
+    # Attempt to find the proposal ID based on the IPFS hash in the body
+    proposal_id = find_proposal_id_by_ipfs(cur, body)
+    if proposal_id is None:
+        logger.error(f"Could not find proposal with IPFS hash: {body}")
+        return
+
+    # Prepare and execute the SQL query to insert the vote into the database
     insert_query = """
-    INSERT INTO votes (vote, txid, mined, block, created_at) 
-    VALUES (%s, %s, %s, %s, NOW());
+    INSERT INTO votes (vote, proposal_id, txid, mined, block, created_at) 
+    VALUES (%s, %s, %s, %s, %s, NOW());
     """
     try:
-        cur.execute(insert_query, (vote, txid, mined, height))
+        cur.execute(insert_query, (vote, proposal_id, txid, mined, height))
         db.commit()
         logger.info(f"Successfully cached vote for txid: {txid}")
     except Exception as e:
