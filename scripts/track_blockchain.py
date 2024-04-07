@@ -762,9 +762,6 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
         "GP": "General Public Application",
         "CT": "Citizenship",
         "ED": "Citizenship Endorsement",
-        "PRY": "Vote Yes on Proposal",
-        "PRN": "Vote No on Proposal",
-        "PRA": "Vote Abstain on Proposal",
         "PR": "Voting Proposal launched",
         "SP": "Signed Post",
     }
