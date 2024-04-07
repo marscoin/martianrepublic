@@ -55,6 +55,7 @@ from logging.handlers import TimedRotatingFileHandler
 # Configure logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+logger.propagate = False #avoid stdout
 
 # File handler for logging into a file
 file_handler = TimedRotatingFileHandler('./track_marscoin.log', when='midnight', interval=1, backupCount=10, encoding='utf-8')
