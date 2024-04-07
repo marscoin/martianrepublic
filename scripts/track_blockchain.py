@@ -777,7 +777,6 @@ def process_block_transactions(db, cur, block_hash, height, mined):
     Process transactions for a given block hash.
     """
     block_transactions = get_txs(block_hash)
-    logging.info("Found: %d transactions", len(block_transactions))
     for tx in block_transactions:
         transaction = get_tx_details(tx)
         if transaction:
