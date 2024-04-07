@@ -110,18 +110,21 @@ def execute_query(cursor, query, params=None, commit=False):
         cursor.connection.rollback()
 
 def get_current_block():
+    """
+    Fetches the current blockchain height.
+    """
     try:
-        p = Popen([MARSCOIN_EXEC_PATH, "-datadir=" + MARSCOIN_CONF_PATH, "getblockchaininfo"], stdout=PIPE, encoding='utf8')
-        output, _ = p.communicate()
+        command = [MARSCOIN_EXEC_PATH, "-datadir=" + MARSCOIN_CONF_PATH, "getblockchaininfo"]
+        p = Popen(command, stdout=PIPE, stderr=PIPE, encoding='utf8')
+        output, errors = p.communicate()
         if p.returncode == 0:
-            b = json.loads(output)
-            return b['blocks'], b['bestblockhash']
+            blockchain_info = json.loads(output)
+            return blockchain_info.get('blocks', 0)
         else:
-            logger.error("Error getting current block: Non-zero exit code")
+            logger.error("Error getting current blockchain height: %s", errors)
     except Exception as e:
-        logger.error("Error getting current block: %s", e)
-    return None
-
+        logger.error("Exception getting current blockchain height: %s", e)
+    return 0
 
 
 def get_txs(block_hash):
