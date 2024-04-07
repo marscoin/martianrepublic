@@ -25,3 +25,4 @@ composer.lock
 public/assets/citizen/M*
 *.log
 scripts/track_marscoin.log
+scripts/track_marscoin.log
