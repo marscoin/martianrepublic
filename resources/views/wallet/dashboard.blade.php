@@ -284,6 +284,61 @@
     @endif
     <script>
 
+function calculateRunningBalanceWithoutFees(jsonData, address) {
+    // Parse the JSON data
+    var balanceData = [];
+    const transactions = jsonData.txs;
+    transactions.sort((a, b) => a.time - b.time);
+    
+    let runningBalance = 0;
+    let processedTransactions = 0;
+    let totalTxValue = 0;
+    //maxCount = 18;
+
+    for (let tx of transactions) {
+        totalTxValue = 0;
+        //if (processedTransactions >= maxCount) {
+        //    break; // Stop processing if we've reached the maxCount
+        //}
+
+        // Track if the address has sent or received in this transaction
+        let isSender = false;
+        let valueReceived = 0;
+
+        // Calculate the value sent (vin)
+        tx.vin.forEach((vin) => {
+            if (vin.addr === address) {
+                isSender = true;
+                runningBalance -= vin.value; // Subtract the value sent from the balance
+                totalTxValue -= vin.value;
+            }
+        });
+
+        // Calculate the value received (vout)
+        tx.vout.forEach((vout) => {
+            if (vout.scriptPubKey.addresses && vout.scriptPubKey.addresses.includes(address)) {
+                valueReceived += parseFloat(vout.value);
+            }
+        });
+
+        // If the address is the sender, subtract the fees from the balance
+        if (isSender) {
+            runningBalance -= tx.fees;
+            totalTxValue -= tx.fees;
+        }
+
+        // Add the value received to the running balance
+        runningBalance += valueReceived;
+        totalTxValue += valueReceived;
+        var time = Math.round(tx.time * 1000);
+        balanceData.push({x: time, y: runningBalance, z: totalTxValue, n: processedTransactions});
+        processedTransactions++;
+    }
+    return balanceData;
+}
+
+
+
         $(document).ready(function() {
             var mars_price = '{{ $mars_price }}';
             var lastdate = 10000000000;
@@ -341,76 +396,115 @@
 
 
 
+            // $.post("/api/getTransactions", {
+            //     "address": '<?= $public_addr ?>'
+            // }, function(data) {
+            //         if (data) {
+            //             console.log("Full balance so far:")
+            //             console.log(calculateRunningBalanceWithoutFees(data, '<?= $public_addr ?>'));
+            //         }
+            //     }
+            // );
+
+
             $.post("/api/getTransactions", {
                 "address": '<?= $public_addr ?>'
             }, function(data) {
                 if (data) {
-                    var txs = data.txs;
-                    var balance = 0; // Initialize running balance
-                    var balanceData = []; // This will hold our balance over time
+                    var address = '<?= $public_addr ?>';
+                    var transactions = data.txs;
+                    transactions.sort((a, b) => a.time - b.time);
+    
+                    var balance = 0; 
+                    var balanceData = []; 
 
-                    $.each(txs, function(i, item) {
-                        if (firstdate < item.time)
-                            firstdate = item.time;
-                        if (lastdate > item.time)
-                            lastdate = item.time;
+                    let runningBalance = 0;
+                    let processedTransactions = 0;
+                    let totalTxValue = 0;
+                    //maxCount = 18;
 
+                    for (let tx of transactions) 
+                    {
+                        totalTxValue = 0;
+                        let dataRowContent = "";
+                        // Track if the address has sent or received in this transaction
+                        let isSender = false;
+                        let valueReceived = 0;
+                        let color = "green";
+                        let recipient = "";
 
-
-                        if (item.vout[0].scriptPubKey.type == "nulldata") {
-                            var dataRowContent = "<tr><td>" + format_time(item.time) + "</td><td>" +
-                                dectag(hexToAscii(item.vout[0].scriptPubKey.asm.split("OP_RETURN ")[
-                                    1])) + " " + ipfsfy(hexToAscii(item.vout[0].scriptPubKey.asm
-                                    .split("OP_RETURN ")[1])) +
-                                "</td><td><span style='color: red'>" + Number.parseFloat(item.fees)
-                                .toFixed(8) + "</span></td><td>$" + (Number.parseFloat(mars_price)
-                                    .toFixed(4) * Number.parseFloat(item.fees)).toFixed(8) +
-                                "</td><td><a href='http://explore.marscoin.org/tx/" + item.txid +
-                                "' target='_blank'>" + item.txid.substring(1, 18) +
-                                "...</a></td></tr>";
-
-                            $("#table-2 tbody").append(dataRowContent);
-                        } else {
-                            c = "";
-                            if (item.vout[0].scriptPubKey.addresses[0] == '{{ $public_addr }}') {
-                                c = "green";
-                                var value = Number.parseFloat(item.vout[0].value);
-                                balance += value; 
-                                var time = Math.round(item.time * 1000);
-                                balanceData.push({x: time, y: balance});
-                            } else {
-                                c = "red";
-                                var value = Number.parseFloat(item.vout[0].value);
-                                balance -= value; 
-                                balanceData.push({x: time, y: balance});
+                        // Calculate the value sent (vin)
+                        tx.vin.forEach((vin) => {
+                            if (vin.addr === address) {
+                                isSender = true;
+                                runningBalance -= vin.value; // Subtract the value sent from the balance
+                                totalTxValue -= vin.value;
                             }
-                            var newRowContent = "<tr><td>" + format_time(item.time) +
-                                "</td><td><a target='_blank' href='http://explore.marscoin.org/address/" +
-                                item.vout[0].scriptPubKey.addresses[0] + "' >" + item.vout[0]
-                                .scriptPubKey.addresses[0] +
-                                "</a></td><td><b><span style='color: " + c + "'>" + Number
-                                .parseFloat(item.vout[0].value).toFixed(4) +
-                                "</span></b></td><td>$" + (Number.parseFloat(mars_price).toFixed(
-                                    4) * Number.parseFloat(item.vout[0].value).toFixed(2)).toFixed(
-                                    8) + "</td><td><a href='http://explore.marscoin.org/tx/" + item
-                                .txid + "' target='_blank'>" + item.txid.substring(1, 18) +
+                        });
+
+                        // Calculate the value received (vout)
+                        tx.vout.forEach((vout) => 
+                        {
+                            if (vout.scriptPubKey.addresses && vout.scriptPubKey.addresses.includes(address)) {
+                                valueReceived += parseFloat(vout.value);
+                            }else if (vout.scriptPubKey.addresses){
+                                recipient = vout.scriptPubKey.addresses[0];
+                            }
+
+                            if (vout.scriptPubKey.type == "nulldata") {
+                                dataRowContent = "<tr><td>" + format_time(tx.time) + "</td><td>" +
+                                dectag(hexToAscii(vout.scriptPubKey.asm.split("OP_RETURN ")[
+                                    1])) + " " + ipfsfy(hexToAscii(vout.scriptPubKey.asm
+                                    .split("OP_RETURN ")[1])) +
+                                "</td><td><span style='color: red'>" + Number.parseFloat(tx.fees)
+                                .toFixed(8) + "</span></td><td>$" + (Number.parseFloat(mars_price)
+                                    .toFixed(4) * Number.parseFloat(tx.fees)).toFixed(8) +
+                                "</td><td><a href='http://explore.marscoin.org/tx/" + tx.txid +
+                                "' target='_blank'>" + tx.txid.substring(1, 18) +
                                 "...</a></td></tr>";
+
+                                 $("#table-2 tbody").append(dataRowContent);
+                            
+                            } 
+                        });
+
+                        // If the address is the sender, subtract the fees from the balance
+                        if (isSender) {
+                            runningBalance -= tx.fees;
+                            totalTxValue -= tx.fees;
+                            color = "red";
+                        }
+
+                        // Add the value received to the running balance
+                        runningBalance += valueReceived;
+                        totalTxValue += valueReceived;
+                        var time = Math.round(tx.time * 1000);
+                        balanceData.push({x: time, y: runningBalance, z: totalTxValue, n: processedTransactions});
+                        processedTransactions++;
+                        if(totalTxValue > 0) 
+                            color = "green"; 
+                            //even if sender, when receiving amount is positive, we received more than sent...
+
+                        if(dataRowContent == "")
+                        {
+                            newRowContent = "<tr><td>" + format_time(tx.time) +
+                            "</td><td><a target='_blank' href='http://explore.marscoin.org/address/" +
+                            recipient + "' >" + recipient +
+                            "</a></td><td><b><span style='color: " + color + "'>" + totalTxValue.toFixed(4) +
+                            "</span></b></td><td>$" + (Number.parseFloat(mars_price).toFixed(
+                                4) * Number.parseFloat(totalTxValue).toFixed(2)).toFixed(
+                                8) + "</td><td><a href='http://explore.marscoin.org/tx/" + tx
+                            .txid + "' target='_blank'>" + tx.txid.substring(1, 18) +
+                            "...</a></td></tr>";
 
                             $("#table-2 tbody").append(newRowContent);
-
-                            
                         }
-                    });
+                    }
+                    
                     firstdate = firstdate - (60 * 60 * 24 * 30);
                     lastdate = lastdate + (60 * 60 * 24 * 30);
                     firstdate = firstdate * 1000;
                     lastdate = lastdate * 1000;
-                    console.log("Time:")
-                    console.log(firstdate)
-                    console.log(lastdate)
-
-                    console.log(d1);
-                    console.log(d2);
 
                     $('#table-2').DataTable({
                             "order": [
@@ -447,14 +541,15 @@
 
                 }
 
-                        // Your cleaned and sorted balanceData array
-                    let cleanedBalanceData = balanceData.filter(point => point.x && point.y);
-                    cleanedBalanceData.sort((a, b) => a.x - b.x);
+                    // Clean and sort the balanceData by time (x)
+                    let cleanedBalanceData = balanceData.filter(point => point.x && !isNaN(point.y)).sort((a, b) => a.x - b.x);
 
-                    // Transform data for ApexCharts
+                    // Map the sorted and updated balanceData for charting
                     let seriesData = cleanedBalanceData.map(point => {
-                    return { x: new Date(point.x), y: point.y };
+                        return { x: new Date(point.x), y: point.y };
                     });
+
+                    //console.log(seriesData);
 
                     let maxYValue = Math.max(...cleanedBalanceData.map(point => point.y));
 
