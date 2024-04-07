@@ -66,6 +66,8 @@ file_handler.setFormatter(formatter)
 # Add the file handler to the logger
 logger.addHandler(file_handler)
 
+#globals
+processed_blocks = []
 
 # Database configuration
 DB_CONFIG = {
@@ -224,6 +226,39 @@ def load_next_block(cur):
         logger.error(f"Error loading the next block: {e}")
         return None, None, None
 
+
+
+
+def batch_record_blocks_processed():
+    global processed_blocks
+    insert_query = """
+    INSERT INTO feed_log (block, hash, mined, processed_at)
+    VALUES (%s, %s, %s, NOW())
+    ON DUPLICATE KEY UPDATE processed_at=NOW();
+    """
+    try:
+        db, cur = db_connect()
+        cur.executemany(insert_query, processed_blocks)
+        db.commit()
+        logger.info(f"Recorded {len(processed_blocks)} blocks as processed in batch.")
+    except Exception as e:
+        logger.error(f"Error recording blocks as processed in batch: {e}")
+        db.rollback()
+    finally:
+        if db:
+            db.close()
+    
+    # Clear the list after successful insertion
+    processed_blocks = []
+
+
+def accumulate_block_processed(block, block_hash, mined):
+    global processed_blocks
+    processed_blocks.append((block, block_hash, mined))
+
+    # Determine batch size, let's say 10
+    if len(processed_blocks) >= 10:
+        batch_record_blocks_processed()
 
 
 def record_block_processed(cur, db, block, block_hash, mined):
@@ -844,7 +879,9 @@ def main_loop():
                 progress = (height / current_height) * 100 if current_height else 0
                 logger.info(f"Next block to process -> Height: {height}, Hash: {block_hash[:8]}, Mined: {mined}. Progress: {progress:.2f}%")
                 process_block_transactions(db, cur, block_hash, height, mined)
-                record_block_processed(cur, db, height, block_hash, mined)
+                #record_block_processed(cur, db, height, block_hash, mined)
+                #parallize
+                accumulate_block_processed(height, block_hash, mined)
             else:
                 logger.info("Waiting for next block...")
                 time.sleep(10)  # Delay if there's no new block to process
