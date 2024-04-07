@@ -395,7 +395,7 @@ if ("{{ $balance }}" < 1) {
     // console.log("THE FEE: ", fee);
     // const mars_amount = 0.001;
     // const total_amount = fee + parseInt(mars_amount);
-    $("#endorse-cost").text("1 MARS (paid as network fee)")
+    $("#endorse-cost").text("0.1 MARS (paid as network fee)")
 
     $("#confirm-endorse-btn").attr("data-confirm", address);
     $("#confirm-endorse-btn").attr("data-endorse", id);
