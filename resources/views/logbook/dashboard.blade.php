@@ -142,13 +142,12 @@ let result;
     }
 }
 
-$("#saveLogLocalBtn").click(function() {
+$("#saveLogLocalBtn").click(function(event) {
     event.preventDefault();
     var formData = new FormData()
     var files = $('.my-pond').filepond('getFiles');
 	$(files).each(function (index) {
-		console.log(files[index].fileExtension);
-        formData.append('filenames[]', files[index].file);
+		formData.append('filenames[]', files[index].file);
 	});
     formData.append('address', '<?=$public_address?>')
     formData.append('title', $("#title").val())
@@ -159,37 +158,32 @@ $("#saveLogLocalBtn").click(function() {
         data: formData,
         processData: false,
         contentType: false,
-        success:function(responseData){
-            // Check if the response is a single JSON object or multiple concatenated JSON objects
-            try {
-                // Try to directly parse the responseData as a single JSON object
-                let data = JSON.parse(responseData);
+        success: function(data) {
+            // Assuming 'data' is already a parsed JSON object (array of objects)
+            let folderHash = "";
 
-                // If successful and data.Hash exists, use it directly
-                if(data.Hash) {
-                    $("#ipfs_path").val(data.Hash);
-                    alert("Successfully saved to the planetary file system!");
+            // Look for the object with an empty "Name" to find the folder's hash
+            data.forEach(item => {
+                if(item.Name === "") {
+                    folderHash = item.Hash;
                 }
-            } catch (e) {
-                // If JSON.parse fails, it might be due to concatenated JSON objects
-                // Split and parse as before
-                let responses = responseData.split("}{").map((elem, index, array) => {
-                    if(index > 0 && index < array.length - 1) return "{" + elem + "}";
-                    else if(index === 0) return elem + "}";
-                    else return "{" + elem;
-                });
-                
-                let hashes = responses.map(resp => JSON.parse(resp));
-                // Assuming the last JSON object contains the folder hash
-                let folderHash = hashes[hashes.length - 1].Hash;
+            });
 
+            // Check if we found a folder hash
+            if(folderHash !== "") {
                 $("#ipfs_path").val(folderHash);
                 alert("Successfully saved to the planetary file system!");
+            } else {
+                // Handle the case where no folder hash was found
+                console.error("No folder hash found in the response.");
+                alert("An error occurred. Please try again.");
             }
         },
-        error: function(data){
-            console.log(data);
-        }   
+        error: function(errorResponse) {
+            // Handle error
+            console.log(errorResponse);
+            alert("Failed to save to the planetary file system.");
+        }
     });
 });
 
