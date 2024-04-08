@@ -51,7 +51,7 @@ class LogbookController extends Controller
 			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
-			$view->myPublications = Publication::where('userid', '=', $uid)->get();
+			$view->myPublications = Publication::where('userid', '=', $uid)->orderBy('created_at', 'desc')->get();
 			$view->allPublications = DB::select('select * from publications order by id desc');
 			$view->balance = 0; //for now, could move to stats helper function as well
 			
