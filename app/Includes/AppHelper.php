@@ -174,8 +174,23 @@ class AppHelper{
 				throw new \Exception('Invalid JSON returned from API');
 			}
 		
-			// Now $jsonResult is a proper array that you can return
-			return $jsonResult;
+			// Now $jsonResult is a proper array
+			// Search for the folder hash by finding the object with an empty "Name"
+			$folderHash = "";
+			foreach ($jsonResult as $item) {
+				if ($item['Name'] === "") {
+					$folderHash = $item['Hash'];
+					break; // No need to continue if the folder hash is found
+				}
+			}
+
+			// If the folder hash was found, return it as a JSON object
+			if ($folderHash !== "") {
+				return ["Hash" => $folderHash];
+			} else {
+				// Handle the case where no folder hash was found
+				throw new \Exception('Folder hash not found in API response');
+			}
 		
 		}
 

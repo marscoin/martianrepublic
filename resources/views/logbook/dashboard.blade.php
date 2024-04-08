@@ -159,19 +159,9 @@ $("#saveLogLocalBtn").click(function(event) {
         processData: false,
         contentType: false,
         success: function(data) {
-            // Assuming 'data' is already a parsed JSON object (array of objects)
-            let folderHash = "";
-
-            // Look for the object with an empty "Name" to find the folder's hash
-            data.forEach(item => {
-                if(item.Name === "") {
-                    folderHash = item.Hash;
-                }
-            });
-
             // Check if we found a folder hash
-            if(folderHash !== "") {
-                $("#ipfs_path").val(folderHash);
+            if(data.Hash !== "") {
+                $("#ipfs_path").val(data.Hash);
                 alert("Successfully saved to the planetary file system!");
             } else {
                 // Handle the case where no folder hash was found
