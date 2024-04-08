@@ -12,6 +12,10 @@ class Feed extends Model {
 
     protected $table = 'feed';
     protected $appends = ['profile_image'];
+    protected $dates = ['mined'];
+    protected $casts = [
+        'mined' => 'datetime',
+    ];
 
     public function user()
     {
@@ -25,6 +29,11 @@ class Feed extends Model {
         }
 
         return 'https://martianrepublic.org/assets/citizen/' . $this->address . '/profile_pic.png';
+    }
+
+    public function citizen()
+    {
+        return $this->belongsTo(Citizen::class, 'userid');
     }
 
 }

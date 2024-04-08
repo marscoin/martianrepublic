@@ -11,11 +11,17 @@ use Illuminate\Database\Eloquent\Model;
 class Citizen extends Model {
 
     protected $table = 'citizen';
-
+    protected $fillable = [
+        'firstname', 'lastname', 'userid',
+    ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'userid');
+    }
+
+    public function feeds() {
+        return $this->hasMany(Feed::class, 'userid', 'userid');
     }
 
 }

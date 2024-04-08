@@ -3,7 +3,7 @@
     <div class="col-md-3 col-sm-5">
 
       <div class="profile-avatar">
-        <img src="/assets/citizen/<?=$public_address?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image. Source <?=$user['data']->data->picture?>">
+        <img src="{{ $citcache->avatar_link }}"  onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'" class="profile-avatar-img thumbnail" alt="Profile Image. Source {{ $citcache->avatar_link }}">
       </div> 
 
       <div class="nav nav-stacked list-group">  
@@ -12,7 +12,7 @@
           <i class="fa fa-bank text-primary"></i> &nbsp;&nbsp;Notarized Activity Feed
 
           <i class="fa fa-chevron-right list-group-chevron"></i>
-          <span class="badge">2</span>
+          <span class="badge">{{$recentActivityCount}}</span>
         </a> 
 
         <a href="#research" data-toggle="tab" class="list-group-item">
@@ -87,115 +87,7 @@
 
       <div id="myTabContent" class="tab-content stacked-content">
 
-        <div class="tab-pane fade active in" id="notary">
-
-
-          <h4 class="content-title"><u>Blockchain Notarized Public Activity Feed</u></h4>
-
-
-     <?php 
-     $eds = 0;
-     foreach($feed as $f){?>
-
-          <div class="feed-item feed-item-file">
-            <div class="feed-icon">
-              <i class="fa fa-link"></i>
-            </div> <!-- /.feed-icon -->
-            <div class="feed-subject">
-              <?php if($f->tag == 'ED'){
-                $eds += 1;
-              ?>
-              <p>Endorsement of Citizen</p>
-              <?php } ?>
-              <?php if($f->tag == 'SP'){?>
-              <p>Signed Public Message</p>
-              <?php } ?>
-            </div> <!-- /.feed-subject -->
-            <div class="feed-content">
-              <?php if($f->tag == 'ED'){?>
-                <p><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> successfully <strong>notarized</strong> an endorsement for <?=$f->message?></p>
-              <?php } ?>
-              <?php if($f->tag == 'SP'){?>
-                <p><blockquote><?=str_replace('\"', "'", str_replace('\n', "\n", $f->message))?></blockquote></p>
-              <?php } ?>
-            </div> <!-- /.feed-content -->
-            <div class="feed-actions">
-              <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-left"><i class="fa  fa-lock"></i> <?=$f->blockid?></a> 
-              <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-right"><i class="fa fa-clock-o"></i> <?=$f->mined?></a>
-            </div> 
-          </div> 
-
-
-            <?php } ?>
-
-
-            <div class="feed-item feed-item-file">
-
-              <div class="feed-icon">
-                <i class="fa fa-drivers-license"></i>
-              </div> <!-- /.feed-icon -->
-
-              <div class="feed-subject">
-                <p><a href="javascript:;"><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> successfully <strong>notarized</strong> his <a href="javascript:;">General Martian Public</a> application</p>
-              </div> <!-- /.feed-subject -->
-
-              <div class="feed-content">
-                <ul class="icons-list">
-                  <li>
-                    <i class="icon-li fa fa-file-text-o"></i>
-                    <a href="#">Data Set</a> - (Basic Biographic Data)
-                  </li>
-
-                  <li>
-                    <i class="icon-li fa fa-file-text-o"></i>
-                    <a href="<?=$user['data']->data->picture?>">Profile Picture</a> - (Basic Biometric Identifier)
-                  </li>
-
-                  <li>
-                    <i class="icon-li fa fa-file-text-o"></i>
-                    <a href="<?=$user['data']->data->video?>">Liveness Video</a> - (Basic Proof of Humanity)
-                  </li>
-                </ul>
-              </div> <!-- /.feed-content -->
-
-              <div class="feed-actions">
-                <a href="javascript:;" class="pull-left"><i class="fa  fa-lock"></i> 123</a> 
-
-                <a href="javascript:;" class="pull-right"><i class="fa fa-clock-o"></i> timestamp</a>
-              </div> <!-- /.feed-actions -->
-
-            </div> <!-- /.feed-item -->
-
-
-            <div class="feed-item feed-item-question">
-
-              <div class="feed-icon">
-                <i class="fa fa-legal"></i>
-              </div> <!-- /.feed-icon -->
-
-              <div class="feed-subject">
-                <p><a href="javascript:;"><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> pledged allegiance to <a href="javascript:;">The Martian Congressional Republic</a></p>
-              </div> <!-- /.feed-subject -->
-
-              <div class="feed-content">
-                <ul class="icons-list">
-                  <li>
-                    <i class="icon-li fa fa-quote-left"></i>
-                    I herewith declare that I, <?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> , am human and a member of the Martian Republic.
-                  </li>
-                </ul>
-              </div> <!-- /.feed-content -->
-
-              <div class="feed-actions">
-                <a href="javascript:;" class="pull-left"><i class="fa  fa-lock"></i> 123</a>
-
-                <a href="javascript:;" class="pull-right"><i class="fa fa-clock-o"></i> timestamp</a>
-              </div> <!-- /.feed-actions -->
-
-            </div> <!-- /.feed-item -->
-
-
-           </div> <!-- /.tab-pane -->
+          @livewire('civic-activity-feed')
 
             <div class="tab-pane fade" id="research">
             <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>

@@ -16,6 +16,8 @@ use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
 use App\Exceptions\Handler;
 use Exception;
+use Carbon\Carbon;
+
 
 class IdentityController extends Controller
 {
@@ -63,7 +65,7 @@ class IdentityController extends Controller
 			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "GP" AND profile.userid NOT IN (6462) ORDER BY feed.id desc');
 			$view->everyCitizen = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "CT" AND profile.userid NOT IN (6462) ORDER BY feed.id desc');
 			$view->everyApplicant = DB::select('select profile.userid, users.fullname, hd_wallet.public_addr as address from users, profile, hd_wallet where profile.userid = users.id and users.id = hd_wallet.user_id and profile.has_application = 1 ORDER BY profile.userid DESC ');
-			$view->activity = DB::select('select profile.userid, users.fullname, feed.tag, feed.mined  from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id ORDER BY feed.id DESC limit 3');
+			$view->recentActivityCount = Feed::where('userid', $uid)->where('mined', '>=', Carbon::now()->subDay())->count();
 
 			if ($wallet) {
 				$view->balance = AppHelper::getMarscoinBalance($wallet['public_addr']);

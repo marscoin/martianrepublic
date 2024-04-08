@@ -461,7 +461,8 @@ def cache_signed_messages(cur, db, addr, head, body, userid, txid, block, blockd
     
     insert_query = """
     INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+    ON DUPLICATE KEY UPDATE mined = VALUES(mined), updated_at = NOW();
     """
     try:
         cur.execute(insert_query, (addr, userid, head, post_message, embedded_link, txid, block, blockdate))
@@ -473,8 +474,11 @@ def cache_signed_messages(cur, db, addr, head, body, userid, txid, block, blockd
 
 
 def insert_citizenship(cur, db, endorsed_address, tag, embedded_link, txid, height, blockdate):
-    insert_query = """INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
-                      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
+    insert_query = """
+    INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+    ON DUPLICATE KEY UPDATE mined = VALUES(mined), updated_at = NOW();
+    """
     # Find the user ID by the endorsed address
     userid = get_user_by_address(cur, endorsed_address)
     
@@ -495,8 +499,11 @@ def insert_citizenship(cur, db, endorsed_address, tag, embedded_link, txid, heig
         db.rollback()
 
 def insert_endorsement(cur, db, addr, userid, tag, message, embedded_link, txid, height, blockdate):
-    insert_query = """INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
-                      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
+    insert_query = """
+    INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+    ON DUPLICATE KEY UPDATE mined = VALUES(mined), updated_at = NOW();
+    """
     try:
         cur.execute(insert_query, (addr, userid, tag, message, embedded_link, txid, height, blockdate))
         db.commit()
@@ -621,7 +628,8 @@ def cache_general_applications(cur, db, addr, head, body, userid, txid, height, 
     message = "General Application"
     insert_query = """
     INSERT INTO feed (`address`, `userid`, `tag`, `message`, `embedded_link`, `txid`, `blockid`, `mined`, `updated_at`, `created_at`) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+    ON DUPLICATE KEY UPDATE mined = VALUES(mined), updated_at = NOW();
     """
     logger.info(head)
     logger.info(body)
@@ -650,9 +658,9 @@ def cache_logbook_entry(cur, db, addr, head, body, userid, txid, height, blockda
     # Define the SQL insert query
     insert_query = """
     INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+    ON DUPLICATE KEY UPDATE mined = VALUES(mined), updated_at = NOW();
     """
-
     # Execute the insert query to cache the LogBook entry
     try:
         cur.execute(insert_query, (addr, userid, head, "", embedded_link, txid, height, blockdate))
@@ -685,7 +693,8 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
         # Insert into feed table
         insert_feed_query = """
         INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW());
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+        ON DUPLICATE KEY UPDATE mined = VALUES(mined), updated_at = NOW();
         """
         try:
             cur.execute(insert_feed_query, (addr, userid, head, proposal_data.get('title', 'Voting Proposal'), embedded_link, txid, height, blockdate))
