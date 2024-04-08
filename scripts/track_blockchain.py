@@ -201,7 +201,7 @@ def load_next_block(cur):
         output, errors = p.communicate()
         
         if p.returncode != 0:
-            logger.error(f"Error getting block hash for height {next_block_height}: {errors}")
+            #logger.error(f"Error getting block hash for height {next_block_height}: {errors}")
             return None, None, None
 
         next_block_hash = output.strip()
@@ -894,7 +894,7 @@ def main_loop():
                     record_block_processed(cur, db, height, block_hash, mined)
                 else:
                     logger.info("Waiting for next block...")
-                    time.sleep(10)  # Delay if there's no new block to process
+                    time.sleep(30)  # Delay if there's no new block to process
         except MySQLdb.Error as e:
             logger.error("Database error occurred: %s", e)
             db, cur = db_connect()  # Attempt to reconnect
