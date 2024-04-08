@@ -157,7 +157,7 @@ class ApiController extends Controller {
 		}
 
 		try {
-			$hash = AppHelper::uploadFolder($file_path, 'http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true'); // Example: use a config value or env variable
+			$hash = AppHelper::uploadFolder($file_path, 'http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter'); // Example: use a config value or env variable
 			AppHelper::insertPublicationCache($uid, $file_path, $hash);
 		} catch (\Exception $e) {
 			// Handle error; possibly log it and return a user-friendly message

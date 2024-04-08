@@ -161,9 +161,11 @@ class AppHelper{
 				throw new \Exception($errorMsg);
 			}
 		
+			print_r($result);
+			die;
 			// Prepare the result string by wrapping with brackets and replacing the '}{'
 			// between JSON objects with '},{', which creates a JSON array
-			$resultArrayString = '[' . str_replace('}{', '},{', $result) . ']';
+			$resultArrayString = '[' . str_replace('} {', '},{', $result) . ']';
 
 			// Decode the JSON array string
 			$jsonResult = json_decode($resultArrayString, true);
