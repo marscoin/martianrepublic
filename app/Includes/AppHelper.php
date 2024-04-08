@@ -125,24 +125,24 @@ class AppHelper{
 			if (!is_dir($filepath) || !is_readable($filepath)) {
 				throw new \Exception("Directory is not accessible");
 			}
-
+		
 			$files = scandir($filepath);
 			$data = [];
 			$headers = ["Content-Type: multipart/form-data"];
 			$ch = curl_init($url);
-
+		
 			foreach ($files as $i => $filep) {
 				$filename = realpath($filepath . "/" . $filep);
 				if (!is_file($filename)) {
 					continue;
 				}
-
+		
 				$finfo = new \finfo(FILEINFO_MIME_TYPE);
 				$mimetype = $finfo->file($filename);
 				$cfile = curl_file_create($filename, $mimetype, basename($filename));
 				$data['file['.$i.']'] = $cfile;
 			}
-
+		
 			curl_setopt_array($ch, [
 				CURLOPT_URL => $url,
 				CURLOPT_POST => true,
@@ -150,22 +150,26 @@ class AppHelper{
 				CURLOPT_HTTPHEADER => $headers,
 				CURLOPT_RETURNTRANSFER => true,
 			]);
-
+		
 			$result = curl_exec($ch);
 			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			curl_close($ch);
-
+		
 			if ($httpCode < 200 || $httpCode >= 300) {
 				$details = json_decode($result, true);
 				$errorMsg = $details['msg'] ?? 'Unknown error occurred';
 				throw new \Exception($errorMsg);
 			}
-
-			echo $result;
-			$resultLines = explode("\n", trim($result));
-			$lastLine = end($resultLines);
-			$details = json_decode($lastLine, true);
-			return $details['Hash'] ?? "{'Hash':''}";
+		
+			// Remove echo and directly return the result if it's the expected JSON response
+			// Assuming the API returns a JSON string, decode it to check for errors
+			$jsonResult = json_decode($result, true);
+			if (json_last_error() !== JSON_ERROR_NONE) {
+				throw new \Exception('Invalid JSON returned from API');
+			}
+			
+			// You might want to check the structure of $jsonResult here and adjust as necessary
+			return $jsonResult;
 		}
 
 

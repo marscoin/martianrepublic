@@ -190,10 +190,13 @@ class ApiController extends Controller {
 			$file_path = "./assets/citizen/" . $public_address . "/".$type.".json";
 
 			file_put_contents($file_path, $json);
-			$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
-
-			return (new Response(json_encode(array("Hash" => $hash)), 200))
-              ->header('Content-Type', "application/json;");
+			try {
+				$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+				return response()->json($apiResponse, 200)
+					->header('Content-Type', "application/json;");
+			} catch (\Exception $e) {
+				return response()->json(["error" => $e->getMessage()], 500);
+			}
 
 		
 		}else{
