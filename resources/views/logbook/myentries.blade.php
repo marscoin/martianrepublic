@@ -3,11 +3,12 @@
 <div class="row">
     <div class="col-md-10">
         <div class="table-responsive">
-            <table class="table table-striped table-bordered thumbnail-table">
+            <table class="table table-striped table-bordered thumbnail-table datatable myentries">
                 <thead>
                     <tr>
+                        <th>Title</th>
                         <th>Planetary Link</th>
-                        <th>Publicized</th>
+                        <th>Published</th>
                         <th>Notarized</th>
                         <th>Status</th>
                     </tr>
@@ -15,7 +16,8 @@
                 <tbody>
                     <?php foreach( $myPublications as $pub){?>
                     <tr>
-                        <td class="valign-middle"><?=$pub->ipfs_hash?> <a target="_blank" href="https://ipfs.marscoin.org/ipfs/<?=$pub->ipfs_hash?>"> <i class="fa fa-globe"> <i class="fa fa-external-link"></a></td>
+                        <td class="valign-middle"><?=$pub->title?></td>
+                        <td class="valign-middle"><?= substr($pub->ipfs_hash, 0, 18) . '...' ?> <a target="_blank" href="https://ipfs.marscoin.org/ipfs/<?=$pub->ipfs_hash?>"> <i class="fa fa-globe"> <i class="fa fa-external-link"></a></td>
                         <td class="valign-middle"><?=$pub->created_at?></td>
                         <td class="valign-middle"><a target="_blank" href="<?=$pub->notarization?>" ><?=substr($pub->notarization, 0, 6)?>...</a></td>
                         <?php if($pub->notarization){ ?>

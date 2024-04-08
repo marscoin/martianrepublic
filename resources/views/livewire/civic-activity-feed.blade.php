@@ -22,7 +22,7 @@
                     <ul class="icons-list">
                         <li>
                             <i class="icon-li fa fa-file-text-o"></i>
-                            <a href="https://explore.marscoin.org/tx/{{ $activity->embedded_link }}">Data Set</a> - (Basic Biographic Data)
+                            <a href="{{ $activity->embedded_link }}">Data Set</a> - (Basic Biographic Data)
                         </li>
 
                         <li>

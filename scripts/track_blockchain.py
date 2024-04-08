@@ -649,25 +649,39 @@ def cache_general_applications(cur, db, addr, head, body, userid, txid, height, 
 
 def cache_logbook_entry(cur, db, addr, head, body, userid, txid, height, blockdate):
     """
-    Cache LogBook entries in the database.
+    Cache LogBook entries in the database, updating both feed and publications tables.
     """
-    # Construct the IPFS link from the body content
     embedded_link = f'https://ipfs.marscoin.org/ipfs/{body}'
-    
 
-    # Define the SQL insert query
-    insert_query = """
+    # Insert or update the feed table
+    insert_feed_query = """
     INSERT INTO feed (address, userid, tag, message, embedded_link, txid, blockid, mined, updated_at, created_at) 
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
     ON DUPLICATE KEY UPDATE mined = VALUES(mined), blockid = VALUES(blockid), updated_at = NOW();
     """
-    # Execute the insert query to cache the LogBook entry
     try:
-        cur.execute(insert_query, (addr, userid, head, "", embedded_link, txid, height, blockdate))
+        cur.execute(insert_feed_query, (addr, userid, head, "", embedded_link, txid, height, blockdate))
         db.commit()
         logger.info(f"Successfully cached LogBook entry for txid: {txid}")
     except Exception as e:
         logger.error(f"Failed to cache LogBook entry for txid {txid}: {e}")
+        db.rollback()
+
+    # Update the publications table if there's a matching ipfs_hash
+    update_publications_query = """
+    UPDATE publications 
+    SET notarized_at = %s, blockid = %s, updated_at = NOW()
+    WHERE ipfs_hash = %s;
+    """
+    try:
+        cur.execute(update_publications_query, (blockdate, height, body))
+        db.commit()
+        if cur.rowcount > 0:  # Check if any row was updated
+            logger.info(f"Successfully updated publications entry for IPFS hash: {body}")
+        else:
+            logger.info(f"No publications entry found to update for IPFS hash: {body}")
+    except Exception as e:
+        logger.error(f"Failed to update publications entry for IPFS hash {body}: {e}")
         db.rollback()
 
 

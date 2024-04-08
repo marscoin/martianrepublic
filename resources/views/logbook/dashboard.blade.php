@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="author" content="The Marscoin Foundation">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
@@ -20,6 +20,8 @@
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
     <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+
 </head>
 <body class=" ">
     <div id="wrapper">
@@ -100,7 +102,8 @@
 <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
 <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
-
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
 <script>
         var simplemde = new SimpleMDE({ element: document.getElementById("description") });
 </script>
@@ -400,6 +403,18 @@ const marsConvert = (zubrin) => {
 });
 </script>
 
+
+<script type="text/javascript">
+$(document).ready( function () {
+    $('.allentries').DataTable({
+        "order": [[3, "desc"]] 
+    });
+
+    $('.myentries').DataTable({
+        "order": [[2, "desc"]] 
+    });
+});
+</script>
 
 </body>
 
