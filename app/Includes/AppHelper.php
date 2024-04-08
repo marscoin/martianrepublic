@@ -186,7 +186,7 @@ class AppHelper{
 
 			// If the folder hash was found, return it as a JSON object
 			if ($folderHash !== "") {
-				return ["Hash" => $folderHash];
+				return $folderHash;
 			} else {
 				// Handle the case where no folder hash was found
 				throw new \Exception('Folder hash not found in API response');
