@@ -60,8 +60,8 @@ class IdentityController extends Controller
 			$view->feed = Feed::where('userid', '=', $uid)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
 			$view->endorsed = array();
 			
-			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "GP" ORDER BY feed.id desc');
-			$view->everyCitizen = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "CT" ORDER BY feed.id desc');
+			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "GP" AND profile.userid NOT IN (6462) ORDER BY feed.id desc');
+			$view->everyCitizen = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "CT" AND profile.userid NOT IN (6462) ORDER BY feed.id desc');
 			$view->everyApplicant = DB::select('select profile.userid, users.fullname, hd_wallet.public_addr as address from users, profile, hd_wallet where profile.userid = users.id and users.id = hd_wallet.user_id and profile.has_application = 1 ORDER BY profile.userid DESC ');
 			$view->activity = DB::select('select profile.userid, users.fullname, feed.tag, feed.mined  from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id ORDER BY feed.id DESC limit 3');
 

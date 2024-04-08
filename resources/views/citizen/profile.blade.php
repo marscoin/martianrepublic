@@ -1,14 +1,10 @@
-<!-- <h3 class="content-title"><u>Proof of Humanity - Join the General Martian Public</u></h3> -->
-
   <div class="row">
 
     <div class="col-md-3 col-sm-5">
 
       <div class="profile-avatar">
         <img src="/assets/citizen/<?=$public_address?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image. Source <?=$user['data']->data->picture?>">
-      </div> <!-- /.profile-avatar -->
-
-
+      </div> 
 
       <div class="nav nav-stacked list-group">  
 
@@ -319,64 +315,11 @@
 
       <div class="col-md-3">
 
-        <h5 class="content-title"><u>MCR Citizen Stats</u></h5>
-
-        <div class="list-group">  
-
-          <a href="javascript:;" class="list-group-item">
-              <h3 class="pull-right"><i class="fa fa-thumbs-o-up text-primary"></i></h3>
-              <h4 class="list-group-item-heading"><?=count($endorsed)?></h4>
-              <p class="list-group-item-text">Endorsements</p>                  
-            </a>
-
-          <a href="javascript:;" class="list-group-item">
-            <h3 class="pull-right"><i class="fa fa-files-o   text-primary"></i></h3>
-            <h4 class="list-group-item-heading">0</h4>
-            <p class="list-group-item-text">Proposals Initiated</p>
-          </a>
-
-          <a href="javascript:;" class="list-group-item">
-            <h3 class="pull-right"><i class="fa  fa-legal  text-primary"></i></h3>
-            <h4 class="list-group-item-heading">0</h4>
-            <p class="list-group-item-text">Ballots cast</p>
-          </a>
-        </div> <!-- /.list-group -->
+        @livewire('citizen-stats')
 
         <br>
 
-        <h5 class="content-title"><u>Blockchain Activity (Example)</u></h5>
-
-        <div class="well">
-
-
-          <ul class="icons-list text-md">
-
-            <li>
-              <i class="icon-li fa fa-location-arrow"></i>
-
-              <strong>Roberta "Bobby" Draper</strong> notarized 6 files. 
-              <br>
-              <small>about 4 hours ago</small>
-            </li>
-
-            <li>
-              <i class="icon-li fa fa-location-arrow"></i>
-
-              <strong>Theresa Yao</strong> published a research document: <a href="javascript:;">Open Access Chip Fablab</a>. 
-              <br>
-              <small>about 6 hours ago</small>
-            </li>
-
-            <li>
-              <i class="icon-li fa fa-location-arrow"></i>
-
-              <strong>Joe Miller</strong> joined the general Martian public. 
-              <br>
-              <small>7 hours ago</small>
-            </li>
-          </ul>
-
-        </div> <!-- /.well -->
+        @livewire('blockchain-activity-feed')
 
       </div> <!-- /.col -->
 

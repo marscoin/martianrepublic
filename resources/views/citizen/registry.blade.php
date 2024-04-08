@@ -23,6 +23,7 @@
     <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <link rel="stylesheet" href="/assets/wallet/js/plugins/magnific/magnific-popup.css">
     <script>var current_blob = null;</script>
+    @livewireStyles
 </head>
 
 <body class=" ">
@@ -626,6 +627,7 @@ const marsConvert = (zubrin) => {
 });
 
 </script>
+@livewireScripts
 </body>
 
 </html>

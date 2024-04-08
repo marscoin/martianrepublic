@@ -44,72 +44,11 @@ use App\Includes\AppHelper;
     </div>
 
     <div class="col-md-3">
-        <h5 class="content-title"><u>Martian Republic Stats</u></h5>
-
-        <div class="list-group">
-
-            <a href="javascript:;" class="list-group-item">
-                <h3 class="pull-right"><i class="fa fa-globe text-primary"></i></h3>
-                <h4 class="list-group-item-heading"><?=count($everyPublic)?></h4>
-                <p class="list-group-item-text">Martians</p>
-            </a>
-
-            <a href="javascript:;" class="list-group-item">
-                <h3 class="pull-right"><i class="fa fa-user  text-primary"></i></h3>
-                <h4 class="list-group-item-heading"><?=count($everyCitizen)?></h4>
-                <p class="list-group-item-text">Citizens</p>
-            </a>
-
-            <a href="javascript:;" class="list-group-item">
-                <h3 class="pull-right"><i class="fa fa-pencil  text-primary"></i></h3>
-                <h4 class="list-group-item-heading">0</h4>
-                <p class="list-group-item-text">Open Proposals</p>
-            </a>
-
-            <a href="javascript:;" class="list-group-item">
-                <h3 class="pull-right"><i class="fa fa-legal  text-primary"></i></h3>
-                <h4 class="list-group-item-heading">0</h4>
-                <p class="list-group-item-text">Open Bills</p>
-            </a>
-        </div> <!-- /.list-group -->
+        @livewire('martian-republic-stats')
 
         <br>
 
-        <h5 class="content-title"><u>Activity</u></h5>
-
-        <div class="well">
-
-
-            <ul class="icons-list text-md">
-
-                <?php foreach($activity as $a){ ?>
-
-                <li>
-                    <?php if($a->tag == "GP"){ ?>
-                        <i class="icon-li fa fa-address-card"></i>
-                        <strong><?=$a->fullname?></strong> joined the Republic.
-                    <?php } else if($a->tag == "CT"){ ?>
-                        <i class="icon-li fa fa-rocket"></i>
-                        <strong><?=$a->fullname?></strong> became citizen.
-                    <?php } else if($a->tag == "ED"){ ?>
-                        <i class="icon-li fa fa-thumbs-up"></i>
-                        <strong><?=$a->fullname?></strong> endorsed someone.
-                    <?php } else if($a->tag == "PR"){ ?>
-                        <i class="icon-li fa fa-pencil"></i>
-                        <strong><?=$a->fullname?></strong> published proposal.
-                    <?php } else if($a->tag == "SP"){ ?>
-                        <i class="icon-li fa fa-quote-left"></i>
-                        <strong><?=$a->fullname?></strong> signed public message.
-                    <?php } ?>
-                    <br>
-                    <small>about <?=AppHelper::time_elapsed_string($a->mined)?></small>
-                </li>
-
-            <?php } ?>
-
-            </ul>
-
-        </div> <!-- /.well -->
+        @livewire('civic-status-feed')
 
         <div class="row">
 

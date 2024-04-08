@@ -761,6 +761,7 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
     head_messages = {
         "GP": "General Public Application",
         "CT": "Citizenship",
+        "LB": "Logbook Entry",
         "ED": "Citizenship Endorsement",
         "PR": "Voting Proposal launched",
         "SP": "Signed Post",

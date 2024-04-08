@@ -23,6 +23,7 @@
     <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <link rel="stylesheet" href="/assets/wallet/js/plugins/magnific/magnific-popup.css">
     <script>var current_blob = null;</script>
+    @livewireStyles
 </head>
 
 <body class=" ">
@@ -47,13 +48,7 @@
                 <div class="portlet">
                     <div class="portlet-body">
 
-
-
-
-
-
-
-                    <div class="row">
+<div class="row">
 
 <div class="col-md-3 col-sm-5">
 
@@ -204,77 +199,19 @@
             <a href="javascript:;" class="pull-left"><i class="fa  fa-lock"></i> 123</a>
 
             <a href="javascript:;" class="pull-right"><i class="fa fa-clock-o"></i> timestamp</a>
-          </div> <!-- /.feed-actions -->
-
-        </div> <!-- /.feed-item -->
-
-
-      
+          </div> 
+        </div> 
 
     <br class="visible-xs">            
     <br class="visible-xs">
-    
-  </div> <!-- /.col -->
 
-
+  </div> 
   <div class="col-md-3">
 
-
-    <h5 class="content-title"><u>Blockchain Activity (Example)</u></h5>
-
-    <div class="well">
-
-
-      <ul class="icons-list text-md">
-
-        <li>
-          <i class="icon-li fa fa-location-arrow"></i>
-
-          <strong>Roberta "Bobby" Draper</strong> notarized 6 files. 
-          <br>
-          <small>about 4 hours ago</small>
-        </li>
-
-        <li>
-          <i class="icon-li fa fa-location-arrow"></i>
-
-          <strong>Theresa Yao</strong> published a research document: <a href="javascript:;">Open Access Chip Fablab</a>. 
-          <br>
-          <small>about 6 hours ago</small>
-        </li>
-
-        <li>
-          <i class="icon-li fa fa-location-arrow"></i>
-
-          <strong>Joe Miller</strong> joined the general Martian public. 
-          <br>
-          <small>7 hours ago</small>
-        </li>
-      </ul>
-
-    </div> <!-- /.well -->
-
-  </div> <!-- /.col -->
-
-</div> <!-- /.row -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        
+  @livewire('blockchain-activity-feed')
+    
+  </div> 
+</div> 
 
                     </div>
                 </div>
@@ -308,6 +245,6 @@
     <script src="/assets/wallet/js/mvpready-admin.js"></script>
     <script src="/assets/wallet/js/md5.min.js"></script>
     <script src="/assets/wallet/js/sha256.js"></script>
-
+    @livewireScripts
 </body>
 </html>
