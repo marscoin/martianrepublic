@@ -407,11 +407,11 @@ const marsConvert = (zubrin) => {
 <script type="text/javascript">
 $(document).ready( function () {
     $('.allentries').DataTable({
-        "order": [[3, "desc"]] 
+        "order": [[4, "desc"]] 
     });
 
     $('.myentries').DataTable({
-        "order": [[2, "desc"]] 
+        "order": [[3, "desc"]] 
     });
 });
 </script>
