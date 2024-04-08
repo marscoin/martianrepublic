@@ -161,15 +161,20 @@ class AppHelper{
 				throw new \Exception($errorMsg);
 			}
 		
-			// Remove echo and directly return the result if it's the expected JSON response
-			// Assuming the API returns a JSON string, decode it to check for errors
-			$jsonResult = json_decode($result, true);
+			// Prepare the result string by wrapping with brackets and replacing the '}{'
+			// between JSON objects with '},{', which creates a JSON array
+			$resultArrayString = '[' . str_replace('}{', '},{', $result) . ']';
+
+			// Decode the JSON array string
+			$jsonResult = json_decode($resultArrayString, true);
+		
 			if (json_last_error() !== JSON_ERROR_NONE) {
 				throw new \Exception('Invalid JSON returned from API');
 			}
-			
-			// You might want to check the structure of $jsonResult here and adjust as necessary
+		
+			// Now $jsonResult is a proper array that you can return
 			return $jsonResult;
+		
 		}
 
 
