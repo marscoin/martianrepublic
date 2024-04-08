@@ -122,58 +122,50 @@ class AppHelper{
 
 		public static function uploadFolder($filepath, $url)
 		{
-			echo $url;
-			$directory = basename($filepath);
-			//echo "dir: ". $directory;
+			if (!is_dir($filepath) || !is_readable($filepath)) {
+				throw new \Exception("Directory is not accessible");
+			}
+
 			$files = scandir($filepath);
-			//print_r($files);
-			$data = array();
-			$headers = array("Content-Type" => "multipart/form-data");
+			$data = [];
+			$headers = ["Content-Type: multipart/form-data"];
 			$ch = curl_init($url);
-			$i = 0;
-			foreach ($files as $filep)
-			{
-				$i = $i + 1;
-				$filename = realpath($filepath."/".$filep);
-				if (!is_file($filename))
-        			continue;
-				//echo "path: " . $filename;
+
+			foreach ($files as $i => $filep) {
+				$filename = realpath($filepath . "/" . $filep);
+				if (!is_file($filename)) {
+					continue;
+				}
+
 				$finfo = new \finfo(FILEINFO_MIME_TYPE);
 				$mimetype = $finfo->file($filename);
 				$cfile = curl_file_create($filename, $mimetype, basename($filename));
-				//print_r($cfile);
-				//array_push($data, array('file' => $cfile));
-				$data += ['file['.$i.']' => $cfile];
-				
-			}			
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_POST, 1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				$data['file['.$i.']'] = $cfile;
+			}
+
+			curl_setopt_array($ch, [
+				CURLOPT_URL => $url,
+				CURLOPT_POST => true,
+				CURLOPT_POSTFIELDS => $data,
+				CURLOPT_HTTPHEADER => $headers,
+				CURLOPT_RETURNTRANSFER => true,
+			]);
+
 			$result = curl_exec($ch);
-			$r = curl_getinfo($ch);
-			if ($r["http_code"] != 200) {
-				$detais = json_decode($result, true);
-				if (isset($detais["msg"])) {
-					throw new \Exception($detais["msg"], 1);
-				} else {
-					return "Error";
-				}
+			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			curl_close($ch);
+
+			if ($httpCode < 200 || $httpCode >= 300) {
+				$details = json_decode($result, true);
+				$errorMsg = $details['msg'] ?? 'Unknown error occurred';
+				throw new \Exception($errorMsg);
 			}
-			print_r($result);
-			$result = explode("\n", $result);
-			// $details = json_decode($result, true);
-			// foreach($details as $l){
-			// 	print_r($l);
-			// }
-			$l = count($result);
-			echo $l;
-			if($l > 0){
-				$details = json_decode($result[$l-2], true);
-				return $details['Hash'];
-			}
-			else return "{'Hash':''}";
+
+			echo $result;
+			$resultLines = explode("\n", trim($result));
+			$lastLine = end($resultLines);
+			$details = json_decode($lastLine, true);
+			return $details['Hash'] ?? "{'Hash':''}";
 		}
 
 

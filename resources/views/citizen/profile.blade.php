@@ -40,11 +40,7 @@
           <i class="fa fa-chevron-right list-group-chevron"></i>
         </a> 
 
-        <a href="#settings" data-toggle="tab" class="list-group-item">
-          <i class="fa fa-cog text-primary"></i> &nbsp;&nbsp;Settings
-
-          <i class="fa fa-chevron-right list-group-chevron"></i>
-        </a> 
+       
       </div> <!-- /.list-group -->
 
 
@@ -89,68 +85,66 @@
 
           @livewire('civic-activity-feed')
 
-            <div class="tab-pane fade" id="research">
-            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
-            </div> <!-- /.tab-pane -->
+          @livewire('research-activity')
 
-            <div class="tab-pane fade" id="signed">
-            
-                  <h4 class="content-title"><u>Public Message</u></h4>
-                  <div class="share-widget clearfix">
+          <div class="tab-pane fade" id="signed">
+          
+                <h4 class="content-title"><u>Public Message</u></h4>
+                <div class="share-widget clearfix">
 
-                  <textarea id="signedpublishpost" class="form-control share-widget-textarea" rows="3" placeholder="What would you like to publish?..." tabindex="1"></textarea>
+                <textarea id="signedpublishpost" class="form-control share-widget-textarea" rows="3" placeholder="What would you like to publish?..." tabindex="1"></textarea>
 
-                  <div class="share-widget-actions">
-                    <div class="share-widget-types pull-left">
-                    <img id="signedpublishprogress" src="/assets/citizen/loading.gif" alt="enter image description here" style="display: none" id="loading">
-                    <a target="_blank" id="signedpublishhash" href="" title=""></a>
-                      <!-- <a id="signedpublishpic" href="javascript:;" class="fa fa-picture-o ui-tooltip" title="" data-original-title="Post an Image"><i></i></a>
-                      <a id="signedpublishvid"href="javascript:;" class="fa fa-video-camera ui-tooltip" title="" data-original-title="Upload a Video"><i></i></a> -->
+                <div class="share-widget-actions">
+                  <div class="share-widget-types pull-left">
+                  <img id="signedpublishprogress" src="/assets/citizen/loading.gif" alt="enter image description here" style="display: none" id="loading">
+                  <a target="_blank" id="signedpublishhash" href="" title=""></a>
+                    <!-- <a id="signedpublishpic" href="javascript:;" class="fa fa-picture-o ui-tooltip" title="" data-original-title="Post an Image"><i></i></a>
+                    <a id="signedpublishvid"href="javascript:;" class="fa fa-video-camera ui-tooltip" title="" data-original-title="Upload a Video"><i></i></a> -->
 
-                    </div>	
+                  </div>	
 
-                  <div class="pull-right">
-                    <a id="signedpublishbtn" class="btn btn-primary btn-sm" tabindex="2">Sign and Publish</a>
-                  </div>
-
-                  </div> <!-- /.share-widget-actions -->
-
+                <div class="pull-right">
+                  <a id="signedpublishbtn" class="btn btn-primary btn-sm" tabindex="2">Sign and Publish</a>
                 </div>
 
+                </div> <!-- /.share-widget-actions -->
+
+              </div>
 
 
-                 <?php foreach($feed as $f){
-                    if($f->tag != 'SP')
-                      continue;
-                  ?>
 
-                      <div class="feed-item feed-item-file">
-                        <div class="feed-icon">
-                          <i class="fa fa-link"></i>
-                        </div> <!-- /.feed-icon -->
-                        <div class="feed-subject">
-                          <?php if($f->tag == 'SP'){?>
-                          <p>Signed Public Message</p>
-                          <?php } ?>
-                        </div> <!-- /.feed-subject -->
-                        <div class="feed-content">
-                          <?php if($f->tag == 'SP'){?>
-                            <p><blockquote><?=str_replace('\"', "'", str_replace('\n', "\n", $f->message))?></blockquote></p>
-                          <?php } ?>
-                        </div> <!-- /.feed-content -->
-                        <div class="feed-actions">
-                          <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-left"><i class="fa  fa-lock"></i> <?=$f->blockid?></a> 
-                          <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-right"><i class="fa fa-clock-o"></i> <?=$f->mined?></a>
-                        </div> 
-                      </div> 
+                <?php foreach($feed as $f){
+                  if($f->tag != 'SP')
+                    continue;
+                ?>
 
-
+                    <div class="feed-item feed-item-file">
+                      <div class="feed-icon">
+                        <i class="fa fa-link"></i>
+                      </div> <!-- /.feed-icon -->
+                      <div class="feed-subject">
+                        <?php if($f->tag == 'SP'){?>
+                        <p>Signed Public Message</p>
                         <?php } ?>
+                      </div> <!-- /.feed-subject -->
+                      <div class="feed-content">
+                        <?php if($f->tag == 'SP'){?>
+                          <p><blockquote><?=str_replace('\"', "'", str_replace('\n', "\n", $f->message))?></blockquote></p>
+                        <?php } ?>
+                      </div> <!-- /.feed-content -->
+                      <div class="feed-actions">
+                        <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-left"><i class="fa  fa-lock"></i> <?=$f->blockid?></a> 
+                        <a target="_blank" href="https://explore.marscoin.org/tx/<?=$f->txid?>" class="pull-right"><i class="fa fa-clock-o"></i> <?=$f->mined?></a>
+                      </div> 
+                    </div> 
+
+
+                      <?php } ?>
 
 
 
 
-            </div> <!-- /.tab-pane -->
+          </div> <!-- /.tab-pane -->
 
             <div class="tab-pane fade" id="endorsed">
 

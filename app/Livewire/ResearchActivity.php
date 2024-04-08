@@ -8,8 +8,9 @@ use App\Models\Citizen;
 use Illuminate\Support\Facades\Auth;
 
 
-class CivicActivityFeed extends Component
+class ResearchActivity extends Component
 {
+
     public $activities;
     public $citcache;
 
@@ -22,7 +23,7 @@ class CivicActivityFeed extends Component
     {
         // Assuming you want to load activities related to the logged-in user
         $this->activities = Feed::where('userid', Auth::id())
-            ->whereIn('tag', ['ED', 'SP', 'GP', 'CT']) // Include other tags as needed
+            ->whereIn('tag', ['LB']) // Include other tags as needed
             ->latest('mined')
             ->take(10)
             ->get();
@@ -31,6 +32,6 @@ class CivicActivityFeed extends Component
 
     public function render()
     {
-        return view('livewire.civic-activity-feed');
+        return view('livewire.research-activity');
     }
 }

@@ -450,7 +450,7 @@ def cache_signed_messages(cur, db, addr, head, body, userid, txid, block, blockd
     Cache signed messages in the database, using the message content from IPFS.
     """
     ipfs_data = fetch_ipfs_data(body)
-    
+
     # If the IPFS fetch is unsuccessful or the 'post' field is missing, log an error and skip caching
     if not ipfs_data or 'data' not in ipfs_data or 'post' not in ipfs_data['data']:
         logger.error(f"IPFS data not accessible or incomplete for hash: {body}. Skipping caching signed message.")

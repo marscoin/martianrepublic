@@ -129,54 +129,45 @@ class ApiController extends Controller {
 	 *
 	 * @hideFromAPIDocumentation
 	 */
-	public function permapinlog(Request $request){
+	public function permapinlog(Request $request)
+	{
+		if (!Auth::check()) {
+			return redirect('/login');
+		}
 
-		if (Auth::check()) {
-			$hash = "";
-			$public_address = $request->input('address');
-			$title = $request->input('title');
-			$entry = $request->input('entry');
-			$uid = Auth::user()->id;
+		$public_address = $request->input('address');
+		$title = $request->input('title');
+		$entry = $request->input('entry');
+		$uid = Auth::user()->id;
+		$file_path = "./assets/citizen/" . $public_address . "/logbook/" . md5($title);
 
-			$file_path = "./assets/citizen/" . $public_address . "/logbook/".md5($title);
-			//echo $file_path;
-			if (!file_exists($file_path)) {
-				echo "making folder";
-				mkdir($file_path, 0777, true);
+		if (!file_exists($file_path)) {
+			mkdir($file_path, 0755, true); // More secure permissions
+		}
+
+		$file = $file_path . "/log.markdown";
+		file_put_contents($file, $title . "\n\n" . $entry);
+
+		$files = $request->file('filenames');
+		if ($files && is_array($files)) {
+			foreach ($files as $f) {
+				$name = $f->hashName(); // Generates a unique, random name...
+				$f->move($file_path, $name);
 			}
-			$file_path = "./assets/citizen/" . $public_address . "/logbook/".md5($title);
-			$hash = "";
+		}
 
-			$file = $file_path."/log.markdown";
-			file_put_contents($file, $title."\n\n".$entry);
-			$files = $request->file('filenames');
-			//print_r($files);
-			//die();
-			if(!is_null($files))
-			{
-				//echo count($files);
-				foreach ($files as $f) {
-					//print_r($f);
-					$name = $f->hashName(); // Generate a unique, random name...
-					//echo "New: " . $name;
-					$f->move($file_path, $name );
-				}
-			}
-			
-			$hash = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true");
+		try {
+			$hash = AppHelper::uploadFolder($file_path, 'http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true'); // Example: use a config value or env variable
 			AppHelper::insertPublicationCache($uid, $file_path, $hash);
+		} catch (\Exception $e) {
+			// Handle error; possibly log it and return a user-friendly message
+			return response()->json(["error" => $e->getMessage()], 500);
+		}
 
-			return (new Response(json_encode(array("Hash" => $hash, "Path" => $file_path)), 200))
+		return response()->json(["Hash" => $hash, "Path" => $file_path], 200)
 			->header('Content-Type', "application/json;");
-		
-			
-
-		
-		}else{
-            return redirect('/login');
-        }
-			
 	}
+	
 
 
 	/**
