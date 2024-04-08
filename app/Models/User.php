@@ -56,7 +56,7 @@ class User extends Authenticatable
 
     public function hdWallet()
     {
-        return $this->hasMany(HDWallet::class, 'user_id');
+        return $this->hasOne(HDWallet::class, 'user_id');
     }
 
     public function citizen()
