@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Proposals;
 use App\Models\Threads;
 use App\Models\Citizen;
+use Illuminate\Support\Facades\Log;
 
 class ApiController extends Controller {
 
@@ -167,6 +168,95 @@ class ApiController extends Controller {
 		return response()->json(["Hash" => $hash, "Path" => $file_path], 200)
 			->header('Content-Type', "application/json;");
 	}
+
+
+	public function removepinlog(Request $request)
+	{
+		if (!Auth::check()) {
+			return redirect('/login');
+		}
+
+		$cid = $request->input('cid'); // The CID to unpin
+
+		if (!$cid) {
+			return response()->json(["error" => "CID is required"], 400);
+		}
+
+		$uid = Auth::user()->id;
+		$ipfsApiUrl = 'http://127.0.0.1:5001/api/v0/pin/rm?arg=' . $cid . "&recursive=true";
+		Log::debug($ipfsApiUrl);
+		try {
+			// Initialize cURL session
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $ipfsApiUrl);
+			curl_setopt($ch, CURLOPT_VERBOSE, true);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST"); // Ensure this is POST
+			// Optional: Set the Content-Type to application/json
+			//curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+			// Execute cURL session
+			$response = curl_exec($ch);
+			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+			Log::debug($response);
+			print_r($response);
+
+			$headers = ["Content-Type: multipart/form-data"];
+			curl_setopt_array($ch, [
+				CURLOPT_URL => $ipfsApiUrl,
+				CURLOPT_POST => true,
+				CURLOPT_POSTFIELDS => array(),
+				CURLOPT_HTTPHEADER => $headers,
+				CURLOPT_RETURNTRANSFER => true,
+			]);
+		
+			$result = curl_exec($ch);
+			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			curl_close($ch);
+		
+			if ($httpCode < 200 || $httpCode >= 300) {
+				$details = json_decode($result, true);
+				$errorMsg = $details['msg'] ?? 'Unknown error occurred';
+				throw new \Exception($errorMsg);
+			}
+
+			Log::debug($response);
+			print_r($response);
+			die;
+
+			if ($httpCode != 200) {
+				// Error handling, IPFS might return error messages as JSON
+				$errorMsg = "Failed to unpin CID. HTTP status code: $httpCode";
+				if ($responseJson = json_decode($response)) {
+					if (!empty($responseJson->Message)) {
+						$errorMsg = $responseJson->Message;
+					}
+				}
+				throw new \Exception($errorMsg);
+			}
+
+			// You might want to remove the CID from your application's tracking system here
+			// For example: AppHelper::removePublicationCache($uid, $cid);
+
+		} catch (\Exception $e) {
+			// Close cURL session
+			if (isset($ch)) {
+				curl_close($ch);
+			}
+
+			// Handle error; possibly log it and return a user-friendly message
+			return response()->json(["error" => $e->getMessage()], 500);
+		}
+
+		// Close cURL session
+		curl_close($ch);
+
+		// Respond to the client
+		return response()->json(["message" => "Successfully unpinned CID: $cid"], 200)
+			->header('Content-Type', "application/json;");
+	}
+
 	
 
 

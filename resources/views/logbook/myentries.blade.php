@@ -17,16 +17,28 @@
                     <?php foreach( $myPublications as $pub){?>
                     <tr>
                         <td class="valign-middle"><?=$pub->title?></td>
-                        <td class="valign-middle"><?= substr($pub->ipfs_hash, 0, 18) . '...' ?> <a target="_blank" href="https://ipfs.marscoin.org/ipfs/<?=$pub->ipfs_hash?>"> <i class="fa fa-globe"> <i class="fa fa-external-link"></a></td>
+                        <td class="valign-middle"><a target="_blank" href="https://ipfs.marscoin.org/ipfs/<?=$pub->ipfs_hash?>"> <?= substr($pub->ipfs_hash, 0, 18) . '...' ?></a></td>
                         <td class="valign-middle"><?=$pub->created_at?></td>
-                        <td class="valign-middle"><a target="_blank" href="<?=$pub->notarization?>" ><?=substr($pub->notarization, 0, 6)?>...</a></td>
+                        <td class="valign-middle"><a target="_blank" href="https://explore1.marscoin.org/tx/<?=$pub->notarization?>" ><?=substr($pub->notarization, 0, 12)?>...</a></td>
                         <?php if($pub->notarization){ ?>
                         <td class="file-info valign-middle">
                             <span class="label label-default demo-element public-status">Notarized</span>
                         </td>
                         <?php }else{ ?>
                             <td class="file-info valign-middle">
-                            <a data-toggle="modal" href="#notarizemeModal" rel="<?=$pub->ipfs_hash?>" class="btn btn-success demo-element notarizemeModalBtn">Notarize...</a>
+
+
+                            <ul class="nav nav-pills">
+                            <li class="dropdown">
+                                <a href="javascript:;" id="myTabDrop2" class="dropdown-toggle" data-toggle="dropdown">
+                                Actions <b class="caret"></b>
+                                </a>
+
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">
+                                <li><a data-toggle="modal" href="#notarizemeModal"  class="notarizemeModalBtn" rel="<?=$pub->ipfs_hash?>" tabindex="-1" data-toggle="tab">Notarize </a></li>
+                                <li><a class="unpinModalBtn" rel="<?=$pub->ipfs_hash?>" href="#confirmDeleteModal" data-toggle="modal">Delete</a></li>
+                                </ul>
+                            </li>
                             </td>
                         <?php } ?>
                     </tr>
@@ -69,4 +81,24 @@
             </div>
         </div> 
     </div>
+</div>
+
+<div id="confirmDeleteModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this publication? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
 </div>

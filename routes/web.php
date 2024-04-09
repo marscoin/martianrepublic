@@ -102,6 +102,6 @@ Route::post('/api/setfullname', 'Wallet\ApiController@setfullname');
 Route::post('/api/closewallet', 'Wallet\ApiController@closewallet');
 Route::post('/api/cacheproposal', 'Wallet\ApiController@cacheproposal');
 Route::post('/api/cacheonboarding', 'Wallet\ApiController@cacheonboarding');
+Route::post('/api/removelog', 'Wallet\ApiController@removepinlog');
 
 
-Route::post('/api/test', 'Wallet\ApiController@test');

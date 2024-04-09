@@ -234,7 +234,42 @@ $(".notarizemeModalBtn").click(async (e) =>
 
     })
 
+    var cidToDelete;  
+    var deleteRow; 
 
+    $(".unpinModalBtn").click(async (e) => 
+    {
+        cidToDelete = $(e.currentTarget).attr('rel');
+        deleteRow = $(this).closest('tr'); 
+    })
+
+    $("#confirmDelete").click(async (e) => 
+    {
+        if (!cidToDelete) {
+            console.error('CID missing for deletion.');
+            return;
+        }
+
+        $("#confirmDeleteModal").click(async () => {
+            try {
+                const response = await $.ajax({
+                    url: '/api/removelog', // Adjust this to your actual endpoint
+                    method: 'POST',
+                    data: { cid: cidToDelete },
+                    dataType: 'json'
+                });
+
+                if (response.error) {
+                    console.error('Error deleting publication:', response.error);
+                } else {
+                    console.log('Publication deleted successfully:', response.message);
+                    deleteRow.remove();
+                }
+            } catch (error) {
+                console.error('AJAX request failed:', error);
+            }
+        })
+    })
 
 
 ////////////////////////////

@@ -18,10 +18,10 @@ use App\Models\CivicWallet;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use BitcoinPHP\BitcoinECDSA\BitcoinECDSA;
-
 
 class ApiController extends Controller
 {
@@ -46,18 +46,34 @@ class ApiController extends Controller
     public function allCitizen()
     {
         $perPage = 25;
-        $feeds = Feed::with(['user' => function ($query) {
-            $query->select('id', 'fullname', 'created_at');
-        }, 'user.profile' => function ($query) {
-            $query->select('userid', 'general_public'); // only select general_public and the foreign key
-        }, 'user.citizen' => function ($query) {
-            $query->select('userid', 'avatar_link'); // Select the userid and avatar_link
-        }])
-        ->whereHas('user.profile', function ($query) {
-            $query->where('tag', 'CT');
-        })
-        ->orderByDesc('id')
-        ->paginate($perPage);
+        $cacheKey = 'all_citizens_cache'; // Define a unique cache key for this query
+
+        // Attempt to get cached data. If not available, the closure will be run to fetch and cache the data.
+        $feeds = Cache::remember($cacheKey, 60, function () use ($perPage) {
+            // Fetch slightly more data than needed to shuffle. Adjust the multiplier based on desired randomness vs performance impact.
+            $extraData = 1.2; // Example: fetching 20% more data
+            $feedsToFetch = (int) ($perPage * $extraData);
+
+            $feeds = Feed::with(['user' => function ($query) {
+                $query->select('id', 'fullname', 'created_at');
+            }, 'user.profile' => function ($query) {
+                $query->select('userid', 'general_public'); // Only select general_public and the foreign key
+            }, 'user.citizen' => function ($query) {
+                $query->select('userid', 'avatar_link'); // Select the userid and avatar_link
+            }])
+            ->whereHas('user.profile', function ($query) {
+                $query->where('tag', 'CT');
+            })
+            ->orderByDesc('id')
+            ->take($feedsToFetch) // Take more records than needed for shuffling
+            ->get();
+
+            // Shuffle the collection to introduce randomness
+            $feeds = $feeds->shuffle();
+
+            // Return only the number of items per page, simulating pagination limit
+            return $feeds->take($perPage);
+        });
 
         return response()->json($feeds);
     }
