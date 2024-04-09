@@ -29,13 +29,13 @@ class ApiController extends Controller
     {
         $perPage = 25;
         $cacheKey = 'all_public_cache'; // Define a unique cache key for this query
-        $excludedUserId = 6462; //7601 ID of the user you want to exclude, for example, a test account
+        $excludedUserIds = [6462, 7601]; //ID of the user you want to exclude, for example, a test account
     
         // Attempt to get cached data. If not available, the closure will be run to fetch and cache the data.
-        $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserId) {
-            $feeds = Feed::with(['user' => function ($query) use ($excludedUserId) {
+        $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserIds) {
+            $feeds = Feed::with(['user' => function ($query) use ($excludedUserIds) {
                 $query->select('id', 'fullname', 'created_at')
-                      ->where('id', '!=', $excludedUserId); // Exclude the specific user by ID
+                      ->where('id', '!=', $excludedUserIds); // Exclude the specific user by ID
             }, 'user.profile' => function ($query) {
                 $query->select('userid', 'general_public'); // Only select general_public and the foreign key
             }, 'user.citizen' => function ($query) {
@@ -44,8 +44,8 @@ class ApiController extends Controller
             ->whereHas('user.profile', function ($query) {
                 $query->where('tag', 'GP');
             })
-            ->whereHas('user', function ($query) use ($excludedUserId) {
-                $query->where('id', '!=', $excludedUserId); 
+            ->whereHas('user', function ($query) use ($excludedUserIds) {
+                $query->whereNotIn('id', $excludedUserIds);
             })
             ->orderByDesc('id')
             ->take($perPage) // Directly take the perPage amount, removing the need for extra data fetching
