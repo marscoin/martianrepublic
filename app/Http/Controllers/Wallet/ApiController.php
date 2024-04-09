@@ -11,6 +11,7 @@ use App\Models\Feed;
 use App\Models\Profile;
 use App\Models\User;
 use App\Models\Proposals;
+use App\Models\Publication;
 use App\Models\Threads;
 use App\Models\Citizen;
 use Illuminate\Support\Facades\Log;
@@ -159,7 +160,7 @@ class ApiController extends Controller {
 
 		try {
 			$hash = AppHelper::uploadFolder($file_path, 'http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter'); // Example: use a config value or env variable
-			AppHelper::insertPublicationCache($uid, $file_path, $hash);
+			AppHelper::insertPublicationCache($uid, $file_path, $hash, $title);
 		} catch (\Exception $e) {
 			// Handle error; possibly log it and return a user-friendly message
 			return response()->json(["error" => $e->getMessage()], 500);
@@ -168,6 +169,8 @@ class ApiController extends Controller {
 		return response()->json(["Hash" => $hash, "Path" => $file_path], 200)
 			->header('Content-Type', "application/json;");
 	}
+
+
 
 
 	public function removepinlog(Request $request)
@@ -192,10 +195,7 @@ class ApiController extends Controller {
 			curl_setopt($ch, CURLOPT_VERBOSE, true);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST"); // Ensure this is POST
-			// Optional: Set the Content-Type to application/json
-			//curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 
-			// Execute cURL session
 			$response = curl_exec($ch);
 			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
@@ -212,8 +212,10 @@ class ApiController extends Controller {
 				throw new \Exception($errorMsg);
 			}
 
-			// You might want to remove the CID from your application's tracking system here
-			// For example: AppHelper::removePublicationCache($uid, $cid);
+			$publicationDeleted = Publication::where('ipfs_hash', $cid)->delete();
+			if (!$publicationDeleted) {
+				throw new \Exception("Failed to delete publication from the database.");
+			}
 
 		} catch (\Exception $e) {
 			// Close cURL session

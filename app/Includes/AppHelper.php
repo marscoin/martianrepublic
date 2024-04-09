@@ -291,15 +291,18 @@ class AppHelper{
 		}
 
 
-		public static function insertPublicationCache($uid, $local_path, $ipfs_hash)
+		public static function insertPublicationCache($uid, $local_path, $ipfs_hash, $title)
 		{
 			$pub = new Publication;
 			if($uid)
+			{
 				$pub->userid = $uid;
-			$pub->ipfs_hash = $ipfs_hash;
-			$pub->local_path = $local_path;
-			$pub->save();
-			return TRUE;
+				$pub->ipfs_hash = $ipfs_hash;
+				$pub->local_path = $local_path;
+				$pub->title = $title;
+				$pub->save();
+				return TRUE;
+			}
 		}
 
 

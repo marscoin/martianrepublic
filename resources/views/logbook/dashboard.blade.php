@@ -264,6 +264,7 @@ $(".notarizemeModalBtn").click(async (e) =>
                 $('#confirmDeleteModal').modal('hide');
                 console.log('Publication deleted successfully:', response.message);
                 deleteRow.remove();
+                location.reload();
             }
         } catch (error) {
             console.error('AJAX request failed:', error);
