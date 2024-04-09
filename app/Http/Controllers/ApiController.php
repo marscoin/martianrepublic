@@ -28,39 +28,34 @@ class ApiController extends Controller
     public function allPublic()
     {
         $perPage = 25;
-        $feeds = Feed::with(['user' => function ($query) {
-            $query->select('id', 'fullname', 'created_at');
-        }, 'user.profile' => function ($query) {
-            $query->select('userid', 'general_public'); // only select general_public and the foreign key
-        }])
-        ->whereHas('user.profile', function ($query) {
-            $query->where('tag', 'GP');
-        })
-        ->orderByDesc('id')
-        ->paginate($perPage);
-
+        $cacheKey = 'all_public_cache'; // Define a unique cache key for this query
+        $excludedUserId = 6462; //7601 ID of the user you want to exclude, for example, a test account
+    
+        // Attempt to get cached data. If not available, the closure will be run to fetch and cache the data.
+        $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserId) {
+            $feeds = Feed::with(['user' => function ($query) use ($excludedUserId) {
+                $query->select('id', 'fullname', 'created_at')
+                      ->where('id', '!=', $excludedUserId); // Exclude the specific user by ID
+            }, 'user.profile' => function ($query) {
+                $query->select('userid', 'general_public'); // Only select general_public and the foreign key
+            }, 'user.citizen' => function ($query) {
+                $query->select('userid', 'avatar_link', 'liveness_link'); // Select the userid and avatar_link
+            }])
+            ->whereHas('user.profile', function ($query) {
+                $query->where('tag', 'GP');
+            })
+            ->whereHas('user', function ($query) use ($excludedUserId) {
+                $query->where('id', '!=', $excludedUserId); 
+            })
+            ->orderByDesc('id')
+            ->take($perPage) // Directly take the perPage amount, removing the need for extra data fetching
+            ->get();
+           
+            return $feeds; // Directly return the fetched feeds
+        });
+    
         return response()->json($feeds);
     }
-
-
-    // public function allCitizen2()
-    // {
-    //     $perPage = 25;
-    //     $feeds = Feed::with(['user' => function ($query) {
-    //         $query->select('id', 'fullname', 'created_at');
-    //     }, 'user.profile' => function ($query) {
-    //         $query->select('userid', 'general_public'); // only select general_public and the foreign key
-    //     }, 'user.citizen' => function ($query) {
-    //         $query->select('userid', 'avatar_link'); // Select the userid and avatar_link
-    //     }])
-    //     ->whereHas('user.profile', function ($query) {
-    //         $query->where('tag', 'CT');
-    //     })
-    //     ->orderByDesc('id')
-    //     ->paginate($perPage);
-
-    //     return response()->json($feeds);
-    // }
 
 
     public function allCitizen()
@@ -88,9 +83,7 @@ class ApiController extends Controller
             ->orderByDesc('id')
             ->take($perPage) // Directly take the perPage amount, removing the need for extra data fetching
             ->get();
-    
-            // Previously here was the shuffling and deduplication logic, which has been removed for simplicity
-    
+           
             return $feeds; // Directly return the fetched feeds
         });
     

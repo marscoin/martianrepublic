@@ -18,17 +18,15 @@ use App\Includes\AppHelper;
                     <?php foreach($everyPublic as $gp){?>
                     <tr>
                         <td>
-                            <object id="photo" data="/assets/citizen/<?= $gp->address ?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image" style="max-height: 100px;"  type="image/png">
-								<img src="/assets/citizen/generic_profile.jpg" class="profile-avatar-img thumbnail">
-							</object>
+                        <img src="{{ $gp->avatar_link }}"  onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'" class="profile-avatar-img thumbnail" alt="Profile Image. Source {{ $gp->avatar_link }}">
                         </td>
                         <td class="valign-middle">
                             <a href="javascript:;" title=""><?= $gp->fullname ?> </a>
                             <p><a target="_blank"
-                                    href="https://explore.marscoin.org/tx/<?= $gp->txid ?>"><?= $gp->address ?></a></p>
+                                    href="https://explore.marscoin.org/tx/<?= $gp->txid ?>"><?= $gp->public_address ?></a></p>
 
-                            <?php if($isCitizen && $gp->address != $public_address && !$gp->citizen){ ?>
-                            <a data-toggle="modal" href="#endorseModal" data-endorse="{{{$gp->userid}}}"  data-name="{{{$gp->fullname}}}" data-address="{{{$gp->address}}}"
+                            <?php if($isCitizen && $gp->public_address != $public_address && !$gp->citizen){ ?>
+                            <a data-toggle="modal" href="#endorseModal" data-endorse="{{$gp->userid}}"  data-name="{{$gp->firstname}} {{$gp->lastname}}" data-address="{{$gp->public_address}}"
                               class="btn-sm btn-primary demo-element endorse-btn">Endorse for Citizenship</a>
                             <?php } ?>
                         </td>
