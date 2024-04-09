@@ -260,8 +260,10 @@ $(".notarizemeModalBtn").click(async (e) =>
                 });
 
                 if (response.error) {
-                    console.error('Error deleting publication:', response.error);
+                    $('#confirmDeleteModal').modal('hide');
+                    alert('Error deleting publication:' + response.error);
                 } else {
+                    $('#confirmDeleteModal').modal('hide');
                     console.log('Publication deleted successfully:', response.message);
                     deleteRow.remove();
                 }
