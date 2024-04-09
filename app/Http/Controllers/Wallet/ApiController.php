@@ -200,30 +200,6 @@ class ApiController extends Controller {
 			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 			Log::debug($response);
-			print_r($response);
-
-			$headers = ["Content-Type: multipart/form-data"];
-			curl_setopt_array($ch, [
-				CURLOPT_URL => $ipfsApiUrl,
-				CURLOPT_POST => true,
-				CURLOPT_POSTFIELDS => array(),
-				CURLOPT_HTTPHEADER => $headers,
-				CURLOPT_RETURNTRANSFER => true,
-			]);
-		
-			$result = curl_exec($ch);
-			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			curl_close($ch);
-		
-			if ($httpCode < 200 || $httpCode >= 300) {
-				$details = json_decode($result, true);
-				$errorMsg = $details['msg'] ?? 'Unknown error occurred';
-				throw new \Exception($errorMsg);
-			}
-
-			Log::debug($response);
-			print_r($response);
-			die;
 
 			if ($httpCode != 200) {
 				// Error handling, IPFS might return error messages as JSON
