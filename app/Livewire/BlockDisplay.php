@@ -9,6 +9,7 @@ class BlockDisplay extends Component
 {
     public $blockNumber = 'Loading...';
     public $timeSinceLastBlock = "n/a";
+    public $lastBlockMinedAt = "";
 
     public function mount()
     {
