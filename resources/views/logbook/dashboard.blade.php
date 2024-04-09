@@ -102,7 +102,6 @@
 <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
 <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
 <script>
         var simplemde = new SimpleMDE({ element: document.getElementById("description") });
@@ -250,27 +249,26 @@ $(".notarizemeModalBtn").click(async (e) =>
             return;
         }
 
-        $("#confirmDeleteModal").click(async () => {
-            try {
-                const response = await $.ajax({
-                    url: '/api/removelog', // Adjust this to your actual endpoint
-                    method: 'POST',
-                    data: { cid: cidToDelete },
-                    dataType: 'json'
-                });
+        try {
+            const response = await $.ajax({
+                url: '/api/removelog', // Adjust this to your actual endpoint
+                method: 'POST',
+                data: { cid: cidToDelete },
+                dataType: 'json'
+            });
 
-                if (response.error) {
-                    $('#confirmDeleteModal').modal('hide');
-                    alert('Error deleting publication:' + response.error);
-                } else {
-                    $('#confirmDeleteModal').modal('hide');
-                    console.log('Publication deleted successfully:', response.message);
-                    deleteRow.remove();
-                }
-            } catch (error) {
-                console.error('AJAX request failed:', error);
+            if (response.error) {
+                $('#confirmDeleteModal').modal('hide');
+                alert('Error deleting publication:' + response.error);
+            } else {
+                $('#confirmDeleteModal').modal('hide');
+                console.log('Publication deleted successfully:', response.message);
+                deleteRow.remove();
             }
-        })
+        } catch (error) {
+            console.error('AJAX request failed:', error);
+        }
+    
     })
 
 
