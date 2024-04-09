@@ -15,21 +15,19 @@ use App\Includes\AppHelper;
                 </tr>
             </thead>
             <tbody>
-              <?php foreach($everyCitizen as $gp){?>
+              <?php foreach($everyCitizen as $ct){?>
                 <tr>
                   <td>
-                      <object id="photo" data="/assets/citizen/<?= $gp->address ?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image" style="max-height: 100px;"  type="image/png">
-                      <img src="/assets/citizen/generic_profile.jpg" class="profile-avatar-img thumbnail">
-                    </object>
+                  <img src="{{ $ct->avatar_link }}"  onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'" class="profile-avatar-img thumbnail" alt="Profile Image. Source {{ $ct->avatar_link }}">
                   </td>
                   <td class="valign-middle">
-                      <a target="_blank" href="/citizen/id/<?=$gp->address?>" title=""><?=$gp->fullname?> </a>
-                    <p><a target="_blank" href="https://explore.marscoin.org/tx/<?=$gp->txid?>"><?=$gp->address?></a></p>
+                      <a target="_blank" href="/citizen/id/<?=$ct->public_address?>" title=""><?=$ct->firstname?> <?=$ct->lastname?> </a>
+                    <p><a target="_blank" href="https://explore.marscoin.org/tx/<?=$ct->txid?>"><?=$ct->public_address?></a></p>
                   </td>
-                  <td class="valign-middle"><?=$gp->mined?></td>
+                  <td class="valign-middle"><?=$ct->mined?></td>
                   <td class="file-info valign-middle">
                       <span class="label label-success demo-element public-status">Citizen</span><br>
-                      <span class="label label-warning row-stat-badge">Endorsements: +<?=0 + $gp->endorse_cnt?></span>
+                      <span class="label label-warning row-stat-badge">Endorsements: +<?=0 + $ct->endorse_cnt?></span>
                   </td>
                 </tr>
                 <?php } ?>

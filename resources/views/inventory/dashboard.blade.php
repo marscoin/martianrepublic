@@ -1,11 +1,5 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
 <html lang="en" class="no-js">
-<!--<![endif]-->
-
 <head>
     <title>Marscoin Wallet</title>
     <meta charset="utf-8">
@@ -42,12 +36,12 @@
                     @include('wallet.header')
                 </div> <!-- /.navbar-header -->
                 <nav class="collapse navbar-collapse" role="navigation">
-                    @include('wallet.navbarleft', array('info' => $network ))
+                    @include('wallet.navbarleft')
                     @include('wallet.navbarright')
                 </nav>
             </div> <!-- /.container -->
         </header>
-        @include('wallet.mainnav', array('active'=>'inventory', 'info'=>$network, 'balance' => $balance))
+        @include('wallet.mainnav', array('active'=>'inventory', 'balance' => $balance))
         <div class="content">
             <div class="container">
 

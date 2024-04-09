@@ -31,12 +31,12 @@
                     @include('wallet.header')
                 </div> <!-- /.navbar-header -->
                 <nav class="collapse navbar-collapse" role="navigation">
-                    @include('wallet.navbarleft', array('info' => $network ))
+                    @include('wallet.navbarleft')
                     @include('wallet.navbarright')
                 </nav>
             </div> 
         </header>
-        @include('wallet.mainnav', array('active'=>'logbook', 'info'=>$network, 'balance' => $balance))
+        @include('wallet.mainnav', array('active'=>'logbook', 'balance' => $balance))
         <div class="content">
             <div class="container">
                 <?php if($wallet_open){ ?>

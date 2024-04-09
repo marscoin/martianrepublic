@@ -42,12 +42,12 @@
                     @include('wallet.header')
                 </div> <!-- /.navbar-header -->
                 <nav class="collapse navbar-collapse" role="navigation">
-                    @include('wallet.navbarleft', array('info' => $network ))
+                    @include('wallet.navbarleft')
                     @include('wallet.navbarright')
                 </nav>
             </div> <!-- /.container -->
         </header>
-        @include('wallet.mainnav', array('active'=>'wallet', 'info'=>$network, 'balance' => $balance))
+        @include('wallet.mainnav', array('active'=>'wallet', 'balance' => $balance))
         <div class="content">
             <div class="container">
 
