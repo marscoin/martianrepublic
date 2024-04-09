@@ -165,6 +165,7 @@ $("#saveLogLocalBtn").click(function(event) {
             if(data.Hash !== "") {
                 $("#ipfs_path").val(data.Hash);
                 alert("Successfully saved to the planetary file system!");
+                location.href="/logbook/all#My"
             } else {
                 // Handle the case where no folder hash was found
                 console.error("No folder hash found in the response.");

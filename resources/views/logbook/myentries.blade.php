@@ -64,8 +64,8 @@
                 <div class="modal-body-box">
                     <h5> Document: </h5>
                     <p class="modal-document" style="font-size: 18px; font-weight: 800;"></p>
-                    <h5> Fee: </h5>
-                    <p class="modal-fee" style="font-size: 18px; font-weight: 800;"></p> MARS
+                    <h5> Fee:</h5>
+                    <p class="modal-fee" style="font-size: 18px; font-weight: 800;"></p>0.1  MARS
                 </div>
                 <div class="modal-message" style="display: none">
                     <i class="fa fa-times-circle"></i>
