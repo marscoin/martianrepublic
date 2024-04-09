@@ -61,6 +61,7 @@ class IdentityController extends Controller
 			$view->feed = Feed::where('userid', '=', $uid)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
 			$view->endorsed = array();
 			
+			//6462 is our test account Roberta Draper
 			$view->everyPublic = DB::select('select * from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id and feed.tag = "GP" AND profile.userid NOT IN (6462) ORDER BY feed.id desc');
 			$view->everyCitizen = DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = "CT" ORDER BY f.id DESC LIMIT 1 ) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = "CT" ORDER BY f.id DESC LIMIT 1 ) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = "CT" ) AND u.id NOT IN (6462) ORDER BY mined DESC; ');
 			$view->everyApplicant = DB::select('select profile.userid, users.fullname, hd_wallet.public_addr as address from users, profile, hd_wallet where profile.userid = users.id and users.id = hd_wallet.user_id and profile.has_application = 1 ORDER BY profile.userid DESC ');

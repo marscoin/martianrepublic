@@ -67,15 +67,13 @@ class ApiController extends Controller
     {
         $perPage = 25;
         $cacheKey = 'all_citizens_cache'; // Define a unique cache key for this query
-
+        $excludedUserId = 6462; // ID of the user you want to exclude, for example, a test account
+    
         // Attempt to get cached data. If not available, the closure will be run to fetch and cache the data.
-        $feeds = Cache::remember($cacheKey, 60, function () use ($perPage) {
-            // Fetch slightly more data than needed to shuffle. Adjust the multiplier based on desired randomness vs performance impact.
-            $extraData = 1.2; // Example: fetching 20% more data
-            $feedsToFetch = (int) ($perPage * $extraData);
-
-            $feeds = Feed::with(['user' => function ($query) {
-                $query->select('id', 'fullname', 'created_at');
+        $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserId) {
+            $feeds = Feed::with(['user' => function ($query) use ($excludedUserId) {
+                $query->select('id', 'fullname', 'created_at')
+                      ->where('id', '!=', $excludedUserId); // Exclude the specific user by ID
             }, 'user.profile' => function ($query) {
                 $query->select('userid', 'general_public'); // Only select general_public and the foreign key
             }, 'user.citizen' => function ($query) {
@@ -84,17 +82,18 @@ class ApiController extends Controller
             ->whereHas('user.profile', function ($query) {
                 $query->where('tag', 'CT');
             })
+            ->whereHas('user', function ($query) use ($excludedUserId) {
+                $query->where('id', '!=', $excludedUserId); // Ensure the excluded user is not included
+            })
             ->orderByDesc('id')
-            ->take($feedsToFetch) // Take more records than needed for shuffling
+            ->take($perPage) // Directly take the perPage amount, removing the need for extra data fetching
             ->get();
-
-            // Shuffle the collection to introduce randomness
-            $feeds = $feeds->shuffle();
-
-            // Return only the number of items per page, simulating pagination limit
-            return $feeds->take($perPage);
+    
+            // Previously here was the shuffling and deduplication logic, which has been removed for simplicity
+    
+            return $feeds; // Directly return the fetched feeds
         });
-
+    
         return response()->json($feeds);
     }
     
