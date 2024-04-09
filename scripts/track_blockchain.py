@@ -577,6 +577,10 @@ def check_for_citizenship_criteria(cur, endorsed_address):
         result = cur.fetchone()
         count = result['endorsement_count'] if result else 0
         logger.info(f"Public ED Count: {count}")
+        userid = get_user_by_address(cur, endorsed_address)
+        cur.execute("UPDATE profile SET endorse_cnt = %s WHERE userid = %s", (count, userid))
+        cur.connection.commit()
+        logger.info(f"Updated endorsement count for {endorsed_address}")
         return count >= 1
     except Exception as e:
         logger.error(f"Error checking endorsement count for {endorsed_address}: {e.__class__.__name__}, {e.args}")
