@@ -60,6 +60,12 @@ class BlockchainActivityFeed extends Component
                     $description .= " <a target='_blank' href='{$embeddedLink}'>Read Post</a>.";
                 }
                 break;
+            case 'LB':
+                $description = "made a logbook entry.";
+                if (!empty($activity->embedded_link)) {
+                    $description .= " <a target='_blank' href='{$embeddedLink}'>Read Entry</a>.";
+                }
+                break;
             default:
                 $description = "performed an unclassified activity.";
                 break;

@@ -51,8 +51,6 @@ class IdentityController extends Controller
 			}
 			$view = View::make('citizen.registry');
 			$view->wallet_open = $profile->civic_wallet_open;
-			// $view->network = AppHelper::stats()['network'];
-			// $view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;
 			$view->citcache = $citcache;
 			$view->isGP  = $profile->general_public;
@@ -63,12 +61,15 @@ class IdentityController extends Controller
 			
 			//6462 is our test account Roberta Draper
 			$view->everyPublic = DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = "GP" ORDER BY f.id DESC LIMIT 1) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = "GP" ORDER BY f.id DESC LIMIT 1) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = "GP") AND u.id NOT IN (6462, 7601) ORDER BY mined DESC;');
+			
 			$view->everyCitizen = DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = "CT" ORDER BY f.id DESC LIMIT 1 ) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = "CT" ORDER BY f.id DESC LIMIT 1 ) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = "CT" ) AND u.id NOT IN (6462) ORDER BY mined DESC; ');
-			$view->everyApplicant = DB::select('select profile.userid, users.fullname, hd_wallet.public_addr as address from users, profile, hd_wallet where profile.userid = users.id and users.id = hd_wallet.user_id and profile.has_application = 1 ORDER BY profile.userid DESC ');
+			
+			$view->everyApplicant = DB::select('SELECT profile.userid, users.fullname, citizen.*, civic_wallet.public_addr AS address FROM users, profile, civic_wallet, citizen WHERE profile.userid = users.id AND users.id = civic_wallet.user_id AND citizen.userid = users.id AND profile.has_application = 1 AND users.id NOT IN (6462)');
+			
 			$view->recentActivityCount = Feed::where('userid', $uid)->where('mined', '>=', Carbon::now()->subDay())->count();
 
 			if ($wallet) {
-				$view->balance = AppHelper::getMarscoinBalance($wallet['public_addr']);
+				$view->balance = 0;// AppHelper::getMarscoinBalance($wallet['public_addr']);
 				$view->public_address = $wallet['public_addr'];
 				$view->endorsed = Feed::where('message', '=', $wallet['public_addr'])->where('tag', '=', "ED")->get();
 			} else {

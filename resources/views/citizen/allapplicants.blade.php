@@ -5,40 +5,87 @@ use App\Includes\AppHelper;
 <div class="row">
     <div class="col-md-9">
         <div class="table-responsive">
-            <table class="table table-striped table-bordered thumbnail-table">
-                <thead>
-                    <tr>
-                        <th style="width: 150px">Profile Picture</th>
-                        <th>Public Address</th>
-                        <th>Since</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach($everyApplicant as $apps){?>
+        <table class="table table-striped table-bordered thumbnail-table">
+            <thead>
+                <tr>
+                    <th style="width: 150px">Profile Picture</th>
+                    <th>Public Address</th>
+                    <th>Since</th>
+                    <th>Status</th>
+                    <th>Missing Fields</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                
+                foreach ($everyApplicant as &$apps) {
+                    $missing_fields_count = 0;
+                    if (empty($apps->firstname)) $missing_fields_count++;
+                    if (empty($apps->lastname)) $missing_fields_count++;
+                    if (empty($apps->displayname)) $missing_fields_count++;
+                    if (empty($apps->shortbio)) $missing_fields_count++;
+                    if (empty($apps->avatar_link)) $missing_fields_count++;
+                    if (empty($apps->liveness_link)) $missing_fields_count++;
+                    
+                    $apps->missing_fields_count = $missing_fields_count;
+                }
+                
+                // Sort the array based on the missing_fields_count property
+                usort($everyApplicant, function($a, $b) {
+                    return $a->missing_fields_count <=> $b->missing_fields_count;
+                });
+                
+                
+                foreach($everyApplicant as $apps) { ?>
                     <tr>
                         <td>
-                            <img id="photo" src="/assets/citizen/<?= $apps->address ?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image" style="max-height: 100px;" onerror="imgError(this);">
+                            <img src="<?= $apps->avatar_link ?>" onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'" class="profile-avatar-img thumbnail" alt="Profile Image" style="max-height: 100px;">
                         </td>
                         <td class="valign-middle">
-                            <a href="javascript:;" title=""><?= $apps->fullname ?> </a>
-                            <p><a target="_blank"  href="#"><?= $apps->address ?></a></p>
+                            <div class="btn-group" role="group" aria-label="User Actions">
+                                <a href="javascript:;" title="<?= $apps->fullname ?>"><?= $apps->fullname ?></a>
+                                <p><a target="_blank" href="#"><?= $apps->address ?></a></p>
 
-                            <?php if($isCitizen && $apps->address != $public_address){ ?>
-                            <a data-toggle="modal" href="#endorseModal" data-endorse="{{{$apps->userid}}}"  data-name="{{{$apps->fullname}}}" data-address="{{{$apps->address}}}"
-                              class="btn-sm btn-primary demo-element endorse-btn">Donate Marscoin</a>
-                            <?php } ?>
+                                <a data-toggle="modal" href="#endorseModal" data-endorse="<?= $apps->userid ?>"  data-name="<?= $apps->fullname ?>" data-address="<?= $apps->address ?>"
+                                class="btn btn-sm btn-success">Donate Marscoin</a>
+
+                                <?php if ($isCitizen) { ?>
+                                    <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Reject
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                       <li> <a class="dropdown-item" href="javascript:;" onclick="rejectApplication('<?= $apps->userid ?>', 'avatar_link')">Missing Personal Image</a></li>
+                                       <li> <a class="dropdown-item" href="javascript:;" onclick="rejectApplication('<?= $apps->userid ?>', 'liveness_link')">Incomplete Video</a></li>
+                                       <li><a class="dropdown-item" href="javascript:;" onclick="rejectApplication('<?= $apps->userid ?>', 'duplicate')">Duplicate Entry</a></li>
+                                </ul>
+                                <?php } ?>
+                            </div>
                         </td>
-                        <td class="valign-middle">not notarized yet</td>
+                        <td class="valign-middle"><?= $apps->created_at ?></td>
                         <td class="file-info valign-middle">
-                            <span class="label label-default demo-element public-status">Applicant</span>
+                            <span class="label label-secondary demo-element public-status">Applicant</span>
+                        </td>
+                        <td class="valign-middle">
+                            <?php
+                            $missing_fields = [];
+                            if (empty($apps->firstname)) $missing_fields[] = "Firstname";
+                            if (empty($apps->lastname)) $missing_fields[] = "Lastname";
+                            if (empty($apps->displayname)) $missing_fields[] = "Nickname";
+                            if (empty($apps->shortbio)) $missing_fields[] = "Bio";
+                            if (empty($apps->avatar_link)) $missing_fields[] = "Picture";
+                            if (empty($apps->liveness_link)) $missing_fields[] = "Video";
+                            if (empty($missing_fields)) {
+                                echo "All complete, awaiting notarization";
+                            } else {
+                                echo implode(', ', $missing_fields);
+                            }
+                            ?>
                         </td>
                     </tr>
-                    <?php } ?>
-                    
+                <?php } ?>
+            </tbody>
+        </table>
 
-                </tbody>
-            </table>
 
         </div>
     </div>
@@ -105,10 +152,7 @@ use App\Includes\AppHelper;
 
     </div>
 
-</div> <!-- /.col -->
-
-<!--Modal Start -->
-
+</div> 
 
 <div id="endorseModal" class="modal fade dynamic-vote-modal">
   <div class="modal-dialog">

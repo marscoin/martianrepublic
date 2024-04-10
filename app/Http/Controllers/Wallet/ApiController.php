@@ -383,6 +383,64 @@ class ApiController extends Controller {
 		}
 	}
 
+
+	public function rejectApplication(Request $request)
+	{
+		if (Auth::check()) 
+		{
+			// Check if the user has citizen status
+			$user = Auth::user();
+			$profile = Profile::where('userid', $user->id)->first();
+			$reporter = Citizen::where('userid', '=',  $user->id)->first();
+			
+			$rejectionReasons = [
+				'avatar_link' => 'Missing Personal Image',
+				'liveness_link' => 'Incomplete Video',
+				'duplicate' => 'Duplicate Entry'
+			];
+			
+			if ($profile && $profile->citizen) 
+			{
+				// Fetch the request data
+				$applicantUserId = $request->input('applicantUserId');
+				$fieldToUpdate = $request->input('field');
+	
+				// Validate the field to update
+				if (!in_array($fieldToUpdate, ['avatar_link', 'liveness_link'])) {
+					return response()->json(['error' => 'Invalid field specified.'], 400);
+				}
+	
+				// Update the citizen table, setting the specified field to NULL for the applicant
+				Citizen::where('userid', $applicantUserId)->update([$fieldToUpdate => NULL]);
+
+				$applicant = Citizen::where('userid', '=',  $applicantUserId)->first();
+	
+				// Insert a new forum post indicating the rejection
+				$content = "The application of {$applicant->public_address} has been rejected due to " . $rejectionReasons[$fieldToUpdate] . ".";
+
+				
+				$fullname = $reporter->firstname . "" . $reporter->lastname;
+				ForumPost::create([
+					'thread_id' => 27, // Thread ID for application commentary
+					'author_id' => $user->id, // The ID of the citizen performing the rejection
+					'content' => $content,
+					'authorName' => $fullname,
+					'created_at' => now(),
+					'updated_at' => now(),
+				]);
+	
+				return response()->json(['success' => 'Application has been rejected and recorded.']);
+			} else {
+				// User is not a citizen or not authenticated
+				return response()->json(['error' => 'Unauthorized access.'], 403);
+			}
+		} else {
+			// User is not logged in
+			return response()->json(['error' => 'User not authenticated.'], 401);
+		}
+		
+	}
+
 	/**
 	 *
 	 * @hideFromAPIDocumentation

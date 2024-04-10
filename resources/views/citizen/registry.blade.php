@@ -448,6 +448,35 @@ $("#confirm-endorse-btn").click(async (e)=>
 })
 
 
+function rejectApplication(userId, causeOfRejection) {
+
+    if (!confirm('This is only available to Citizens. Are you sure you want to reject this application? A public entry will be posted in the Forum.')) {
+        return; // Stop if user does not confirm
+    }
+    const postData = {
+        applicantUserId: userId,
+        field: causeOfRejection
+    };
+
+    fetch('/api/rejection', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(postData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle response data
+        console.log('Success:', data);
+        // Optionally, update the UI to reflect the rejection
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
+
 
 
 

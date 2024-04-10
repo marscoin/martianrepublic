@@ -33,7 +33,7 @@ class MarscoinBalance extends Component
                     'status' => $response->status(),
                     'response' => $response->body(),
                 ]);
-                $this->balance = 'n/a';
+                $this->balance = '0';
             }
         } catch (\Throwable $exception) {
             // Log exception details
@@ -41,7 +41,7 @@ class MarscoinBalance extends Component
                 'address' => $this->address,
                 'exception' => $exception,
             ]);
-            $this->balance = 'n/a';
+            $this->balance = '0';
         }
     }
 
