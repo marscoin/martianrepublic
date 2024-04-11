@@ -5,9 +5,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
-use App\Models\Feed;
+use App\Models\Posts;
 use App\Models\Profile;
 use App\Models\User;
 use App\Models\Proposals;
@@ -309,6 +308,61 @@ class ApiController extends Controller {
 	 *
 	 * @hideFromAPIDocumentation
 	 */
+	public function getBalance(Request $request)
+	{
+		if (Auth::check()) {
+			$address = $request->input('address');
+			$balance = AppHelper::getMarscoinBalance($address);
+			return (new Response(json_encode(array("balance" => $balance)), 200))
+              ->header('Content-Type', "application/json;");
+
+		
+		}else{
+            return redirect('/login');
+        }
+	}
+
+
+
+	/**
+	 * Internal
+	 *
+	 * @hideFromAPIDocumentation
+	 */
+	public function dismissAlert(Request $request)
+    {
+        $alertType = $request->alertType;
+        session()->put($alertType, true);
+
+        return response()->json(['success' => true]);
+    }
+
+
+
+	/**
+	 * Internal
+	 *
+	 * @hideFromAPIDocumentation
+	 */
+	public function getPrice(Request $request)
+	{
+		if (Auth::check()) {
+			$price = AppHelper::getMarscoinPrice();
+			return (new Response(json_encode(array("mars_price" => $price)), 200))
+              ->header('Content-Type', "application/json;");
+
+		
+		}else{
+            return redirect('/login');
+        }
+	}
+
+
+	/**
+	 * Internal
+	 *
+	 * @hideFromAPIDocumentation
+	 */
 	public function getTransactions(Request $request)
 	{
 		if (Auth::check()) {
@@ -420,7 +474,7 @@ class ApiController extends Controller {
 
 				
 				$fullname = $reporter->firstname . "" . $reporter->lastname;
-				ForumPost::create([
+				Posts::create([
 					'thread_id' => 27, // Thread ID for application commentary
 					'author_id' => $user->id, // The ID of the citizen performing the rejection
 					'content' => $content,

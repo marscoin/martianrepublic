@@ -50,6 +50,7 @@
 }
     </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
+    @livewireStyles
 </head>
 
 <body class=" ">
@@ -757,10 +758,8 @@
     <script src="/assets/wallet/js/mvpready-helpers.js"></script>
     <script src="/assets/wallet/js/demos/table_demo.js"></script>
     <script type="text/javascript">
-// ===================================================================
-// =================== Handle Unlock Wallet Modal ====================
-// ===================================================================
-        $.ajaxSetup({
+    
+    $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
@@ -1556,56 +1555,6 @@
     });
 
 
-// let progress = 0;
-// // Add the dot styles to the page
-// var style = document.createElement('style');
-// document.head.appendChild(style);
-// style.sheet.insertRule(`
-// .dot {
-//     position: absolute;
-//     width: 5px;
-//     height: 5px;
-//     border-radius: 50%;
-//     background: black;
-//     pointer-events: none;
-// }`, 0);
-
-// Function to log mouse movements and create dots
-// function trackMouseAndCreateDots(e) {
-//     // Log to console
-//     console.log(`Mouse position: X=${e.clientX}, Y=${e.clientY}`);
-    
-//     // Create and append dot
-//     var dot = document.createElement('div');
-//     dot.className = 'dot';
-//     dot.style.left = `${e.clientX}px`;
-//     dot.style.top = `${e.clientY}px`;
-//     dot.style.zIndex = 1100;
-//     document.body.appendChild(dot);
-//     progress += 0.1;
-//     if (progress > 100) {
-//         progress = 100; // Cap progress at 100%
-//     }
-
-//     // Update the progress counter element's text
-//     document.getElementById('progress-counter').innerText = `${progress.toFixed(1)}%`;
-// }
-
-// // This function should be called when the modal is opened
-// function enableEntropyOnModal(modalElement) {
-//     // Reset progress
-//     progress = 0;
-//     document.getElementById('progress-counter').innerText = '0%';
-
-//     // Start tracking
-//     modalElement.addEventListener('mousemove', trackMouseAndCreateDots);
-// }
-
-// // Assuming 'myModal' is the ID of your modal
-// $('#styledModal').on('shown.bs.modal', function () {
-//     enableEntropyOnModal(this);
-// });
-
 </script>
 
 <script src="/assets/wallet/js/demos/parsley.js"></script>
@@ -1614,7 +1563,7 @@
 <script src="/assets/wallet/js/mvpready-helpers.js"></script>
 <script src="/assets/wallet/js/mvpready-admin.js"></script>
 
-
+@livewireScripts
 </body>
 
 </html>

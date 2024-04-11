@@ -378,7 +378,7 @@ class AppHelper{
 			}
 
 			// Handle the case where the API call was not successful or caching failed
-			return null;
+			return 0;
 		}
 
 
@@ -408,7 +408,7 @@ class AppHelper{
 			}
 
 			// Handle the case where the API call was not successful or caching failed
-			return null;
+			return 0;
 		}
 
 		public static function getMarscoinTotalReceived($publicAddr)

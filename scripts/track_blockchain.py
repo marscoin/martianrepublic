@@ -37,6 +37,7 @@ import re
 import os
 import sys
 import json
+import math
 import time
 import requests
 import pymysql as MySQLdb
@@ -557,12 +558,8 @@ def process_citizenship(cur, db, endorsed_address, userid, txid, height, blockda
 def check_for_citizenship_criteria(cur, endorsed_address):
     """
     Evaluates if an address meets the criteria for citizenship based on the number of endorsements received.
-    Currently, receiving at least one endorsement is sufficient for attaining citizenship status. This threshold
-    reflects the community's current standards but may be subject to change based on future community proposals or decisions.
-    
-    This approach models the concept of societal integration ("immigration laws"), where an individual's acceptance into a community or nation
-    can be quantified by the endorsements or support they receive from existing members ("time & money equals interactions/endorsements"). 
-    This function translates that notion into a straightforward numerical criterion.
+    A member of the public requires endorsements from 10% of existing citizens or a maximum of 5 endorsements,
+    whichever is lower, to attain citizenship status.
 
     Args:
     cur: Database cursor to execute the query.
@@ -573,18 +570,37 @@ def check_for_citizenship_criteria(cur, endorsed_address):
     """
     logger.info(f"Checking endorsement count for: {endorsed_address}")
     try:
+        # Fetch the total number of citizens from the profile table
+        cur.execute("SELECT COUNT(*) as total_citizens FROM profile WHERE citizen = 1")
+        result = cur.fetchone()
+        total_citizens = result['total_citizens'] if result else 0
+        
+        # Calculate 10% of existing citizens and use floor to round down
+        ten_percent_of_citizens = math.floor(total_citizens * 0.1)
+
+        # Ensure at least 1 endorsement is required if the calculation results in a number between 1 and 2
+        max_endorsements_required = max(min(ten_percent_of_citizens, 5), 1)
+        
+        # Fetch the number of endorsements received by the address
         cur.execute("SELECT COUNT(*) as endorsement_count FROM feed WHERE message = %s AND tag = 'ED'", (endorsed_address,))
         result = cur.fetchone()
         count = result['endorsement_count'] if result else 0
+        
         logger.info(f"Public ED Count: {count}")
+        
+        # Update the endorsement count for the user
         userid = get_user_by_address(cur, endorsed_address)
         cur.execute("UPDATE profile SET endorse_cnt = %s WHERE userid = %s", (count, userid))
         cur.connection.commit()
+        
         logger.info(f"Updated endorsement count for {endorsed_address}")
-        return count >= 1
+        
+        # Check if the number of endorsements meets or exceeds the requirement
+        return count >= max_endorsements_required
     except Exception as e:
         logger.error(f"Error checking endorsement count for {endorsed_address}: {e.__class__.__name__}, {e.args}")
         return False
+
 
 
 def process_endorsement(cur, db, addr, head, body, userid, txid, height, blockdate, block_hash):

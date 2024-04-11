@@ -77,17 +77,17 @@ class IdentityController extends Controller
 				$view->public_address = "";
 			}
 
-			if($profile->general_public )
-			{
-				try
-				{
-					$view->user = AppHelper::getUserFromCache($wallet['public_addr']);
-				}
-				catch(Exception $e) {
-					$view->user = AppHelper::addUserToLocalCache($wallet['public_addr']);
-					$view->user = AppHelper::getUserFromCache($wallet['public_addr']);
-				}
-			}
+			// if($profile->general_public )
+			// {
+			// 	try
+			// 	{
+			// 		$view->user = AppHelper::getUserFromCache($wallet['public_addr']);
+			// 	}
+			// 	catch(Exception $e) {
+			// 		$view->user = AppHelper::addUserToLocalCache($wallet['public_addr']);
+			// 		$view->user = AppHelper::getUserFromCache($wallet['public_addr']);
+			// 	}
+			// }
 			return $view;
 
 

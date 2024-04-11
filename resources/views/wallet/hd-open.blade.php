@@ -1,12 +1,11 @@
-<!DOCTYPE html>
 <html lang="en" class="no-js">
-
 <head>
     <title>Marscoin Wallet</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
@@ -66,9 +65,16 @@
 
                     <div class="col-md-7 col-sm-7">
 
-
-                        @if($is_civic_wallet)
-                            <div class="alert alert-danger" role="alert">
+                        @if(!session()->has('blockchain_re-sync_dismissed'))
+                            <div class="connectivity alert alert-danger" style="display: none" role="alert">
+                                <a class="close" data-dismiss="alert" href="#" onclick="dismissAlert('blockchain_re-sync_dismissed')" aria-hidden="true">×</a>
+                                <i class="fa fa-spinner fa-spin fa-fw"></i>
+                                Blockchain connection re-sycing.
+                            </div>
+                        @endif
+                        @if($is_civic_wallet && !session()->has('passport_wallet_dismissed'))
+                            <div class="alert alert-info" role="alert">
+                                <a class="close" data-dismiss="alert" href="#" onclick="dismissAlert('passport_wallet_dismissed')" aria-hidden="true">×</a>
                                 You are currently viewing your Passport Wallet used for civic functions.
                             </div>
                         @endif
@@ -483,10 +489,28 @@
     <script src="/assets/wallet/js/demos/table_demo.js"></script>
     <script src="/assets/wallet/js/plugins/scan/qrcode.min.js"></script>
     <script type="text/javascript">
+    $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+    });  
+    function dismissAlert(type) {
+        $.ajax({
+            url: '/api/dismiss',
+            type: 'POST',
+            data: {
+                alertType: type
+            },
+            success: function() {
+                console.log('Alert dismissed');
+            },
+            error: function() {
+                console.log('Error dismissing alert');
+            }
+        });
+    }
+
         $(document).ready(function() {
-            // ================================================================
-            // ================================================================
-            // CONSTANTS....
             const unlockedWallet = localStorage.getItem("key")
 
             if(!unlockedWallet)
@@ -498,13 +522,24 @@
                 console.log("Wallet found.")
 
 
-
-
             let cur_currency = "MARS";
-            var mars_price = "{{ $mars_price }}";
+            var mars_price = 0;
 
-            // ================================================================
-            // ================================================================
+            $.ajax({
+                url: '/api/price',
+                type: 'POST',
+                data: {
+                },
+                success: function(data) {
+                    var mars_price = parseFloat(data.mars_price);
+                    console.log("Mars price: ", mars_price);
+                    $('.connectivity').hide();
+                },
+                error: function() {
+                    console.log('Error fetching Mars price');
+                    $('.connectivity').show();
+                }
+            });
 
             const decryptWallet = (seed) => {
                 //  console.log(seed)
@@ -513,20 +548,6 @@
             }
             const encrypted_seed = "{{ $encrypted_seed }}"
             decryptWallet(encrypted_seed)
-
-
-            // ================================================================
-            // ================================================================
-            // handle
-
-
-
-
-
-
-            //=================================================================
-            //=================================================================
-            // Conversion rate
 
             $(".input-placeholder").on('input', (e) => {
 
@@ -546,15 +567,8 @@
             }
 
 
-
-
-            //=================================================================
-            //=================================================================
-            // Switch Currencies MARS <--> USD
             $('.exchange').click(() => {
                 toggleCurrency()
-
-
             })
 
             function toggleCurrency() {
@@ -594,10 +608,6 @@
                 }
 
             }
-
-            //=================================================================
-            //=================================================================
-            // COPY ADDRESS TO CLIPBOARD
 
             $(".copy-icon").click(() => {
                 copyClipboard()
@@ -700,31 +710,31 @@
 
                 // Handle Input for Tx
                 if (addy && amount && m && len) {
+                    $.ajax({
+                        url: `/api/balance/${addy}`, 
+                        type: 'GET',
+                        success: function(balance) {
+                            balance = parseFloat(balance.balance);
+                            amount = parseFloat(amount);
 
-                    if ("{{ $balance }}" > parseFloat(amount)) {
-                        $("#address-error").hide()
-                        $("#amount-error").hide()
-                        $("#send-preconfirm").attr("href", "#basicModal")
-                    } else {
-                        $("#insufficient-error").show()
-                    }
-
+                            if (balance > amount) {
+                                $("#address-error, #amount-error, #insufficient-error").hide();
+                                $("#send-preconfirm").attr("href", "#basicModal");
+                            } else {
+                                $("#insufficient-error").show();
+                            }
+                        },
+                        error: function() {
+                            // Handle API error (e.g., balance fetch failed)
+                            console.log('Error fetching balance');
+                            // You might want to show an error message to the user here
+                        }
+                    });
                 } else {
-                    $("#amount-error").show()
-                    $("#address-error").show()
-                    $("#send-preconfirm").attr("href", "")
-                }
-
-                if (!addy || !m || !len) {
-                    $("#address-error").show()
-                } else {
-                    $("#address-error").hide()
-                }
-
-                if (!amount) {
-                    $("#amount-error").show()
-                } else {
-                    $("#amount-error").hide()
+                    // Handle invalid input
+                    $("#send-preconfirm").attr("href", "");
+                    $("#address-error").toggle(!addy || !m || !len);
+                    $("#amount-error").toggle(!amount);
                 }
 
 

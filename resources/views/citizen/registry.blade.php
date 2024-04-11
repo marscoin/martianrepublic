@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
     <title>Marscoin Wallet</title>
@@ -19,8 +18,6 @@
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="stylesheet" href="/assets/wallet/js/plugins/fileupload/bootstrap-fileupload.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <link rel="stylesheet" href="/assets/wallet/js/plugins/magnific/magnific-popup.css">
     <script>var current_blob = null;</script>
     @livewireStyles
@@ -135,6 +132,37 @@ function imgError(image) {
     image.src = "/assets/citizen/generic_profile.jpg";
     return true;
 }
+
+function rejectApplication(userId, causeOfRejection) 
+{
+
+    if (!confirm('This is only available to Citizens. Are you sure you want to reject this application? A public entry will be posted in the Forum.')) {
+        return; // Stop if user does not confirm
+    }
+    const postData = {
+        applicantUserId: userId,
+        field: causeOfRejection
+    };
+
+    fetch('/api/rejection', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        body: JSON.stringify(postData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle response data
+        console.log('Success:', data);
+        location.reload();
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
 
 $(document).ready(function() {
 
@@ -446,36 +474,6 @@ $("#confirm-endorse-btn").click(async (e)=>
     }
 
 })
-
-
-function rejectApplication(userId, causeOfRejection) {
-
-    if (!confirm('This is only available to Citizens. Are you sure you want to reject this application? A public entry will be posted in the Forum.')) {
-        return; // Stop if user does not confirm
-    }
-    const postData = {
-        applicantUserId: userId,
-        field: causeOfRejection
-    };
-
-    fetch('/api/rejection', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(postData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Handle response data
-        console.log('Success:', data);
-        // Optionally, update the UI to reflect the rejection
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
-}
-
 
 
 

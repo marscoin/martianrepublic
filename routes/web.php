@@ -104,6 +104,6 @@ Route::post('/api/cacheproposal', 'Wallet\ApiController@cacheproposal');
 Route::post('/api/cacheonboarding', 'Wallet\ApiController@cacheonboarding');
 Route::post('/api/removelog', 'Wallet\ApiController@removepinlog');
 Route::post('/api/rejection', 'Wallet\ApiController@rejectApplication');
-
-
-
+Route::post('/api/balance', 'Wallet\ApiController@getBalance');
+Route::post('/api/price', 'Wallet\ApiController@getPrice');
+Route::post('/api/dismiss', 'Wallet\ApiController@dismissAlert');

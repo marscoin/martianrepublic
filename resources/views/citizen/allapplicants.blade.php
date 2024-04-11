@@ -36,7 +36,15 @@ use App\Includes\AppHelper;
                 });
                 
                 
-                foreach($everyApplicant as $apps) { ?>
+                foreach($everyApplicant as $apps) { 
+                    $missing_fields = [];
+                    if (empty($apps->firstname)) $missing_fields[] = "Firstname";
+                    if (empty($apps->lastname)) $missing_fields[] = "Lastname";
+                    if (empty($apps->displayname)) $missing_fields[] = "Nickname";
+                    if (empty($apps->shortbio)) $missing_fields[] = "Bio";
+                    if (empty($apps->avatar_link)) $missing_fields[] = "Picture";
+                    if (empty($apps->liveness_link)) $missing_fields[] = "Video";
+                    ?>
                     <tr>
                         <td>
                             <img src="<?= $apps->avatar_link ?>" onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'" class="profile-avatar-img thumbnail" alt="Profile Image" style="max-height: 100px;">
@@ -46,10 +54,10 @@ use App\Includes\AppHelper;
                                 <a href="javascript:;" title="<?= $apps->fullname ?>"><?= $apps->fullname ?></a>
                                 <p><a target="_blank" href="#"><?= $apps->address ?></a></p>
 
-                                <a data-toggle="modal" href="#endorseModal" data-endorse="<?= $apps->userid ?>"  data-name="<?= $apps->fullname ?>" data-address="<?= $apps->address ?>"
+                                <a data-toggle="modal" href="#donateModal" data-donate="<?= $apps->userid ?>"  data-name="<?= $apps->fullname ?>" data-address="<?= $apps->address ?>"
                                 class="btn btn-sm btn-success">Donate Marscoin</a>
 
-                                <?php if ($isCitizen) { ?>
+                                <?php if ($isCitizen && empty($missing_fields)) { ?>
                                     <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Reject
                                     </button>
@@ -67,13 +75,6 @@ use App\Includes\AppHelper;
                         </td>
                         <td class="valign-middle">
                             <?php
-                            $missing_fields = [];
-                            if (empty($apps->firstname)) $missing_fields[] = "Firstname";
-                            if (empty($apps->lastname)) $missing_fields[] = "Lastname";
-                            if (empty($apps->displayname)) $missing_fields[] = "Nickname";
-                            if (empty($apps->shortbio)) $missing_fields[] = "Bio";
-                            if (empty($apps->avatar_link)) $missing_fields[] = "Picture";
-                            if (empty($apps->liveness_link)) $missing_fields[] = "Video";
                             if (empty($missing_fields)) {
                                 echo "All complete, awaiting notarization";
                             } else {
@@ -154,34 +155,34 @@ use App\Includes\AppHelper;
 
 </div> 
 
-<div id="endorseModal" class="modal fade dynamic-vote-modal">
+<div id="donateModal" class="modal fade dynamic-vote-modal">
   <div class="modal-dialog">
       <div class="modal-content">
           <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-              <h3 class="modal-title" id="endorse-title"></h3>
-          </div> <!-- /.modal-header -->
+              <h3 class="modal-title" id="donate-title"></h3>
+          </div>
           <div class="modal-body">
               <div class="modal-body-box">
                   <p class="modal-category"> </p>
               </div>
               <div class="modal-body-box">
                   <h5> User Address </h5>
-                  <p class="modal-description" id="endorse-address"></p>
+                  <p class="modal-description" id="donate-address"></p>
               </div>
             
               <div class="modal-body-box">
-                  <h5>Cost of Endorsement: </h5>
-                  <p class="modal-cost" id="endorse-cost"></p>
+                  <h5>Cost of Donation: </h5>
+                  <p class="modal-cost" id="donate-cost"></p>
 
                   <hr>
-                  <p>*All endorsements are permanent records on the Marscoin blockchain. A member of the public requires 10% of existing citizens or a maximum of 5 endorsements to attain citizenship status.</p>
+                  <p>* Donation of Marscoin is voluntary.</p>
               </div>
               
 
               <div class="modal-message" id="confirm-success-message" style="display: none">
                   <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
-                  <span id="modal-message-success" style="font-weight: 600; display: none;"> <i class="fa fa-check-circle"></i> Successfully Endorsed <h3></h3></span>
+                  <span id="modal-message-success" style="font-weight: 600; display: none;"> <i class="fa fa-check-circle"></i> Successfully Donated <h3></h3></span>
               </div>
               <div class="modal-message" style="display: flex; align-items: center">
                     <a  rel="noreferrer noopener"  target="_blank"  class="transaction-hash-link" href="">
@@ -191,7 +192,7 @@ use App\Includes\AppHelper;
                 </div>
             </div>
           <div class="modal-footer">
-              <button id="confirm-endorse-btn" type="submit" data-confirm data-endorse class="btn btn-primary submit-endorse">Confirm Endorsement</button>
+              <button id="confirm-donate-btn" type="submit" data-confirm data-donate class="btn btn-primary submit-donate">Confirm Donation</button>
               <img src="/assets/citizen/loading.gif" alt="enter image description here" style="display: none" id="confirm-loading">
           </div> 
       </div>

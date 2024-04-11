@@ -51,9 +51,9 @@
 
     <div class="col-md-6 col-sm-7">
 
-      <h3><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </h3>
+      <h3><?=$citcache->firstName?> <?=$citcache->lastName?> </h3>
 
-      <h5 class="text-muted"><?=$user['data']->data->shortbio?> </h5>
+      <h5 class="text-muted"><?=$citcache->shortbio?> </h5>
 
       <hr>
 

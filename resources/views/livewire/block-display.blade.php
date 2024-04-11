@@ -13,7 +13,7 @@
 <script>
     timeSinceLastBlock = 0;
     function updateTime() {
-        const minedAt = @json($this->lastBlockMinedAt->getTimestamp()); // Pass the timestamp from PHP to JS
+        const minedAt = @json($this->lastBlockMinedAt ? $this->lastBlockMinedAt->getTimestamp() : null);
         const now = Math.floor(Date.now() / 1000); // Get current timestamp in seconds
         timeSinceLastBlock = now - minedAt; // Calculate the difference in seconds
         let minutes = Math.floor(timeSinceLastBlock / 60);

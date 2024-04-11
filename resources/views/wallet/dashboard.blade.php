@@ -19,6 +19,7 @@
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    @livewireStyles
 </head>
 
 <body class=" ">
@@ -40,60 +41,9 @@
                 <div class="row">
                     <div class="col-md-4 col-sm-5">
                         <div class="portlet">
-                            <h4 class="portlet-title">
-                                <u>Daily Stats</u>
-                            </h4>
-                            <!--   <div class="alert alert-danger" role="alert">
-                Blockchain resync in process ... your balance might not reflect actual balance
-              </div>-->
-                            @if ($balance >= 5000)
-                                <div class="alert alert-danger" role="alert">
-                                    Your online wallet balance exceeds 5000 MARS. Please store them safely offline.
-                                </div>
-                            @endif
-                            <div class="portlet-body">
-                                <p>Quick overview over your Marscoin account.</p>
-                                <hr>
-                                <table class="table keyvalue-table">
-                                    <tbody>
-                                        <tr>
-                                            <td class="kv-key"><i title="{{ $public_addr }}"
-                                                    class="fa fa-money kv-icon kv-icon-primary"></i> Balance</td>
-                                            <td class="kv-value">♂ <span
-                                                    id="balance">{{ number_format($balance ?? '', 4) }}</span> MARS
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="kv-key"><i
-                                                    class="fa fa-angle-double-right kv-icon kv-icon-secondary"></i>
-                                                Received</td>
-                                            <td class="kv-value">♂ <span
-                                                    id="received">{{ number_format($received, 4) }}</span> MARS</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="kv-key"><i
-                                                    class="fa fa-angle-double-left kv-icon kv-icon-tertiary"></i>Sent
-                                            </td>
-                                            <td class="kv-value">♂ <span
-                                                    id="sent">{{ number_format($sent, 4) }}</span> MARS</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="kv-key"><a href="/forum"><i class="fa  fa-wechat kv-icon kv-icon-default"></i> Forum Recently</a></td>
-                                            <td class="kv-value">{{$forum_count}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="kv-key"><a href="/congress/voting"><i class="fa fa-bank kv-icon kv-icon-default"></i> Open Proposals</a></td>
-                                            <td class="kv-value">{{$proposal_count}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="kv-key"><a href="/citizen/all"><i class="fa  fa-universal-access kv-icon kv-icon-default"></i> Citizen Status</a></td>
-                                            <td class="kv-value">{{$citizen_status}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div> <!-- /.portlet-body -->
-                        </div> <!-- /.portlet -->
-                    </div> <!-- /.col -->
+                            @livewire('dashboard-stats')
+                        </div> 
+                    </div> 
                     <div class="col-md-8 col-sm-7">
                         <div class="portlet">
 
@@ -109,10 +59,9 @@
                                 <hr>
 
                                 <div class="portlet-body">
-                                <!-- <canvas id="balanceChart" style="width: 100%; height: 260px;"></canvas> -->
-
+                                
                                 <div id="chart"></div>
-                                </div> <!-- /.portlet-body -->
+                                </div> 
                             @else
                                 @if ($has_civic_wallet || $has_wallet)
                                     <div>
@@ -215,12 +164,10 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="portlet">
-                            <h4 class="portlet-title">
-                                <u>Your balance / MARS Circulation</u>
-                            </h4>
-                            <div class="portlet-body">
-                                <div id="pie-chart" class="chart-holder-250"></div>
-                            </div> <!-- /.portlet-body -->
+
+                            @livewire('hodler-stats')
+
+                            
                         </div> <!-- /.portlet -->
                     </div> <!-- /.col -->
                     <div class="col-md-5">
@@ -284,6 +231,12 @@
     @endif
     <script>
 
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+
 function calculateRunningBalanceWithoutFees(jsonData, address) {
     // Parse the JSON data
     var balanceData = [];
@@ -339,73 +292,31 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
 
 
 
-        $(document).ready(function() {
-            var mars_price = '{{ $mars_price }}';
+        $(document).ready(function() 
+        {
+            var mars_price = 0;
             var lastdate = 10000000000;
             var firstdate = 0;
             var d1 = [],
                 d2 = [];
 
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            var mars_price = 0;
+
+            $.ajax({
+                url: '/api/price',
+                type: 'POST',
+                data: {
+                },
+                success: function(data) {
+                    var mars_price = parseFloat(data.mars_price);
+                    console.log("Mars price: ", mars_price);
+                    $('.connectivity').hide();
+                },
+                error: function() {
+                    console.log('Error fetching Mars price');
+                    $('.connectivity').show();
                 }
             });
-
-            var data, chartOptions
-
-            data = [{
-                    label: "Global Marscoin ({{ number_format($coincount) }}) MARS",
-                    data: Math.floor({{ $coincount }})
-                },
-                {
-                    label: "Your holdings ({{ number_format($balance) }}) MARS",
-                    data: Math.floor({{ $balance }})
-                }
-            ]
-
-            chartOptions = {
-                series: {
-                    pie: {
-                        show: true,
-                        innerRadius: 0,
-                        stroke: {
-                            width: 4
-                        }
-                    }
-                },
-                legend: {
-                    show: false,
-                    position: 'ne'
-                },
-                tooltip: true,
-                tooltipOpts: {
-                    content: '%s: %y'
-                },
-                grid: {
-                    hoverable: true
-                },
-                colors: mvpready_core.layoutColors
-            }
-
-            var holder = $('#pie-chart')
-
-            if (holder.length) {
-                $.plot(holder, data, chartOptions)
-            }
-
-
-
-            // $.post("/api/getTransactions", {
-            //     "address": '<?= $public_addr ?>'
-            // }, function(data) {
-            //         if (data) {
-            //             console.log("Full balance so far:")
-            //             console.log(calculateRunningBalanceWithoutFees(data, '<?= $public_addr ?>'));
-            //         }
-            //     }
-            // );
-
 
             $.post("/api/getTransactions", {
                 "address": '<?= $public_addr ?>'
@@ -557,10 +468,11 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
                     var options = {
                     series: [{
                         name: 'Balance',
-                        data: seriesData
+                        data: seriesData,
+                        color: '#d74b4b',
                     }],
                     chart: {
-                        type: 'line',
+                        type: 'area',
                         height: 350,
                         zoom: {
                         enabled: false
@@ -661,6 +573,7 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
 
         });
     </script>
+    @livewireScripts
 </body>
 
 </html>
