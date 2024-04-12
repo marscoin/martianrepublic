@@ -39,11 +39,6 @@
     <div id="wrapper">
         <header class="navbar navbar-inverse" role="banner">
             <div class="container">
-
-
-
-
-
                 <div class="navbar-header">
                     @include('wallet.header')
                 </div>
@@ -1309,9 +1304,6 @@
         };
 
 
-        // $(".download-wallet").click(() => {
-        //     console.log("downloading...")
-        // })
     </script>
 
 @livewireScripts    

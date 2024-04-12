@@ -49,7 +49,6 @@ class CongressController extends Controller
 				}
 			}
 			$view = View::make('congress.dashboard');
-			$view->balance = 0; //for now, could move to stats helper function as well
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->wallet_open = $profile->civic_wallet_open;
@@ -70,9 +69,10 @@ class CongressController extends Controller
 			$startTime = microtime(true);
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
-			$proposals = DB::table('proposals')->leftJoin('ballots', 'proposals.id', '=', 'ballots.proposalid')->select('proposals.*', 'ballots.btxid', 'ballots.proposalid')->where('active', '=', '1')->get();
-
+			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
+			$proposals = DB::table('proposals')->select('proposals.*')->where('active', '=', '1')->get();
+			$oldproposals = DB::table('proposals')->select('proposals.*')->where('active', '=', '0')->get();
+			
 			$endTime = microtime(true);
     		$executionTime = $endTime - $startTime;
     		Log::info("Execution time: {$executionTime} seconds");
@@ -84,12 +84,15 @@ class CongressController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
+			//check if any proposals have expired... if so, archive.
+			Proposals::where(DB::raw('DATE_ADD(mined, INTERVAL duration DAY)'), '<', now())
+        ->update(['active' => 0]);
 
 			$endTime = microtime(true);
     		$executionTime = $endTime - $startTime;
     		Log::info("Execution time2: {$executionTime} seconds");
 
-			if(AppHelper::getCitizenStatus($uid)->type != "CT"){
+			if(!$profile->citizen){
 				$view = View::make('congress.noteligableyet');
 			}else{
 				$view = View::make('congress.voting');
@@ -97,38 +100,19 @@ class CongressController extends Controller
 
 			$endTime = microtime(true);
     		$executionTime = $endTime - $startTime;
-    		Log::info("Execution time3: {$executionTime} seconds");
-			
-			if ($wallet) {
-				$view->balance = AppHelper::getMarscoinBalance($wallet->public_addr);
-				$view->public_address = $wallet->public_addr;
-			} else {
-				$view->balance = 0;
-			}
-
-			$endTime = microtime(true);
-    		$executionTime = $endTime - $startTime;
     		Log::info("Execution time4: {$executionTime} seconds");
 
 			$view->proposals = $proposals;
+			$view->oldproposals = $oldproposals;
 			$view->fullname = Auth::user()->fullname;
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->wallet_open = $profile->civic_wallet_open;
-
+			$view->public_address = $civic_wallet->public_addr;
 			$endTime = microtime(true);
     		$executionTime = $endTime - $startTime;
     		Log::info("Execution time4a: {$executionTime} seconds");
 
-			$view->network = AppHelper::getMarscoinNetworkInfo();
-
-			$endTime = microtime(true);
-    		$executionTime = $endTime - $startTime;
-    		Log::info("Execution time4b: {$executionTime} seconds");
-			
-			$endTime = microtime(true);
-    		$executionTime = $endTime - $startTime;
-    		Log::info("Execution time5: {$executionTime} seconds");
 
 			return $view;
 		}else{

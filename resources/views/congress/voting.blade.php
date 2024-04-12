@@ -249,16 +249,16 @@ img.payment {
                             <li class="active">
                                 <a href="#Active" data-toggle="tab">Active</a>
                             </li>
-
-                            <li class="">
-                                <a href="#All" data-toggle="tab">All</a>
-                            </li>
-
                             <li class="">
                                 <a href="#New-Proposal" data-toggle="tab">New Proposal</a>
                             </li>
+                            <li class="">
+                                <a href="#Archived" data-toggle="tab">Archived</a>
+                            </li>
+                            <li class="">
+                                <a href="#All" data-toggle="tab">All</a>
+                            </li>
                         </ul>
-                        <a class="archival pull-right" style="margin-top: -80px" href="#" target="_blank"><i class="fa fa-hdd-o"></i>Archives</a>
                         <div id="myTab1Content" class="tab-content" style="margin-top: 50px;">
 
                             <div class="tab-pane fade active in" id="Active">
@@ -266,6 +266,9 @@ img.payment {
                             </div> 
                             <div class="tab-pane fade" id="All">
                                 @include('congress.allproposals')
+                            </div> 
+                            <div class="tab-pane fade" id="Archived">
+                                @include('congress.archivedproposals')
                             </div> 
                             <?php if($isCitizen){?>
                                 <div class="tab-pane fade" id="New-Proposal">
@@ -490,10 +493,34 @@ $(document).ready(function() {
         let desc = $(".modal-description").text(simplemde.value())
         let config = $(".modal-configuration").text($("#" + $("#preset").val() + "-descriptor").text())
         let category = $(".modal-category").text($("#preset").val())
+        var balance = 0;
+        const fee = 0.1;
 
-        const fee = 1;
+        // Handle Input for Tx
+        if ('<?=$public_address?>') {
+            $.ajax({
+                url: "/api/balance/'<?=$public_address?>'", 
+                type: 'GET',
+                success: function(balance) {
+                    balance = parseFloat(balance.balance);
+                    amount = parseFloat(amount);
 
-        if ("{{ $balance }}" < fee) {
+                    if (balance > amount) {
+                        console.log("Sufficient funds in civic wallet...")
+                    } else {
+                        console.log("Insufficient funds...")
+                    }
+                },
+                error: function() {
+                    console.log('Error fetching balance');
+                }
+            });
+        } else {
+            // Handle invalid input
+            console.log("Error getting balance...");
+        }
+
+        if (balance < fee) {
             $("#submit-proposal").prop("disabled", true)
             $("#modal-message-error").text("Not enough MARS to submit proposal")
             $(".modal-message").show()
@@ -551,6 +578,7 @@ $(document).ready(function() {
                             const data = await doAjax("/api/cacheproposal", {"type": "PR", "txid": tx.tx_hash, message: jsonString, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
                             if(data.Discussion){
                                 //if(!alert('Submitted to Blockchain successfully')){location.href = '/forum/'+data.Discussion;}
+                                console.log('Submitted to Blockchain successfully redirect to /forum/'+data.Discussion)
                             }
                         }
                     } catch (e) {
@@ -717,9 +745,6 @@ const handleError = () => {
     console.log("PANIC AN ERROR!!!!!!!!")
 }
 
-//===============================================================================
-//===============================================================================
-// API CALLS
 
 const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
     // Default options are marked with *

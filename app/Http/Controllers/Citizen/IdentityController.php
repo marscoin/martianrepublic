@@ -70,7 +70,7 @@ class IdentityController extends Controller
 			$view->recentActivityCount = Feed::where('userid', $uid)->where('mined', '>=', Carbon::now()->subDay())->count();
 
 			if ($wallet) {
-				$view->balance = 0;// AppHelper::getMarscoinBalance($wallet['public_addr']);
+				$view->balance = 0;
 				$view->public_address = $wallet['public_addr'];
 				$view->endorsed = Feed::where('message', '=', $wallet['public_addr'])->where('tag', '=', "ED")->get();
 			} else {
@@ -78,17 +78,6 @@ class IdentityController extends Controller
 				$view->public_address = "";
 			}
 
-			// if($profile->general_public )
-			// {
-			// 	try
-			// 	{
-			// 		$view->user = AppHelper::getUserFromCache($wallet['public_addr']);
-			// 	}
-			// 	catch(Exception $e) {
-			// 		$view->user = AppHelper::addUserToLocalCache($wallet['public_addr']);
-			// 		$view->user = AppHelper::getUserFromCache($wallet['public_addr']);
-			// 	}
-			// }
 			return $view;
 
 

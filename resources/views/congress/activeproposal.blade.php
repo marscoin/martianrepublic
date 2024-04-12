@@ -2,7 +2,11 @@
 <div class="row">
   <div class="col-md-9">
 
-
+  @if ($proposals->isEmpty())
+    <div class="alert alert-info">
+        Currently no active proposals underway. Consider launching a new proposal!
+    </div>
+@else
 @foreach ($proposals as $proposal)
     <div class="feed-item feed-item-idea">
 
@@ -262,7 +266,7 @@
 
     </div>
 @endforeach
-
+@endif
   </div>
   <div class="col-md-3">
         <p>The <b>Martian Congressional Republic</b> consists of known <a href="/citizen/all">citizens</a> who discuss public matters ("res publica") in an open and transparent way. They vote on changes - including the very code that runs this application ("<b>The Constitution</b>") - in an equally transparent yet fully anonymous way. Every vote is cryptographically secured and can be audited by everyone. </p> 
