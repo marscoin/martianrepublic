@@ -5,7 +5,7 @@
         <h2>{{ trans('forum::threads.recent') }}</h2>
 
         @if (! $threads->isEmpty())
-            <div class="threads list-group my-3 shadow-sm">
+            <div class="threads list-group my-3">
                 @foreach ($threads as $thread)
                     @include ('forum::thread.partials.list')
                 @endforeach

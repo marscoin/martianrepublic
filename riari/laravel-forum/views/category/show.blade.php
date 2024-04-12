@@ -57,7 +57,7 @@
                     @endcan
                 @endif
 
-                <div class="threads list-group my-3 shadow-sm">
+                <div class="threads list-group my-3">
                     @foreach ($threads as $thread)
                         @include ('forum::thread.partials.list')
                     @endforeach
@@ -170,22 +170,22 @@
     <style>
     .list-group.threads .list-group-item
     {
-        border-left-width: 2px;
+        border-left-width: 2px; margin-bottom: 20px;
     }
 
     .list-group.threads .list-group-item.locked
     {
-        border-left-color: var(--bs-yellow);
+        border-left-color: var(--bs-yellow); margin-bottom: 20px;
     }
 
     .list-group.threads .list-group-item.pinned
     {
-        border-left-color: var(--bs-cyan);
+        border-left-color: var(--bs-cyan); margin-bottom: 20px;
     }
 
     .list-group.threads .list-group-item.deleted
     {
-        border-left-color: var(--bs-red);
+        border-left-color: var(--bs-red); margin-bottom: 20px;
         opacity: 0.5;
     }
     </style>

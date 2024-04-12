@@ -1,4 +1,4 @@
-<div style="padding-left: 50px;" class="list-group-item {{ $thread->pinned ? 'pinned' : '' }} {{ $thread->locked ? 'locked' : '' }} {{ $thread->trashed() ? 'deleted' : '' }}" :class="{ 'border-primary': selectedThreads.includes({{ $thread->id }}) }">
+<div style="padding-left: 50px; margin-bottom: 20px;" class="list-group-item {{ $thread->pinned ? 'pinned' : '' }} {{ $thread->locked ? 'locked' : '' }} {{ $thread->trashed() ? 'deleted' : '' }}" :class="{ 'border-primary': selectedThreads.includes({{ $thread->id }}) }" >
     <div class="row align-items-center text-left">
         <div class="col-sm text-md-start">
             <span class="lead">
