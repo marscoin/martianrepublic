@@ -102,89 +102,71 @@ class IdentityController extends Controller
 
 	protected function printout()
 	{
-		
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
 			$view = View::make('citizen.printout');
-			$view->fullname = Auth::user()->fullname;
+			$citcache = Citizen::where('userid', '=', $uid)->first();
+			$view->fullname = $citcache->firstname . " " . $citcache->lastname;
 			
-			if ($wallet) {
-				$view->balance = AppHelper::getMarscoinBalance($wallet->public_addr);
-				$view->public_address = $wallet['public_addr'];
+			if ($civic_wallet) {
+				$view->public_address = $civic_wallet['public_addr'];
 			} else {
 				$view->balance = 0;
 				$view->public_address = "";
 			}
-			
 			return $view;
-
-
 		}else{
             return redirect('/login');
         }
-
-		
 	}
 
 
 	protected function printout2()
 	{
-		
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
 			$view = View::make('citizen.themes.printout2');
-			$view->fullname = Auth::user()->fullname;
+			$citcache = Citizen::where('userid', '=', $uid)->first();
+			$view->fullname = $citcache->firstname . " " . $citcache->lastname;
 			
-			if ($wallet) {
-				$view->balance = AppHelper::getMarscoinBalance($wallet->public_addr);
-				$view->public_address = $wallet['public_addr'];
+			if ($civic_wallet) {
+				$view->public_address = $civic_wallet['public_addr'];
 			} else {
 				$view->balance = 0;
 				$view->public_address = "";
 			}
-			
 			return $view;
-
-
 		}else{
             return redirect('/login');
         }
-
-		
 	}
 
 
 
 	protected function printout3()
 	{
-		
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
 			$view = View::make('citizen.themes.printout3');
-			$view->fullname = Auth::user()->fullname;
+			$citcache = Citizen::where('userid', '=', $uid)->first();
+			$view->fullname = $citcache->firstname . " " . $citcache->lastname;
 			
-			if ($wallet) {
-				$view->balance = AppHelper::getMarscoinBalance($wallet->public_addr);
-				$view->public_address = $wallet['public_addr'];
+			if ($civic_wallet) {
+				$view->public_address = $civic_wallet['public_addr'];
 			} else {
 				$view->balance = 0;
 				$view->public_address = "";
 			}
-			
 			return $view;
-
-
 		}else{
             return redirect('/login');
         }
-
-		
 	}
 
 

@@ -12,11 +12,13 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
   <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/landing/css/font-awesome.min.css">
+  <!-- <link rel="stylesheet" href="/assets/landing/css/font-awesome.min.css"> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="/assets/landing/css/bootstrap.min.css">
   <link href="/assets/landing/css/mvpready-landing.css" rel="stylesheet">
   <link href="/assets/landing/css/mvpready-flat.css" rel="stylesheet">
   <link href="/assets/landing/css/animate.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="shortcut icon" href="/assets/favicon.ico">
   <style>
     .mini-feature-title{
@@ -74,30 +76,44 @@
         <ul class="nav navbar-nav navbar-social navbar-left">
 
           <li>
-            <a target="_blank" href="http://facebook.com/marscoin" class="ui-tooltip" title="Facebook" data-placement="bottom">
-              <i class="fa fa-facebook"></i>
+            <a target="_blank" href="https://facebook.com/marscoin" class="ui-tooltip" title="Facebook" data-placement="bottom">
+            <i class="fa-brands fa-facebook"></i>
               <span class="navbar-social-label">Facebook</span>
             </a>
           </li>
 
           <li>
-            <a target="_blank" href="http://twitter.com/marscoinorg" class="ui-tooltip" title="Twitter" data-placement="bottom">
-              <i class="fa fa-twitter"></i>
+            <a target="_blank" href="https://twitter.com/marscoinorg" class="ui-tooltip" title="Twitter" data-placement="bottom">
+            <i class="fa-brands fa-x-twitter"></i>
               <span class="navbar-social-label">Twitter</span>
             </a>
           </li>
 
           <li>
             <a target="_blank" href="https://discord.gg/6vVKH6QdYb" class="ui-tooltip" title="Discord" data-placement="bottom">
-              <i class="fa fa-github-alt"></i>
+            <i class="fa-brands fa-discord"></i>
               <span class="navbar-social-label">Discord</span>
             </a>
           </li>
 
           <li>
             <a target="_blank" href="https://reddit.com/r/marscoin" class="ui-tooltip" title="Reddit" data-placement="bottom">
-              <i class="fa fa-reddit"></i>
+            <i class="fa-brands fa-reddit"></i>
               <span class="navbar-social-label">Reddit</span>
+            </a>
+          </li>
+
+          <li>
+            <a target="_blank" href="https://github.com/marscoin/martianrepublic" class="ui-tooltip" title="Reddit" data-placement="bottom">
+            <i class="fa-brands fa-github"></i>
+              <span class="navbar-social-label">Github</span>
+            </a>
+          </li>
+
+          <li>
+            <a target="_blank" href="https://app.gitter.im/#/room/#marscoin-dev_community:gitter.im" class="ui-tooltip" title="Reddit" data-placement="bottom">
+            <i class="fa-brands fa-gitter"></i>
+              <span class="navbar-social-label">Gitter</span>
             </a>
           </li>
 
@@ -159,7 +175,7 @@
                   <h1 class="masthead-title">The Martian Congressional Republic </h1>
 
                   <p class="masthead-">
-                  a decentralized, transparent, auditable peer-to-peer governance platform for early Martian settlement.
+                  a decentralized, transparent, auditable peer-to-peer governance platform for early Mars settlement.
                   </p>
 
                   <br>
@@ -336,7 +352,7 @@
 
         <div class="row">
 
-          <div class="mini-feature">
+          <div class="mini-feature" data-aos="fade-down" data-aos-duration="1000">
             <i class="fa fa-gears mini-feature-icon text-secondary"></i>
 
             <div class="mini-feature-text">
@@ -348,14 +364,14 @@
           <div class="mini-feature">
             <i class="fa fa-users mini-feature-icon text-secondary"></i>
 
-            <div class="mini-feature-text">
+            <div class="mini-feature-text" data-aos="fade-down" data-aos-duration="1000">
               <h5 class="mini-feature-title">Mars Citizen Registry</h5>
 
               <p>The Martian Citizen Registry is an on-chain "proof of humanity" registry using decentralized and cryptographically secured file storage to create a private/public identity attestation system.</p>
             </div>
           </div> <!-- /.mini-feature -->
 
-          <div class="mini-feature">
+          <div class="mini-feature" data-aos="fade-down" data-aos-duration="1000">
             <i class="fa fa-bank mini-feature-icon text-secondary"></i>
 
             <div class="mini-feature-text">
@@ -369,7 +385,7 @@
 
         <div class="row">
 
-          <div class="mini-feature">
+          <div class="mini-feature" data-aos="fade-up" data-aos-duration="1000">
             <i class="fa fa-database mini-feature-icon text-secondary"></i>
 
             <div class="mini-feature-text">
@@ -378,7 +394,7 @@
             </div>
           </div> <!-- /.mini-feature -->
 
-          <div class="mini-feature">
+          <div class="mini-feature" data-aos="fade-up" data-aos-duration="1000">
             <i class="fa fa-book mini-feature-icon text-secondary"></i>
 
             <div class="mini-feature-text">
@@ -388,7 +404,7 @@
             </div>
           </div> <!-- /.mini-feature -->
 
-          <div class="mini-feature">
+          <div class="mini-feature" data-aos="fade-up" data-aos-duration="1000">
             <i class="fa fa-globe mini-feature-icon text-secondary"></i>
 
             <div class="mini-feature-text">
@@ -405,7 +421,7 @@
 
 
         <div class="row">
-          <div class="col-sm-6 col-sm-push-6">
+          <div class="col-sm-6 col-sm-push-6 " data-aos="fade-in">
             <h4 class="mini-feature-title">
               <span>About The Martian Congressional Republic</span>
             </h4>
@@ -413,11 +429,11 @@
             <p class="lead lead-small">This open source code itself <i>is</i> the constitution. It uses the Marscoin blockchain to immutably anchor data and allows all Martian citizens to directly vote on how their Republic evolves.</p>
             <p class="lead lead-small">Unlike token based projects, The Martian Congress is formed by individuals whose identity is known and who openly participate in discussion but vote cryptographically secured and anonymously.</p>
             <br>
-            <a href="/signup" class="btn btn-default">Join the Martian Republic</a>
+            <a data-aos="fade-up" data-aos-delay="150" href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
           <div class="col-sm-6 col-sm-pull-6 text-center">
             <br><br>
-            <img class="img-responsive figure-shadow center-block shadow-lg" src="/assets/citizen/mars_flag5.png" >
+            <img  data-aos="fade-right" class="img-responsive figure-shadow center-block shadow-lg" src="/assets/citizen/mars_flag5.png" >
             <p style="font-size: 10px; text-align: left;" class="small">Fictional fan-made Mars flag from the Sci-Fi show "The Expanse" by James S. A. Corey. The Expanse portraits Mars as a sophisticated and technologically advanced society in which governance is closely and intimiately directed by self-empowered citizens.</p>
           </div> 
         </div> 
@@ -425,9 +441,9 @@
         <div class="row">
            <div class="col-sm-6 col-sm-push-6 text-center">
             <br><br>
-            <img class="img-responsive figure-shadow center-block shadow-lg" src="/assets/citizen/mars_flag4.jpg" >
+            <img data-aos="fade-left" class="img-responsive figure-shadow center-block shadow-lg" src="/assets/citizen/mars_flag4.jpg" >
           </div>
-          <div class="col-sm-6 col-sm-pull-6">
+          <div class="col-sm-6 col-sm-pull-6" data-aos="fade-in">
             <h4 class="mini-feature-title">
               <span>Join the Martian Republic, citizen!</span>
             </h4>
@@ -435,14 +451,14 @@
             <p class="lead lead-small">As forward looking and technology friendly Mars enthusiasts we believe that blockchain technology presents a unique opportunity to improve upon current indirect methods of cooperation.</p>
             <p class="lead lead-small">This open source reference implementation is our proposal to take the advantages and advances in cryptography allowing direct citizen participation and experiment and form our community prior to settling Mars.</p>
             <br>
-            <a href="/signup" class="btn btn-default">Join the Martian Republic</a>
+            <a data-aos="fade-up" data-aos-delay="150" href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
         </div> 
 
         <div class="row-divider divider-wider"></div> <!-- /.row-divider -->
 
         <div class="row">
-          <div class="col-sm-6 col-sm-push-6">
+          <div class="col-sm-6 col-sm-push-6" data-aos="fade-in">
             <h4 class="mini-feature-title">
               <span>Built-in HD non-custodial wallet</span>
             </h4>
@@ -451,11 +467,11 @@
             <p>A seed phrase thus generated can also be used to regain access to a previously created wallet.</p>
             <p>Basic receive and send functions allow users to receive and send Marscoin to other participants in the network.</p>
             <br>
-            <a href="/signup" class="btn btn-default">Join the Martian Republic</a>
+            <a data-aos="fade-up" data-aos-delay="150" href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
           <div class="col-sm-6 col-sm-pull-6 text-center">
             <br><br>
-            <img class="img-responsive figure-shadow center-block shadow-lg" src="/assets/wallet/img/marscoin_wallet.png" >
+            <img data-aos="fade-right" class="img-responsive figure-shadow center-block shadow-lg" src="/assets/wallet/img/marscoin_wallet.png" >
           </div> 
         </div> 
 
@@ -467,9 +483,9 @@
         <div class="row">
            <div class="col-sm-6 col-sm-push-6 text-center">
             <br><br>
-            <img class="img-responsive figure-shadow center-block shadow-lg" src="/assets/citizen/registry_screenshot.png" >
+            <img data-aos="fade-left" class="img-responsive figure-shadow center-block shadow-lg" src="/assets/citizen/registry_screenshot.png" >
           </div>
-          <div class="col-sm-6 col-sm-pull-6">
+          <div class="col-sm-6 col-sm-pull-6" data-aos="fade-in">
             <h4 class="mini-feature-title">
               <span>Proof-of-Humanity Martian Voter Registry</span>
             </h4>
@@ -477,7 +493,7 @@
             <p class="">It comes with a community driven identity attestation service in which an initial community dictates the terms to invite new members to join their group using clear programmatic guidelines that future proposal can modify, allowing a virtuous feedback loop in which the community is allowed to integrate new members.</p>
             <p class="">We start out with a basic user submission form and liveness-test which could be further improved with kiosk-style self service terminals (upon arrival on Mars, for instance). After an initial registration the users are vetted by the community itself and integrated into the general public.</p>
             <br>
-            <a href="/signup" class="btn btn-default">Join the Martian Republic</a>
+            <a data-aos="fade-up" data-aos-delay="150" href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
         </div> 
 
@@ -486,7 +502,7 @@
 
 
         <div class="row">
-          <div class="col-sm-6 col-sm-push-6">
+          <div class="col-sm-6 col-sm-push-6" data-aos="fade-in">
             <h4 class="mini-feature-title">
               <span>Martian Congress</span>
             </h4>
@@ -495,11 +511,11 @@
             <p>Utilizing the Marscoin blockchain to timestamp proposals and identify the members of the public is part of the solution in conjuction with a public voter registry. The Martian Congress favors a transparent and intuitive solution which allows all participants to easily audit and verify the validity of the vote.</p>
             <p> By utilizing an open source model in which the code itself becomes the constitution, we opt for a server/client architecture in which citizens can initiate proposals, bills, and amendments. </p>
             <br>
-            <a href="/signup" class="btn btn-default">Join the Martian Republic</a>
+            <a data-aos="fade-up" data-aos-delay="150" href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
           <div class="col-sm-6 col-sm-pull-6 text-center">
             <br><br>
-            <img class="img-responsive figure-shadow center-block shadow-lg" src="/assets/congress/proposal_screenshot.png" >
+            <img data-aos="fade-right" class="img-responsive figure-shadow center-block shadow-lg" src="/assets/congress/proposal_screenshot.png" >
           </div> 
         </div> 
 
@@ -565,8 +581,7 @@
           <h4 class="content-title">
             <span>Martian Republic</span>
           </h4>
-
-          Is a project by the Marscoin Foundation, Inc. to further the cause of Marscoin and cryptocurrencies in space exploration.
+          Martian Republic is an initiative of the Marscoin&trade; Foundation, Inc., dedicated to advancing Marscoin and the use of blockchain technology in space exploration.
         </div> <!-- /.col -->
 
 
@@ -592,19 +607,32 @@
           <br>
 
           <ul class="footer-social-link">
-            <li>
-              <a href="javascript:;" class="ui-tooltip" title="Facebook" data-placement="bottom">
-                <i class="fa fa-facebook"></i>
+          <li>
+              <a href="https://twitter.com/marscoinorg" class="ui-tooltip" title="X" data-placement="bottom">
+              <i class="fa-brands fa-x-twitter"></i>
               </a>
             </li>
-            <li>
-              <a href="javascript:;" class="ui-tooltip" title="Twitter" data-placement="bottom">
-                <i class="fa fa-twitter"></i>
+          <li>
+              <a href="https://facebook.com/marscoin" class="ui-tooltip" title="Facebook" data-placement="bottom">
+              <i class="fa-brands fa-facebook"></i>
               </a>
             </li>
+
             <li>
-              <a href="javascript:;" class="ui-tooltip" title="Google+" data-placement="bottom">
-                <i class="fa fa-google-plus"></i>
+              <a href="https://discord.gg/6vVKH6QdYb" class="ui-tooltip" title="Discord" data-placement="bottom">
+              <i class="fa-brands fa-discord"></i>
+              </a>
+            </li>
+
+            <li>
+              <a href="https://github.com/marscoin/martianrepublic" class="ui-tooltip" title="Discord" data-placement="bottom">
+              <i class="fa-brands fa-github"></i>
+              </a>
+            </li>
+
+            <li>
+              <a href="https://app.gitter.im/#/room/#marscoin-dev_community:gitter.im" class="ui-tooltip" title="Discord" data-placement="bottom">
+              <i class="fa-brands fa-gitter"></i>
               </a>
             </li>
           </ul>
@@ -618,7 +646,7 @@
           <span>Stay Updated</span>
         </h4>
 
-        <p>Get emails about new theme launches &amp;  future updates.</p>
+        <p>Get emails about the Martian Republic &amp;  future updates.</p>
 
         <form action="/" class="form">
 
@@ -666,5 +694,9 @@
 <script src="/assets/landing/js/plugins/carouFredSel/jquery.carouFredSel-6.2.1-packed.js"></script>
 <script src="/assets/landing/js/mvpready-core.js"></script>
 <script src="/assets/landing/js/mvpready-landing.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    AOS.init();
+  </script>
 </body>
 </html>

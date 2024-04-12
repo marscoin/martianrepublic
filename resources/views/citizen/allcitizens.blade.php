@@ -22,7 +22,7 @@ use App\Includes\AppHelper;
                   </td>
                   <td class="valign-middle">
                       <a target="_blank" href="/citizen/id/<?=$ct->public_address?>" title=""><?=$ct->firstname?> <?=$ct->lastname?> </a>
-                    <p><a target="_blank" href="https://explore.marscoin.org/tx/<?=$ct->txid?>"><?=$ct->public_address?></a></p>
+                    <p><a target="_blank" href="https://explore.marscoin.org/tx/<?=$ct->txid?>"><?=substr($ct->public_address, 0, 9)?></a></p>
                   </td>
                   <td class="valign-middle"><?=$ct->mined?></td>
                   <td class="file-info valign-middle">
