@@ -75,6 +75,22 @@
 
             <h5>Please select a new password</h5>
 
+            @if (session('status'))
+                <div>
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
  <form class="form account-form" method="POST"  action="{{ route('password.update') }}">
             @csrf
 
