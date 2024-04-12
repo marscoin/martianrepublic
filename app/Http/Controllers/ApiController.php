@@ -100,7 +100,7 @@ class ApiController extends Controller
         })
         ->with(['profile', 'hdWallet' => function($query) {
             // If you only need the public_addr from HdWallet, select it specifically
-            $query->select('user_id', 'public_addr', 'endorse_cnt', 'citizen', 'has_application');
+            $query->select('user_id', 'public_addr');
         }])
         ->orderByDesc('id')
         ->paginate($perPage, ['id', 'fullname']); 
@@ -110,6 +110,9 @@ class ApiController extends Controller
                 'userid' => $user->id,
                 'fullname' => $user->fullname,
                 'address' => $user->hdWallet ? $user->hdWallet->public_addr : null,
+                'endorse_cnt' => $user->endorse_cnt, 
+                'citizen' => $user->citizen, 
+                'has_application' => $user->has_application,
             ];
         });
     

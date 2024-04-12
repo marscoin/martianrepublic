@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin-extended.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="stylesheet" href="/assets/wallet/css/jquery.steps.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link rel="shortcut icon" href="/favicon.ico">
 
@@ -86,7 +87,7 @@
                         <div class="row">
 
                             <div class="col-md-5 col-sm-7 ">
-                                <a data-toggle="modal" href="#unlockWalletModal" data-keyboard="false"
+                                <a  data-aos="fade-right" data-aos-duration="1000" data-toggle="modal" href="#unlockWalletModal" data-keyboard="false"
                                     class="wallet-card-link" data-wallet='{{ json_encode($civic_wallet, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES) }}'
                                     id={{ $civic_wallet->public_addr }}>
                                     <div class="icon-stat wallet-card">
@@ -165,7 +166,7 @@
                         @foreach ($wallets as $wallet)
                             <div class="row">
                                 <div class="col-md-5 col-sm-7">
-                                <a  data-toggle="modal" @if($wallet->wallet_type == "Imported") href="#modalLogin" @else href="#unlockWalletModal" @endif data-keyboard="false"
+                                <a data-aos="fade-right" data-aos-duration="1000" data-toggle="modal" @if($wallet->wallet_type == "Imported") href="#modalLogin" @else href="#unlockWalletModal" @endif data-keyboard="false"
                                         class="wallet-card-link" data-wallet='{{ json_encode($wallet, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES) }}'
                                         id={{ $wallet->public_addr }}>
                                         <div class="icon-stat wallet-card">
@@ -1562,7 +1563,10 @@
 <script src="/assets/wallet/js/mvpready-core.js"></script>
 <script src="/assets/wallet/js/mvpready-helpers.js"></script>
 <script src="/assets/wallet/js/mvpready-admin.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        AOS.init();
+    </script>
 @livewireScripts
 </body>
 

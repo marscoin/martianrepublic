@@ -17,8 +17,7 @@
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     @livewireStyles
 </head>
 
@@ -71,8 +70,8 @@
 
                                         <div
                                             style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                                            <h3>Connect to wallet 🚀</h3>
-                                            <a id="" type="button" class="btn-lg btn-primary "
+                                            <h3>Connect your wallet 🚀</h3>
+                                            <a data-aos="fade-up" data-aos-duration="1000" id="" type="button" class="btn-lg btn-primary "
                                                 href="/wallet/dashboard/hd">Connect
                                                 Wallet</a>
                                         </div>
@@ -229,6 +228,12 @@
     @if (count($transactions) <= 0)
         <script src="/assets/wallet/js/demos/flot/line.js"></script>
     @endif
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYk1fGKX6S2SsHywmPkrnzTZHrgiVT7GcQkLGDe2ev0aWb8zejytzS8wjo7PGEXKqJOrjQ4oORtnimIRZBtw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        AOS.init();
+    </script>
     <script>
 
 $.ajaxSetup({
