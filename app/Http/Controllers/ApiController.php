@@ -37,7 +37,7 @@ class ApiController extends Controller
                 $query->select('id', 'fullname', 'created_at')
                       ->where('id', '!=', $excludedUserIds); // Exclude the specific user by ID
             }, 'user.profile' => function ($query) {
-                $query->select('userid', 'general_public'); // Only select general_public and the foreign key
+                $query->select('userid', 'general_public', 'endorse_cnt'); // Only select general_public and the foreign key
             }, 'user.citizen' => function ($query) {
                 $query->select('userid', 'avatar_link', 'liveness_link'); // Select the userid and avatar_link
             }])
