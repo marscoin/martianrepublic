@@ -78,12 +78,10 @@
             <li><i class="icon-li fa fa-globe"></i> Awaiting Starship flight</li>
       </ul>
       <hr>
-      <br><br>
-
 
       <div id="myTabContent" class="tab-content stacked-content">
 
-          @livewire('civic-activity-feed')
+          @livewire('civic-activity-feed', ['userId' => Auth::id()])
 
           @livewire('research-activity')
 
