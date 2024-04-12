@@ -3,9 +3,9 @@
         <div class="row align-items-center text-center">
             <div style="text-align: left; padding-left: 50px; padding-top: 10px; padding-bottom: 10px;" class="col-sm text-md-start">
                 <h5 style="font-size: 25px;" class="card-title">
-                    <a href="{{ Forum::route('category.show', $category) }}" style="color: {{ $category->color }};">{{ $category->title }}</a>
+                    <a href="{{ Forum::route('category.show', $category) }}" style="color: #333333; font-family: 'Oswald';">{{ $category->title }}</a>
                 </h5>
-                <p class="card-text text-muted"><i>{{ $category->description }}</i></p>
+                <p class="card-text text-muted" style="font-family: 'Oswald';color: #999; font-weight: 500;">{{ $category->description }}</p>
             </div>
             
             <!-- <div style="text-align: left; padding-left: 90px; margin-top: 15px;"  class="col-sm text-md-end text-muted">

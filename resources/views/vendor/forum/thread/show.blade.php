@@ -3,7 +3,7 @@
 @section ('content')
     <div id="thread" class="v-thread">
         <div class="d-flex flex-column flex-md-row justify-content-between">
-            <h2 class="flex-grow-1">{{ $thread->title }}</h2>
+            <h2 style="color: #333333; font-weight: 600; font-family: 'Oswald';" class="flex-grow-1">{{ $thread->title }}</h2>
 
             <div>
                 @if (Gate::allows('deleteThreads', $thread->category) && Gate::allows('delete', $thread))
@@ -83,7 +83,7 @@
         <hr>
 
         @if ((count($posts) > 1 || $posts->currentPage() > 1) && (Gate::allows('deletePosts', $thread) || Gate::allows('restorePosts', $thread)) && count($selectablePosts) > 0)
-            <form :action="postActions[selectedPostAction]" method="POST">
+            <form :action="postActions[selectedPostAction]" method="POST" style="margin-top: -107px;">
                 @csrf
                 <input type="hidden" name="_method" :value="postActionMethods[selectedPostAction]" />
         @endif

@@ -57,7 +57,7 @@
                         <a href="{{ Forum::route('post.edit', $post) }}" class="card-link">{{ trans('forum::general.edit') }}</a>
                     @endcan
                     @can ('reply', $post->thread)
-                       <a style="float: left;" href="{{ Forum::route('post.create', $post) }}" class="card-link">{{ trans('forum::general.reply') }}</a>
+                       <a style="float: left;margin-left: 1px; margin-top: -20px;" href="{{ Forum::route('post.create', $post) }}" class="card-link">reply</a>
                     @endcan
                 @else
                     @can ('restorePosts', $post->thread)

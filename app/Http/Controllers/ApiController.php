@@ -110,9 +110,6 @@ class ApiController extends Controller
                 'userid' => $user->id,
                 'fullname' => $user->fullname,
                 'address' => $user->hdWallet ? $user->hdWallet->public_addr : null,
-                'endorse_cnt' => $user->endorse_cnt, 
-                'citizen' => $user->citizen, 
-                'has_application' => $user->has_application,
             ];
         });
     

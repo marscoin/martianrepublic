@@ -2,14 +2,14 @@
     <div class="row align-items-center text-left">
         <div class="col-sm text-md-start">
             <span class="lead">
-                <a href="{{ Forum::route('thread.show', $thread) }}" @if (isset($category))style="color: {{ $category->color }};"@endif>{{ $thread->title }}</a>
+                <a href="{{ Forum::route('thread.show', $thread) }}" @if (isset($category))style="color: #333333; font-weight: 600; font-family: 'Oswald';"@endif>{{ $thread->title }}</a>
             </span>
             <br>
             {{ $thread->authorName }} <span class="text-muted">@include ('forum::partials.timestamp', ['carbon' => $thread->created_at])</span>
 
             @if (! isset($category))
                 <br>
-                <a href="{{ Forum::route('category.show', $thread->category) }}" style="color: {{ $thread->category->color }};">{{ $thread->category->title }}</a>
+                <a href="{{ Forum::route('category.show', $thread->category) }}" style="color: #333333; font-family: 'Oswald';">{{ $thread->category->title }}</a>
             @endif
         </div>
         <div class="col-sm text-md-end" style="float:right;     padding-right: 50px;">
@@ -25,7 +25,7 @@
             @if ($thread->trashed())
                 <div class="badge rounded-pill bg-danger">{{ trans('forum::general.deleted') }}</div>
             @endif
-            <div class="badge rounded-pill bg-primary" @if (isset($category))style="background: {{ $category->color }};"@endif>
+            <div class="badge rounded-pill bg-primary" @if (isset($category))style="background: #6685a4;"@endif>
                 {{ trans('forum::general.replies') }}: 
                 {{ $thread->reply_count }}
                 </div>

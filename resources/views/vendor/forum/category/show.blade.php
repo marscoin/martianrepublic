@@ -3,7 +3,7 @@
 
 @section('content')
     <div class="d-flex flex-row justify-content-between mb-2">
-        <h2 style="color: {{ $category->color }};">
+        <h2 style="color:#d23636; font-weight: 600; font-family: 'Oswald';">
             {{ $category->title }} &nbsp;
             @if ($category->description)
                 <small>{{ $category->description }}</small>

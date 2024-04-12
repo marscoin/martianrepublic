@@ -4,19 +4,20 @@
         <div id="pie-chart" class="chart-holder-250"></div>
     </div>
     <script>
-        document.addEventListener('livewire:load', function () {
-            var data = [
-                {
-                    label: "Global Marscoin ({{ number_format($coincount) }}) MARS",
-                    data: Math.floor(@js($coincount))
-                },
-                {
-                    label: "Your holdings ({{ number_format($balance) }}) MARS",
-                    data: Math.floor(@js($balance))
-                }
-            ];
 
-            var chartOptions = {
+        document.addEventListener('livewire:load', function () {
+            function drawChart() {
+                var data = [
+                    {
+                        label: `Global Marscoin (${Livewire.entangle('coincount').defer}) MARS`,
+                        data: Math.floor(Livewire.entangle('coincount').defer)
+                    },
+                    {
+                        label: `Your holdings (${Livewire.entangle('balance').defer}) MARS`,
+                        data: Math.floor(Livewire.entangle('balance').defer)
+                    }
+                ];
+                var chartOptions = {
                 series: {
                     pie: {
                         show: true,
@@ -39,16 +40,18 @@
                 },
                 colors: mvpready_core.layoutColors
             };
-
-            var holder = $('#pie-chart');
-
-            if (holder.length) {
-                $.plot(holder, data, chartOptions);
+                var holder = $('#pie-chart');
+                if (holder.length) {
+                    $.plot(holder, data, chartOptions);
+                }
             }
 
-            Livewire.on('loadCoinCount', () => {
-                $.plot(holder, data, chartOptions); // Re-plot the chart when data updates
+            drawChart(); // Initial draw
+
+            Livewire.on('coinDataUpdated', () => {
+                drawChart(); // Redraw when data updates
             });
         });
+
     </script>
 </div>

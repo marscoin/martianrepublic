@@ -25,6 +25,7 @@ class HodlerStats extends Component
         $civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
         $this->balance = AppHelper::getMarscoinBalance($civic_wallet->public_addr);
         $this->coincount = AppHelper::getMarscoinTotalAmount();
+        $this->dispatch('coinDataUpdated');
     }
 
     public function render()
