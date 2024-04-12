@@ -37,7 +37,7 @@ class ApiController extends Controller
                 $query->select('id', 'fullname', 'created_at')
                       ->where('id', '!=', $excludedUserIds); // Exclude the specific user by ID
             }, 'user.profile' => function ($query) {
-                $query->select('userid', 'general_public', 'endorse_cnt'); // Only select general_public and the foreign key
+                $query->select('userid', 'general_public', 'endorse_cnt', 'citizen', 'has_application' ); // Only select general_public and the foreign key
             }, 'user.citizen' => function ($query) {
                 $query->select('userid', 'avatar_link', 'liveness_link'); // Select the userid and avatar_link
             }])
@@ -70,7 +70,7 @@ class ApiController extends Controller
                 $query->select('id', 'fullname', 'created_at')
                       ->where('id', '!=', $excludedUserId); // Exclude the specific user by ID
             }, 'user.profile' => function ($query) {
-                $query->select('userid', 'general_public', 'endorse_cnt'); // Only select general_public and the foreign key
+                $query->select('userid', 'general_public', 'endorse_cnt' , 'citizen', 'has_application'); // Only select general_public and the foreign key
             }, 'user.citizen' => function ($query) {
                 $query->select('userid', 'avatar_link', 'liveness_link'); // Select the userid and avatar_link
             }])
@@ -100,7 +100,7 @@ class ApiController extends Controller
         })
         ->with(['profile', 'hdWallet' => function($query) {
             // If you only need the public_addr from HdWallet, select it specifically
-            $query->select('user_id', 'public_addr');
+            $query->select('user_id', 'public_addr', 'endorse_cnt', 'citizen', 'has_application');
         }])
         ->orderByDesc('id')
         ->paginate($perPage, ['id', 'fullname']); 
