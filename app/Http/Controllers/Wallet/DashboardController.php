@@ -763,12 +763,8 @@ class DashboardController extends Controller
 				}
 			}
 			$view = View::make('wallet.anchor');
-			$view->network = AppHelper::stats()['network'];
-			$view->coincount = AppHelper::stats()['coincount'];
 
 			if ($wallet) {
-				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$view->balance = ($cur_balance * 0.00000001);
 				$view->public_address = $wallet['public_addr'];
 			} else {
 				$view->balance = 0;

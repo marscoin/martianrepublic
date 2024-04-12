@@ -47,8 +47,6 @@ class LogbookController extends Controller
 			
 			$view = View::make('logbook.dashboard');
 			$view->wallet_open = $profile->civic_wallet_open;
-			$view->network = AppHelper::stats()['network'];
-			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->myPublications = Publication::where('userid', '=', $uid)->orderBy('created_at', 'desc')->get();

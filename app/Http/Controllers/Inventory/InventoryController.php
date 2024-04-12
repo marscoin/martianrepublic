@@ -45,8 +45,6 @@ class InventoryController extends Controller
 			
 			$view = View::make('inventory.dashboard');
 			$view->wallet_open = $profile->civic_wallet_open;
-			$view->network = AppHelper::stats()['network'];
-			$view->coincount = AppHelper::stats()['coincount'];
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->balance = 0; //for now, could move to stats helper function as well

@@ -47,22 +47,14 @@ class ThreadController extends BaseController
 					return redirect('/twofachallenge');
 				}
 			}
-			$gravtar_link = "https://www.gravatar.com/avatar/" . md5(strtolower(trim(Auth::user()->email)));
-			$view->gravtar_link  = $gravtar_link;
-			$view->network = AppHelper::stats()['network'];
-			$view->coincount = AppHelper::stats()['coincount'];
 			$view->balance = 0; //for now, could move to stats helper function as well
 
-
             if ($wallet) {
-				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$view->balance = ($cur_balance * 0.00000001);
 				$view->public_address = $wallet->public_addr;
 			} else {
 				$view->balance = 0;
 			}
 
-			$view->gravtar_link  = $gravtar_link;
 			$view->fullname = Auth::user()->fullname;
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;

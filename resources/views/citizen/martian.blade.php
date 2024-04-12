@@ -39,7 +39,7 @@
                 </nav>
             </div> <!-- /.container -->
         </header>
-        @include('wallet.mainnav', array('active'=>'citizen', 'balance' => $balance))
+        @include('wallet.mainnav', array('active'=>'citizen'))
         <div class="content">
 
             <div class="container">
@@ -52,9 +52,9 @@
 
 <div class="col-md-3 col-sm-5">
 
-  <div class="profile-avatar">
-    <img src="/assets/citizen/<?=$public_address?>/profile_pic.png" class="profile-avatar-img thumbnail" alt="Profile Image. Source <?=$user['data']->data->picture?>" >
-  </div> <!-- /.profile-avatar -->
+<div class="profile-avatar">
+        <img src="{{ $citcache->avatar_link }}"  onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'" class="profile-avatar-img thumbnail" alt="Profile Image. Source {{ $citcache->avatar_link }}">
+      </div> 
 
   <h5 class="content-title"><u>Citizen Engagement</u></h5>
 
@@ -85,9 +85,9 @@
 
 <div class="col-md-6 col-sm-7">
 
-  <h3><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </h3>
+<h3><?=$citcache->firstName?> <?=$citcache->lastName?> </h3>
 
-  <h5 class="text-muted"><?=$user['data']->data->shortbio?> </h5>
+<h5 class="text-muted"><?=$citcache->shortbio?> </h5>
 
   <hr>
   <ul class="icons-list">
@@ -123,7 +123,7 @@
             </div> <!-- /.feed-subject -->
             <div class="feed-content">
               <?php if($f->tag == 'ED'){?>
-                <p><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> successfully <strong>notarized</strong> an endorsement for <?=$f->message?></p>
+                <p><?=$citcache->firstName?> <?=$citcache->lastName?> </a> successfully <strong>notarized</strong> an endorsement for <?=$f->message?></p>
               <?php } ?>
               <?php if($f->tag == 'SP'){?>
                 <p><blockquote><?=str_replace('\"', "'", str_replace('\n', "\n", $f->message))?></blockquote></p>
@@ -146,7 +146,7 @@
           </div> <!-- /.feed-icon -->
 
           <div class="feed-subject">
-            <p><a href="javascript:;"><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> successfully <strong>notarized</strong> his <a href="javascript:;">General Martian Public</a> application</p>
+            <p><a href="javascript:;"><?=$citcache->firstName?> <?=$citcache->lastName?> </a> successfully <strong>notarized</strong> his <a href="javascript:;">General Martian Public</a> application</p>
           </div> <!-- /.feed-subject -->
 
           <div class="feed-content">
@@ -158,12 +158,12 @@
 
               <li>
                 <i class="icon-li fa fa-file-text-o"></i>
-                <a href="<?=$user['data']->data->picture?>">Profile Picture</a> - (Basic Biometric Identifier)
+                <a href="{{ $citcache->avatar_link }}">Profile Picture</a> - (Basic Biometric Identifier)
               </li>
 
               <li>
                 <i class="icon-li fa fa-file-text-o"></i>
-                <a href="<?=$user['data']->data->video?>">Liveness Video</a> - (Basic Proof of Humanity)
+                <a href="{{ $citcache->liveness_link }}">Liveness Video</a> - (Basic Proof of Humanity)
               </li>
             </ul>
           </div> <!-- /.feed-content -->
@@ -183,14 +183,14 @@
           </div> <!-- /.feed-icon -->
 
           <div class="feed-subject">
-            <p><a href="javascript:;"><?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> </a> pledged allegiance to <a href="javascript:;">The Martian Congressional Republic</a></p>
+            <p><a href="javascript:;"><?=$citcache->firstName?> <?=$citcache->lastName?> </a> pledged allegiance to <a href="javascript:;">The Martian Congressional Republic</a></p>
           </div> <!-- /.feed-subject -->
 
           <div class="feed-content">
             <ul class="icons-list">
               <li>
                 <i class="icon-li fa fa-quote-left"></i>
-                I herewith declare that I, <?=$user['data']->data->firstName?> <?=$user['data']->data->lastName?> , am human and a member of the Martian Republic.
+                I herewith declare that I, <?=$citcache->firstName?> <?=$citcache->lastName?> , am human and a member of the Martian Republic.
               </li>
             </ul>
           </div> <!-- /.feed-content -->

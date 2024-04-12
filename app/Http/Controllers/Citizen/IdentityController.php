@@ -183,6 +183,8 @@ class IdentityController extends Controller
 			$martian = HDWallet::where('public_addr', '=', $address)->first();
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$citcache = Citizen::where('public_address', '=', $address)->first();
+
 
 			if (!$profile) {
 				return redirect('/twofa');
@@ -192,28 +194,19 @@ class IdentityController extends Controller
 				}
 			}
 			$view = View::make('citizen.martian');
-			$view->wallet_open = $profile->wallet_open;
-			$view->network = AppHelper::stats()['network'];
-			$view->coincount = AppHelper::stats()['coincount'];
+			$view->wallet_open = $profile->civic_wallet_open;
 			$view->isCitizen = $profile->citizen;
 
-			
-			//print_r($view->isCitizen);
-			//die();
 			$view->isGP  = $profile->general_public;
 			$view->mePublic = Feed::where('userid', '=', $martian->user_id)->where('tag', '=', "GP")->first();
 			$view->meCitizen = Feed::where('userid', '=', $martian->user_id)->where('tag', '=', "CT")->first();
 			$view->feed = Feed::where('userid', '=', $martian->user_id)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
 			$view->endorsed = Feed::where('userid', '=', $martian->user_id)->where('tag', '=', "ED")->get();
 			
-			//print_r(is_null($view->meCitizen));
-			//die();
 			$view->activity = DB::select('select profile.userid, users.fullname, feed.tag, feed.mined  from feed, users, profile where feed.userid = profile.userid and profile.userid = users.id ORDER BY feed.id DESC limit 3');
 
 
 			if ($wallet) {
-				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$view->balance = ($cur_balance * 0.00000001);
 				$view->public_address = $wallet['public_addr'];
 				$view->endorsed = Feed::where('message', '=', $wallet['public_addr'])->where('tag', '=', "ED")->get();
 			} else {
@@ -222,17 +215,7 @@ class IdentityController extends Controller
 			}
 
 			$view->public_address = $address;
-
-			if($profile->general_public ){
-				try
-				{
-					$view->user = AppHelper::getUserFromCache($address);
-				}
-				catch(Exception $e) {
-					$view->user = AppHelper::addUserToLocalCache($address);
-					$view->user = AppHelper::getUserFromCache($address);
-				}
-			}
+			$view->citcache = $citcache;
 
 			return $view;
 

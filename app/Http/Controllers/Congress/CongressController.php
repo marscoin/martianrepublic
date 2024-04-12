@@ -49,8 +49,6 @@ class CongressController extends Controller
 				}
 			}
 			$view = View::make('congress.dashboard');
-			$view->network = AppHelper::stats()['network'];
-			$view->coincount = AppHelper::stats()['coincount'];
 			$view->balance = 0; //for now, could move to stats helper function as well
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
