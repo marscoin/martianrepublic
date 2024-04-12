@@ -62,7 +62,7 @@
 
   <a href="javascript:;" class="list-group-item">
       <h3 class="pull-right"><i class="fa fa-thumbs-o-up text-primary"></i></h3>
-      <h4 class="list-group-item-heading"><?=count($endorsed)?></h4>
+      <h4 class="list-group-item-heading"><?=$endorsed?></h4>
       <p class="list-group-item-text">Endorsements</p>                  
     </a>
 
