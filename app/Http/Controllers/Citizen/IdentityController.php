@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Profile;
 use App\Models\Feed;
 use App\Models\User;
+use App\Models\Proposals;
 use App\Models\HDWallet;
 use App\Models\CivicWallet;
 use App\Models\Citizen;
@@ -180,27 +181,32 @@ class IdentityController extends Controller
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			//Martian user we are looking at
-			$martian = HDWallet::where('public_addr', '=', $address)->first();
-			$profile = Profile::where('userid', '=', $uid)->first();
-			$citcache = Citizen::where('public_address', '=', $address)->first();
-			
+			$martian = Citizen::where('public_address', '=', $address)->first();
+			$martian_profile = Profile::where('userid', '=', $martian->userid)->first();
+			$martian_proposals = Proposals::where('user_id', '=', $martian->userid)->count();
+			$myprofile = Profile::where('userid', '=', $uid)->first();
 
-			if (!$profile) {
+			if (!$myprofile) {
 				return redirect('/twofa');
 			} else {
-				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
+				if ($myprofile->openchallenge == 1 || is_null($myprofile->openchallenge)) {
 					return redirect('/twofachallenge');
 				}
 			}
 			$view = View::make('citizen.martian');
-			$view->wallet_open = $profile->civic_wallet_open;
-			$view->isCitizen = $profile->citizen;
-			$view->endorsed = $profile->endorse_cnt;
-			$view->isGP  = $profile->general_public;
-			$view->mePublic = Feed::where('userid', '=', $martian->user_id)->where('tag', '=', "GP")->first();
-			$view->meCitizen = Feed::where('userid', '=', $martian->user_id)->where('tag', '=', "CT")->first();
+			$view->wallet_open = $myprofile->civic_wallet_open;
 
-			$view->citcache = $citcache;
+
+			$view->isCitizen = $martian_profile->citizen;
+			$view->endorsements = $martian_profile->endorse_cnt;
+			$view->proposals = $martian_proposals;
+			$view->isGP  = $martian_profile->general_public;
+			$view->mePublic = Feed::where('userid', '=', $martian->userid)->where('tag', '=', "GP")->first();
+			$view->meCitizen = Feed::where('userid', '=', $martian->userid)->where('tag', '=', "CT")->first();
+			$view->endorsed = Feed::where('userid', '=', $martian->userid)->where('tag', '=', "ED")->count();
+
+
+			$view->citcache = $martian;
 
 			return $view;
 

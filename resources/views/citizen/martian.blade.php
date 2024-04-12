@@ -62,21 +62,22 @@
 
   <a href="javascript:;" class="list-group-item">
       <h3 class="pull-right"><i class="fa fa-thumbs-o-up text-primary"></i></h3>
-      <h4 class="list-group-item-heading"><?=$endorsed?></h4>
+      <h4 class="list-group-item-heading"><?=$endorsements?></h4>
       <p class="list-group-item-text">Endorsements</p>                  
+    </a>
+
+    <a href="javascript:;" class="list-group-item">
+      <h3 class="pull-right"><i class="fa fa-thumbs-o-up text-primary"></i></h3>
+      <h4 class="list-group-item-heading"><?=$endorsed?></h4>
+      <p class="list-group-item-text">Endorsed</p>                  
     </a>
 
   <a href="javascript:;" class="list-group-item">
     <h3 class="pull-right"><i class="fa fa-files-o   text-primary"></i></h3>
-    <h4 class="list-group-item-heading">0</h4>
+    <h4 class="list-group-item-heading"><?=$proposals?></h4>
     <p class="list-group-item-text">Proposals Initiated</p>
   </a>
 
-  <a href="javascript:;" class="list-group-item">
-    <h3 class="pull-right"><i class="fa  fa-legal  text-primary"></i></h3>
-    <h4 class="list-group-item-heading">0</h4>
-    <p class="list-group-item-text">Ballots cast</p>
-  </a>
 </div> <!-- /.list-group -->
 
 </div> <!-- /.col -->
