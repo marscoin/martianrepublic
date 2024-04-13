@@ -37,7 +37,7 @@
                 </nav>
             </div>
         </header>
-        @include('wallet.mainnav', array('active'=>'congress', 'balance' => $balance))
+        @include('wallet.mainnav', array('active'=>'congress')
         <div class="content">
             <div class="container">
                 <div class="portlet">
