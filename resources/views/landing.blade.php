@@ -4,11 +4,35 @@
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
 <head>
-  <title>Martian Republic</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="">
-  <meta name="author" content="">
+<title>Martian Republic</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Join the Martian Congressional Republic and participate in a blockchain-based community preparing for life on Mars.">
+<meta name="keywords" content="Mars, Marscoin, Martian Congressional Republic, blockchain, Mars settlement, citizen participation">
+<meta name="author" content="The Marscoin&trade; Foundation, Inc.">
+
+<!-- Open Graph Meta Tags -->
+<meta property="og:title" content="The Martian Congressional Republic">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.martianrepublic.org">
+<meta property="og:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta property="og:description" content="Participate in the Martian Congressional Republic and prepare for settling Mars with our blockchain-based governance and community tools.">
+<meta property="og:site_name" content="Martian Congressional Republic">
+<meta property="og:locale" content="en_US">
+
+<!-- Additional Tags for Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@Marscoinorg">
+<meta name="twitter:title" content="The Martian Congressional Republic">
+<meta name="twitter:description" content="Join our blockchain-based community and prepare for life on Mars.">
+<meta name="twitter:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
+
+<!-- Canonical URL -->
+<link rel="canonical" href="https://www.martianrepublic.org">
+
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
   <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
