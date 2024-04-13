@@ -20,7 +20,7 @@
                     <td class="valign-middle"><?=$pub->title?></td>
                     <td class="valign-middle"><a href="https://ipfs.marscoin.org/ipfs/<?=$pub->ipfs_hash?>"><?= substr($pub->ipfs_hash, 0, 12) . '...' ?></td>
                         <td class="valign-middle"><?=$pub->created_at?></td>
-                        <td class="valign-middle"><a href="https://explore1.marscoin.org/tx/"><?=substr($pub->notarization, 0, 12) . '...' ?></a></td>
+                        <td class="valign-middle"><a href="https://explore1.marscoin.org/tx/<?=$pub->notarization?>"><?=substr($pub->notarization, 0, 12) . '...' ?></a></td>
                         <td class="valign-middle"><?=$pub->notarized_at?></td>
                         <td class="file-info valign-middle">
                             <span class="label label-default demo-element public-status">
