@@ -19,8 +19,6 @@
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="stylesheet" href="/assets/wallet/js/plugins/fileupload/bootstrap-fileupload.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <link rel="stylesheet" href="/assets/wallet/js/plugins/magnific/magnific-popup.css">
     <script>var current_blob = null;</script>
 </head>
