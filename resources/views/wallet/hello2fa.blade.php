@@ -21,25 +21,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap"
         rel="stylesheet">
 
-    <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
 
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
-
-    <!-- App CSS -->
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <!-- <link href="/assets/wallet/css/custom.css" rel="stylesheet">-->
 
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="favicon.ico">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-  <![endif]-->
 </head>
 
 <body class="account-bg" style="background-image: url(/assets/landing/img/mcolony.jpg); background-size: cover;">

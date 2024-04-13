@@ -10,31 +10,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
   <meta name="author" content="">
-
-  <!-- Google Font: Open Sans -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
   <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
-
-  <!-- Font Awesome CSS -->
   <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
-
-  <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
-
-  <!-- App CSS -->
   <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
   <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
   <!-- <link href="/assets/wallet/css/custom.css" rel="stylesheet">-->
-
-  <!-- Favicon -->
   <link rel="shortcut icon" href="/assets/favicon.ico">
-
-  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-  <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-  <![endif]-->
 </head>
 
 <body class="account-bg" style="background-image: url(/assets/landing/img/u8jQzd5.jpg); background-size: cover;">
