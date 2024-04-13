@@ -43,12 +43,12 @@
                 <div class="portlet">
                     <div class="portlet-body">
                         <h3>
-                            Hello! It looks like you're not yet part of our Voter Registry yet. 
+                            Hello! It looks like you're not yet part of the Public Voter Registry. 
                         </h3>
                         <div class="col-lg-8">
                             <div class="row">
                                 <h4 style="font-weight: 300">
-                                Don't worry, though – it's an easy process to become a citizen. Our community thrives on the support and endorsement of its members. To get started, we invite you to <a href="http://martianrepublic.local/forum/t/12-new-members-endorsement-hub-join-the-republic-and-become-a-citizen">visit our forum thread</a> specifically designed for new members seeking endorsements.</h4> <h4 style="font-weight: 300">This is a great opportunity to introduce yourself and connect with our citizens who can endorse your addition to the Voter Registry. Looking forward to seeing you there and welcoming you as a full registered citizen!</h4>
+                                Don't worry, though – it's an easy process to become a citizen. Our community thrives on the support and endorsement of its members. To get started, <a href="/citizen/all#new">post your application</a>. We invite you to <a href="/forum/t/12-new-members-endorsement-hub-join-the-republic-and-become-a-citizen">visit our forum thread</a> specifically designed for new members <a href="/citizen/all#all">seeking endorsements</a>.</h4> <h4 style="font-weight: 300">This is a great opportunity to introduce yourself and connect with citizens of the Republic who can endorse your addition to the Public Voter Registry. Looking forward to seeing you there and welcoming you as a citizen!<br>PS: If you like to learn more about the Martian Republic and how it works, take a look at our <a href="https://marscoin.gitbook.io/marscoin-documentation/">documentation</a></h4>
 
                             </div>
                         </div>
