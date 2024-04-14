@@ -107,3 +107,4 @@ Route::post('/api/rejection', 'Wallet\ApiController@rejectApplication');
 Route::post('/api/balance', 'Wallet\ApiController@getBalance');
 Route::post('/api/price', 'Wallet\ApiController@getPrice');
 Route::post('/api/dismiss', 'Wallet\ApiController@dismissAlert');
+Route::post('/api/rename', 'Wallet\ApiController@renameWallet');

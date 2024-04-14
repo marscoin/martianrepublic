@@ -381,6 +381,7 @@ class DashboardController extends Controller
 				$view->general_public = $profile->general_public;
 				$view->citizen = $profile->citizen;
 				$view->applied = $profile->has_application;
+				$view->wallet_open = $profile->civic_wallet_open;
 			}
 
 

@@ -22,10 +22,22 @@
                 <h5 style="background-color: #2f4354; color: white; padding: 9px; border-radius: 8px; text-align: center"
                     class="nav-wallet-connect">
                     <img src="/assets/wallet/img/marscoin-350x350.png" width="20" height="20" />
-                    Connect Wallet
+                    0.0 MARS
                 </h5>
             </a>
         </div>
         @endif
     @endif
+
+    <script>
+    document.addEventListener('livewire:load', function () {
+        window.livewire.on('balanceUpdated', () => {
+            toastr.options = {
+                "positionClass": "toast-bottom-right",
+                "timeOut": "5000",
+            }
+            toastr.info('Balance updated: {{ $balance }} MARS');
+        });
+    });
+</script>
 </div>

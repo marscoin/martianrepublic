@@ -11,11 +11,12 @@ use Illuminate\Support\Facades\Auth;
 
 class WalletStatus extends Component
 {
-    public $wallet_open = false;
-    public $balance = 0;
     public $uid;
+    public $balance = 0;
     public $loading = true;
-
+    public $wallet_open = false;
+    public $previous_balance = 0;
+    
     public function loadWalletData()
     {
         $user = Auth::user();
@@ -31,7 +32,12 @@ class WalletStatus extends Component
 
         if ($wallet) {
             $this->wallet_open = true;
-            $this->balance = AppHelper::getMarscoinBalance($wallet->public_addr);
+            $new_balance = AppHelper::getMarscoinBalance($wallet->public_addr);
+            if ($this->balance != $new_balance) {
+                $this->previous_balance = $this->balance;
+                $this->balance = $new_balance;
+                $this->dispatch('balanceUpdated'); 
+            }
         } else {
             $this->wallet_open = false;
             $this->balance = 0;

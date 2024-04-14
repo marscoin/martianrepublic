@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="/assets/wallet/css/mainnav/mainnav.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 <div class="mainnav">
 
     <div class="container">
@@ -89,7 +90,7 @@
     </div> <!-- /.container -->
 </div> <!-- /.mainnav -->
 <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     // const nav_key = localStorage.getItem("key");
     // if (nav_key != null) {

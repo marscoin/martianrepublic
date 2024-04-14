@@ -13,6 +13,7 @@ use App\Models\Proposals;
 use App\Models\Publication;
 use App\Models\Threads;
 use App\Models\Citizen;
+use App\Models\HDWallet;
 use Illuminate\Support\Facades\Log;
 
 class ApiController extends Controller {
@@ -509,6 +510,30 @@ class ApiController extends Controller {
 			return;
 		}
 	}
+
+	/**
+	 *
+	 * @hideFromAPIDocumentation
+	 */
+	public function renameWallet(Request $request)
+	{
+		$request->validate([
+			'hdwallet_id' => 'required',
+			'new_name' => 'required|string|max:500',
+		]);
+
+		if (Auth::check()) {
+			$wallet = HDWallet::where('id', $request->hdwallet_id)
+								->where('user_id', Auth::id())
+								->firstOrFail();
+			$wallet->wallet_type = $request->new_name;
+			$wallet->save();
+			return response()->json(['success' => 'Wallet renamed successfully']);
+		}
+
+		return response()->json(['error' => 'Unauthorized'], 403);
+	}
+
 
 	/**
 	 * @hideFromAPIDocumentation
