@@ -55,7 +55,7 @@ class DashboardStats extends Component
         else if ($profile->civic_wallet_open > 0)
         {
             $openwallet = CivicWallet::where('id', '=', $profile->civic_wallet_open)->first();
-            $this->public_addr = $openwallet ? $civicWallet->public_addr : ''; 
+            $this->public_addr = $openwallet ? $openwallet->public_addr : ''; 
         }
         $this->received = $openwallet ? AppHelper::getMarscoinTotalReceived($this->public_addr) : 0;
         $this->sent = $openwallet ? AppHelper::getMarscoinTotalSent($this->public_addr) : 0;
