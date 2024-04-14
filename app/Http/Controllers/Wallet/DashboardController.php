@@ -243,37 +243,43 @@ class DashboardController extends Controller
 			// 1) NO civic + No wallets
 			// 2) Civic + No wallets
 			// 3) Civic + wallets
-			try {
+			//try {
 
 				if (!$civic_wallet && !$wallet) {
 					$view->balance = 0;
 					$view->received = 0;
 					$view->sent = 0;
-
-					// important state.
 					$view->has_civic_wallet = false;
 					$view->has_wallet = false;
-				} else if ($civic_wallet && !$wallet) {
+					$view->wallet_open = false;
+				}
 
-					$view->public_addr = $civic_wallet->public_addr;
-					$view->received = AppHelper::getMarscoinTotalReceived($civic_wallet->public_addr);
-					$view->sent = AppHelper::getMarscoinTotalSent($civic_wallet->public_addr);
-
-					$view->has_civic_wallet = true;
-					$view->has_wallet = false;
-				} else if ($civic_wallet && $wallet) {
-					$view->public_addr = $civic_wallet->public_addr;
-					$view->received = AppHelper::getMarscoinTotalReceived($civic_wallet->public_addr);
-					$view->sent = AppHelper::getMarscoinTotalSent($civic_wallet->public_addr);
-
+				if($profile->wallet_open > 0){
+					$openhdwallet = HDWallet::where('id', '=', $profile->wallet_open)->first();
+					$view->public_addr = $openhdwallet->public_addr;
+					$view->received = AppHelper::getMarscoinTotalReceived($openhdwallet->public_addr);
+					$view->sent = AppHelper::getMarscoinTotalSent($openhdwallet->public_addr);
 					$view->has_civic_wallet = true;
 					$view->has_wallet = true;
-				} else{
+					$view->wallet_open = true;
+				}
+				else if($profile->civic_wallet_open > 0)
+				{
+					$view->public_addr = $civic_wallet->public_addr;
+					$view->received = AppHelper::getMarscoinTotalReceived($civic_wallet->public_addr);
+					$view->sent = AppHelper::getMarscoinTotalSent($civic_wallet->public_addr);
+					$view->has_civic_wallet = true;
+					$view->has_wallet = true;
+					$view->wallet_open = true;
+				} 
+				else
+				{
 					$view->balance = 0;
 					$view->received = 0;
 					$view->sent = 0;
 					$view->has_civic_wallet = false;
 					$view->has_wallet = false;
+					$view->wallet_open = false;
 				}
 
 				$end = microtime(true);
@@ -281,13 +287,6 @@ class DashboardController extends Controller
 				Log::info('Time taken for section: ' . $timeTaken . ' seconds.');
 
 				$view->transactions = array();
-				
-				if($profile->wallet_open > 0)
-					$view->wallet_open = $profile->wallet_open;
-				else if($profile->civic_wallet_open > 0)
-					$view->wallet_open = $profile->civic_wallet_open;
-				else
-					$view->wallet_open = 0;
 
 				$end = microtime(true);
 				$timeTaken = $end - $start;
@@ -302,16 +301,12 @@ class DashboardController extends Controller
 				$timeTaken = $end - $start;
 				Log::info('Time taken for section: ' . $timeTaken . ' seconds.');
 
-				$view->voucher = false;
-				$voucher = Voucher::where('user_account', '=', Auth::user()->email)->first();
-				if ($voucher != null)
-					$view->voucher = true;
-
 				return $view;
-			} catch (Exception $e) {
-				$view = View::make('wallet.downtime');
-				return $view;
-			}
+			// } catch (Exception $e) {
+			// 	// $view = View::make('wallet.downtime');
+			// 	// return $view;
+			// 	Log::debug('Error: ' . $e);
+			// }
 		} else {
 			return redirect('/login');
 		}

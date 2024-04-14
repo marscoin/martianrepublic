@@ -29,15 +29,15 @@
         @endif
     @endif
 
+    @script
     <script>
-    document.addEventListener('livewire:load', function () {
-        window.livewire.on('balanceUpdated', () => {
+        $wire.on('balanceUpdated', () => {
             toastr.options = {
                 "positionClass": "toast-bottom-right",
                 "timeOut": "5000",
             }
             toastr.info('Balance updated: {{ $balance }} MARS');
         });
-    });
-</script>
+    </script>
+    @endscript
 </div>

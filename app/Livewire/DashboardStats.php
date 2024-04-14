@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\{CivicWallet, Proposals};
+use App\Models\{CivicWallet, Proposals, Profile, HDWallet};
 use Illuminate\Support\Facades\Auth;
 use App\Includes\AppHelper;
 
@@ -15,8 +15,21 @@ class DashboardStats extends Component
     public function mount()
     {
         $uid = Auth::user()->id;
-        $civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
-        $this->public_addr =  $civic_wallet ? $civic_wallet->public_address : "n/a";
+        $profile = Profile::where('userid', '=', $uid)->first();
+        $openwallet = null;
+        if($profile->wallet_open > 0)
+        {
+            $openwallet = HDWallet::where('id', '=', $profile->wallet_open)->first();
+            $this->public_addr =  $openwallet->public_address;
+        }
+        else if ($profile->civic_wallet_open > 0)
+        {
+            $openwallet = CivicWallet::where('id', '=', $profile->civic_wallet_open)->first();
+            $this->public_addr =  $openwallet->public_address;
+        }
+        else{
+            $this->public_addr =  "n/a";
+        }
         $this->received = 0;
         $this->sent = 0;
         $this->forum_count = AppHelper::checkForRecentPosts();
@@ -30,14 +43,23 @@ class DashboardStats extends Component
         if (!Auth::check()) {
             return redirect('/login');
         }
-
         $user = Auth::user();
-        $civicWallet = CivicWallet::where('user_id', '=', $user->id)->first();
-
-        $this->public_addr = $civicWallet ? $civicWallet->public_addr : '';
-        $this->received = $civicWallet ? AppHelper::getMarscoinTotalReceived($this->public_addr) : 0;
-        $this->sent = $civicWallet ? AppHelper::getMarscoinTotalSent($this->public_addr) : 0;
-        $this->balance = $civicWallet ? $this->received - $this->sent : 0; 
+        $uid = $user->id;
+        $profile = Profile::where('userid', '=', $uid)->first();
+        $openwallet = null;
+        if($profile->wallet_open > 0)
+        {
+            $openwallet = HDWallet::where('id', '=', $profile->wallet_open)->first();
+            $this->public_addr = $openwallet ? $openwallet->public_addr : '';
+        }
+        else if ($profile->civic_wallet_open > 0)
+        {
+            $openwallet = CivicWallet::where('id', '=', $profile->civic_wallet_open)->first();
+            $this->public_addr = $openwallet ? $civicWallet->public_addr : ''; 
+        }
+        $this->received = $openwallet ? AppHelper::getMarscoinTotalReceived($this->public_addr) : 0;
+        $this->sent = $openwallet ? AppHelper::getMarscoinTotalSent($this->public_addr) : 0;
+        $this->balance = $openwallet ? $this->received - $this->sent : 0;
 
         $this->forum_count = AppHelper::checkForRecentPosts();
         $this->proposal_count = Proposals::countOpenProposals();
