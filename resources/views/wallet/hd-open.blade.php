@@ -625,6 +625,12 @@
                 //alert("Copied the text: " + copyText.text());
                 $("#copy-addr").toggleClass("fa-copy fa-check", "fa-copy");
 
+                toastr.options = {
+                "positionClass": "toast-bottom-right",
+                "timeOut": "3000",
+                }
+                toastr.success('Address copied to clipboard');
+
             }
 
             // GEN TRANSACTION HEX....
