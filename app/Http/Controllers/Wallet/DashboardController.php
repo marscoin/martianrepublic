@@ -393,6 +393,8 @@ class DashboardController extends Controller
 				$view->wallet_open = $profile->wallet_open;
 				$view->encrypted_seed = $civic_wallet->encrypted_seed;
 				$view->wallets = $wallets;
+				$view->citizen = null;
+				$view->applied = null;
 			}
 
 			$data = json_decode(file_get_contents("/home/mars/constitution/marswallet.json"), true);
