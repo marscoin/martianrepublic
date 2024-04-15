@@ -73,6 +73,7 @@ Route::get('/inventory/all', 'Inventory\InventoryController@showAll');
 // ==================================================================================
 Route::get('/congress/all', 'Congress\CongressController@showAll');
 Route::any('/congress/voting', 'Congress\CongressController@showVoting');
+Route::any('/congress/voting/new', 'Congress\CongressController@newProposal');
 Route::post('/congress/createproposal', 'Congress\CongressController@postCreateProposal');
 Route::get('/congress/ballot/{propid?}', 'Congress\CongressController@acquireBallot');
 
@@ -81,6 +82,14 @@ Route::get('/congress/ballot/{propid?}', 'Congress\CongressController@acquireBal
 // Logbook Routes
 // ==================================================================================
 Route::get('/logbook/all', 'Logbook\LogbookController@showAll');
+
+
+// 
+// Map/Geography Routes
+// ==================================================================================
+Route::get('/map/all', 'Planet\MapController@showAll');
+Route::get('/map/embed', 'Planet\MapController@embed');
+
 
 
 //

@@ -34,7 +34,7 @@
                 </nav>
             </div> <!-- /.container -->
         </header>
-        @include('wallet.mainnav', array('active'=>'inventory', 'balance' => $balance))
+        @include('wallet.mainnav', array('active'=>'inventory'))
         <div class="content">
             <div class="container">
 

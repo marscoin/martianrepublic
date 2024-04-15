@@ -120,6 +120,46 @@ class CongressController extends Controller
         }
 	}
 
+	protected function newProposal()
+	{
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
+			$proposals = DB::table('proposals')->select('proposals.*')->where('active', '=', '1')->get();
+			$oldproposals = DB::table('proposals')->select('proposals.*')->where('active', '=', '0')->get();
+			
+			if (!$profile) {
+				return redirect('/twofa');
+			} else {
+				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
+					return redirect('/twofachallenge');
+				}
+			}
+			//check if any proposals have expired... if so, archive.
+			Proposals::where(DB::raw('DATE_ADD(mined, INTERVAL duration DAY)'), '<', now())
+        ->update(['active' => 0]);
+
+			if(!$profile->citizen){
+				$view = View::make('congress.noteligableyet');
+			}else{
+				$view = View::make('congress.newproposal');
+			}
+
+			$view->proposals = $proposals;
+			$view->oldproposals = $oldproposals;
+			$view->fullname = Auth::user()->fullname;
+			$view->isCitizen = $profile->citizen;
+			$view->isGP  = $profile->general_public;
+			$view->wallet_open = $profile->civic_wallet_open;
+			$view->public_address = $civic_wallet->public_addr;
+
+			return $view;
+		}else{
+            return redirect('/login');
+        }
+	}
+
 
 	protected function acquireBallot($propid)
 	{

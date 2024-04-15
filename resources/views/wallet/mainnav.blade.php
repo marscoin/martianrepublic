@@ -84,6 +84,16 @@
                 </a>
                 </li>
 
+                @if ($active === 'map')
+                    <li class="dropdown active">
+                    @else
+                    <li class="dropdown">
+                @endif
+                <a href="/map/all">
+                    Map
+                </a>
+                </li>
+
 
             </ul>
         </nav>

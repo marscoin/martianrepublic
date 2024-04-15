@@ -30,6 +30,15 @@ class Proposals extends Model {
         return self::where('active', 1)->count();
     }
 
+	protected $casts = [
+        'created_at' => 'datetime',
+    ];
+
+	protected function serializeDate(\DateTimeInterface $date)
+	{
+		return $date->format('Y-m-d H:i:s');
+	}
+
 }
 
 ?>

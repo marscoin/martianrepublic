@@ -108,7 +108,7 @@
 
     .category > .list-group-item
     {
-        z-index: 1000;
+        z-index: 1000; 
     }
 
     .category .subcategories .list-group-item:first-child

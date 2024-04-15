@@ -17,13 +17,14 @@
         href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="stylesheet" href="/assets/wallet/css/voting/voting.css">
     <link rel="stylesheet" href="/assets/wallet/css/simplemde.min.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         span.qrcodeicon span {
             position: absolute;
@@ -243,17 +244,27 @@ img.payment {
 
                 <?php if($wallet_open){ ?>
                 <div class="portlet">
+
+                    <?php if($isCitizen){?>
+                    <h3 class="">
+                         <a style="float:right;margin-top: -25px;" href="/congress/voting/new" class="btn-lg btn-primary demo-element" data-backdrop="static" data-keyboard="false"><i class="fa-solid fa-pen-to-square"></i> New Proposal</a>
+                    </h3>
+                    <?php } ?>
+
                     <div class="portlet-body">
 
                         <ul id="myTab1" class="nav nav-tabs">
                             <li class="active">
                                 <a href="#Active" data-toggle="tab">Active</a>
                             </li>
-                            <li class="">
-                                <a href="#New-Proposal" data-toggle="tab">New Proposal</a>
+                            <li class="passed">
+                                <a href="#Passed" data-toggle="tab">Passed</a>
                             </li>
-                            <li class="">
-                                <a href="#Archived" data-toggle="tab">Archived</a>
+                            <li class="rejected">
+                                <a href="#Rejected" data-toggle="tab">Rejected</a>
+                            </li>
+                            <li class="rejected">
+                                <a href="#Expired" data-toggle="tab">Expired</a>
                             </li>
                             <li class="">
                                 <a href="#All" data-toggle="tab">All</a>
@@ -264,21 +275,19 @@ img.payment {
                             <div class="tab-pane fade active in" id="Active">
                                 @include('congress.activeproposal') 
                             </div> 
+                            <div class="tab-pane fade active in" id="Passed">
+                                @include('congress.passedproposal') 
+                            </div> 
+                            <div class="tab-pane fade active in" id="Rejected">
+                                @include('congress.rejectedproposal') 
+                            </div> 
+                            <div class="tab-pane fade" id="Expired">
+                                @include('congress.archivedproposals2')
+                            </div> 
                             <div class="tab-pane fade" id="All">
                                 @include('congress.allproposals')
                             </div> 
-                            <div class="tab-pane fade" id="Archived">
-                                @include('congress.archivedproposals')
-                            </div> 
-                            <?php if($isCitizen){?>
-                                <div class="tab-pane fade" id="New-Proposal">
-                                    @include('congress.newproposal')
-                                </div> 
-                                <?php }else{ ?>
-                                    <div class="tab-pane fade" id="New-Proposal">
-                                    @include('congress.noteligableyet')
-                                    </div> 
-                                <?php } ?>
+                  
 
                         </div>
 
@@ -327,7 +336,7 @@ img.payment {
 
         $("#req_amount").text("5%");$("#req_duration").text("7 days");$("#req_threshold").text("51%");$("#req_expiration").text("Never");$("#req_total").text("2.6%");
         $('#preset').on('change', function() {
-         $('.descriptor-text').hide();
+        $('.descriptor-text').hide();
          //$("#" + this.value + "-descriptor").show();
          if(this.value == 'poll'){
             $( "#slider" ).slider( "value", 5 );
@@ -335,6 +344,7 @@ img.payment {
             $( "#slider3" ).slider( "value", 51 );
             $( "#slider4" ).slider( "value", 0 );
             $("#req_amount").text("5%");$("#req_duration").text("7 days");$("#req_threshold").text("51%");$("#req_expiration").text("Never");$("#req_total").text("2.6%");
+            $("#poll-descriptor").show();
          }
          if(this.value == 'ordinance'){
             $( "#slider" ).slider( "value", 60 );
@@ -342,6 +352,7 @@ img.payment {
             $( "#slider3" ).slider( "value", 55 );
             $( "#slider4" ).slider( "value", 668 );
             $("#req_amount").text("60%");$("#req_duration").text("14 days");$("#req_threshold").text("55%");$("#req_expiration").text("668 sols");$("#req_total").text("33%");
+            $("#ordinance-descriptor").show();
          }
          if(this.value == 'regulation'){
             $( "#slider" ).slider( "value", 70 );
@@ -349,6 +360,7 @@ img.payment {
             $( "#slider3" ).slider( "value", 60 );
             $( "#slider4" ).slider( "value", 668 );
             $("#req_amount").text("70%");$("#req_duration").text("14 days");$("#req_threshold").text("60%");$("#req_expiration").text("668 sols (1 year)");$("#req_total").text("42%");
+            $("#regulation-descriptor").show();
          }
          if(this.value == 'statute'){
             $( "#slider" ).slider( "value", 75 );
@@ -356,6 +368,7 @@ img.payment {
             $( "#slider3" ).slider( "value", 60 );
             $( "#slider4" ).slider( "value", 1336 );
             $("#req_amount").text("75%");$("#req_duration").text("14 days");$("#req_threshold").text("60%");$("#req_expiration").text("1336 sols (2 years)");$("#req_total").text("45%");
+            $("#statute-descriptor").show();
          }
          if(this.value == 'law'){
             $( "#slider" ).slider( "value", 80 );
@@ -363,6 +376,7 @@ img.payment {
             $( "#slider3" ).slider( "value", 65 );
             $( "#slider4" ).slider( "value", 2672 );
             $("#req_amount").text("80%");$("#req_duration").text("30 days");$("#req_threshold").text("65%");$("#req_expiration").text("2672 sols (4 years)");$("#req_total").text("52%");
+            $("#law-descriptor").show();
          }
          if(this.value == 'amendment'){
             $( "#slider" ).slider( "value", 90 );
@@ -370,6 +384,7 @@ img.payment {
             $( "#slider3" ).slider( "value", 75 );
             $( "#slider4" ).slider( "value", 0 );
             $("#req_amount").text("90%");$("#req_duration").text("90 days");$("#req_threshold").text("75%");$("#req_expiration").text("Never");$("#req_total").text("68%");
+            $("#amendment-descriptor").show();
          }
         });
 

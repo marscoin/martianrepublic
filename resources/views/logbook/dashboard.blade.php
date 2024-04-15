@@ -36,7 +36,7 @@
                 </nav>
             </div> 
         </header>
-        @include('wallet.mainnav', array('active'=>'logbook', 'balance' => $balance))
+        @include('wallet.mainnav', array('active'=>'logbook'))
         <div class="content">
             <div class="container">
                 <?php if($wallet_open){ ?>
