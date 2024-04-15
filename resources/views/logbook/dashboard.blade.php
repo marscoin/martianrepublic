@@ -72,7 +72,7 @@
                 <div class="portlet">
                     <div class="portlet-body">
                         <h3>
-                            Please open / connect your wallet in order to access the Research Logbook.
+                        Please <a href="/wallet/dashboard/hd">unlock</a> your civic wallet in order to access the Research Logbook.
                         </h3>
                     </div>
                 </div>
@@ -97,8 +97,6 @@
     <script src="/assets/wallet/js/sha256.js"></script>
     <script src="/assets/wallet/js/dropify.js"></script>
 
-    <!-- include jQuery library -->
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script> -->
 <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
 <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>

@@ -70,9 +70,9 @@
 
                                         <div
                                             style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                                            <h3>Connect your wallet 🚀</h3>
+                                            <h3>Unlock your wallet 🚀</h3>
                                             <a data-aos="fade-up" data-aos-duration="1000" id="" type="button" class="btn-lg btn-primary "
-                                                href="/wallet/dashboard/hd">Connect
+                                                href="/wallet/dashboard/hd">Unlock
                                                 Wallet</a>
                                         </div>
                                     </div>

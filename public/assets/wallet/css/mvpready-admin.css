@@ -1652,6 +1652,10 @@ fieldset[disabled] .btn-twitter.active {
 .feed-item-question .feed-icon {
   background-color: #428bca;
 }
+.feed-item .feed-icon .fa{
+  padding-top: 5px;
+  font-size: 26px;
+}
 /* !Progress Stats */
 /* ----------------------------------------------- */
 .progress-stat {

@@ -54,7 +54,7 @@ use App\Includes\AppHelper;
                                 <a href="javascript:;" title="<?= $apps->fullname ?>"><?= $apps->fullname ?></a>
                                 <p><a target="_blank" href="#"><?= $apps->address ?></a></p>
 
-                                <a data-toggle="modal" href="#donateModal" data-donate="<?= $apps->userid ?>"  data-name="<?= $apps->fullname ?>" data-address="<?= $apps->address ?>"
+                                <a data-toggle="modal" href="#donateModal" data-donate-id="<?= $apps->userid ?>"  data-donate-for="<?= $apps->fullname ?>" data-donate-to="<?= $apps->address ?>"
                                 class="btn btn-sm btn-success">Donate Marscoin</a>
 
                                 <?php if ($isCitizen && empty($missing_fields)) { ?>
@@ -155,45 +155,53 @@ use App\Includes\AppHelper;
 
 </div> 
 
-<div id="donateModal" class="modal fade dynamic-vote-modal">
+
+<div id="donateModal" class="modal modal-styled fade dynamic-vote-modal" data-keyboard="true">
   <div class="modal-dialog">
       <div class="modal-content">
           <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-              <h3 class="modal-title" id="donate-title"></h3>
+              <h3 class="modal-title" id="donate-title">Donate Marscoin</h3>
           </div>
           <div class="modal-body">
-              <div class="modal-body-box">
-                  <p class="modal-category"> </p>
-              </div>
-              <div class="modal-body-box">
-                  <h5> User Address </h5>
-                  <p class="modal-description" id="donate-address"></p>
-              </div>
-            
-              <div class="modal-body-box">
-                  <h5>Cost of Donation: </h5>
-                  <p class="modal-cost" id="donate-cost"></p>
-
-                  <hr>
-                  <p>* Donation of Marscoin is voluntary.</p>
-              </div>
+                <div class="row">
+                    <div class="form-group" >
+                        <label class="control-label col-md-2">For:</label>
+                        <div class="col-md-10" style="margin-bottom: 15px;">
+                        <input type="text" id="donate-for" class="form-control" disabled placeholder="Name">
+                        </div> 
+                    </div>
+                    <div class="form-group" >
+                        <label class="control-label col-md-2">To:</label>
+                        <div class="col-md-10" style="margin-bottom: 15px;">
+                        <input type="text" id="donate-to" class="form-control" disabled placeholder="Address">
+                        </div> 
+                    </div>
+                    <div class="form-group" >
+                        <label class="control-label col-md-2">Amount:</label>
+                        <div class="col-md-10" style="margin-bottom: 15px;">
+                        <input type="text" id="donate-amount" class="form-control" placeholder="0.1 MARS">
+                        </div> 
+                    </div>
+                    <input type="hidden" id="donate-id" class="form-control">
+                </div>
               
 
-              <div class="modal-message" id="confirm-success-message" style="display: none">
+              <div class="modal-message" id="donate-success-message" style="display: none">
                   <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
-                  <span id="modal-message-success" style="font-weight: 600; display: none;"> <i class="fa fa-check-circle"></i> Successfully Donated <h3></h3></span>
+                  <span id="modal-message-success" style="font-weight: 600;"> <i class="fa fa-check-circle"></i> Successfully Donated <h3></h3></span>
               </div>
               <div class="modal-message" style="display: flex; align-items: center">
                     <a  rel="noreferrer noopener"  target="_blank"  class="transaction-hash-link" href="">
-                        <h5 class="transaction-hash" id="confirm-transaction-hash">
+                        <h5 class="transaction-hash" id="donate-transaction-hash">
                         </h5>
                     </a>
                 </div>
             </div>
           <div class="modal-footer">
-              <button id="confirm-donate-btn" type="submit" data-confirm data-donate class="btn btn-primary submit-donate">Confirm Donation</button>
-              <img src="/assets/citizen/loading.gif" alt="enter image description here" style="display: none" id="confirm-loading">
+          <small style="float: left; margin-top: -15px; margin-left: -15px;max-width: 270px; text-align: left;">* Marscoin donations are made on a voluntary basis (0.1 MARS paid as network fee).</small>
+              <button id="confirm-donate-btn" type="submit" data-confirm data-donate class="btn btn-primary">Confirm Donation</button>
+              <img src="/assets/citizen/loading.gif" alt="enter image description here" style="display: none; float: left;" id="donate-loading">
           </div> 
       </div>
   </div>

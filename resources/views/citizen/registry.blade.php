@@ -87,28 +87,23 @@
                             <div class="tab-pane fade " id="citizens">
                                 @include('citizen.allcitizens')
                             </div>
-
                             <!-- Show the general public -->
                             <div class="tab-pane fade" id="all">
                                 @include('citizen.allpublic')
                             </div>
-                             <!-- Show the general public -->
+                             <!-- Show all applicants -->
                              <div class="tab-pane fade" id="applicants">
                                 @include('citizen.allapplicants')
                             </div>
-                            <!-- New public registration form -->
    
-
                         </div>
-
                     </div>
-
                 </div>
             <?php }else{ ?>
                 <div class="portlet">
                     <div class="portlet-body">
                         <h3>
-                            Please open / connect your wallet in order to access the Citizen platform.
+                        Please <a href="/wallet/dashboard/hd">unlock</a> your civic wallet in order to access the Citizen platform.
                         </h3>
                     </div>
                 </div>
@@ -174,6 +169,19 @@ function rejectApplication(userId, causeOfRejection)
 }
 
 
+$('#donateModal').on('show.bs.modal', function (event) {
+    var applicant = $(event.relatedTarget);  
+    var donatefor = applicant.data('donate-for'); 
+    var donateto = applicant.data('donate-to');
+    var donateid = applicant.data('donate-id');
+    $('#donate-for').val(donatefor); 
+    $('#donate-to').val(donateto); 
+    $('#donate-id').val(donateid);
+    $("#confirm-donate-btn").attr("data-donate-to", donateto);
+    $("#confirm-donate-btn").attr("data-donate-id", donateid);
+});
+
+
 $(document).ready(function() {
 
 var mem = localStorage.getItem("key").trim();
@@ -211,8 +219,6 @@ $("#saveprofilebutton").click(function() {
         }
     });
 });
-
-
 
 
 $("#lastname").blur(function() {
@@ -435,7 +441,6 @@ if ("{{ $balance }}" < 1) {
     // const mars_amount = 0.001;
     // const total_amount = fee + parseInt(mars_amount);
     $("#endorse-cost").text("0.1 MARS (paid as network fee)")
-
     $("#confirm-endorse-btn").attr("data-confirm", address);
     $("#confirm-endorse-btn").attr("data-endorse", id);
     $(".modal-message").show()
@@ -486,6 +491,41 @@ $("#confirm-endorse-btn").click(async (e)=>
 })
 
 
+
+$("#confirm-donate-btn").click(async (e)=>
+{
+    $("#donate-loading").show();
+    address  = e.target.getAttribute("data-donate-to")
+    id  = e.target.getAttribute("data-donate-id")
+    amount  = $('#donate-amount').val();
+    console.log("confirming..." + address)
+    const io = await sendMARS(amount, address);
+    try {
+        const tx = await signMARSRegular(amount, io);
+        if(tx.tx_hash){
+            $("#donate-success-message").show()
+            $("#donate-transaction-hash").text(tx.tx_hash)
+            $("#donate-loading").hide();
+            toastr.options = {
+                "positionClass": "toast-bottom-right",
+                "timeOut": "3000",
+                onHidden: function() {
+                    $('#donateModal').modal('hide');
+                }
+            }
+            toastr.success("Donated " + amount + " MARS");
+        }
+
+    } catch (e) {
+        toastr.options = {
+                "positionClass": "toast-bottom-right",
+                "timeOut": "3000",
+            }
+        toastr.error(e);
+        throw e;
+    }
+
+})
 
 
 ////////////////////////////
@@ -595,6 +635,58 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     }
 
 }
+
+
+const signMARSRegular = async (mars_amount, tx_i_o) => {
+
+if(!localStorage.getItem("key"))
+{
+    alert("Unencrypt first");
+    return;
+}
+const mnemonic = localStorage.getItem("key");
+const sender_address = "<?=$public_address?>".trim()
+const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
+const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
+const child = root.derivePath("m/44'/2'/0'/0/0");
+const wif = child.toWIF()
+const zubs = zubrinConvert(mars_amount)
+var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
+var psbt = new my_bundle.bitcoin.Psbt({
+    network: Marscoin.mainnet,
+});
+psbt.setVersion(1)
+psbt.setMaximumFeeRate(100000);
+tx_i_o.inputs.forEach((input, i) => {
+    psbt.addInput({
+        hash: input.txId,
+        index: input.vout,
+        nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex'),
+    })
+})
+tx_i_o.outputs.forEach(output => {
+    if (!output.address) {
+        output.address = sender_address
+    }
+
+    psbt.addOutput({
+        address: output.address,
+        value: output.value,
+    })
+})
+for (let i = 0; i < tx_i_o.inputs.length; i++) {
+    psbt.signInput(i, key);
+}
+const txhash = psbt.finalizeAllInputs().extractTransaction().toHex()
+try {
+        const txId = await broadcastTxHash(txhash);
+        return txId;
+    } catch (e) {
+        handleError("broadcasting")
+        throw e;
+    }
+}
+
 
 const handleError = () => {
     console.log("PANIC AN ERROR!!!!!!!!")

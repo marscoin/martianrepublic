@@ -48,7 +48,7 @@
       <li>
         <a href="/wallet/dashboard/hd-close">
           <i class="fa fa-window-close-o"></i>
-          &nbsp;&nbsp;Disconnect Wallet
+          &nbsp;&nbsp;Lock Wallet
         </a>
       </li>
       <li>

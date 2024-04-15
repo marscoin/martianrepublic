@@ -95,42 +95,20 @@ h5 {
 
                                         <div class="row">
                                             <div class="col-xs-8 text-left">
-                                                <h4><i class="fa fa-drivers-license"></i> Civic Wallet</h4>
+                                                @if(!$general_public && !@citizen)
+                                                    <h4><i class="fa fa-drivers-license"></i> Civic Wallet - Applicant</h4>
+                                                @endif
+                                                @if(!$citizen)
+                                                    <h4><i class="fa fa-drivers-license"></i> Civic Wallet - Public</h4>
+                                                @endif
+                                                @if($citizen)
+                                                    <h4><i class="fa fa-drivers-license"></i> Civic Wallet - Citizen</h4>
+                                                @endif
                                                 <span class="icon-stat-label">{{ $civic_wallet->public_addr }}</span>
                                                 <!-- /.icon-stat-label -->
                                                 <span class="icon-stat-value">{{$civic_balance}}</span> <!-- /.icon-stat-value -->
 
-                                                <div style="display: flex; flex-direction: column;">
-
-                                                    @if(!$general_public && !@citizen)
-                                                    <p
-                                                        style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin: 0; width: 50%;">
-                                                        Application:<i
-                                                            class="fa fa-{{ $applied ? 'check bg-success' : 'times bg-primary' }} "
-                                                            style="padding: .5rem; margin: .5rem; border-radius: 4px">
-                                                        </i>
-                                                    </p>
-                                                    @endif
-                                                    @if(!$citizen)
-                                                    <p
-                                                        style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin: 0; width: 50%;">
-                                                        General Public:<i
-                                                            class="fa fa-{{ $general_public ? 'check bg-success' : 'times bg-primary' }} "
-                                                            style="padding: .6rem; margin: .5rem; border-radius: 4px">
-                                                        </i>
-                                                    </p>
-                                                    @endif
-                                                    @if($citizen)
-                                                    <p
-                                                        style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin: 0; width: 50%;">
-                                                        Citizen:<i
-                                                            class="fa fa-{{ $citizen ? 'check bg-success' : 'times bg-primary' }} "
-                                                            style="padding: .6rem; margin: .5rem; border-radius: 4px">
-                                                        </i>
-                                                    </p>
-                                                    @endif
-
-                                                </div>
+                                            
 
 
                                             </div><!-- /.col-xs-8 -->

@@ -50,7 +50,7 @@
                 <div class="portlet">
                     <div class="portlet-body">
                         <h3>
-                            Please open / connect your wallet in order to access the Inventory platform.
+                            Please <a href="/wallet/dashboard/hd">unlock</a> your civic wallet in order to access the Citizen platform.
                         </h3>
                     </div>
                 </div>
