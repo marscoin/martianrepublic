@@ -84,9 +84,10 @@
 
 <div class="col-md-6 col-sm-7">
 
-<h3><?=$citcache->firstName?> <?=$citcache->lastName?> </h3>
+<h3><?=$citcache->firstname?> <?=$citcache->lastname?> </h3>
 
 <h5 class="text-muted"><?=$citcache->shortbio?> </h5>
+<h5 class="text-muted"><?=$citcache->public_address?> </h5>
 
   <hr>
   <ul class="icons-list">
