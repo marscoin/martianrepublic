@@ -313,20 +313,18 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
                 data: {
                 },
                 success: function(data) {
-                    var mars_price = parseFloat(data.mars_price);
+                    mars_price = parseFloat(data.mars_price);
                     console.log("Mars price: ", mars_price);
                     $('.connectivity').hide();
-                },
-                error: function() {
-                    console.log('Error fetching Mars price');
-                    $('.connectivity').show();
-                }
-            });
 
-            $.post("/api/getTransactions", {
+
+                    $.post("/api/getTransactions", {
                 "address": '<?= $public_addr ?>'
             }, function(data) {
                 if (data) {
+
+                    
+
                     var address = '<?= $public_addr ?>';
                     var transactions = data.txs;
                     transactions.sort((a, b) => a.time - b.time);
@@ -408,8 +406,8 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
                             recipient + "' >" + recipient +
                             "</a></td><td><b><span style='color: " + color + "'>" + totalTxValue.toFixed(4) +
                             "</span></b></td><td>$" + (Number.parseFloat(mars_price).toFixed(
-                                4) * Number.parseFloat(totalTxValue).toFixed(2)).toFixed(
-                                8) + "</td><td><a href='http://explore.marscoin.org/tx/" + tx
+                                4) * Number.parseFloat(totalTxValue).toFixed(8)).toFixed(
+                            2) + "</td><td><a href='http://explore.marscoin.org/tx/" + tx
                             .txid + "' target='_blank'>" + tx.txid.substring(1, 18) +
                             "...</a></td></tr>";
 
@@ -515,13 +513,19 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
                     var chart = new ApexCharts(document.querySelector("#chart"), options);
                     chart.render();
 
+                });
 
 
+
+
+                },
+                error: function() {
+                    console.log('Error fetching Mars price');
+                    $('.connectivity').show();
+                }
             });
 
-
             
-
 
 
             function format_time(s) {
