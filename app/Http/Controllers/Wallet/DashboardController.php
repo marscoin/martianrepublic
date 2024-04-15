@@ -386,6 +386,8 @@ class DashboardController extends Controller
 				$view->encrypted_seed = null;
 				$view->civic_wallet = null;
 				$view->public_addr = null;
+				$view->citizen = null;
+				$view->applied = null;
 			} else {
 				$view->civic_wallet = $civic_wallet;
 				$view->wallet_open = $profile->wallet_open;
