@@ -97,11 +97,9 @@ h5 {
                                             <div class="col-xs-8 text-left">
                                                 @if(!$general_public && !@$citizen)
                                                     <h4><i class="fa fa-drivers-license"></i> Civic Wallet - Applicant</h4>
-                                                @endif
-                                                @if(!$citizen)
+                                                @elseif($general_public && !$citizen)
                                                     <h4><i class="fa fa-drivers-license"></i> Civic Wallet - Public</h4>
-                                                @endif
-                                                @if($citizen)
+                                                @elseif($citizen)
                                                     <h4><i class="fa fa-drivers-license"></i> Civic Wallet - Citizen</h4>
                                                 @endif
                                                 <span class="icon-stat-label">{{ $civic_wallet->public_addr }}</span>
