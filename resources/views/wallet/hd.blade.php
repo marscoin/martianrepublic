@@ -95,7 +95,7 @@ h5 {
 
                                         <div class="row">
                                             <div class="col-xs-8 text-left">
-                                                @if(!$general_public && !@citizen)
+                                                @if(!$general_public && !@$citizen)
                                                     <h4><i class="fa fa-drivers-license"></i> Civic Wallet - Applicant</h4>
                                                 @endif
                                                 @if(!$citizen)
@@ -288,30 +288,30 @@ h5 {
     </div>
     <!--------------------------------------->
     <div id="renameWalletModal" class="modal modal-styled fade" data-keyboard="true">
-    <div class="modal-dialog" style="width: 600px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 class="modal-title">Rename Wallet</h3>
-            </div>
-            <div class="modal-body" style="padding: 3rem; display: flex; justify-content: center;flex-direction: column; height: 300px;">
-                <div class="form-group">
-                    <label>Current Name</label>
-                    <input type="text" class="form-control" id="currentName" disabled>
+        <div class="modal-dialog" style="width: 600px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h3 class="modal-title">Rename Wallet</h3>
                 </div>
-                <div class="form-group">
-                    <label>New Name</label>
-                    <input type="text" class="form-control" id="newName" required>
+                <div class="modal-body" style="padding: 3rem; display: flex; justify-content: center;flex-direction: column; height: 300px;">
+                    <div class="form-group">
+                        <label>Current Name</label>
+                        <input type="text" class="form-control" id="currentName" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>New Name</label>
+                        <input type="text" class="form-control" id="newName" required>
+                    </div>
+                    <div class="row d-flex justify-content-center text-center" style="padding-top: 5rem;">
+                                    <button type="button" class="btn btn-primary" onclick="renameWallet()"  
+                                        style="">Save Changes</button>
+                    </div>
+                
                 </div>
-                <div class="row d-flex justify-content-center text-center" style="padding-top: 5rem;">
-                                <button type="button" class="btn btn-primary" onclick="renameWallet()"  
-                                    style="">Save Changes</button>
-                </div>
-               
             </div>
         </div>
     </div>
-</div>
 
     
 
