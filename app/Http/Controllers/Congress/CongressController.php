@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\HDWallet;
 use App\Models\CivicWallet;
 use App\Models\Proposals;
+use App\Models\Vote;
 use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
@@ -161,6 +162,55 @@ class CongressController extends Controller
 	}
 
 
+
+	protected function proposal($id)
+	{
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
+			$proposal = DB::table('proposals')->select('proposals.*')->where('id', '=', $id)->first();
+			
+			if (!$profile) {
+				return redirect('/twofa');
+			} else {
+				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
+					return redirect('/twofachallenge');
+				}
+			}
+
+			if(!$profile->citizen){
+				$view = View::make('congress.noteligableyet');
+			}else{
+				$view = View::make('congress.proposal');
+			}
+			$view->activities = DB::table('proposals')
+			->join('feed', function ($join) {
+				$join->on('proposals.txid', '=', 'feed.txid')
+					 ->where('feed.tag', '=', 'PR');
+			})
+			->join('citizen', 'proposals.user_id', '=', 'citizen.userid')
+			->where('proposals.id', $id)
+			->select('proposals.*', 'feed.*', 'citizen.firstname', 'citizen.lastname', 'citizen.displayname', 'citizen.shortbio', 'citizen.avatar_link')
+			->take(10)
+			->get();
+
+			$view->proposal = $proposal;
+			$view->fullname = Auth::user()->fullname;
+			$view->isCitizen = $profile->citizen;
+			$view->isGP  = $profile->general_public;
+			$view->wallet_open = $profile->civic_wallet_open;
+			$view->public_address = $civic_wallet->public_addr;
+
+			return $view;
+		}else{
+            return redirect('/login');
+        }
+	}
+
+
+
+
 	protected function acquireBallot($propid)
 	{
 		if (Auth::check()) {
@@ -206,6 +256,29 @@ class CongressController extends Controller
             return redirect('/login');
         }
 	}
+
+
+	protected function breakdown(Request $request)
+    {
+		$propid = $request->input('proposalId');
+		Log::info("Proposal: " . $propid);
+
+        $yays = Vote::where('proposal_id', $propid)
+                    ->where('vote', 'Y')
+                    ->count();
+        
+        $nays = Vote::where('proposal_id', $propid)
+                    ->where('vote', 'N')
+                    ->count();
+
+        $totalVotes = $yays + $nays;
+		Log::info("Total: " . $totalVotes);
+        $yayPercent = $totalVotes > 0 ? round(($yays / $totalVotes) * 100, 2) : 0;
+        $nayPercent = $totalVotes > 0 ? round(($nays / $totalVotes) * 100, 2) : 0;
+        Log::info("Percentage: " . $yayPercent);
+
+		return response()->json(["yayPercent" => $yayPercent, "nayPercent" => $nayPercent, "totalVotes" => $totalVotes]);
+    }
 
 
 }

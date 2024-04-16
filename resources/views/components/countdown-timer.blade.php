@@ -38,9 +38,6 @@ document.addEventListener('DOMContentLoaded', function () {
         let elapsedPercentage = (elapsedTime / totalDuration) * 100;
         progressBar.style.width = elapsedPercentage + "%";
         progressBar.setAttribute("aria-valuenow", Math.round(elapsedPercentage));
-        console.log("P"+ percentage);
-        console.log("P2 "+ elapsedPercentage);
-        
 
         // Change progress bar color based on time left
         if (elapsedPercentage >= 80) {

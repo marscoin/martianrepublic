@@ -394,31 +394,14 @@
   </div>
 </footer>
 
-
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Core JS -->
 <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
 <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
-
-<!--[if lt IE 9]>
-<script src="/assets/wallet/js/libs/excanvas.compiled.js"></script>
-<![endif]-->
-
-<!-- Plugin JS -->
 <script src="/assets/wallet/js/plugins/flot/jquery.flot.js"></script>
 <script src="/assets/wallet/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
 <script src="/assets/wallet/js/plugins/flot/jquery.flot.pie.js"></script>
 <script src="/assets/wallet/js/plugins/flot/jquery.flot.resize.js"></script>
-
-<!-- App JS -->
 <script src="/assets/wallet/js/mvpready-core.js"></script>
 <script src="/assets/wallet/js/mvpready-admin.js"></script>
-
-<!-- Plugin JS -->
-<script src="/assets/wallet/js/demos/flot/line.js"></script>
-<script src="/assets/wallet/js/demos/flot/pie.js"></script>
-<script src="/assets/wallet/js/demos/flot/auto.js"></script>
 
 
 </body>
