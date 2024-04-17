@@ -19,7 +19,7 @@
                     <span class="post-date-year">{{ $createdAt->format('Y') }}</span>
                 </div>
                 <a href="/forum/t/{{ $proposal->discussion }}" class="post-comment">
-                13
+                {{$proposal->post_count}}
                 </a>
             </div> 
             <div class="post-main">
@@ -46,208 +46,14 @@
         </div>
     @endforeach
 @endif
-    <!--YES MODAL -->
-    <div id="ProposalModal_{{{$proposal->id}}}_yes" class="modal fade dynamic-vote-modal">
+</div>
 
-        <div class="modal-dialog">
+<div class="col-md-3">
+    <p>The <b>Martian Congressional Republic</b> consists of known <a href="/citizen/all">citizens</a> who discuss public matters ("res publica") in an open and transparent way. They vote on changes - including the very code that runs this application ("<b>The Constitution</b>") - in an equally transparent yet fully anonymous way. Every vote is cryptographically secured and can be audited by everyone. </p> 
 
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    <h3 class="modal-title">Yes: {{$proposal->title}}</h3>
-                </div> <!-- /.modal-header -->
-
-                <div class="modal-body">
-                    <div class="modal-body-box">
-                        <h5>Category: </h5>
-                        <p class="modal-category"> {{$proposal->category}}</p>
-                    </div>
-
-
-                    <div class="modal-body-box">
-                        <h5> Description: </h5>
-                        <p class="modal-description">{{$proposal->description}}</p>
-                    </div>
-
-
-                    <div class="modal-body-box">
-                        <h5>Discussion URL: </h5>
-                        <a class="modal-discussion-url" href=""> {{$proposal->discussion}}</a>
-                    </div>
-
-
-                    <div class="modal-body-box">
-                        <h5>Cost of Proposal: </h5>
-                        <h3 class="modal-cost"></h3>
-                    </div>
-
-                    <div class="modal-message" style="display: none">
-                        <i class="fa fa-times-circle"></i>
-                        <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
-                        <span id="modal-message-success" style="font-weight: 600"> </span>
-                    </div>
-                    <div class="modal-message">
-                        <a class="transaction-hash-link" href="" target="_blank" rel="noreferrer noopener">
-                            <h5 class="transaction-hash">
-                            </h5>
-                        </a>
-                    </div>
-                </div> <!-- /.modal-body -->
-
-                <div class="modal-footer">
-                    <img src="https://i.stack.imgur.com/FhHRx.gif" alt="enter image description here"
-                    style="display: none" id="loading">
-                    <button id="submit-yes-vote" type="submit" class="btn btn-primary">Vote</button>
-                    <img src="https://i.stack.imgur.com/FhHRx.gif" alt="enter image description here"
-                        style="display: none" id="loading">
-                </div> <!-- /.modal-footer -->
-
-            </div> <!-- /.modal-content -->
-
-        </div><!-- /.modal-dialog -->
+    <p>Fair, transparent, immutable and auditable votes are the outcome. Our congressional archive lists all passed and failed proposals, bills, amendments and references all discussions. The Martian Congressional Republic embodies democracy as a living organism shared directly by all members of the Republic - allowing better ideas to win out and move Martian civilization forward. </p>
 
     </div>
-
-    <!--NO MODAL -->
-    <div id="ProposalModal_{{{$proposal->id}}}_no" class="modal fade dynamic-vote-modal">
-
-        <div class="modal-dialog">
-
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    <h3 class="modal-title">Yes: {{$proposal->title}}</h3>
-                </div> <!-- /.modal-header -->
-
-                <div class="modal-body">
-                    <div class="modal-body-box">
-                        <h5>Category: </h5>
-                        <p class="modal-category"> {{$proposal->category}}</p>
-                    </div>
-
-
-                    <div class="modal-body-box">
-                        <h5> Description: </h5>
-                        <p class="modal-description">{{$proposal->description}}</p>
-                    </div>
-
-
-                    <div class="modal-body-box">
-                        <h5>Discussion URL: </h5>
-                        <a class="modal-discussion-url" href=""> {{$proposal->discussion}}</a>
-                    </div>
-
-
-                    <div class="modal-body-box">
-                        <h5>Cost of Proposal: </h5>
-                        <h3 class="modal-cost"></h3>
-                    </div>
-
-                    <div class="modal-message" style="display: none">
-                        <i class="fa fa-times-circle"></i>
-                        <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
-                        <span id="modal-message-success" style="font-weight: 600"> </span>
-                    </div>
-
-                    <div class="modal-message">
-                        
-                        <a rel="noreferrer noopener" target="_blank" class="transaction-hash-link" href="" style="display: flex, text-align: center, align-items: center">
-                            <h5 class="transaction-hash">
-        
-        
-                            </h5>
-                        </a>
-                    </div>
-                </div> <!-- /.modal-body -->
-              
-
-                <div class="modal-footer">
-                    <span id="modal-message-success" style="font-weight: 600"> </span>
-                    <button id="submit-no-vote" type="submit" class="btn btn-primary">Vote</button>
-                    <img src="https://i.stack.imgur.com/FhHRx.gif" alt="enter image description here"
-                        style="display: none" id="loading">
-                </div> <!-- /.modal-footer -->
-
-            </div> <!-- /.modal-content -->
-
-        </div><!-- /.modal-dialog -->
-
-    </div>
-
-    <!--NULL MODAL -->
-    <div id="ProposalModal_{{{$proposal->id}}}_null" class="modal fade dynamic-vote-modal">
-
-        <div class="modal-dialog">
-
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    <h3 class="modal-title">Yes: {{$proposal->title}}</h3>
-                </div> <!-- /.modal-header -->
-
-                <div class="modal-body">
-                    <div class="modal-body-box">
-                        <h5>Category: </h5>
-                        <p class="modal-category"> {{$proposal->category}}</p>
-                    </div>
-
-
-                    <div class="modal-body-box">
-                        <h5> Description: </h5>
-                        <p class="modal-description">{{$proposal->description}}</p>
-                    </div>
-
-
-                    <div class="modal-body-box">
-                        <h5>Discussion URL: </h5>
-                        <a class="modal-discussion-url" href=""> {{$proposal->discussion}}</a>
-                    </div>
-
-                    <div class="modal-body-box">
-                        <h5>Cost of Proposal: </h5>
-                        <h3 class="modal-cost"></h3>
-                    </div>
-
-                    <div class="modal-message" style="display: none">
-                        <i class="fa fa-times-circle"></i>
-                        <span id="modal-message-error" style="color:red; font-weight: 600"> </span>
-                        <span id="modal-message-success" style="font-weight: 600"> </span>
-                    </div>
-                    <div class="modal-message">
-
-                        <a rel="noreferrer noopener"  target="_blank" class="transaction-hash-link" href="" style="display: flex, text-align: center, align-items: center">
-                            <h5 class="transaction-hash">
-        
-                            </h5>
-                        </a>
-                    </div>
-                    
-    
-                </div> <!-- /.modal-body -->
-              
-                <div class="modal-footer">
-                    <button id="submit-null-vote" type="submit" class="btn btn-primary">Vote</button>
-                    <img src="https://i.stack.imgur.com/FhHRx.gif" alt="enter image description here"
-                        style="display: none" id="loading">
-                </div> <!-- /.modal-footer -->
-
-            </div> <!-- /.modal-content -->
-
-        </div><!-- /.modal-dialog -->
-
-    </div>
-
-    
-  </div>
-  <div class="col-md-3">
-        <p>The <b>Martian Congressional Republic</b> consists of known <a href="/citizen/all">citizens</a> who discuss public matters ("res publica") in an open and transparent way. They vote on changes - including the very code that runs this application ("<b>The Constitution</b>") - in an equally transparent yet fully anonymous way. Every vote is cryptographically secured and can be audited by everyone. </p> 
-
-        <p>Fair, transparent, immutable and auditable votes are the outcome. Our congressional archive lists all passed and failed proposals, bills, amendments and references all discussions. The Martian Congressional Republic embodies democracy as a living organism shared directly by all members of the Republic - allowing better ideas to win out and move Martian civilization forward. </p>
-
-        </div>
 </div>
 
 

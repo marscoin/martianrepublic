@@ -71,7 +71,12 @@ class CongressController extends Controller
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
-			$proposals = DB::table('proposals')->select('proposals.*')->where('active', '=', '1')->get();
+			$proposals = DB::table('proposals')
+			->leftJoin('forum_posts', 'proposals.discussion', '=', 'forum_posts.thread_id')
+			->select('proposals.*', DB::raw('COUNT(forum_posts.id) as post_count'))
+			->where('proposals.active', '=', 1)
+			->groupBy('proposals.id')
+			->get();
 			$oldproposals = DB::table('proposals')->select('proposals.*')->where('active', '=', '0')->get();
 			
 			$endTime = microtime(true);
