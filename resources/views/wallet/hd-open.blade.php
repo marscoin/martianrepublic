@@ -739,8 +739,6 @@
                 }
 
 
-
-
                 /// Trying to breakdown the logic of gettig fee on modal click
                 var mars_amount;
                 var receiver_address = $(".destination-address").val();

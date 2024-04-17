@@ -507,13 +507,12 @@ $(document).ready(function() {
         // Handle Input for Tx
         if ('<?=$public_address?>') {
             $.ajax({
-                url: "/api/balance/'<?=$public_address?>'", 
+                url: "/api/balance/<?=$public_address?>", 
                 type: 'GET',
                 success: function(balance) {
                     balance = parseFloat(balance.balance);
-                    amount = parseFloat(amount);
-
-                    if (balance > amount) {
+                    
+                    if (balance > 0.1) {
                         console.log("Sufficient funds in civic wallet...")
                     } else {
                         console.log("Insufficient funds...")

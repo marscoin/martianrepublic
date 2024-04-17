@@ -253,7 +253,7 @@ img.payment {
 
                 <label for="textarea-input">Description *</label>
                 <textarea type="description" data-required="true" data-minlength="5" name="description" id="description"
-                    cols="10" rows="180" style="min-height: 986px;" class="form-control"></textarea>
+                    cols="10" rows="60" style="min-height: 600px;" class="form-control"></textarea>
 
                 <div style="display: flex; align-items: center; justify-content: flex-end; margin-top: 15px">
 
@@ -557,7 +557,6 @@ img.payment {
           update();
       });
 
-      //changed. now with parameter
       function update(slider,val) {
         //changed. Now, directly take value from ui.value. if not set (initial, will use current value.)
         var $amount = slider == 1?val:$("#amount").val();
@@ -565,17 +564,6 @@ img.payment {
         var $threshold = slider == 3?val:$("#threshold").val();
         var $expiration = slider == 4?val:$("#expiration").val();
 
-        /* commented
-        $amount = $( "#slider" ).slider( "value" );
-        $duration = $( "#slider2" ).slider( "value" );
-         */
-
-        //   $( "#amount" ).val($amount);
-        //  $( "#amount-label" ).text($amount);
-        //  $( "#duration" ).val($duration);
-        //  $( "#duration-label" ).text($duration);
-        //  $( "#total" ).val($total);
-        //  $( "#total-label" ).text($total);
 
          $('#slider a').html('<label><span class="glyphicon glyphicon-chevron-left"></span> '+$amount+' <span class="glyphicon glyphicon-chevron-right"></span></label>');
          $('#slider2 a').html('<label><span class="glyphicon glyphicon-chevron-left"></span> '+$duration+' <span class="glyphicon glyphicon-chevron-right"></span></label>');
@@ -613,118 +601,105 @@ $(document).ready(function() {
     }
 }
 
+// Click on confirm
+$("#proposalModalBtn").click(async (e) => {
+    handleFormFilled()
 
-    // Click on confirm
-    $("#proposalModalBtn").click(async (e) => {
+    let title = $(".modal-title").text($("#title").val())
+    fulltext = simplemde.value();
+    abbreviatedtext = fulltext.substring(0, 200);
+    let desc = $(".modal-description").text(abbreviatedtext)
+    let config = $(".modal-configuration").text($("#" + $("#preset").val() + "-descriptor").text())
+    let category = $(".modal-category").text($("#preset").val())
+    var balance = 0;
+    const fee = 0.1;
 
-        handleFormFilled()
+    if ('<?=$public_address?>') {
+        $.ajax({
+            url: "/api/balance/<?=$public_address?>", 
+            type: 'GET',
+            success: function(balance) {
+                balance = parseFloat(balance.balance);
+                if (balance > 0.1) {
+                    console.log("Sufficient funds in civic wallet...");
 
-        let title = $(".modal-title").text($("#title").val())
-        let desc = $(".modal-description").text(simplemde.value())
-        let config = $(".modal-configuration").text($("#" + $("#preset").val() + "-descriptor").text())
-        let category = $(".modal-category").text($("#preset").val())
-        var balance = 0;
-        const fee = 0.1;
+                    $(".modal-message").hide()
+                    console.log("able to confirm..")
+                    $("#submit-proposal").prop("disabled", false)
+                    
+                    $("#submit-proposal").click(async () => {
+                        $("#loading").show()
+                        try {
 
-        // Handle Input for Tx
-        if ('<?=$public_address?>') {
-            $.ajax({
-                url: "/api/balance/'<?=$public_address?>'", 
-                type: 'GET',
-                success: function(balance) {
-                    balance = parseFloat(balance.balance);
-                    amount = parseFloat(amount);
+                            var obj = new Object();
+                            obj.data = {};
+                            obj.meta = {};
+                            obj.data.title = $("#title").val();
+                            obj.data.description = simplemde.value();
+                            obj.data.category = $("#preset").val()
+                            obj.data.participation = $( "#slider" ).slider('value')
+                            obj.data.duration = $( "#slider2" ).slider('value')
+                            obj.data.threshold = $( "#slider3" ).slider('value')
+                            obj.data.expiration = $( "#slider4" ).slider('value')
 
-                    if (balance > amount) {
-                        console.log("Sufficient funds in civic wallet...")
-                    } else {
-                        console.log("Insufficient funds...")
-                    }
-                },
-                error: function() {
-                    console.log('Error fetching balance');
-                }
-            });
-        } else {
-            // Handle invalid input
-            console.log("Error getting balance...");
-        }
-
-        if (balance < fee) {
-            $("#submit-proposal").prop("disabled", true)
-            $("#modal-message-error").text("Not enough MARS to submit proposal")
-            $(".modal-message").show()
-            console.log("unable to confirm...")
-            return false;
-
-        } else {
-            $(".modal-message").hide()
-
-            console.log("able to confirm..")
-            $("#submit-proposal").prop("disabled", false)
-            $("#submit-proposal").click(async () => {
-
-                $("#loading").show()
-                try {
-
-                    var obj = new Object();
-                    obj.data = {};
-                    obj.meta = {};
-                    obj.data.title = $("#title").val();
-                    obj.data.description = simplemde.value();
-                    obj.data.category = $("#preset").val()
-                    obj.data.participation = $( "#slider" ).slider('value')
-                    obj.data.duration = $( "#slider2" ).slider('value')
-                    obj.data.threshold = $( "#slider3" ).slider('value')
-                    obj.data.expiration = $( "#slider4" ).slider('value')
-
-                    var jsonString = JSON.stringify(obj.data);
-                    var m = sha256(jsonString);
-                    obj.meta.hash = m;
-                    var jsonString = JSON.stringify(obj);
-                    utcnow = new Date().getTime();
-                    const data = await doAjax("/api/permapinjson", {"type": "proposal_"+utcnow, "payload": jsonString, "address": '<?=$public_address?>'});
-                    if(data.Hash == "Error"){
-                        alert("Pinning data failed. Check IPFS connection and try again later.")
-                        return false;
-                    }
-                    cid = data.Hash;
-
-                    message = "PR_"+cid;
-                    const io = await sendMARS(1, "<?=$public_address?>");
-                    const fee = 0.01
-                    const mars_amount = 0.01
-                    const total_amount = fee + parseInt(mars_amount)
-
-                    try {
-                        const tx = await signMARS(message, mars_amount, io);
-                        $(".transaction-hash").text("" + tx.tx_hash)
-                        $(".transaction-hash-link").attr("href","https://explore.marscoin.org/tx/" + tx.tx_hash)
-                        const data = await doAjax("/api/setfeed", {"type": "PR", "txid": tx.tx_hash, message: $("#title").val(), "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
-                        if(data.Hash){
-                            $("#modal-message-success").show()
-                            $("#loading").hide()
-                            $(".modal-footer").hide();
-                            const data = await doAjax("/api/cacheproposal", {"type": "PR", "txid": tx.tx_hash, message: jsonString, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
-                            if(data.Discussion){
-                                //if(!alert('Submitted to Blockchain successfully')){location.href = '/forum/'+data.Discussion;}
-                                console.log('Submitted to Blockchain successfully redirect to /forum/'+data.Discussion)
+                            var jsonString = JSON.stringify(obj.data);
+                            var m = sha256(jsonString);
+                            obj.meta.hash = m;
+                            var jsonString = JSON.stringify(obj);
+                            utcnow = new Date().getTime();
+                            const data = await doAjax("/api/permapinjson", {"type": "proposal_"+utcnow, "payload": jsonString, "address": '<?=$public_address?>'});
+                            if(data.Hash == "Error"){
+                                alert("Pinning data failed. Check IPFS connection and try again later.")
+                                return false;
                             }
+                            cid = data.Hash;
+
+                            message = "PR_"+cid;
+                            const io = await sendMARS(1, "<?=$public_address?>");
+                            const fee = 0.01
+                            const mars_amount = 0.01
+                            const total_amount = fee + parseInt(mars_amount)
+
+                            try {
+                                const tx = await signMARS(message, mars_amount, io);
+                                $(".transaction-hash").text("" + tx.tx_hash)
+                                $(".transaction-hash-link").attr("href","https://explore.marscoin.org/tx/" + tx.tx_hash)
+                                const data = await doAjax("/api/setfeed", {"type": "PR", "txid": tx.tx_hash, message: $("#title").val(), "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+                                if(data.Hash){
+                                    $("#modal-message-success").show()
+                                    $("#loading").hide()
+                                    $(".modal-footer").hide();
+                                    const data = await doAjax("/api/cacheproposal", {"type": "PR", "txid": tx.tx_hash, message: jsonString, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+                                    if(data.Discussion){
+                                        console.log('Submitted to Blockchain successfully redirect to /forum/'+data.Discussion)
+                                    }
+                                }
+                            } catch (e) {
+                                throw e;
+                            }
+
+                        } catch (e) {
+                            throw e;
                         }
-                    } catch (e) {
-                        throw e;
-                    }
-
-                } catch (e) {
-                    throw e;
+                    })
+                
+                } else {
+                    console.log("Insufficient funds...");
+                    $("#submit-proposal").prop("disabled", true)
+                    $("#modal-message-error").text("Not enough MARS to submit proposal")
+                    $(".modal-message").show()
+                    console.log("unable to confirm...")
+                    return false;
                 }
-
-            })
-
-        }
-
-
-    })
+            },
+            error: function() {
+                console.log('Error fetching balance');
+            }
+        });
+    } else {
+        console.log("Error getting balance...");
+    }
+})
 
     const handleFormFilled = () => {
 

@@ -309,10 +309,9 @@ class ApiController extends Controller {
 	 *
 	 * @hideFromAPIDocumentation
 	 */
-	public function getBalance(Request $request)
+	public function getBalance($address)
 	{
 		if (Auth::check()) {
-			$address = $request->input('address');
 			$balance = AppHelper::getMarscoinBalance($address);
 			return (new Response(json_encode(array("balance" => $balance)), 200))
               ->header('Content-Type', "application/json;");
