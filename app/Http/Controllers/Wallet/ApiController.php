@@ -248,7 +248,7 @@ class ApiController extends Controller {
 		if (!Auth::check()) {
 			return redirect('/login');
 		}
-		Log::debug("in function");
+		Log::info("in function");
 		$public_address = $request->input('address');
 		$type = $request->input('type');
 		$json = $request->input('payload');
@@ -256,9 +256,9 @@ class ApiController extends Controller {
 
 		// Check and create the directory if it doesn't exist
 		if (!file_exists($base_path)) {
-			Log::debug("PermaJson: ".$base_path);
+			Log::info("PermaJson: ".$base_path);
 			if (!mkdir($base_path, 0755, true)) {
-				Log::debug("PermaJson2: ".$base_path);
+				Log::info("PermaJson2: ".$base_path);
 				return response()->json(["error" => "Failed to create directory. Check permissions."], 500);
 			}
 		} elseif (!is_writable($base_path)) {
@@ -274,7 +274,7 @@ class ApiController extends Controller {
 
 		try {
 			// Upload the folder and pin the file
-			Log::debug("PermaJson: ".$file_path);
+			Log::info("PermaJson: ".$file_path);
 			$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
 			return response()->json($apiResponse, 200)->header('Content-Type', "application/json;");
 		} catch (\Exception $e) {
