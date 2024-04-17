@@ -582,6 +582,13 @@ img.payment {
         });
 </script>
 <script>
+
+function isValidCID(hash) {
+    const cidv0Regex = /^Qm[a-zA-Z1-9]{44}$/;
+    const cidv1Regex = /^b[a-z2-7]{58}$/;
+    return cidv0Regex.test(hash) || cidv1Regex.test(hash);
+}
+
 $(document).ready(function() {
 
 
@@ -648,10 +655,11 @@ $("#proposalModalBtn").click(async (e) => {
                             var jsonString = JSON.stringify(obj);
                             utcnow = new Date().getTime();
                             const data = await doAjax("/api/permapinjson", {"type": "proposal_"+utcnow, "payload": jsonString, "address": '<?=$public_address?>'});
-                            if(data.Hash == "Error"){
-                                alert("Pinning data failed. Check IPFS connection and try again later.")
+                            if (data.Hash == "Error" || data.Hash == "undefined" || !isValidCID(data.Hash)) {
+                                alert("Pinning data failed. Check IPFS connection and try again later.");
                                 return false;
                             }
+                            cid = data.Hash;
                             cid = data.Hash;
 
                             message = "PR_"+cid;
@@ -672,6 +680,8 @@ $("#proposalModalBtn").click(async (e) => {
                                     const data = await doAjax("/api/cacheproposal", {"type": "PR", "txid": tx.tx_hash, message: jsonString, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
                                     if(data.Discussion){
                                         console.log('Submitted to Blockchain successfully redirect to /forum/'+data.Discussion)
+                                        location.href="http://martianrepublic.local/forum/c/2-proposals";
+
                                     }
                                 }
                             } catch (e) {
@@ -738,9 +748,6 @@ $("#proposalModalBtn").click(async (e) => {
     }
 
 
-
-   ////////////////////////////
-
 const Marscoin = {
     mainnet: {
         messagePrefix: "\x19Marscoin Signed Message:\n",
@@ -755,8 +762,6 @@ const Marscoin = {
         wif: 0x80,
     }
 };
-
-
 const sendMARS = async (mars_amount, receiver_address) => {
     const sender_address = "<?=$public_address?>".trim()
 
@@ -772,38 +777,27 @@ const sendMARS = async (mars_amount, receiver_address) => {
 
     return null
 }
-
 const signMARS = async (message, mars_amount, tx_i_o) => {
     const mnemonic = localStorage.getItem("key").trim();
     const sender_address = "<?=$public_address?>".trim()
-
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-
     const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-
     const child = root.derivePath("m/44'/2'/0'/0/0");
-
     const wif = child.toWIF()
-
     const zubs = zubrinConvert(mars_amount)
-
     var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-    
     var psbt = new my_bundle.bitcoin.Psbt({
         network: Marscoin.mainnet,
     });
     psbt.setVersion(1)
     psbt.setMaximumFeeRate(10000000);
-
     unspent_vout = 0
     var data = my_bundle.Buffer(message)
     const embed = my_bundle.bitcoin.payments.embed({ data: [data] });
-    
     psbt.addOutput({
     script: embed.output,
     value: 0,
     })
-    
     tx_i_o.inputs.forEach((input, i) => {
         psbt.addInput({
             hash: input.txId,
@@ -830,59 +824,43 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
             alert("Problem while trying to sign with your key. Please try to reconnect your wallet...");
         }
     }
-
     const tx = psbt.finalizeAllInputs().extractTransaction(); 
     const txhash = tx.toHex()
     console.log(txhash)
-
     try {
         const txId = await broadcastTxHash(txhash);
         return txId;
 
     } catch (e) {
-        handleError()
+        handleError(e)
         throw e;
     }
-
 }
 
-const handleError = () => {
-    console.log("PANIC AN ERROR!!!!!!!!")
+const handleError = (error) => {
+    console.error("Error encountered:", error);
+    alert("An error occurred. Please check the console for more details.");
 }
-
 
 const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
-    // Default options are marked with *
     if (!sender_address || !receiver_address || !amount) {
         throw new Error("Missing inputs for tx hash call...");
     }
-    //console.log(sender_address)
-    //console.log(receiver_address)
-    //console.log(amount)
-
     const url =
         `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
-
     try {
         const response = await fetch(url, {
             method: 'GET',
         });
-
         return response.json()
-
     } catch (e) {
         throw e;
     }
-
-
-
 }
-
 const broadcastTxHash = async (txhash) => {
     if (!txhash) {
         throw new Error("Missing tx hash...");
     }
-
     const url = 'https://pebas.marscoin.org/api/mars/broadcast?txhash='+txhash
     try {
         const response = await fetch(url, {
@@ -893,20 +871,13 @@ const broadcastTxHash = async (txhash) => {
     } catch (e) {
         throw e;
     }
-
-
 }
-
-
 const zubrinConvert = (MARS) => {
     return (MARS * 100000000)
 }
-
 const marsConvert = (zubrin) => {
     return (zubrin / 100000000)
 }
-
-
 });
 </script>
 

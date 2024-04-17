@@ -2,76 +2,50 @@
 <div class="row">
   <div class="col-md-9">
 
-  @if ($proposals->isEmpty())
+@if ($proposals->isEmpty())
     <div class="alert alert-info">
         Currently no active proposals underway. Consider launching a new proposal!
     </div>
 @else
-@foreach ($proposals as $proposal)
-    <div class="feed-item feed-item-idea">
-
-        <div class="feed-icon">
-            <i class="fa fa-lightbulb-o"></i>
-        </div> <!-- /.feed-icon -->
-        <div class="feed-subject">
-            <h5 style="font-size: 30px;"><a href="{{{$proposal->ipfs_hash}}}">Proposal #{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</a></h5>
-            <h5>Category: {{str_replace("poll", "Certified Poll", $proposal->category)}}</h5>
-            <hr style="border-top: 1px dotted #ccc;">
-            <h3><a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }} </a> @if($proposal->category =='poll') asked: @else proposed: @endif <br><a target="_blank" href="/forum/t/{{ $proposal->discussion }}">{{ $proposal->title }} </a></h3>
-        </div> <!-- /.feed-subject -->
-        <div class="feed-content">
-            <ul class="icons-list">
-                <li>
-                    <i class="icon-li fa fa-quote-left"></i>
-                    <p style="font-size: 2rem">
-                        {{ $proposal->description }}
-
-                    </p>
-                </li>
-            </ul>
-            <span>Vote Participation: 0% of {{$proposal->participation}}% required</span>
-            <div class="progress progress-sm" style="width: {{$proposal->threshold}}%">
-                <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow={{$proposal->participation}} aria-valuemin="0" aria-valuemax="100" style="width: {{{$proposal->participation}}}%"> <span class="sr-only"></span>
+    @foreach ($proposals as $proposal)
+        <div class="post">
+            <div class="post-aside">
+                @php
+                    $createdAt = \Carbon\Carbon::parse($proposal->mined);
+                @endphp
+                <div class="post-date">
+                    <span class="post-date-day">{{ $createdAt->format('d') }}</span>
+                    <span class="post-date-month">{{ $createdAt->format('M') }}</span>
+                    <span class="post-date-year">{{ $createdAt->format('Y') }}</span>
                 </div>
+                <a href="/forum/t/{{ $proposal->discussion }}" class="post-comment">
+                13
+                </a>
+            </div> 
+            <div class="post-main">
+                <h3 class="post-title"><a href="/congress/proposal/{{$proposal->id}}">#{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }} Proposal: {{ $proposal->title }}</a></h3>
+                <h4 class="post-meta">Submitted by <a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }}</a> in <a href="javascript:;">{{str_replace("poll", "Certified Poll", $proposal->category)}}</a></h4>
+                <div class="post-content">      
+                <p>{{substr($proposal->description, 0, 400)}}<a href="/congress/proposal/{{$proposal->id}}">Read More...</a></p>
+                    <div class="row">
+                        <div class="col-sm-4" style="padding-top: 14px;">
+                        <a href="#" class="btn btn-success">Voting in Progress</a>
+                        </div>
+                        <div class="col-sm-4">
+                        @php
+                            $endTime = \Carbon\Carbon::parse($proposal->mined)->addDays($proposal->duration)->format('Y-m-d H:i:s');
+                        @endphp
+                        <x-countdown-timer :proposal-id="$proposal->id" :end-time="$endTime" :start-time="$proposal->mined" />
+                        </div>
+                        <div class="col-sm-4">
+                        @livewire('voting-progress', ['proposalId' => $proposal->id])
+                        </div>
+                    </div>
+                </div> 
             </div>
-            <span>Vote Threshold: 0% of {{$proposal->threshold}}% required</span>
-            <div class="progress progress-sm" style="width: {{$proposal->threshold}}%">
-                <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow={{$proposal->threshold}} aria-valuemin="0" aria-valuemax="100" style="width: {{{$proposal->threshold}}}%"> <span class="sr-only"></span>
-                </div>
-            </div>
-            <span>Vote Duration: 0 days passed of {{$proposal->duration}} days available</span>
-            <div class="progress progress-sm" style="width: {{$proposal->threshold}}%">
-                <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow={{$proposal->duration}} aria-valuemin="0" aria-valuemax="100" style="width: {{{$proposal->duration}}}%"> <span class="sr-only"></span>
-                </div>
-            </div>
-            <div>
-            <?php if($isCitizen){?>
-                
-                @if($proposal->btxid)
-                    <a data-toggle="modal" href="#ProposalModal" id="" class="btn-lg btn-primary demo-element ">Cast Your Vote</a>
-                @else
-                    <a data-toggle="modal" href="/congress/ballot/{{$proposal->id}}" id="" class="btn-lg btn-secondary demo-element ">Request Ballot</a>
-                @endif
-                    
-            <?php }else{ ?>
-                <p>To cast a vote, please <a href="/citizen/all">join the voter registry</a> first</p>
-            <?php } ?>
-            </div>
-
-        </div> 
-
-
-        <div class="feed-actions">
-            
-                <a href='/forum/t/{{ $proposal->discussion }}' class="pull-left discussion-link">
-                Discuss! <i class="fa fa-external-link"></i></a>
-
-            <a href="https://explore.marscoin.org/tx/{{ $proposal->txid }}" class="pull-right"><i class="fa fa-clock-o"></i>
-                {{ $proposal->created_at }} <i class=" fa-check-square"></i>Notarized: {{ substr($proposal->txid, 0, 16) }}...</a> 
-        </div> <!-- /.feed-actions -->
-
-    </div>
-
+        </div>
+    @endforeach
+@endif
     <!--YES MODAL -->
     <div id="ProposalModal_{{{$proposal->id}}}_yes" class="modal fade dynamic-vote-modal">
 
@@ -265,8 +239,8 @@
         </div><!-- /.modal-dialog -->
 
     </div>
-@endforeach
-@endif
+
+    
   </div>
   <div class="col-md-3">
         <p>The <b>Martian Congressional Republic</b> consists of known <a href="/citizen/all">citizens</a> who discuss public matters ("res publica") in an open and transparent way. They vote on changes - including the very code that runs this application ("<b>The Constitution</b>") - in an equally transparent yet fully anonymous way. Every vote is cryptographically secured and can be audited by everyone. </p> 

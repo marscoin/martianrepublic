@@ -592,6 +592,11 @@ class ApiController extends Controller {
 			$embedded_link = $request->input('embedded_link');
 			$json = $request->input('message');
 			$data = json_decode($json);
+			$citcache = Citizen::where('userid', '=', $uid)->first();
+
+			if (!$this->isValidCID($embedded_link)) {
+				return response()->json(['error' => 'Invalid IPFS hash'], 400);
+			}
 
 			$proposal = new Proposals;	
 			$proposal->user_id = $uid;
@@ -611,10 +616,20 @@ class ApiController extends Controller {
 			$proposal->save();
 			$prop_id = $proposal->id;
 
+			$post = new Posts;
+			$post->thread->id = 2;
+			$post->author_id = $uid;
+			$post->content = $proposal->description;
+			$post->authorName = $citcache->firstname . " " . $citcache->lastname;
+			$post->save();
+
+			$post_id = $post->id;
+
 			$threads = new Threads;
 			$threads->category_id = 2;
 			$threads->author_id = $uid;
 			$threads->title = $data->data->title;
+			$threads->first_post_id = $post_id;
 			$threads->proposal_id = $prop_id;
 			$threads->save();
 
@@ -629,6 +644,17 @@ class ApiController extends Controller {
 		}else{
             return redirect('/login');
         }
+	}
+
+
+	protected function isValidCID($hash)
+	{
+		// Regex to check CIDv0; starts with 'Qm' and followed by 44 characters from Base58 set
+		$cidv0Regex = '/^Qm[a-zA-Z1-9]{44}$/';
+		// Regex for basic validation of CIDv1; broader due to variability in encoding and version
+		$cidv1Regex = '/^b[a-z2-7]{58}$/';  // Example for base32 encoding
+
+		return preg_match($cidv0Regex, $hash) || preg_match($cidv1Regex, $hash);
 	}
 
 
