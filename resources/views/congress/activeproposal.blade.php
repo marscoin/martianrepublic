@@ -29,16 +29,28 @@
                 <p>{{substr($proposal->description, 0, 400)}}<a href="/congress/proposal/{{$proposal->id}}">Read More...</a></p>
                     <div class="row">
                         <div class="col-sm-4" style="padding-top: 14px;">
-                        <a href="#" class="btn btn-success">Voting in Progress</a>
+                        @if(!$proposal->mined && $proposal->active)
+                            <a href="#" class="btn btn-info">Submitted</a>
+                        @elseif($proposal->mined && $proposal->active)
+                            <a href="#" class="btn btn-success">Voting in Progress</a>
+                        @else
+                            <a href="#" class="btn btn-tertiary">Concluded</a>
+                        @endif
                         </div>
                         <div class="col-sm-4">
-                        @php
-                            $endTime = \Carbon\Carbon::parse($proposal->mined)->addDays($proposal->duration)->format('Y-m-d H:i:s');
-                        @endphp
-                        <x-countdown-timer :proposal-id="$proposal->id" :end-time="$endTime" :start-time="$proposal->mined" />
+                            @if(!$proposal->mined && $proposal->active)
+                            @else
+                            @php
+                                $endTime = \Carbon\Carbon::parse($proposal->mined)->addDays($proposal->duration)->format('Y-m-d H:i:s');
+                            @endphp
+                            <x-countdown-timer :proposal-id="$proposal->id" :end-time="$endTime" :start-time="$proposal->mined" />
+                            @endif
                         </div>
                         <div class="col-sm-4">
-                        @livewire('voting-progress', ['proposalId' => $proposal->id])
+                            @if(!$proposal->mined && $proposal->active)
+                            @else
+                            @livewire('voting-progress', ['proposalId' => $proposal->id])
+                            @endif
                         </div>
                     </div>
                 </div> 

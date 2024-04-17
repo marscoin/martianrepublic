@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
+
 </head>
 
 <body class=" ">
@@ -94,7 +95,7 @@
                     
                     <div id="myTabContent" class="tab-content stacked-content">  
                         <div class="tab-pane fade active in" id="info">  
-                            <p>{{ $proposal->description }}</p>
+                            <div id="markdown-container">Loading...</div>
                         </div>
                         
                         
@@ -491,7 +492,7 @@
 <script src="/assets/wallet/js/plugins/flot/jquery.flot.js"></script>
 <script src="/assets/wallet/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
 <script src="/assets/wallet/js/plugins/flot/jquery.flot.pie.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/marked@3.0.7/marked.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
     $.ajaxSetup({
@@ -503,7 +504,11 @@ $(document).ready(function() {
 });
 </script>
 <script>
+    
+
 $(document).ready(function() {
+    var htmlContent = marked(`{{ $proposal->description }}`);
+    document.getElementById('markdown-container').innerHTML = htmlContent;
 
     $.ajax({
         url: "/congress/vote/breakdown",
