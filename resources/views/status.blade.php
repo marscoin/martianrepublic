@@ -246,6 +246,21 @@
                 </div> <!-- /.col --> 
 
 
+                <div class="col-sm-4">
+                  <div class="pricing-plan">
+                    <div class="pricing-header">
+                      <h3 class="pricing-plan-title">BlockAnalyzer</h3>               
+                      <p class="pricing-plan-label">Tracks blockchain notarizations</p>   
+                    </div>
+                    <?php if($ipfs_status == "success"){ ?>
+                    <a href="#" class="btn btn-success">Online</a>
+                    <?php }else { ?>
+                    <a href="#" class="btn btn-danger">Offline</a>
+                    <?php } ?>
+                  </div> <!-- /.pricing-plan -->
+                </div> <!-- /.col --> 
+
+
 
 
 

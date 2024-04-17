@@ -8,7 +8,7 @@ use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
-
+use Carbon\Carbon;
 
 class StatusController extends Controller {
 
@@ -122,6 +122,14 @@ class StatusController extends Controller {
 		}
 
 
+		// Check the blockchain tracker status
+        $lastProcessed = $this->getLastProcessedTimestamp();
+        if ($lastProcessed->diffInMinutes(Carbon::now()) <= 15) {
+            $blockchain_tracker_status = "success";
+        } else {
+            $blockchain_tracker_status = "danger";
+        }
+
 
 		
 
@@ -135,13 +143,16 @@ class StatusController extends Controller {
 		$view->blockexplorer = $blockexplorer;
 		$view->pebas_status = $pebas_status;
 		$view->ipfs_status = $ipfs_status;
-
+		$view->blockchain_tracker_status = $blockchain_tracker_status;
 
 		return $view;
 	}
 
 
-
+    private function getLastProcessedTimestamp() {
+        $lastLog = DB::table('feed_log')->latest('processed_at')->first();
+        return Carbon::parse($lastLog->processed_at);
+    }
 
 
 
