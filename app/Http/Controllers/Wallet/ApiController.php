@@ -256,7 +256,9 @@ class ApiController extends Controller {
 
 		// Check and create the directory if it doesn't exist
 		if (!file_exists($base_path)) {
+			Log::debug("PermaJson: ".$base_path);
 			if (!mkdir($base_path, 0755, true)) {
+				Log::debug("PermaJson2: ".$base_path);
 				return response()->json(["error" => "Failed to create directory. Check permissions."], 500);
 			}
 		} elseif (!is_writable($base_path)) {
