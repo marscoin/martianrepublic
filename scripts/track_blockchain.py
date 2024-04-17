@@ -805,7 +805,13 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
     else:
         logger.info("User: " + str(userid))
 
+    logger.info(data)
+    if data == "Donation":
+        logger.info("Donation seen, ignoring recording...")
+        return
+
     head, body = data.split("_", 1)  # Safely unpack data with a maxsplit=1
+    logger.error("split")
 
     # Mapping head codes to human-readable messages, assuming these messages are used for logging or similar
     head_messages = {
@@ -895,22 +901,24 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
             plain = byte_array.decode()
             logging.info("Decoded message: %s", plain)
         else:
-            print("false")
+            print("No OPRETURN")
             # Check if this output has the highest value so far and capture the address
             if vo['value'] > max_value:
                 max_value = vo['value']
                 # Extract the address from this output, if available
                 addresses = script.get('addresses', [])
                 owner_address = addresses[0] if addresses else None
-
+    
+    print("Here")
     if plain and owner_address:
-        logging.info(f"Transaction initiated by: {owner_address}")
-        analyze_embedded_data(cur, db, plain, owner_address, transaction['txid'], height, mined, block_hash)
+        logger.info(f"Transaction initiated by: {owner_address}")
+        return analyze_embedded_data(cur, db, plain, owner_address, transaction['txid'], height, mined, block_hash)
     if plain:
-        logging.info("Anonymous data discovered...analyzing...")
-        analyze_embedded_anonymous_data(cur, db, plain, transaction['txid'], height, mined, block_hash)
+        logger.info("Anonymous data discovered...analyzing...")
+        return analyze_embedded_anonymous_data(cur, db, plain, transaction['txid'], height, mined, block_hash)
     else:
-        logging.info("Unable to determine transaction initiator.")
+        logger.info("Unable to determine transaction initiator.")
+        return
 
 
 def main_loop():
