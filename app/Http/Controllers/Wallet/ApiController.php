@@ -252,14 +252,21 @@ class ApiController extends Controller {
 		$public_address = $request->input('address');
 		$type = $request->input('type');
 		$json = $request->input('payload');
-		$base_path = "./assets/citizen/" . $public_address;
+		$rootPath = base_path();
+		$base_path = $rootPath . "/assets/citizen/" . $public_address;
 
 		// Check and create the directory if it doesn't exist
 		if (!file_exists($base_path)) {
-			Log::info("PermaJson: ".$base_path);
-			if (!mkdir($base_path, 0755, true)) {
-				Log::info("PermaJson2: ".$base_path);
+			Log::info("Trying to create directory: " . $base_path);
+			if (!mkdir($base_path, 0777, true)) {
+				Log::error("Failed to create directory: " . $base_path);
 				return response()->json(["error" => "Failed to create directory. Check permissions."], 500);
+			}
+			Log::info("Directory created or already exists: " . $base_path);
+
+			if (!is_writable($base_path)) {
+				Log::error("Directory not writable: " . $base_path);
+				return response()->json(["error" => "Directory is not writable."], 500);
 			}
 		} elseif (!is_writable($base_path)) {
 			return response()->json(["error" => "Directory is not writable."], 500);
