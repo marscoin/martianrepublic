@@ -281,12 +281,21 @@ class ApiController extends Controller {
 		}
 
 		try {
-			// Upload the folder and pin the file
-			Log::info("PermaJson: ".$file_path);
-			$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
+			Log::info("PermaJson: " . $file_path);
+		
+			// Check if the type contains the word 'log'
+			if (strpos($type, 'log') !== false) {
+				// The type contains 'log', use uploadFolder
+				$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
+			} else {
+				// The type does not contain 'log', use upload
+				$apiResponse = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+			}
+			
 			return response()->json($apiResponse, 200)->header('Content-Type', "application/json;");
 		} catch (\Exception $e) {
 			// Handle exceptions during the upload and pinning process
+			Log::error("Upload error: " . $e->getMessage());
 			return response()->json(["error" => $e->getMessage()], 500);
 		}
 	}
