@@ -252,7 +252,8 @@ class ApiController extends Controller {
 		$public_address = $request->input('address');
 		$type = $request->input('type');
 		$json = $request->input('payload');
-		$base_path =  "./assets/citizen/" . $public_address;
+		$projectRoot = env('PROJECT_ROOT', base_path());
+		$base_path =  $projectRoot . "/assets/citizen/" . $public_address;
 
 		// Check and create the directory if it doesn't exist
 		Log::info($base_path);
