@@ -245,32 +245,36 @@ class ApiController extends Controller {
 	 */
 	public function permapinjson(Request $request)
 	{
-		if (Auth::check()) {
-			$hash = "";
-			$json = $request->input('payload');
-			$type = $request->input('type');
-			$public_address = $request->input('address');
-			$file_path = "./assets/citizen/" . $public_address . "/";
-			if (!file_exists($file_path)) {
-				mkdir($file_path);
-			}
-			
-			$file_path = "./assets/citizen/" . $public_address . "/".$type.".json";
+		if (!Auth::check()) {
+			return redirect('/login');
+		}
 
-			file_put_contents($file_path, $json);
-			try {
-				$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
-				return response()->json($apiResponse, 200)
-					->header('Content-Type', "application/json;");
-			} catch (\Exception $e) {
-				return response()->json(["error" => $e->getMessage()], 500);
-			}
+		$public_address = $request->input('address');
+		$type = $request->input('type');
+		$json = $request->input('payload');
 
-		
-		}else{
-            return redirect('/login');
-        }
+		// Define the path to store the JSON file
+		$base_path = "./assets/citizen/" . $public_address;
+		$file_path = $base_path . "/" . $type . ".json";
+
+		// Check and create the directory if it doesn't exist
+		if (!file_exists($base_path)) {
+			mkdir($base_path, 0755, true); // Use more secure permissions
+		}
+
+		// Write the JSON data to the file
+		file_put_contents($file_path, $json);
+
+		try {
+			// Try uploading the folder and pinning the file
+			$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
+			return response()->json($apiResponse, 200)->header('Content-Type', "application/json;");
+		} catch (\Exception $e) {
+			// Handle any exceptions during the upload and pinning process
+			return response()->json(["error" => $e->getMessage()], 500);
+		}
 	}
+
 
 
 	/**
