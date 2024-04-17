@@ -248,7 +248,7 @@ class ApiController extends Controller {
 		if (!Auth::check()) {
 			return redirect('/login');
 		}
-
+		Log::debug("in function");
 		$public_address = $request->input('address');
 		$type = $request->input('type');
 		$json = $request->input('payload');
