@@ -258,7 +258,7 @@ class ApiController extends Controller {
 		// Check and create the directory if it doesn't exist
 		if (!file_exists($base_path)) {
 			Log::info("Trying to create directory: " . $base_path);
-			if (!mkdir($base_path, 0777, true)) {
+			if (!mkdir($base_path, 0755, true)) {
 				Log::error("Failed to create directory: " . $base_path);
 				return response()->json(["error" => "Failed to create directory. Check permissions."], 500);
 			}
