@@ -96,8 +96,13 @@
                     <div id="myTabContent" class="tab-content stacked-content">  
                         <div class="tab-pane fade active in" id="info">  
                             <div id="markdown-container">Loading...</div>
-                        </div>
                         
+
+                        @if(!$proposal->mined && $proposal->active)
+                        <hr>
+                            <a href="" style=" text-align: center;" class="btn btn-lg btn-info demo-element "><i class="fa-solid fa-file-contract"></i> Submitted</a>
+                        @endif
+                        </div>
                         
                         <div class="tab-pane fade" id="timeline">
                             <h3 class="content-title"><u>Timeline</u></h3>
@@ -141,11 +146,55 @@
 
 
 
-                        <a id="comments"></a>
+
+<a id="comments"></a>
 
 <div class="heading-block">
   <h3>Comments</h3>
 </div>
+<ol class="comment-list">
+  {{-- Loop through the posts --}}
+  @foreach ($posts as $post)
+    {{-- Check if the post is a top-level post --}}
+    @if (is_null($post->post_id))
+      <li>
+        <div class="comment">
+          {{-- Comment structure here --}}
+          <div class="comment-avatar">
+            <!-- <img src="{{ asset('path/to/avatars/'.$post->author_id.'-md.jpg') }}" class="avatar"> -->
+            <img alt="" src="/assets/global/img/avatars/avatar-5-md.jpg" class="avatar">
+          </div>
+          <div class="comment-meta">
+            <span class="comment-author">
+            <a href="javascript:;">{{ $post->authorName }}</a>
+            </span>
+            <a href="javascript:;" class="comment-timestamp">
+            {{ $post->created_at->format('F j, Y at h:i a') }}
+            </a>
+            -
+            <a class="comment-reply-link" href="javascript:;">Reply</a>
+          </div>
+          <div class="comment-body">
+            <p>{{ $post->content }}</p>
+          </div>
+        </div>
+        {{-- Now check if this post has any replies --}}
+        @php
+          $replies = $posts->where('post_id', $post->id);
+        @endphp
+
+        @if ($replies->isNotEmpty())
+          <ol class="comment-list">
+            {{-- Loop through the replies --}}
+            @foreach ($replies as $reply)
+              @include('congress.reply', ['reply' => $reply])
+            @endforeach
+          </ol>
+        @endif
+      </li>
+    @endif
+  @endforeach
+</ol>
 
 <ol class="comment-list">
 
@@ -398,8 +447,43 @@
 
 
           <div class="col-sm-4 col-md-4 col-lg-3 layout-sidebar">
-
             <hr class="visible-xs">
+
+
+@if(!$proposal->mined && $proposal->active)
+<h5><i class="fa fa-spinner fa-spin fa-fw"></i> Awaiting Notarization ...</h5>
+
+<br class="xs-50">
+
+<div class="list-group">
+
+      <a href="javascript:;" class="list-group-item">
+          <h3 class="pull-right"><i class="fa fa-gavel text-primary"></i></h3>
+          <h4 class="list-group-item-heading">{{$proposal->threshold}}%</h4>
+          <p class="list-group-item-text">Required to pass</p>
+        </a>
+
+      <a href="javascript:;" class="list-group-item">
+        <h3 class="pull-right"><i class="fa fa-users  text-primary"></i></h3>
+        <h4 class="list-group-item-heading">{{$proposal->participation}}%</h4>
+        <p class="list-group-item-text">Citizen participation needed</p>
+      </a>
+
+      <a href="javascript:;" class="list-group-item">
+        <h3 class="pull-right"><i class="fa fa-calendar  text-primary"></i></h3>
+        <h4 class="list-group-item-heading">{{$proposal->participation}}</h4>
+        <p class="list-group-item-text">Vote duration in days</p>
+      </a>
+
+      <a href="javascript:;" class="list-group-item">
+        <h3 class="pull-right"><i class="fa fa-multiply  text-primary"></i></h3>
+        <h4 class="list-group-item-heading">{{$proposal->expiration}}</h4>
+        <p class="list-group-item-text">Automatic expiration in years</p>
+      </a>
+    </div>
+
+
+@elseif($proposal->mined && $proposal->active)
             
             <?php if($isCitizen){?>
                 
@@ -457,7 +541,9 @@
                     <p class="list-group-item-text">Automatic expiration in years</p>
                   </a>
                 </div>
-            
+@else
+<a href="#" class="btn btn-tertiary">Concluded</a>
+@endif       
             
 
           </div> <!-- /.col -->

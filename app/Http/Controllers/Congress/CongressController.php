@@ -12,6 +12,7 @@ use App\Models\HDWallet;
 use App\Models\CivicWallet;
 use App\Models\Proposals;
 use App\Models\Vote;
+use App\Models\Posts;
 use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
@@ -200,6 +201,17 @@ class CongressController extends Controller
 			->take(10)
 			->get();
 
+			$posts = Posts::with(['replies' => function ($query) {
+				$query->orderBy('sequence', 'asc');
+			}])
+			->where('thread_id', $proposal->discussion)
+			->whereNull('post_id') // Top-level posts
+			->orderBy('sequence', 'asc')
+			->get();
+
+			// dd($posts);
+
+			$view->posts = $posts;
 			$view->proposal = $proposal;
 			$view->fullname = Auth::user()->fullname;
 			$view->isCitizen = $profile->citizen;

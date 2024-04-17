@@ -90,14 +90,17 @@ class PostController extends BaseController
         return $this->check(ViewFactory::make('forum::post.create', compact('thread', 'post')));
     }
 
-    public function store(CreatePost $request, Thread $thread): RedirectResponse
+    public function store(CreatePost $request, Thread $thread)
     {
         $this->authorize('reply', $thread);
 
         $post = $request->fulfill();
 
+        $category = $thread->category;
+
         Forum::alert('success', 'general.reply_added');
 
+        //return redirect()->route('forum::thread.show', ['thread' => $thread]);
         return $this->check(ViewFactory::make('forum::post.edit', compact('category', 'thread', 'post')));
     }
 

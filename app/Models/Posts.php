@@ -26,8 +26,19 @@ class Posts extends Model {
 	 *
 	 * @var array
 	 */
-	public static $rules = array(
-		);
+	public static $rules = array();
+
+	// public function replies()
+    // {
+    //     return $this->hasMany(Posts::class, 'post_id', 'id');
+    // }
+
+	public function replies()
+	{
+		return $this->hasMany(Posts::class, 'post_id', 'id');
+	}
+
+
 }
 
 ?>
