@@ -272,6 +272,7 @@ class ApiController extends Controller {
 
 		try {
 			// Upload the folder and pin the file
+			Log::debug("PermaJson: ".$file_path);
 			$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
 			return response()->json($apiResponse, 200)->header('Content-Type', "application/json;");
 		} catch (\Exception $e) {
