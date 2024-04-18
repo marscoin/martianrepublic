@@ -8,7 +8,7 @@
     </div>
 @else
     @foreach ($passed as $proposal)
-        <div class="post">
+    <div class="post" style="border-bottom: 1px dotted #ccc;margin-bottom: 50px;padding-bottom: 50px;">
             <div class="post-aside">
                 @php
                     $createdAt = \Carbon\Carbon::parse($proposal->mined);
@@ -22,12 +22,15 @@
                 {{$proposal->post_count}}
                 </a>
             </div> 
+            @php
+                $endTime = \Carbon\Carbon::parse($proposal->mined)->addDays($proposal->duration)->format('F j, Y');
+            @endphp
             <div class="post-main">
-                <h3 class="post-title"><a href="#">{{ $proposal->title }}</a></h3>
-                <h4 class="post-meta">Submitted by <a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }}</a> in <a href="javascript:;">{{str_replace("poll", "Certified Poll", $proposal->category)}}</a></h4>
-                <h5>Summary: Voting lasted {{$proposal->duration}} days. It started on {{ $createdAt->format('F j, Y') }} and ended  {{ $createdAt->format('F j, Y') }}. A total of {{$proposal->total_votes}} votes was cast exceeding a necessary participation threshold of {{$proposal->threshold}}% of the current number of citizens. The motion carried with {{round($proposal->yay_percent,2)}}% of the vote in favor. Notarized: {{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }} <a  target="_blank" href="{{$proposal->ipfs_hash}}"><i class="fa-solid fa-link"></i></a> </h5>
+                <h3 class="post-title"><a href="/congress/proposal/{{$proposal->id}}">{{ $proposal->title }}</a></h3>
+                <h4 class="post-meta">Submitted by <a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }}</a> in <a href="javascript:;">{{str_replace("poll", "Certified Poll", $proposal->category)}}</a> [<a  target="_blank" href="{{$proposal->ipfs_hash}}">{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</a>]</h4>
+                <h5>Summary: Voting lasted {{$proposal->duration}} days. It started on {{ $createdAt->format('F j, Y') }} and ended  {{ $endTime }}. A total of {{$proposal->total_votes}} votes was cast exceeding a necessary participation threshold of {{$proposal->threshold}}% of the current number of citizens ({{$proposal->citizen_count}}). The motion carried with {{round($proposal->yay_percent,2)}}% of the vote in favor.</h5>
                 <div class="post-content">      
-                <p>{{substr($proposal->description, 0, 400)}}<a href="/congress/proposal/{{$proposal->id}}">Read More...</a></p>
+                <p>{{substr($proposal->description, 0, 400)}}<a href="/congress/proposal/{{$proposal->id}}"> Read More...</a></p>
                     <div class="row">
                         <div class="col-sm-4" style="padding-top: 14px;">
                             <a href="#" class="btn btn-success"><i class="fa-regular fa-square-check"></i> Passed</a>

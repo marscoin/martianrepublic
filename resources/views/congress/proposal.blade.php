@@ -44,23 +44,18 @@
 
 
 <div class="row layout layout-stack-sm layout-main-left">
-
           <div class="col-sm-8 col-md-8 col-lg-9 layout-main">
-
             <div class="posts">
-
               <div class="post">
                 <div class="post-aside">
                     @php
                         $createdAt = \Carbon\Carbon::parse($proposal->mined);
                     @endphp
                     <div class="post-date">
-                        <span class="post-date-day">{{ $createdAt->format('d') }}</span>
-                        <span class="post-date-month">{{ $createdAt->format('M') }}</span>
-                        <span class="post-date-year">{{ $createdAt->format('Y') }}</span>
+                        <span class="post-date-day">{{ $proposal->id }}</span>
+                        <span class="post-date-month">#</span>
+                        <span class="post-date-year">Bill</span>
                     </div>
-
-            
 
                     <ul id="myTab" class="nav nav-pills nav-stacked">
                         <li class="active">
@@ -68,24 +63,18 @@
                             <i class="fa-solid fa-circle-info"></i>
                             </a>
                         </li>
-
                         <li class="">
                             <a href="#timeline" data-toggle="tab">
                             <i class="fa-solid fa-timeline"></i>
                             </a>
                         </li>
-
                         <li class="">
                             <a href="#comments" data-toggle="tab">
                             <i class="fa-solid fa-comment"></i>
                             </a>
                         </li>
-
-                       
                     </ul>
-
-
-                </div> <!-- /.post-aside -->
+                </div> 
 
                 <div class="post-main">
                 <h3 class="post-title"><a href="#">{{ $proposal->title }}</a></h3>
@@ -143,12 +132,7 @@
                         <div class="tab-pane fade" id="comments">
                            
 
-
-
-
-
 <a id="comments"></a>
-
 <div class="heading-block">
   <h3>Comments</h3>
 </div>
@@ -187,27 +171,27 @@
   @endforeach
 </ol>
 
-<br class="xs-60">
 
+@if ($proposal->active)
+<br class="xs-60">
 <div class="heading-block">
   <h3>Post a Comment</h3>
 </div>
-
   <div class="form-group">
     <div class="col-md-8 col-sm-12">
       <label>Message: <span>*</span></label>
       <textarea class="form-control" id="text" name="text" rows="6" cols="40"></textarea>
     </div>
   </div>
-
   <div class="form-group">
     <div class="col-md-8 col-sm-12">
       <button class="btn btn-primary" type="submit">Submit Comment</button>
     </div>
   </div>
-
- 
 </form>
+@else
+<h3>Public comment period ended</h3>
+@endif
 
 
 
@@ -243,7 +227,7 @@
 
 
 
-          <div class="col-sm-4 col-md-4 col-lg-3 layout-sidebar">
+<div class="col-sm-4 col-md-4 col-lg-3 layout-sidebar" style="min-height:700px;">
             <hr class="visible-xs">
 
 
@@ -338,8 +322,131 @@
                     <p class="list-group-item-text">Automatic expiration in years</p>
                   </a>
                 </div>
+@elseif($proposal->status == "passed")
+<a  style="width: 100%; text-align: center;" class="btn-lg btn-success demo-element "><i class="fa-solid fa-square-check"></i> Passed</a>
+
+<br class="xs-50">
+
+<div class="list-group">
+
+<a href="javascript:;" class="list-group-item">
+          <h3 class="pull-right"><i class="fa fa-gavel text-primary"></i></h3>
+          <h4 class="list-group-item-heading">{{$proposal->threshold}}%</h4>
+          <p class="list-group-item-text">Threshold for passing</p>
+        </a>
+
+
+        <a href="javascript:;" class="list-group-item">
+          <h3 class="pull-right"><i class="fa fa-hand-peace text-primary"></i></h3>
+          <h4 class="list-group-item-heading">{{round($proposal->yay_percent,2)}}%</h4>
+          <p class="list-group-item-text">of votes carried motion</p>
+        </a>
+
+    <a href="javascript:;" class="list-group-item">
+        <h3 class="pull-right"><i class="fa fa-calendar  text-primary"></i></h3>
+        <h4 class="list-group-item-heading">{{$proposal->participation}}</h4>
+        <p class="list-group-item-text">Days of voting</p>
+      </a>
+
+
+
+      <a href="javascript:;" class="list-group-item">
+        <h3 class="pull-right"><i class="fa fa-users  text-primary"></i></h3>
+        <h4 class="list-group-item-heading">{{$proposal->participation}}</h4>
+        <p class="list-group-item-text">Min. participation required</p>
+      </a>
+
+        <a href="javascript:;" class="list-group-item">
+          <h3 class="pull-right"><i class="fa fa-check-double text-primary"></i></h3>
+          <h4 class="list-group-item-heading">{{$proposal->total_votes}}</h4>
+          <p class="list-group-item-text">Actual votes received</p>
+        </a>
+
+
+        <a href="javascript:;" class="list-group-item">
+          <h3 class="pull-right"><i class="fa fa-thumbs-up text-primary"></i></h3>
+          <h4 class="list-group-item-heading">{{$proposal->yays}}</h4>
+          <p class="list-group-item-text">Yay votes</p>
+        </a>
+
+        <a href="javascript:;" class="list-group-item">
+          <h3 class="pull-right"><i class="fa fa-thumbs-down text-primary"></i></h3>
+          <h4 class="list-group-item-heading">{{$proposal->nays}}</h4>
+          <p class="list-group-item-text">Nay votes</p>
+        </a>
+
+      <a href="javascript:;" class="list-group-item">
+        <h3 class="pull-right"><i class="fa fa-multiply  text-primary"></i></h3>
+        <h4 class="list-group-item-heading">{{$proposal->expiration}}</h4>
+        <p class="list-group-item-text">Policy expiration term (in years)</p>
+      </a>
+    </div>
+
+
+@elseif($proposal->status == "rejected")
+<a  style="width: 100%; text-align: center;" class="btn-lg btn-danger demo-element "><i class="fa-regular fa-circle-xmark"></i> Rejected</a>
+
+<br class="xs-50">
+
+<div class="list-group">
+
+<a href="javascript:;" class="list-group-item">
+          <h3 class="pull-right"><i class="fa fa-gavel text-primary"></i></h3>
+          <h4 class="list-group-item-heading">{{$proposal->threshold}}%</h4>
+          <p class="list-group-item-text">Threshold for passing</p>
+        </a>
+
+
+        <a href="javascript:;" class="list-group-item">
+          <h3 class="pull-right"><i class="fa fa-hand-peace text-primary"></i></h3>
+          <h4 class="list-group-item-heading">{{round($proposal->nay_percent,2)}}%</h4>
+          <p class="list-group-item-text">of votes blocked motion</p>
+        </a>
+
+    <a href="javascript:;" class="list-group-item">
+        <h3 class="pull-right"><i class="fa fa-calendar  text-primary"></i></h3>
+        <h4 class="list-group-item-heading">{{$proposal->participation}}</h4>
+        <p class="list-group-item-text">Days of voting</p>
+      </a>
+
+      <a href="javascript:;" class="list-group-item">
+        <h3 class="pull-right"><i class="fa fa-users  text-primary"></i></h3>
+        <h4 class="list-group-item-heading">{{$proposal->participation}}</h4>
+        <p class="list-group-item-text">Min. participation required</p>
+      </a>
+
+        <a href="javascript:;" class="list-group-item">
+          <h3 class="pull-right"><i class="fa fa-check-double text-primary"></i></h3>
+          <h4 class="list-group-item-heading">{{$proposal->total_votes}}</h4>
+          <p class="list-group-item-text">Actual votes received</p>
+        </a>
+
+        <a href="javascript:;" class="list-group-item">
+          <h3 class="pull-right"><i class="fa fa-thumbs-down text-primary"></i></h3>
+          <h4 class="list-group-item-heading">{{$proposal->nays}}</h4>
+          <p class="list-group-item-text">Nay votes</p>
+        </a>
+
+
+        <a href="javascript:;" class="list-group-item">
+          <h3 class="pull-right"><i class="fa fa-thumbs-up text-primary"></i></h3>
+          <h4 class="list-group-item-heading">{{$proposal->yays}}</h4>
+          <p class="list-group-item-text">Yay votes</p>
+        </a>
+
+    </div>
+
+@elseif($proposal->status == "expired")
+<a href="#" style="width: 100%; text-align: center;" class="btn btn-warning"><i class="fa-solid fa-hourglass-end"></i> Expired</a>
+@elseif($proposal->status == "closed")
+<a href="#" style="width: 100%; text-align: center;" class="btn btn-tertiary"><i class="fa-solid fa-triangle-exclamation"></i> Closed</a>
+<div style="margin-top: 15px;">
+<h5>Reason: {{$proposal->closed_reason}}</h5>
+</div>
+
+
 @else
-<a href="#" class="btn btn-tertiary">Concluded</a>
+<a href="#" style="width: 100%; text-align: center;" class="btn btn-tertiary">Concluded</a>
 @endif       
             
 

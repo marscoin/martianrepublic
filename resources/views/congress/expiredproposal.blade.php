@@ -8,50 +8,32 @@
     </div>
 @else
     @foreach ($expired as $proposal)
-        <div class="post">
+    <div class="post" style="border-bottom: 1px dotted #ccc;margin-bottom: 50px;padding-bottom: 50px;">
             <div class="post-aside">
                 @php
                     $createdAt = \Carbon\Carbon::parse($proposal->mined);
                 @endphp
                 <div class="post-date">
-                    <span class="post-date-day">{{ $createdAt->format('d') }}</span>
-                    <span class="post-date-month">{{ $createdAt->format('M') }}</span>
-                    <span class="post-date-year">{{ $createdAt->format('Y') }}</span>
+                    <span class="post-date-day">{{ $proposal->id }}</span>
+                    <span class="post-date-month">#</span>
+                    <span class="post-date-year">Bill</span>
                 </div>
                 <a href="/forum/t/{{ $proposal->discussion }}" class="post-comment">
                 {{$proposal->post_count}}
                 </a>
             </div> 
             <div class="post-main">
-                <h3 class="post-title"><a href="#">{{ $proposal->title }}</a></h3>
+                <h3 class="post-title"><a href="/congress/proposal/{{$proposal->id}}">{{ $proposal->title }}</a></h3>
                 <h4 class="post-meta">Submitted by <a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }}</a> in <a href="javascript:;">{{str_replace("poll", "Certified Poll", $proposal->category)}}</a></h4>
                 <h5>Proposal: {{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }} <a  target="_blank" href="{{$proposal->ipfs_hash}}"><i class="fa-solid fa-link"></i></a></h5>
                 <div class="post-content">      
                 <p>{{substr($proposal->description, 0, 400)}}<a href="/congress/proposal/{{$proposal->id}}">Read More...</a></p>
                     <div class="row">
                         <div class="col-sm-4" style="padding-top: 14px;">
-                        @if(!$proposal->mined && $proposal->active)
-                            <a href="#" class="btn btn-info">{{$proposal->status}}</a>
-                        @elseif($proposal->mined && $proposal->active)
-                            <a href="#" class="btn btn-success">Voting in Progress</a>
-                        @else
-                            <a href="#" class="btn btn-tertiary">{{$proposal->status}}</a>
-                        @endif
+                            <a href="#" class="btn btn-tertiary">Expired</a>
                         </div>
-                        <div class="col-sm-4">
-                            @if(!$proposal->mined && $proposal->active)
-                            @else
-                            @php
-                                $endTime = \Carbon\Carbon::parse($proposal->mined)->addDays($proposal->duration)->format('Y-m-d H:i:s');
-                            @endphp
-                            <x-countdown-timer :proposal-id="$proposal->id" :end-time="$endTime" :start-time="$proposal->mined" />
-                            @endif
-                        </div>
-                        <div class="col-sm-4">
-                            @if(!$proposal->mined && $proposal->active)
-                            @else
-                            @livewire('voting-progress', ['proposalId' => $proposal->id])
-                            @endif
+                        <div class="col-sm-12">
+                           
                         </div>
                     </div>
                 </div> 

@@ -1,4 +1,4 @@
-<h3 class="content-title"><u>All Proposals</u></h3>
+<h3 class="content-title"><u>Closed Proposals</u></h3>
 <div class="row">
   <div class="col-md-9">
 
@@ -7,8 +7,8 @@
         Currently no active proposals underway. Consider launching a new proposal!
     </div>
 @else
-    @foreach ($proposals as $proposal)
-    <div class="post" style="border-bottom: 1px dotted #ccc;margin-bottom: 50px;padding-bottom: 50px;">
+    @foreach ($closed as $proposal)
+        <div class="post" style="border-bottom: 1px dotted #ccc;margin-bottom: 50px;padding-bottom: 50px;">
             <div class="post-aside">
                 @php
                     $createdAt = \Carbon\Carbon::parse($proposal->mined);
@@ -24,25 +24,15 @@
             </div> 
             <div class="post-main">
                 <h3 class="post-title"><a href="/congress/proposal/{{$proposal->id}}">{{ $proposal->title }}</a></h3>
-                <h4 class="post-meta">Submitted by <a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }}</a> in <a href="javascript:;">{{str_replace("poll", "Certified Poll", $proposal->category)}}</a> [<a  target="_blank" href="{{$proposal->ipfs_hash}}">{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</a>]</h4>
+                <h4 class="post-meta">Submitted by <a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }}</a> in <a href="javascript:;">{{str_replace("poll", "Certified Poll", $proposal->category)}}</a></h4>
+                <h5>Proposal: {{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }} <a  target="_blank" href="{{$proposal->ipfs_hash}}"><i class="fa-solid fa-link"></i></a></h5>
                 <div class="post-content">      
-                <p>{{substr($proposal->description, 0, 400)}}<a href="/congress/proposal/{{$proposal->id}}"> Read More...</a></p>
+                <p>{{substr($proposal->description, 0, 400)}}<a href="/congress/proposal/{{$proposal->id}}">Read More...</a></p>
                     <div class="row">
                         <div class="col-sm-4" style="padding-top: 14px;">
-                        @if($proposal->status == "passed")
-                        <a href="#" class="btn btn-success"><i class="fa-regular fa-square-check"></i> Passed</a>
-                        @elseif($proposal->status == "rejected")
-                            <a href="#" class="btn btn-danger"><i class="fa-regular fa-circle-xmark"></i> Rejected</a>
-                        @elseif($proposal->status == "expired")
-                            <a href="#" class="btn btn-warning"><i class="fa-solid fa-hourglass-end"></i> Expired</a>
-                        @elseif($proposal->status == "closed")
-                            <a href="#" class="btn btn-tertiary"><i class="fa-solid fa-triangle-exclamation"></i> Closed</a></a>
-                        @else 
-                            <a href="#" class="btn btn-tertiary">{{$proposal->status}}</a>
-                        @endif
+                            <a href="#" class="btn btn-tertiary">Closed ({{$proposal->closed_reason}})</a>
                         </div>
                         <div class="col-sm-12">
-                           
                         </div>
                     </div>
                 </div> 

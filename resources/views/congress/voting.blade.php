@@ -64,8 +64,11 @@
                             <li class="rejected">
                                 <a href="#Rejected" data-toggle="tab">Rejected</a>
                             </li>
-                            <li class="rejected">
+                            <li class="expired">
                                 <a href="#Expired" data-toggle="tab">Expired</a>
+                            </li>
+                            <li class="closed">
+                                <a href="#Closed" data-toggle="tab">Closed</a>
                             </li>
                             <li class="">
                                 <a href="#All" data-toggle="tab">All</a>
@@ -76,14 +79,17 @@
                             <div class="tab-pane fade active in" id="Active">
                                 @include('congress.activeproposal') 
                             </div> 
-                            <div class="tab-pane fade active in" id="Passed">
+                            <div class="tab-pane fade in" id="Passed">
                                 @include('congress.passedproposal') 
                             </div> 
-                            <div class="tab-pane fade active in" id="Rejected">
+                            <div class="tab-pane fade in" id="Rejected">
                                 @include('congress.rejectedproposal') 
                             </div> 
                             <div class="tab-pane fade" id="Expired">
                                 @include('congress.expiredproposal')
+                            </div> 
+                            <div class="tab-pane fade" id="Closed">
+                                @include('congress.closedproposal')
                             </div> 
                             <div class="tab-pane fade" id="All">
                                 @include('congress.allproposals')

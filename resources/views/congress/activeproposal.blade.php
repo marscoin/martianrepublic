@@ -8,22 +8,22 @@
     </div>
 @else
     @foreach ($active as $proposal)
-        <div class="post">
+    <div class="post" style="border-bottom: 1px dotted #ccc;margin-bottom: 50px;padding-bottom: 50px;">
             <div class="post-aside">
                 @php
                     $createdAt = \Carbon\Carbon::parse($proposal->mined);
                 @endphp
                 <div class="post-date">
-                    <span class="post-date-day">{{ $createdAt->format('d') }}</span>
-                    <span class="post-date-month">{{ $createdAt->format('M') }}</span>
-                    <span class="post-date-year">{{ $createdAt->format('Y') }}</span>
+                    <span class="post-date-day">{{ $proposal->id }}</span>
+                    <span class="post-date-month">#</span>
+                    <span class="post-date-year">Bill</span>
                 </div>
                 <a href="/forum/t/{{ $proposal->discussion }}" class="post-comment">
                 {{$proposal->post_count}}
                 </a>
             </div> 
             <div class="post-main">
-                <h3 class="post-title"><a href="#">{{ $proposal->title }}</a></h3>
+                <h3 class="post-title"><a href="/congress/proposal/{{$proposal->id}}">{{ $proposal->title }}</a></h3>
                 <h4 class="post-meta">Submitted by <a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }}</a> in <a href="javascript:;">{{str_replace("poll", "Certified Poll", $proposal->category)}}</a></h4>
                 <h5>Proposal: {{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }} <a  target="_blank" href="{{$proposal->ipfs_hash}}"><i class="fa-solid fa-link"></i></a></h5>
                 <div class="post-content">      
