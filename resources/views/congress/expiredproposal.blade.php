@@ -24,13 +24,12 @@
             </div> 
             <div class="post-main">
                 <h3 class="post-title"><a href="/congress/proposal/{{$proposal->id}}">{{ $proposal->title }}</a></h3>
-                <h4 class="post-meta">Submitted by <a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }}</a> in <a href="javascript:;">{{str_replace("poll", "Certified Poll", $proposal->category)}}</a></h4>
-                <h5>Proposal: {{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }} <a  target="_blank" href="{{$proposal->ipfs_hash}}"><i class="fa-solid fa-link"></i></a></h5>
+                <h4 class="post-meta">Submitted by <a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }}</a> in <a href="javascript:;">{{str_replace("poll", "Certified Poll", $proposal->category)}}</a> [<a  target="_blank" href="{{$proposal->ipfs_hash}}">{{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}</a>]</h4>
                 <div class="post-content">      
                 <p>{{substr($proposal->description, 0, 400)}}<a href="/congress/proposal/{{$proposal->id}}">Read More...</a></p>
                     <div class="row">
                         <div class="col-sm-4" style="padding-top: 14px;">
-                            <a href="#" class="btn btn-tertiary">Expired</a>
+                            <a href="#" class="btn btn-warning"><i class="fa-solid fa-hourglass-end"></i> Expired</a>
                         </div>
                         <div class="col-sm-12">
                            

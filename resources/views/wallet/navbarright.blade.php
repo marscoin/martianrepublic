@@ -40,10 +40,13 @@
 
   <li class="dropdown navbar-profile">
     <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:;">
-      <img src="https://unavatar.io/{{ Auth::user()->email }}?fallback=https://martianrepublic.org/assets/citizen/generic_profile.jpg" class="navbar-profile-avatar" alt="">
+      @php
+          $avatarLink = Auth::user()->citizen->avatar_link ?? 'https://martianrepublic.org/assets/citizen/generic_profile.jpg';
+      @endphp
+      <img src="{{ $avatarLink }}" class="navbar-profile-avatar" alt="">
       <span class="navbar-profile-label">{{ Auth::user()->email }} &nbsp;</span>
       <i class="fa fa-caret-down"></i>
-    </a>
+  </a>
     <ul class="dropdown-menu" role="menu">
       <li>
         <a href="/wallet/dashboard/hd-close">
