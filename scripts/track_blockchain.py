@@ -495,6 +495,7 @@ def insert_citizenship(cur, db, endorsed_address, tag, embedded_link, txid, heig
         cur.execute(insert_query, (endorsed_address, userid, tag, message, embedded_link, txid, height, blockdate))
         db.commit()
         logger.info(f"Successfully logged citizenship for txid: {txid}")
+        update_population_count(cur, db, height, tag)
     except Exception as e:
         logger.error(f"Failed to log citizenship for txid {txid}: {e}")
         db.rollback()
@@ -640,6 +641,30 @@ def process_endorsement(cur, db, addr, head, body, userid, txid, height, blockda
 
 
 
+def update_population_count(cur, db, block, tag):
+    """
+    Updates the population count in the database based on the transaction tag.
+    
+    block: The block number in which the transaction was found.
+    tag: The tag from the transaction that determines which counter to increment.
+    """
+    if tag == 'GP':
+        update_query = "UPDATE population SET general_public_count = general_public_count + 1 WHERE block = %s"
+    elif tag == 'CT':
+        update_query = "UPDATE population SET citizen_count = citizen_count + 1 WHERE block = %s"
+    else:
+        return  # If the tag is neither GP nor CT, do nothing
+
+    try:
+        cur.execute(update_query, (block,))
+        db.commit()
+        logger.info(f"Updated population count for block {block} with tag {tag}.")
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to update population count for block {block} with tag {tag}: {e}")
+
+
+
 def cache_general_applications(cur, db, addr, head, body, userid, txid, height, blockdate):
     """
     Cache general public applications
@@ -661,6 +686,7 @@ def cache_general_applications(cur, db, addr, head, body, userid, txid, height, 
         edata = fetch_ipfs_data(body)
         logger.info("IPFS json data fetched...")
         update_or_insert_applicant(cur, db, addr, edata, userid)
+        update_population_count(cur, db, height, head)
         logger.info("User application data stored in citizen cache table...")
     except Exception as e:
         logger.error("Failed to cache application for txid %s: %s", txid, e)

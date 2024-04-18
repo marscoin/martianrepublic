@@ -83,7 +83,7 @@
                                 @include('congress.rejectedproposal') 
                             </div> 
                             <div class="tab-pane fade" id="Expired">
-                                @include('congress.archivedproposals2')
+                                @include('congress.expiredproposal')
                             </div> 
                             <div class="tab-pane fade" id="All">
                                 @include('congress.allproposals')

@@ -72,13 +72,71 @@ class CongressController extends Controller
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
+
 			$proposals = DB::table('proposals')
 			->leftJoin('forum_posts', 'proposals.discussion', '=', 'forum_posts.thread_id')
 			->select('proposals.*', DB::raw('COUNT(forum_posts.id) as post_count'))
-			->where('proposals.active', '=', 1)
 			->groupBy('proposals.id')
 			->get();
-			$oldproposals = DB::table('proposals')->select('proposals.*')->where('active', '=', '0')->get();
+
+			$active = DB::table('proposals')
+			->leftJoin('forum_posts', 'proposals.discussion', '=', 'forum_posts.thread_id')
+			->select('proposals.*', DB::raw('COUNT(forum_posts.id) as post_count'))
+			->where('proposals.active', '=', 1)
+			->whereIn('status', ['submitted','voting'])
+			->groupBy('proposals.id')
+			->get();
+
+			$passed = DB::table('proposals as p')
+				->leftJoinSub(
+					'SELECT proposal_id, COUNT(*) AS yays FROM votes WHERE vote = "Y" GROUP BY proposal_id', 
+					'yay_votes', 
+					function($join) {
+						$join->on('p.id', '=', 'yay_votes.proposal_id');
+					}
+				)
+				->leftJoinSub(
+					'SELECT proposal_id, COUNT(*) AS nays FROM votes WHERE vote = "N" GROUP BY proposal_id', 
+					'nay_votes', 
+					function($join) {
+						$join->on('p.id', '=', 'nay_votes.proposal_id');
+					}
+				)
+				->leftJoinSub(
+					'SELECT thread_id, COUNT(*) AS post_count FROM forum_posts GROUP BY thread_id', 
+					'fp', 
+					function($join) {
+						$join->on('p.discussion', '=', 'fp.thread_id');
+					}
+				)
+				->selectRaw('
+					p.*, 
+					COALESCE(yay_votes.yays, 0) as yays, 
+					COALESCE(nay_votes.nays, 0) as nays, 
+					COALESCE(yay_votes.yays, 0) + COALESCE(nay_votes.nays, 0) as total_votes, 
+					COALESCE(100 * yay_votes.yays / NULLIF(yay_votes.yays + nay_votes.nays, 0), 0) as yay_percent, 
+					COALESCE(100 * nay_votes.nays / NULLIF(yay_votes.yays + nay_votes.nays, 0), 0) as nay_percent,
+					COALESCE(fp.post_count, 0) as post_count
+				')
+				->where('p.status', '=', 'passed')
+				->groupBy('p.id', 'yay_votes.yays', 'nay_votes.nays', 'fp.post_count')
+				->get();
+
+
+			$rejected = DB::table('proposals')
+			->leftJoin('forum_posts', 'proposals.discussion', '=', 'forum_posts.thread_id')
+			->select('proposals.*', DB::raw('COUNT(forum_posts.id) as post_count'))
+			->where('proposals.status', '=', 'rejected')
+			->groupBy('proposals.id')
+			->get();
+
+
+			$expired = DB::table('proposals')
+			->leftJoin('forum_posts', 'proposals.discussion', '=', 'forum_posts.thread_id')
+			->select('proposals.*', DB::raw('COUNT(forum_posts.id) as post_count'))
+			->whereNotIn('status', ['rejected','passed', 'closed'])
+			->groupBy('proposals.id')
+			->get();
 			
 			$endTime = microtime(true);
     		$executionTime = $endTime - $startTime;
@@ -110,7 +168,10 @@ class CongressController extends Controller
     		Log::info("Execution time4: {$executionTime} seconds");
 
 			$view->proposals = $proposals;
-			$view->oldproposals = $oldproposals;
+			$view->active = $active;
+			$view->expired = $expired;
+			$view->passed = $passed;
+			$view->rejected = $rejected;
 			$view->fullname = Auth::user()->fullname;
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
@@ -201,13 +262,13 @@ class CongressController extends Controller
 			->take(10)
 			->get();
 
-			$posts = Posts::with(['replies' => function ($query) {
-				$query->orderBy('sequence', 'asc');
-			}])
+			$posts = Posts::with('allRepliesWithCitizen', 'citizen')
 			->where('thread_id', $proposal->discussion)
 			->whereNull('post_id') // Top-level posts
-			->orderBy('sequence', 'asc')
 			->get();
+
+			// print_r($posts);
+			// die;
 
 			// dd($posts);
 

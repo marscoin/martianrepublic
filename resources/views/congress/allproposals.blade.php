@@ -1,6 +1,6 @@
 <div class="col-sm-8 col-md-8 col-lg-9">
     <div class="posts">
-        @foreach ($oldproposals as $proposal)
+        @foreach ($proposals as $proposal)
         <div class="post">
             <div class="post-aside">
                 @php

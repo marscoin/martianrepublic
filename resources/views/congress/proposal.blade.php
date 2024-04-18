@@ -153,16 +153,13 @@
   <h3>Comments</h3>
 </div>
 <ol class="comment-list">
-  {{-- Loop through the posts --}}
   @foreach ($posts as $post)
     {{-- Check if the post is a top-level post --}}
     @if (is_null($post->post_id))
       <li>
         <div class="comment">
-          {{-- Comment structure here --}}
           <div class="comment-avatar">
-            <!-- <img src="{{ asset('path/to/avatars/'.$post->author_id.'-md.jpg') }}" class="avatar"> -->
-            <img alt="" src="/assets/global/img/avatars/avatar-5-md.jpg" class="avatar">
+            <img src="{{ $post->citizen->avatar_link }}"  onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'" class="avatar">
           </div>
           <div class="comment-meta">
             <span class="comment-author">
@@ -178,216 +175,16 @@
             <p>{{ $post->content }}</p>
           </div>
         </div>
-        {{-- Now check if this post has any replies --}}
-        @php
-          $replies = $posts->where('post_id', $post->id);
-        @endphp
-
-        @if ($replies->isNotEmpty())
-          <ol class="comment-list">
-            {{-- Loop through the replies --}}
-            @foreach ($replies as $reply)
-              @include('congress.reply', ['reply' => $reply])
-            @endforeach
-          </ol>
-        @endif
+        @if ($post->replies->isNotEmpty())
+        <ol class="comment-list">
+          @foreach ($post->replies as $reply)
+            @include('congress.reply', ['reply' => $reply])
+          @endforeach
+        </ol>
+      @endif
       </li>
     @endif
   @endforeach
-</ol>
-
-<ol class="comment-list">
-
-  <li>
-    <div class="comment">
-
-      <div class="comment-avatar">
-        <img alt="" src="../../global/img/avatars/avatar-4-md.jpg" class="avatar">
-      </div> <!-- /.comment-avatar -->
-
-      <div class="comment-meta">
-
-        <span class="comment-author">
-          <a href="javascript:;" class="url">Peter Landt</a>
-        </span>
-
-        <a href="javascript:;" class="comment-timestamp">
-          April 3, 2013 at 6:47 am
-        </a>
-
-        -
-
-        <a class="comment-reply-link" href="javascript:;">Reply</a>
-
-      </div> <!-- /.comment-meta -->
-
-      <div class="comment-body">
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
-      </div> <!-- /.comment-body -->
-
-    </div> <!-- /.comment -->
-  </li>
-
-  <li>
-    <div class="comment">
-
-      <div class="comment-avatar">
-        <img alt="" src="../../global/img/avatars/avatar-3-md.jpg" class="avatar">
-      </div> <!-- /.comment-avatar -->
-
-      <div class="comment-meta">
-
-        <span class="comment-author">
-          <a href="javascript:;" class="url">Adelle Charles</a>
-        </span>
-
-        <a href="javascript:;" class="comment-timestamp">
-          April 3, 2013 at 6:47 am
-        </a>
-
-        -
-
-        <a class="comment-reply-link" href="javascript:;">Reply</a>
-
-      </div> <!-- /.comment-meta -->
-
-      <div class="comment-body">
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
-      </div> <!-- /.comment-body -->
-
-    </div> <!-- /.comment -->
-
-    <ol class="comment-list">
-      <li>
-        <div class="comment">
-
-          <div class="comment-avatar">
-            <img alt="" src="../../global/img/avatars/avatar-5-md.jpg" class="avatar">
-          </div> <!-- /.comment-avatar -->
-
-          <div class="comment-meta">
-
-            <span class="comment-author">
-              <a href="javascript:;" class="url">Enda Nasution</a>
-            </span>
-
-            <a href="javascript:;" class="comment-timestamp">
-              April 3, 2013 at 6:47 am
-            </a>
-
-            -
-
-            <a class="comment-reply-link" href="javascript:;">Reply</a>
-
-          </div> <!-- /.comment-meta -->
-
-          <div class="comment-body">
-            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
-          </div> <!-- /.comment-body -->
-
-        </div> <!-- /.comment -->                    
-      </li>
-
-      <li>
-        <div class="comment">
-
-          <div class="comment-avatar">
-            <img alt="" src="../../global/img/avatars/avatar-5-md.jpg" class="avatar">
-          </div> <!-- /.comment-avatar -->
-
-          <div class="comment-meta">
-
-            <span class="comment-author">
-              <a href="javascript:;" class="url">Enda Nasution</a>
-            </span>
-
-            <a href="javascript:;" class="comment-timestamp">
-              April 3, 2013 at 6:47 am
-            </a>
-
-            -
-
-            <a class="comment-reply-link" href="javascript:;">Reply</a>
-
-          </div> <!-- /.comment-meta -->
-
-          <div class="comment-body">
-            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
-          </div> <!-- /.comment-body -->
-
-        </div> <!-- /.comment -->  
-
-
-        <ol class="comment-list">
-          <li>
-            <div class="comment">
-
-              <div class="comment-avatar">
-                <img alt="" src="../../global/img/avatars/avatar-5-md.jpg" class="avatar">
-              </div> <!-- /.comment-avatar -->
-
-              <div class="comment-meta">
-
-                <span class="comment-author">
-                  <a href="javascript:;" class="url">Enda Nasution</a>
-                </span>
-
-                <a href="javascript:;" class="comment-timestamp">
-                  April 3, 2013 at 6:47 am
-                </a>
-
-                -
-
-                <a class="comment-reply-link" href="javascript:;">Reply</a>
-
-              </div> <!-- /.comment-meta -->
-
-              <div class="comment-body">
-                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
-              </div> <!-- /.comment-body -->
-
-            </div> <!-- /.comment -->                    
-          </li>
-        </ol>
-
-
-
-      </li>
-    </ol>
-  </li>
-
-
-
-  <li>
-    <div class="comment">
-
-      <div class="comment-avatar">
-        <img alt="" src="../../global/img/avatars/avatar-4-md.jpg" class="avatar">
-      </div> <!-- /.comment-avatar -->
-
-      <div class="comment-meta">
-
-        <span class="comment-author">
-          <a href="javascript:;" class="url">Peter Landt</a>
-        </span>
-
-        <a href="javascript:;" class="comment-timestamp">
-          April 3, 2013 at 6:47 am
-        </a>
-
-        -
-
-        <a class="comment-reply-link" href="javascript:;">Reply</a>
-
-      </div> <!-- /.comment-meta -->
-
-      <div class="comment-body">
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
-      </div> <!-- /.comment-body -->
-
-    </div> <!-- /.comment -->
-  </li>
-
 </ol>
 
 <br class="xs-60">

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Citizen;
 
 class Posts extends Model {
 
@@ -28,15 +29,18 @@ class Posts extends Model {
 	 */
 	public static $rules = array();
 
-	// public function replies()
-    // {
-    //     return $this->hasMany(Posts::class, 'post_id', 'id');
-    // }
 
-	public function replies()
-	{
-		return $this->hasMany(Posts::class, 'post_id', 'id');
-	}
+	public function citizen() {
+        return $this->belongsTo(Citizen::class, 'author_id', 'userid');
+    }
+
+    public function replies() {
+        return $this->hasMany(Posts::class, 'post_id', 'id')->with('replies', 'citizen');
+    }
+
+    public function allRepliesWithCitizen() {
+        return $this->replies()->with('allRepliesWithCitizen');
+    }
 
 
 }

@@ -24,6 +24,10 @@ class Citizen extends Model {
         return $this->hasMany(Feed::class, 'userid', 'userid');
     }
 
+    public function posts() {
+        return $this->hasMany(Posts::class, 'author_id');
+    }
+
 }
 
 ?>
