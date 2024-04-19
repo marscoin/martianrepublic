@@ -291,8 +291,15 @@ class ApiController extends Controller {
 				// The type does not contain 'log', use upload
 				$apiResponse = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
 			}
+
+			if (is_string($apiResponse)) {
+				$formattedResponse = ['Hash' => $apiResponse];
+			} else {
+				Log::error("Upload error: Formatting");
+				return response()->json(["error"=>"formatting error"], 500);
+			}
 			
-			return response()->json($apiResponse, 200)->header('Content-Type', "application/json;");
+			return response()->json($formattedResponse, 200)->header('Content-Type', "application/json;");
 		} catch (\Exception $e) {
 			// Handle exceptions during the upload and pinning process
 			Log::error("Upload error: " . $e->getMessage());

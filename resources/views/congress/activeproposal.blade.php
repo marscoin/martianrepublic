@@ -4,7 +4,7 @@
 
 @if ($active->isEmpty())
     <div class="alert alert-info">
-        Currently no active proposals underway. Consider launching a <a href="/congress/voting/new">new proposal</a>!
+        Currently no active proposals underway. Consider launching a <a href="/congress/voting/new" style="color: white;">new proposal</a>!
     </div>
 @else
     @foreach ($active as $proposal)
