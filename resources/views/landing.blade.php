@@ -501,61 +501,42 @@
                 <a href="http://marspedia.org/Home"><img src="/assets/landing/img/clients/logo5-grayscale.png" class="img-responsive" alt="Client Logo" style="width: 183px;  height: 63px;"></a>
               </li>
             </ul>
+          </div> 
+        </div> 
+        </div> 
+      </div> 
+    </div>
 
-
-
-          </div> <!-- /.col -->
-
-        </div> <!-- /.row -->
-        </div> <!-- /.carousel-container -->
-
-
-
-
-      </div> <!-- /.container -->
-
-    </div> <!-- /.content -->
-
-
-
-
-</div> <!-- /#wrapper -->
-
+</div> 
 <footer class="footer">
 
 	<div class="container">
-
       <div class="row">
-
         <div class="col-sm-3">
           <h4 class="content-title">
             <span>Martian Republic</span>
           </h4>
           Martian Republic is an initiative of the Marscoin&trade; Foundation, Inc., dedicated to advancing Marscoin and the use of blockchain technology in space exploration.
-        </div> <!-- /.col -->
-
-
+        </div> 
         <div class="col-sm-3">
+        
 
+        </div>
+        <div class="col-sm-3">
           <h4 class="content-title">
             <span>Twitter Feed</span>
              <a class="twitter-timeline" height="250" href="https://twitter.com/marscoinorg" data-chrome="nofooter  noscrollbar" data-widget-id="492843006043516928">Tweets by @marscoinorg</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 
           </h4>
-        </div> <!-- /.col -->
-
+        </div> 
 
         <div class="col-sm-3">
-
           <h4 class="content-title">
             <span>Stay Connected</span>
           </h4>
-
           <p></p>
-
           <br>
-
           <ul class="footer-social-link">
           <li>
               <a href="https://twitter.com/marscoinorg" class="ui-tooltip" title="X" data-placement="bottom">
@@ -587,35 +568,9 @@
             </li>
           </ul>
 
-        </div> <!-- /.col -->
-
-
-        <div class="col-sm-3">
-
-        <h4 class="content-title">
-          <span>Stay Updated</span>
-        </h4>
-
-        <p>Get emails about the Martian Republic &amp;  future updates.</p>
-
-        <form action="/" class="form">
-
-          <div class="form-group">
-            <!-- <label>Email: <span class="required">*</span></label> -->
-            <input class="form-control" id="newsletter_email" name="newsletter_email" type="text" value="" required="" placeholder="Email Address">
-          </div> <!-- /.form-group -->
-
-          <div class="form-group">
-            <button class="btn btn-transparent">Subscribe Me</button>
-          </div> <!-- /.form-group -->
-
-        </form>
-
-      </div> <!-- /.col -->
-
-      </div> <!-- /.row -->
-
-	</div> <!-- /.container -->
+        </div>
+      </div> 
+	</div>
 </footer>
 <footer class="copyright">
   <div class="container">
