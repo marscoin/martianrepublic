@@ -312,7 +312,7 @@
 
                   <a href="javascript:;" class="list-group-item">
                     <h3 class="pull-right"><i class="fa fa-calendar  text-primary"></i></h3>
-                    <h4 class="list-group-item-heading">{{$proposal->participation}}</h4>
+                    <h4 class="list-group-item-heading">{{$proposal->duration}}</h4>
                     <p class="list-group-item-text">Vote duration in days</p>
                   </a>
 
