@@ -1,4 +1,4 @@
-<html>  
+<html lang="en">  
 <head>
 <title>Martian Republic</title>
 <meta charset="utf-8">
@@ -38,21 +38,6 @@
 <link href="/assets/landing/css/animate.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="shortcut icon" href="/assets/favicon.ico">
-  <style>
-    .mini-feature-title{
-      font-size: 25px;
-    }
-    .shadow-lg {
-        box-shadow: 0 1rem 3rem rgb(0 0 0 / 18%) !important;
-    }
-    .lead-small{
-      font-size: 19px;
-    }
-    .divider-wider{
-      margin-bottom: 110px;
-      margin-top: 50px;
-    }
-  </style>
 </head>
 <body class=" ">
 <div id="wrapper">
@@ -123,51 +108,36 @@
               <span class="navbar-social-label">Gitter</span>
             </a>
           </li>
-
         </ul>
-
       </nav>
-
-    </div> <!-- /.container -->
-
+    </div>  
   </header>
-
-
 
     <div class="masthead">
       <div class="container">
         <div id="masthead-carousel" class="carousel masthead-carousel slide">
           <div class="carousel-inner">
           <div class="item active">
-
               <div class="row">
-
                 <div class="col-md-6 masthead-text animated fadeInUpBig">
                   <h1 class="masthead-title">Join the Martian Public. Endorse Citizens. Launch proposals. Vote.</h1>
-
                   <p class="masthead-">
                   Get involved in Humanity's journey to the stars. Explore a congress of citizens - direct democracy, cryptographically secured and fully auditable. Shape the early history of a spacefaring civilization.
                   </p>
-
                   <br>
-
                  <div class="masthead-actions">
                    <a href="https://martianrepublic.org/login" class="btn btn-success btn-jumbo">
                     Login
                     </a>
-                    
                     <a href="https://martianrepublic.org/signup" class="btn btn-primary btn-jumbo">
                     Create account
                     </a>
                   </div>
-                </div> <!-- /.masthead-text -->
-
+                </div> 
                 <div class="col-md-6 masthead-img animated pulse">
-                  <img src="/assets/landing/img/city_on_mars.jpg" alt="slide2" class="img-responsive" />
-                </div> <!-- /.masthead-img -->
-
-              </div> <!-- /.row -->
-
+                  <img src="/assets/landing/img/city_on_mars.jpg" loading="lazy" alt="slide2" class="img-responsive" />
+                </div> 
+              </div> 
             </div>
 
 
@@ -190,27 +160,22 @@
                     <a href="https://martianrepublic.org/signup" class="btn btn-primary btn-jumbo">
                     Create account
                     </a>
-                  </div> <!-- /.masthead-actions -->
-                </div> <!-- /.masthead-text -->
+                  </div>
+                </div>
 
                 <div class="col-md-6 masthead-img animated fadeInUpBig">
-                  <img src="/assets/citizen/mars_flag5.png" alt="slide2" class="img-responsive" />
-                </div> <!-- /.masthead-img -->
-              </div> <!-- /.row -->
-            </div> <!-- /.item -->
-
-
+                  <img src="/assets/citizen/mars_flag5.png" loading="lazy" alt="slide2" class="img-responsive" />
+                </div> 
+              </div> 
+            </div> 
             <div class="item ">
               <div class="row">
                 <div class="col-md-6 masthead-text animated fadeInDownBig">
                   <h1 class="masthead-title">Marscoin HD Wallet - Send and Receive Marscoin</h1>
-
                   <p class="masthead-">
                   a non-custodial online wallet for Marscoin - the "Bitcoin" of Mars. Send and Receive MARS anywhere around the globe. We'll take a copy of the blockchain and governance system with us.
                   </p>
-
                   <br>
-
                   <div class="masthead-actions">
                     <a href="https://martianrepublic.org/login" class="btn btn-success btn-jumbo">
                     Login
@@ -324,36 +289,22 @@
                 </div>
               </div>
             </div>
-
-
-
           </div>
-
           <div class="carousel-controls">
             <a class="carousel-control left" href="#masthead-carousel" data-slide="prev">&lsaquo;</a>
             <a class="carousel-control right" href="#masthead-carousel" data-slide="next">&rsaquo;</a>
           </div>
-
-        </div> <!-- /.masthead-carousel -->
-
+        </div> 
         </div>
-
-    </div> <!-- /.masthead -->
-
-
+    </div> 
 
     <div class="content">
-
       <div class="container">
-
         <h4 class="content-title"  style="font-size: 32px;">
           <span>Martian Congressional Republic</span>
         </h4>
-
         <br>
-
         <div class="row">
-
           <div class="mini-feature" data-aos="fade-down" data-aos-duration="1000">
             <i class="fa fa-gears mini-feature-icon text-secondary"></i>
 
@@ -381,9 +332,8 @@
 
               <p>The Martian Congress is an on-chain, ultra-transparent, end-to-end auditable governance system using wallet, public voter registry and encrypted ballot distribution system to ensure fair voting.</p>
             </div>
-          </div> <!-- /.mini-feature -->
-
-        </div> <!-- /.row -->
+          </div> 
+        </div> 
 
         <div class="row">
 
@@ -521,11 +471,9 @@
           </div> 
         </div> 
 
-
         <div class="row-divider"></div> <!-- /.row-divider -->
 
-        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQFJLAKZc6YWBlqFxsCI3y9g0XkpB-k-_zIFxbtfey6EI3ck3ljOH7eUnwxz9Z6rrCN1VfV6VL0kpHV/embed?start=true&loop=true&delayms=5000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
-
+        <iframe title="Martian Republic - Research Paper" src="https://docs.google.com/presentation/d/e/2PACX-1vQFJLAKZc6YWBlqFxsCI3y9g0XkpB-k-_zIFxbtfey6EI3ck3ljOH7eUnwxz9Z6rrCN1VfV6VL0kpHV/embed?start=true&loop=true&delayms=5000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
 
         <div class="carousel-container">
         <div class="row">

@@ -70,3 +70,16 @@
   -ms-filter: none;
   filter: none;
 }
+.mini-feature-title{
+  font-size: 25px;
+}
+.shadow-lg {
+    box-shadow: 0 1rem 3rem rgb(0 0 0 / 18%) !important;
+}
+.lead-small{
+  font-size: 19px;
+}
+.divider-wider{
+  margin-bottom: 110px;
+  margin-top: 50px;
+}
