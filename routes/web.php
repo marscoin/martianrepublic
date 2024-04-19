@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Wallet\DashboardController;
-
+use Illuminate\Support\Facades\Cache;
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -11,9 +11,10 @@ Route::get('/dashboard', function () {
 require __DIR__.'/auth.php';
 
 
-Route::get('/', function()
-{
-    return view('landing');
+Route::get('/', function () {
+    return Cache::remember('home.page', 260000, function () {
+        return view('landing')->render();
+    });
 });
 
 

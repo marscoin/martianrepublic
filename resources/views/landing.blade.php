@@ -31,11 +31,11 @@
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css&display=swap" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="/assets/landing/css/bootstrap.min.css">
 <link href="/assets/landing/css/mvpready-landing.css" rel="stylesheet">
-<link href="/assets/landing/css/mvpready-flat.css" rel="stylesheet">
-<link href="/assets/landing/css/animate.css" rel="stylesheet">
+<link href="/assets/landing/css/mvpready-flat.css&display=swap" rel="stylesheet">
+<link href="/assets/landing/css/animate.css&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="shortcut icon" href="/assets/favicon.ico">
   <style>
@@ -57,40 +57,29 @@
 <body class=" ">
 <div id="wrapper">
   <header class="navbar navbar-inverse" role="banner">
-
     <div class="container">
-
       <div class="navbar-header">
         <a href="/" class="navbar-brand navbar-brand-img"  style="font-family: 'Orbitron', sans-serif;">
           <img style="width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="MVP Ready">
         Martian Republic
         </a>
-
         <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
           <span class="sr-only">Toggle navigation</span>
           <i class="fa fa-bars"></i>
         </button>
       </div> <!-- /.navbar-header -->
-
-
       <nav class="collapse navbar-collapse" role="navigation">
-
         <ul class="nav navbar-nav navbar-right mainnav-menu">
-
           <li class="">
             <a target="_blank" href="https://marscoin.gitbook.io/marscoin-documentation/">Documentation</a>
           </li>
-
           <li>
             <a href="/signup">Signup</a>
           </li>
-
           <li>
             <a href="/login">Login</a>
           </li>
-
         </ul>
-
         <ul class="nav navbar-nav navbar-social navbar-left">
 
           <li>
@@ -146,14 +135,9 @@
 
 
     <div class="masthead">
-
       <div class="container">
-            <!-- starts carousel -->
-
         <div id="masthead-carousel" class="carousel masthead-carousel slide">
           <div class="carousel-inner">
-
-
           <div class="item active">
 
               <div class="row">
@@ -263,7 +247,7 @@
                   </div>
                 </div>
                 <div class="col-md-6 masthead-img animated pulse">
-                  <img src="/assets/landing/img/inside_view.png" alt="slide2" class="img-responsive" />
+                  <img src="/assets/landing/img/inside_view.png" alt="slide2"  loading="lazy" class="img-responsive" />
                 </div>
               </div>
             </div>
@@ -287,7 +271,7 @@
                   </div>
                 </div> <!-- /.masthead-text -->
                 <div class="col-md-6 masthead-img animated fadeInRightBig">
-                  <img src="/assets/landing/img/login_screen.png" style="max-width: 600px;" alt="slide2" class="img-responsive" />
+                  <img src="/assets/landing/img/login_screen.png" loading="lazy" style="max-width: 600px;" alt="slide2" class="img-responsive" />
                 </div> <!-- /.masthead-img -->
               </div> <!-- /.row -->
             </div> <!-- /.item -->
@@ -312,7 +296,7 @@
                   </div>
                 </div>
                 <div class="col-md-6 masthead-img animated pulse">
-                  <img src="/assets/landing/img/iphone_marscoin.jpg" alt="slide2" class="img-responsive" />
+                  <img src="/assets/landing/img/iphone_marscoin.jpg" loading="lazy" alt="slide2" class="img-responsive" />
                 </div>
               </div>
             </div>
@@ -336,7 +320,7 @@
                   </div>
                 </div>
                 <div class="col-md-6 masthead-img animated pulse">
-                  <img src="/assets/citizen/printout_screenshot.png" alt="slide2" class="img-responsive" />
+                  <img src="/assets/citizen/printout_screenshot.png" loading="lazy" alt="slide2" class="img-responsive" />
                 </div>
               </div>
             </div>
