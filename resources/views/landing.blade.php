@@ -135,7 +135,7 @@
                   </div>
                 </div> 
                 <div class="col-md-6 masthead-img animated pulse">
-                  <img src="/assets/landing/img/city_on_mars.jpg" loading="lazy" alt="slide2" class="img-responsive" />
+                  <img src="/assets/landing/img/city_on_mars.webp" loading="lazy" alt="slide2" class="img-responsive" />
                 </div> 
               </div> 
             </div>
@@ -585,8 +585,8 @@
   </div>
 </footer>
 
-<script src="/assets/landing/js/libs/jquery-1.10.2.min.js"></script>
-<script src="/assets/landing/js/libs/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js" integrity="sha512-YHQNqPhxuCY2ddskIbDlZfwY6Vx3L3w9WRbyJCY81xpqLmrM6rL2+LocBgeVHwGY9SXYfQWJ+lcEWx1fKS2s8A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.1/js/bootstrap.min.js" integrity="sha512-49i8j9WLCsHZ/ERPIfLa2U3v3lNq8qrbas52iuC8qfnJJ0FhsHb8VGztF08jzHSVqMUEmrAL4Zx19jEOkase3A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="/assets/landing/js/plugins/timeago/jquery.timeago.js"></script>
 <script src="/assets/landing/js/plugins/tweetable/tweetable.jquery.min.js"></script>
 <script src="/assets/landing/js/plugins/carouFredSel/jquery.carouFredSel-6.2.1-packed.js"></script>
