@@ -141,6 +141,7 @@ class ApiController extends Controller
             ->join('users', 'feed.userid', '=', 'users.id')
             ->join('profile', 'feed.userid', '=', 'profile.userid')
             ->select('profile.userid', 'users.fullname', 'feed.tag', 'feed.mined')
+            ->whereNotNull('profile.avatar')  
             ->orderBy('feed.id', 'desc')
             ->limit(3)
             ->get();

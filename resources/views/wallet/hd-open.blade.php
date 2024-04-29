@@ -744,9 +744,7 @@
                 var receiver_address = $(".destination-address").val();
 
                 if (cur_currency == "MARS") {
-                    mars_amount = $(".input-placeholder").val();
-                } else if (cur_currency == "USD") {
-                    mars_amount = $(".conversion-rate").text();
+                    mars_amount = fromSeed $(".conversion-rate").text();
                 }
                 //console.log("MARS AMOUNT: ", mars_amount)
 
