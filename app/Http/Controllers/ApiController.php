@@ -39,7 +39,8 @@ class ApiController extends Controller
             }, 'user.profile' => function ($query) {
                 $query->select('userid', 'general_public', 'endorse_cnt', 'citizen', 'has_application' ); // Only select general_public and the foreign key
             }, 'user.citizen' => function ($query) {
-                $query->select('userid', 'avatar_link', 'liveness_link'); // Select the userid and avatar_link
+                $query->select('userid', 'avatar_link', 'liveness_link') // Select the userid and avatar_link
+                ->whereNotNull('avatar_link');
             }])
             ->whereHas('user.profile', function ($query) {
                 $query->where('tag', 'GP');
@@ -63,16 +64,17 @@ class ApiController extends Controller
         $perPage = 25;
         $cacheKey = 'all_citizens_cache'; // Define a unique cache key for this query
         $excludedUserId = 6462; // ID of the user you want to exclude, for example, a test account
-    
+
         // Attempt to get cached data. If not available, the closure will be run to fetch and cache the data.
         $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserId) {
             $feeds = Feed::with(['user' => function ($query) use ($excludedUserId) {
                 $query->select('id', 'fullname', 'created_at')
-                      ->where('id', '!=', $excludedUserId); // Exclude the specific user by ID
+                    ->where('id', '!=', $excludedUserId); // Exclude the specific user by ID
             }, 'user.profile' => function ($query) {
                 $query->select('userid', 'general_public', 'endorse_cnt' , 'citizen', 'has_application'); // Only select general_public and the foreign key
             }, 'user.citizen' => function ($query) {
-                $query->select('userid', 'avatar_link', 'liveness_link'); // Select the userid and avatar_link
+                $query->select('userid', 'avatar_link', 'liveness_link') // Select the userid and avatar_link
+                    ->whereNotNull('avatar_link'); // Ensure that avatar_link is not NULL
             }])
             ->whereHas('user.profile', function ($query) {
                 $query->where('tag', 'CT');
@@ -83,12 +85,13 @@ class ApiController extends Controller
             ->orderByDesc('id')
             ->take($perPage) // Directly take the perPage amount, removing the need for extra data fetching
             ->get();
-           
+        
             return $feeds; // Directly return the fetched feeds
         });
-    
+
         return response()->json($feeds);
     }
+
     
 
     public function allApplicants()
@@ -140,8 +143,7 @@ class ApiController extends Controller
         $activity = DB::table('feed')
             ->join('users', 'feed.userid', '=', 'users.id')
             ->join('profile', 'feed.userid', '=', 'profile.userid')
-            ->select('profile.userid', 'users.fullname', 'feed.tag', 'feed.mined')
-            ->whereNotNull('profile.avatar')  
+            ->select('profile.userid', 'users.fullname', 'feed.tag', 'feed.mined') 
             ->orderBy('feed.id', 'desc')
             ->limit(3)
             ->get();
