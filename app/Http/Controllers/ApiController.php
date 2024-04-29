@@ -61,12 +61,6 @@ class ApiController extends Controller
 
     public function allCitizen()
     {
-        \DB::listen(function ($query) {
-            \Log::info("Query: ".$query->sql);
-            \Log::info("Bindings: ".implode(', ', $query->bindings));
-            \Log::info("Time: ".$query->time);
-        });
-        
         $perPage = 25;
         $cacheKey = 'all_citizens_cache'; // Define a unique cache key for this query
         $excludedUserId = 6462; // ID of the user you want to exclude, for example, a test account
