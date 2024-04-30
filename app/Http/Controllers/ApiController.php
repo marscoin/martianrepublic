@@ -63,7 +63,6 @@ class ApiController extends Controller
     {
         $perPage = 25;
         $cacheKey = 'all_citizens_cache';
-    
         $excludedUserId = 6462;
     
         $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserId) {
@@ -74,8 +73,11 @@ class ApiController extends Controller
                 },
                 'user.profile' => function ($query) {
                     $query->select('userid', 'general_public', 'endorse_cnt', 'citizen', 'has_application');
+                },
+                'user.citizen' => function ($query) {
+                    $query->select('userid', 'avatar_link', 'liveness_link') // Select the userid and relevant fields
+                          ->whereNotNull('avatar_link'); // Ensure that avatar_link is not NULL
                 }
-                // If you don't need detailed citizen data, remove 'user.citizen' from here
             ])
             ->whereHas('user.citizen', function ($query) {
                 $query->whereNotNull('avatar_link');
@@ -83,7 +85,7 @@ class ApiController extends Controller
             ->whereHas('user.profile', function ($query) {
                 $query->where('tag', 'CT');
             })
-            ->select('id', 'address', 'userid', 'tag', 'message', 'embedded_link', 'txid', 'blockid', 'mined', 'updated_at', 'created_at', 'avatar_link', 'endorse_cnt', 'liveness_link', 'citizen', 'general_public', 'fullname')  // Make sure to only select fields you need
+            ->select('id', 'address', 'userid', 'tag', 'message', 'embedded_link', 'txid', 'blockid', 'mined', 'updated_at', 'created_at')  // Only select columns from the feed table
             ->orderByDesc('id')
             ->take($perPage)
             ->get();
