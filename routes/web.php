@@ -16,10 +16,13 @@ Route::get('/', function () {
         return view('landing')->render();
     });
 });
-
+Route::get('/privacy', function () {
+    return Cache::remember('privacy.page', 2, function () {
+        return view('privacy')->render();
+    });
+});
 
 Route::get('/status', 'StatusController@showStatus');
-
 
 // 
 // Wallet
