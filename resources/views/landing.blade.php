@@ -415,9 +415,9 @@
               <span>Built-in HD non-custodial wallet</span>
             </h4>
             <p class="lead lead-small">The Marscoin Online Wallet ("Wallet") is an open source non-custodial online HD wallet with built-in encrypted backup service and seed phrase recovery.</p>
-            <p>Setting up an online wallet account is simple: our basic website framework allows users to create two-factor authenticated accounts, which serve as a backup service for the online non-custodial wallet that is generated in-browser, locally, on the user's device.</p>
-            <p>A seed phrase thus generated can also be used to regain access to a previously created wallet.</p>
-            <p>Basic receive and send functions allow users to receive and send Marscoin to other participants in the network.</p>
+            <p class="lead lead-small">Setting up an online wallet account is simple: our basic website framework allows users to create two-factor authenticated accounts, which serve as a backup service for the online non-custodial wallet that is generated in-browser, locally, on the user's device.</p>
+            <p class="lead lead-small">A seed phrase thus generated can also be used to regain access to a previously created wallet.</p>
+            <p class="lead lead-small">Basic receive and send functions allow users to receive and send Marscoin to other participants in the network.</p>
             <br>
             <a data-aos="fade-up" data-aos-delay="150" href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
@@ -442,8 +442,8 @@
               <span>Proof-of-Humanity Martian Voter Registry</span>
             </h4>
             <p class="lead lead-small">Martian Citizen Registry : an on-chain "proof of humanity" registry using decentralized and cryptographically secured file storage to create a private/public identity attestation system.</p>
-            <p class="">It comes with a community driven identity attestation service in which an initial community dictates the terms to invite new members to join their group using clear programmatic guidelines that future proposal can modify, allowing a virtuous feedback loop in which the community is allowed to integrate new members.</p>
-            <p class="">We start out with a basic user submission form and liveness-test which could be further improved with kiosk-style self service terminals (upon arrival on Mars, for instance). After an initial registration the users are vetted by the community itself and integrated into the general public.</p>
+            <p class="lead lead-small">It comes with a community driven identity attestation service in which an initial community dictates the terms to invite new members to join their group using clear programmatic guidelines that future proposal can modify, allowing a virtuous feedback loop in which the community is allowed to integrate new members.</p>
+            <p class="lead lead-small">We start out with a basic user submission form and liveness-test which could be further improved with kiosk-style self service terminals (upon arrival on Mars, for instance). After an initial registration the users are vetted by the community itself and integrated into the general public.</p>
             <br>
             <a data-aos="fade-up" data-aos-delay="150" href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
@@ -459,9 +459,9 @@
               <span>Martian Congress</span>
             </h4>
             <p class="lead lead-small">An on-chain, ultra-transparent end-to-end auditable governance system utilizing the non-custodial wallet, public voter registry and a coin-shuffle based, encrypted ballot distribution system to ensure fair voting on public proposals, bills, and amendments by secret ballot. </p>
-            <p>A purely on-chain, cryptographically secure voting process would allow each citizen to participate directly in the formation of a Republic in which matters of the "res publica" are decided by a congress consisting of the very public itself, without the need for intermediaries.</p>
-            <p>Utilizing the Marscoin blockchain to timestamp proposals and identify the members of the public is part of the solution in conjuction with a public voter registry. The Martian Congress favors a transparent and intuitive solution which allows all participants to easily audit and verify the validity of the vote.</p>
-            <p> By utilizing an open source model in which the code itself becomes the constitution, we opt for a server/client architecture in which citizens can initiate proposals, bills, and amendments. </p>
+            <p class="lead lead-small">A purely on-chain, cryptographically secure voting process would allow each citizen to participate directly in the formation of a Republic in which matters of the "res publica" are decided by a congress consisting of the very public itself, without the need for intermediaries.</p>
+            <p class="lead lead-small">Utilizing the Marscoin blockchain to timestamp proposals and identify the members of the public is part of the solution in conjuction with a public voter registry. The Martian Congress favors a transparent and intuitive solution which allows all participants to easily audit and verify the validity of the vote.</p>
+            <p class="lead lead-small">By utilizing an open source model in which the code itself becomes the constitution, we opt for a server/client architecture in which citizens can initiate proposals, bills, and amendments. </p>
             <br>
             <a data-aos="fade-up" data-aos-delay="150" href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
