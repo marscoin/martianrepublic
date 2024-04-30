@@ -132,7 +132,6 @@
           <div class="col-md-7">
 
             <h2 class="no-bold">Introduction <strong></strong></h2>
-
             <p class="lead">Welcome to the Martian Congressional Republic, an innovative  decentralized blockchain-based governance system and its reference implementation. By visiting, accessing, or using our services, you consent to the policies and practices described in this Privacy Policy, so please review them thoroughly. Should you find any policies or practices described here unacceptable, please refrain from using our services. References to "we", "us", or "our" in this Privacy Policy refer to the Marscoin Foundation, Inc. (Non-Profit) and any of its affiliates.</p>
 
             <br class="xs-30">
