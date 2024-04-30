@@ -75,14 +75,17 @@ class ApiController extends Controller
                     $query->select('userid', 'general_public', 'endorse_cnt', 'citizen', 'has_application');
                 },
                 'user.citizen' => function ($query) {
-                    $query->select('userid', 'avatar_link', 'liveness_link') // Select the userid and relevant fields
+                    $query->select('userid', 'avatar_link', 'liveness_link')
                           ->whereNotNull('avatar_link'); // Ensure that avatar_link is not NULL
                 }
             ])
-            ->whereHas('user.citizen', function ($query) {
+            ->whereHas('user', function ($query) use ($excludedUserId) {  // Ensure user exists and is not excluded
+                $query->where('id', '!=', $excludedUserId);
+            })
+            ->whereHas('user.citizen', function ($query) {  // Ensure user has valid citizen data
                 $query->whereNotNull('avatar_link');
             })
-            ->whereHas('user.profile', function ($query) {
+            ->whereHas('user.profile', function ($query) {  // Additional filters for the profile
                 $query->where('tag', 'CT');
             })
             ->select('id', 'address', 'userid', 'tag', 'message', 'embedded_link', 'txid', 'blockid', 'mined', 'updated_at', 'created_at')  // Only select columns from the feed table
