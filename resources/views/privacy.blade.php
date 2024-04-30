@@ -180,6 +180,12 @@
             We take steps to ensure your information is accurate and retained only as long as necessary for the purposes for which it was collected, unless further retention is required by law.
             </p>
 
+            <br class="xs-30">
+            <h2 class="no-bold">Online Web Wallet <strong></strong></h2>
+            <p>
+            Our online web wallet is completely non-custodial, meaning that users have full control over their funds and are solely responsible for managing and securing their private keys or seed phrases. The website does not store any keys unencrypted. Users are strongly encouraged to always back up their keys or seed phrases and keep them in a secure location. It's essential to understand that disclosing your private key or seed phrase to anyone may result in a loss of funds, as it provides access to your cryptocurrency holdings. We cannot recover lost or stolen funds resulting from the unauthorized disclosure of private keys or seed phrases.
+            </p>
+
 
             <br class="xs-30">
             <h2 class="no-bold">Access and Correction of Information <strong></strong></h2>
