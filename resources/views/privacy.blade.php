@@ -318,16 +318,15 @@
 </footer>
 
 <footer class="copyright">
-  <div class="container">
-
+<div class="container">
     <div class="row">
-
-      <div class="col-sm-12">
+      <div class="col-sm-6">
         <p>Copyright &copy; 2014-<?=date('Y')?> The Marscoin Foundation, Inc.</p>
-      </div> <!-- /.col -->
-
-    </div> <!-- /.row -->
-
+    </div>
+      <div class="col-sm-6">
+        <p class="pull-right"><a style="color: white;" href="/status">Server Status</a> &middot; <a style="color: white;" href="/privacy">Privacy</a></p>
+      </div> 
+    </div> 
   </div>
 </footer>
 
