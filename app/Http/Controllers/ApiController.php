@@ -67,16 +67,23 @@ class ApiController extends Controller
         $excludedUserId = 6462;
     
         $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserId) {
-            return Feed::whereHas('user.citizen', function ($query) {
-                $query->whereNotNull('avatar_link'); // Filter at the main query level
+            return Feed::with([
+                'user' => function ($query) use ($excludedUserId) {
+                    $query->where('id', '!=', $excludedUserId)
+                          ->select('id', 'fullname', 'created_at');
+                },
+                'user.profile' => function ($query) {
+                    $query->select('userid', 'general_public', 'endorse_cnt', 'citizen', 'has_application');
+                }
+                // If you don't need detailed citizen data, remove 'user.citizen' from here
+            ])
+            ->whereHas('user.citizen', function ($query) {
+                $query->whereNotNull('avatar_link');
             })
             ->whereHas('user.profile', function ($query) {
                 $query->where('tag', 'CT');
             })
-            ->with(['user' => function ($query) use ($excludedUserId) {
-                $query->where('id', '!=', $excludedUserId)
-                      ->select('id', 'fullname', 'created_at');
-            }, 'user.profile', 'user.citizen'])
+            ->select('id', 'address', 'userid', 'tag', 'message', 'embedded_link', 'txid', 'blockid', 'mined', 'updated_at', 'created_at', 'profile_image')  // Make sure to only select fields you need
             ->orderByDesc('id')
             ->take($perPage)
             ->get();
@@ -84,6 +91,7 @@ class ApiController extends Controller
     
         return response()->json($feeds);
     }
+    
     
 
     
