@@ -579,7 +579,7 @@
         <p>Copyright &copy; 2014-<?=date('Y')?> The Marscoin Foundation, Inc.</p>
     </div>
       <div class="col-sm-6">
-        <p class="pull-right"><a style="color: white;" href="/status">Server Status</a></p>
+        <p class="pull-right"><a style="color: white;" href="/status">Server Status</a> &middot; <a style="color: white;" href="/privacy">Privacy</a></p>
       </div> 
     </div> 
   </div>
