@@ -83,7 +83,7 @@ class ApiController extends Controller
             ->whereHas('user.profile', function ($query) {
                 $query->where('tag', 'CT');
             })
-            ->select('id', 'address', 'userid', 'tag', 'message', 'embedded_link', 'txid', 'blockid', 'mined', 'updated_at', 'created_at', 'profile_image')  // Make sure to only select fields you need
+            ->select('id', 'address', 'userid', 'tag', 'message', 'embedded_link', 'txid', 'blockid', 'mined', 'updated_at', 'created_at', 'avatar_link', 'endorse_cnt', 'liveness_link', 'citizen', 'general_public', 'fullname')  // Make sure to only select fields you need
             ->orderByDesc('id')
             ->take($perPage)
             ->get();
