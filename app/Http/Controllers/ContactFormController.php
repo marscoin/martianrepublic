@@ -11,7 +11,7 @@ class ContactFormController extends Controller
     {
         $details = $request->only(['name', 'email', 'subject', 'text']);
 
-        Mail::to('your-receiving-email@example.com')->send(new ContactFormMail($details));
+        Mail::to('info@marscoin.org')->send(new ContactFormMail($details));
 
         return back()->with('message_sent', 'Your message has been sent successfully!');
     }
