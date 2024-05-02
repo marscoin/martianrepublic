@@ -142,6 +142,11 @@
             <h4 class="content-title">
               <span>Send an Email</span>
             </h4>
+            @if(session('message_sent'))
+                <div class="alert alert-success">
+                    {{ session('message_sent') }}
+                </div>
+            @endif
             <form class="form form-horizontal" action="{{ route('contact.send') }}" method="POST">
             @csrf
               <div class="form-group">
