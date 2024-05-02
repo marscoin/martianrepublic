@@ -21,7 +21,12 @@ Route::get('/privacy', function () {
         return view('privacy')->render();
     });
 });
-
+Route::get('/support', function () {
+    return Cache::remember('support.page', 2, function () {
+        return view('support')->render();
+    });
+});
+Route::post('/contact', 'ContactFormController@sendEmail')->name('contact.send');
 Route::get('/status', 'StatusController@showStatus');
 
 // 
