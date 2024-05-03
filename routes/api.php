@@ -23,3 +23,7 @@ Route::get('/citizen/{address}', 'App\Http\Controllers\ApiController@showCitizen
 
 Route::post('/token', 'App\Http\Controllers\ApiController@token');
 Route::get('/test', 'App\Http\Controllers\ApiController@test');
+
+Route::post('/sfname', 'App\Http\Controllers\ApiController@sfname')->middleware(['auth:sanctum'])->name('api_sfname');
+Route::post('/pinpic', 'App\Http\Controllers\ApiController@pinpic')->middleware(['auth:sanctum'])->name('api_pinpic');
+Route::post('/pinvideo', 'App\Http\Controllers\ApiController@pinvideo')->middleware(['auth:sanctum'])->name('api_pinvideo');

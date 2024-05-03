@@ -51,13 +51,8 @@
         @include('wallet.mainnav', ['active' => 'wallet'])
 
         <div class="content">
-
-
             <div class="container">
-
                 <div class="row">
-
-
                     <div class="col-md-7 col-sm-7">
 
                         @if(!session()->has('blockchain_re-sync_dismissed'))

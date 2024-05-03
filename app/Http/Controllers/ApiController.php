@@ -248,6 +248,101 @@ class ApiController extends Controller
 
 
 
+    //token access
+    public function sfname(Request $request)
+	{
+		
+        $uid = Auth::user()->id;
+        $firstname = $request->input('firstname');
+        $lastname = $request->input('lastname');
+        if(!isset($firstname))
+            return;
+        if(!isset($lastname))
+            return;
+
+        $fullname = $firstname . " " . $lastname;
+
+        $citcache = Citizen::where('userid', '=', $uid)->first();
+        if(is_null($citcache)) $citcache = new Citizen;	
+        
+        $citcache->userid = $uid;
+        $citcache->firstname = $firstname;
+        $citcache->lastname = $lastname;
+        $citcache->save();
+
+        $user = User::where('id', '=', $uid)->first();
+        $user->fullname = $fullname;
+        $user->save();
+		
+	}
+
+
+    public function pinpic(Request $request)
+    {
+		$uid = Auth::user()->id;
+        $hash = "";
+        $dataPic = $request->input('picture');
+        $type = $request->input('type');
+        $public_address = $request->input('address');
+        $file_path = "./assets/citizen/" . $public_address . "/";
+        if (!file_exists($file_path)) {
+            mkdir($file_path);
+        }
+        list($type, $dataPic) = explode(';', $dataPic);
+        list(, $type) = explode('/', $type);
+        $file_path = "./assets/citizen/" . $public_address . "/profile_pic." . $type;
+        //if (!file_exists($file_path)) { overwrite by default
+        
+        list(, $dataPic) = explode(',', $dataPic);
+        $dataPic = base64_decode($dataPic);
+        file_put_contents($file_path, $dataPic);
+        $hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+
+        $citcache = Citizen::where('userid', '=', $uid)->first();
+        if(is_null($citcache)) $citcache = new Citizen;	
+        $citcache->userid = $uid;
+        $citcache->avatar_link = "https://ipfs.marscoin.org/ipfs/".$hash;
+        $citcache->save();
+
+        return (new Response(json_encode(array("Hash" => $hash)), 200))
+            ->header('Content-Type', "application/json;");
+
+	}
+
+
+
+	public function pinvideo(Request $request){
+
+        $uid = Auth::user()->id;
+        $hash = "";
+        $dataPic = $request->input('file');
+        $type = $request->input('type');
+        $public_address = $request->input('address');
+        if ($request->hasFile('file'))
+        {
+            $file_path = "./assets/citizen/" . $public_address . "/";
+            if (!file_exists($file_path)) {
+                mkdir($file_path);
+            }
+            $file_path = "./assets/citizen/" . $public_address  . "/";
+            $request->file('file')->move($file_path, "profile_video.webm" );
+            $file_path = $file_path . "profile_video.webm";
+            $hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+
+            $citcache = Citizen::where('userid', '=', $uid)->first();
+            if(is_null($citcache)) $citcache = new Citizen;	
+            $citcache->userid = $uid;
+            $citcache->liveness_link = "https://ipfs.marscoin.org/ipfs/".$hash;
+            $citcache->save();
+
+            return (new Response(json_encode(array("Hash" => $hash)), 200))
+            ->header('Content-Type', "application/json;");
+        }
+			
+	}
+
+
+
 
 
 

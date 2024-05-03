@@ -78,7 +78,6 @@ class ApiController extends Controller {
 		}else{
             return redirect('/login');
         }
-			
 	}
 
 
