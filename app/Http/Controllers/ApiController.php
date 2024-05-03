@@ -177,6 +177,11 @@ class ApiController extends Controller
         $sig = $request->input('s');
         $timestamp = $request->input('t');
 
+        Log::debug("Address: " . $publicAddress);
+        Log::debug("msg: " . $msg);
+        Log::debug("sig: " . $sig);
+        Log::debug("timestamp: " . $timestamp);
+
         if (empty($msg)){
             $data = $request->json()->all();
 
