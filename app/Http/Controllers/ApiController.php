@@ -229,6 +229,11 @@ class ApiController extends Controller
 
     public function test()
     {
+
+        $messageM="https://martianrepublic.org/api/token?a=MCHe2XTUEegyqsYc5ePe2dQiPtixLfhppR&t=1715354045";
+        $addressM="MCHe2XTUEegyqsYc5ePe2dQiPtixLfhppR";
+        $signatureM="H+Qrav6eWNrB0P5DiRaGRRR/RVtD8qd5dKlWA3FOfeiFc4h04769HtfMbsmxrrNPk0MeTJmwPCR9xg67f1NatOA=";
+
         $bitcoinECDSA = new BitcoinECDSA(); 
         $bitcoinECDSA->generateRandomPrivateKey(); //generate new random private key
         $address = $bitcoinECDSA->getAddress();
@@ -249,6 +254,17 @@ class ApiController extends Controller
             Log::debug("False");
             echo "False<br>";
         }
+
+
+         //loading Bitcoin crypto library
+         if ($bitcoinECDSA->checkSignatureForMessage($addressM, $signatureM, $messageM))       //verifying signature
+         {
+             Log::debug("True");
+             echo "True<br>";
+         }else{
+             Log::debug("False");
+             echo "False<br>";
+         }
     }
 
 
