@@ -1361,6 +1361,8 @@ class MarscoinECDSA
         else
             $recoveredAddress = $this->getUncompressedAddress(false, $derPubKey);
 
+        print_r($recoveredAddress);
+
         if($address === $recoveredAddress)
             return true;
         else
