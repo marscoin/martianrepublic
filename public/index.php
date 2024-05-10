@@ -4,8 +4,7 @@ use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
-ini_set('memory_limit', '2048M');
-
+ini_set('memory_limit', '4096M'); // Increase to 4GB
 /*
 |--------------------------------------------------------------------------
 | Check If The Application Is Under Maintenance
