@@ -1338,7 +1338,7 @@ class MarscoinECDSA
      */
     public function checkSignatureForMessage($address, $encodedSignature, $message)
     {
-        $hash = $this->hash256("\x18Bitcoin Signed Message:\n" . $this->numToVarIntString(strlen($message)) . $message);
+        $hash = $this->hash256("\x19Marscoin Signed Message:\n" . $this->numToVarIntString(strlen($message)) . $message);
 
         //recover flag
         $signature = base64_decode($encodedSignature);
