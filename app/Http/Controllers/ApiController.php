@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use BitcoinPHP\BitcoinECDSA\BitcoinECDSA;
+use App\Includes\MarscoinECDSA;
 
 class ApiController extends Controller
 {
@@ -255,9 +256,10 @@ class ApiController extends Controller
             echo "False<br>";
         }
 
+        $marscoinECDSA = new MarscoinECDSA();
 
          //loading Bitcoin crypto library
-         if ($bitcoinECDSA->checkSignatureForMessage($addressM, $signatureM, $messageM))       //verifying signature
+         if ($marscoinECDSA->checkSignatureForMessage($addressM, $signatureM, $messageM))       //verifying signature
          {
              Log::debug("True");
              echo "True<br>";
