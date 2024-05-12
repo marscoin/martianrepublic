@@ -34,7 +34,7 @@ class MarscoinECDSA
                     'y' => gmp_init('32670510020758816978083085130507043184471273380659243275938904335757337482424')
                    ];
 
-        $this->networkPrefix = '00';
+        $this->networkPrefix = '32';
     }
 
     /***
@@ -86,7 +86,7 @@ class MarscoinECDSA
         if($this->networkPrefix =='6f')
             return 'ef';
         else
-           return '80';
+           return 'b2';
     }
 
     /***
@@ -718,9 +718,12 @@ class MarscoinECDSA
      */
     public function getUncompressedAddress($compressed = false, $derPubKey = null)
     {
+        echo "<br>getUncompressedAddress";
+        
         if($derPubKey !== null)
         {
             if($compressed === true) {
+                echo "<br>getPubKey";
                 $address = $this->getPubKey($this->getPubKeyPointsWithDerPubKey($derPubKey));
             }
             else {
@@ -738,10 +741,14 @@ class MarscoinECDSA
         }
 
         $address = $this->getNetworkPrefix() . $this->hash160(hex2bin($address));
+        print_r("<br>NP: ".$this->getNetworkPrefix()."<br>");
+        print_r("<br>NP: ".$address);
 
         //checksum
         $address = $address.substr($this->hash256(hex2bin($address)), 0, 8);
         $address = $this->base58_encode($address);
+        print_r("<br>NP: ".$address);
+
 
         if($this->validateAddress($address))
             return $address;
@@ -790,13 +797,15 @@ class MarscoinECDSA
             }
         }
 
-        $keyhash = '00'.'14'.$this->hash160(hex2bin($pubkey));
+        $keyhash = '32'.'14'.$this->hash160(hex2bin($pubkey));
 	$address = '05'.$this->hash160(hex2bin($keyhash));
 		
 	$checksum = $this->hash256(hex2bin($address));
 	$address = $address.substr($checksum, 0, 8);
 
         $address = $this->base58_encode($address);
+
+        print_r("Address: " . $address);
 
         if($this->validateAddress($address))
             return $address;
@@ -1204,8 +1213,11 @@ class MarscoinECDSA
         while(strlen($pubKey['y']) < 64)
             $pubKey['y'] = '0' . $pubKey['y'];
 
+        print_r($pubKey);
+
         $derPubKey = $this->getDerPubKeyWithPubKeyPoints($pubKey, $isCompressed);
 
+        print_r($derPubKey);
 
         if($this->checkSignaturePoints($derPubKey, $R, $S, $hash))
             return $derPubKey;
@@ -1338,30 +1350,43 @@ class MarscoinECDSA
      */
     public function checkSignatureForMessage($address, $encodedSignature, $message)
     {
-        $hash = $this->hash256("\x19Marscoin Signed Message:\n" . $this->numToVarIntString(strlen($message)) . $message);
+        echo "<br>start";
+        //$hash = $this->hash256("\x19Marscoin Signed Message:\n" . $this->numToVarIntString(strlen($message)) . $message);
+        $hash = $this->hash256("\x18Bitcoin Signed Message:\n" . $this->numToVarIntString(strlen($message)). $message);
 
         //recover flag
         $signature = base64_decode($encodedSignature);
-
         $flag = hexdec(bin2hex(substr($signature, 0, 1)));
+        echo "<br>Flag:".$flag;
+        
 
         $isCompressed = false;
         if($flag >= 31 & $flag < 35) //if address is compressed
         {
+            echo "<br>Compressed";
+        
             $isCompressed = true;
         }
 
         $R = bin2hex(substr($signature, 1, 32));
         $S = bin2hex(substr($signature, 33, 32));
 
+        echo "<br>R: ".$R;
+        echo "<br>S: ".$S;
+        
+        
         $derPubKey = $this->getPubKeyWithRS($flag, $R, $S, $hash);
-
-        if($isCompressed === true)
+        echo "<br>der: ".$derPubKey;
+        
+        if($isCompressed === true){
+            echo "<br>here";
             $recoveredAddress = $this->getAddress($derPubKey);
-        else
+        }
+        else{
+            echo "there";
             $recoveredAddress = $this->getUncompressedAddress(false, $derPubKey);
-
-        print_r($recoveredAddress);
+        }
+        echo "Recovered Address: " . $recoveredAddress . "<br>";
 
         if($address === $recoveredAddress)
             return true;

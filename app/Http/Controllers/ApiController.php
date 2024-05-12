@@ -198,8 +198,9 @@ class ApiController extends Controller
             return response()->json(['error' => 'Request timestamp is too old.'], 401);
         }
 
-        $bitcoinECDSA = new BitcoinECDSA();                                     //loading Bitcoin crypto library
-        if ($bitcoinECDSA->checkSignatureForMessage($publicAddress, $sig, $msg)) 
+        $bitcoinECDSA = new BitcoinECDSA();          
+        $marscoinECDSA = new MarscoinECDSA();
+        if ($marscoinECDSA->checkSignatureForMessage($publicAddress, $sig, $msg))    
         {
             $wallet = CivicWallet::where('public_addr', $publicAddress)->first();
 
@@ -256,8 +257,11 @@ class ApiController extends Controller
             echo "False<br>";
         }
 
+        echo "mars test";
         $marscoinECDSA = new MarscoinECDSA();
-
+        echo "Address; " . $addressM;
+        echo "Message:" . $messageM;
+        echo "sig:" . $signatureM;
          //loading Bitcoin crypto library
          if ($marscoinECDSA->checkSignatureForMessage($addressM, $signatureM, $messageM))       //verifying signature
          {
