@@ -212,7 +212,7 @@ class ApiController extends Controller
                 $user = User::where('email', $publicAddress . '@martianrepublic.org')->first();
                 if (!$user) {
                     $user = User::create([
-                        'name' => 'UserWithoutWallet', // Or any other default or generated name
+                        'fullname' => 'UserWithoutWallet', // Or any other default or generated name
                         'email' => $publicAddress . '@martianrepublic.org',
                         'password' => Hash::make(Str::random(10)), // Random password
                     ]);
