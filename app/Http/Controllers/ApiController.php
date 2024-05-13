@@ -282,24 +282,30 @@ class ApiController extends Controller
         $uid = Auth::user()->id;
         $citcache = Citizen::where('userid', '=', $uid)->first();
         if(is_null($citcache)) $citcache = new Citizen;	
+        $citcache->userid = $uid;
+        
         $firstname = $request->input('firstname');
         $lastname = $request->input('lastname');
         $shortbio = $request->input('shortbio');
+        $displayname = $request->input('displayname');
+        
         if(isset($firstname) && isset($lastname))
         {
             $fullname = $firstname . " " . $lastname;
-            $citcache->userid = $uid;
+            
             $citcache->firstname = $firstname;
             $citcache->lastname = $lastname;
-
             $user = User::where('id', '=', $uid)->first();
             $user->fullname = $fullname;
             $user->save();
         }
         if(isset($shotbio))
         {
-            $citcache->userid = $uid;
             $citcache->shortbio = $shortbio;
+        }
+        if(isset($displayname))
+        {
+            $citcache->displayname = $displayname;
         }
         
         $citcache->save();
