@@ -276,30 +276,35 @@ class ApiController extends Controller
 
 
     //token access
-    public function sfname(Request $request)
+    public function scitizen(Request $request)
 	{
 		
         $uid = Auth::user()->id;
-        $firstname = $request->input('firstname');
-        $lastname = $request->input('lastname');
-        if(!isset($firstname))
-            return;
-        if(!isset($lastname))
-            return;
-
-        $fullname = $firstname . " " . $lastname;
-
         $citcache = Citizen::where('userid', '=', $uid)->first();
         if(is_null($citcache)) $citcache = new Citizen;	
-        
-        $citcache->userid = $uid;
-        $citcache->firstname = $firstname;
-        $citcache->lastname = $lastname;
-        $citcache->save();
+        $firstname = $request->input('firstname');
+        $lastname = $request->input('lastname');
+        $shortbio = $request->input('shortbio');
+        if(isset($firstname) && isset($lastname))
+        {
+            $fullname = $firstname . " " . $lastname;
+            $citcache->userid = $uid;
+            $citcache->firstname = $firstname;
+            $citcache->lastname = $lastname;
 
-        $user = User::where('id', '=', $uid)->first();
-        $user->fullname = $fullname;
-        $user->save();
+            $user = User::where('id', '=', $uid)->first();
+            $user->fullname = $fullname;
+            $user->save();
+        }
+        if(isset($shotbio))
+        {
+            $citcache->userid = $uid;
+            $citcache->shortbio = $shortbio;
+        }
+        
+        $citcache->save();
+        // Return the updated Citizen object as a JSON response
+        return response()->json($citcache);
 		
 	}
 
