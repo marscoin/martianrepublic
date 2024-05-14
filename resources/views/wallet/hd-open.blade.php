@@ -703,11 +703,12 @@
                 let amount = $(".input-placeholder").val()
                 let m = addy.charAt(0) === "M" ? true : false
                 let len = addy.length === 34 ? true : false
+                let pa = "{{ $public_addr }}";
 
                 // Handle Input for Tx
-                if (addy && amount && m && len) {
+                if (addy && amount && m && len && pa) {
                     $.ajax({
-                        url: `/api/balance/${addy}`, 
+                        url: `/api/balance/${pa}`, 
                         type: 'GET',
                         success: function(balance) {
                             balance = parseFloat(balance.balance);
