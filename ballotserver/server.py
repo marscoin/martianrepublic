@@ -11,6 +11,7 @@ from ballot_shuffle import CoinShuffleServer
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK, WebSocketException
 import hashlib
 import uuid
+from datetime import datetime
 
 # Load environment variables
 load_dotenv("../.env")
@@ -20,7 +21,7 @@ SERVER_SSL_CERT = os.getenv('SSL_CERT')
 SERVER_SSL_KEY = os.getenv('SSL_KEY')
 
 # Configure logging
-logging.basicConfig()
+logging.basicConfig(level=logging.INFO)
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 
 # Load SSL certificate and key
@@ -30,7 +31,7 @@ ssl_context.load_cert_chain(ssl_cert, keyfile=ssl_key)
 
 # Global state and data structures
 STATE = {"value": 0}
-USERS = set()
+USERS = {}
 SHUFFLE = {}
 SIGNATURES = {}
 PEER_NUM = 0
@@ -40,7 +41,7 @@ server = CoinShuffleServer()
 max_voters_required = 3
 
 # Client and room tracking
-clients = {}  # : {client_id: {websocket, name, room}}
+clients = {}  # : {client_id: {websocket, name, room, address, last_seen}}
 rooms = {}  # : {room: {websocket: name}}
 client_states = {}  # : {client_id: {state}}
 
@@ -104,13 +105,13 @@ async def notify_users():
         message = users_event()
         await asyncio.wait([user.send(message) for user in USERS])
 
-async def register(websocket):
-    USERS.add(websocket)
+async def register(websocket, address):
+    USERS[websocket] = {"address": address, "last_seen": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
     await notify_users()
 
 async def unregister(websocket):
     if websocket in USERS:
-        USERS.remove(websocket)
+        del USERS[websocket]
     await notify_users()
 
 async def restore_client_state(websocket, client_id):
@@ -122,19 +123,26 @@ async def save_client_state(client_id, state):
     client_states[client_id] = state
 
 async def client_handler(websocket, path):
-    client_id = str(uuid.uuid4())
-    clients[client_id] = {"websocket": websocket, "name": None, "room": None}
-
     try:
         print('New voter: ' + str(websocket.remote_address[0]) + ":" + str(websocket.remote_address[1]))
-        current = len(clients) + 1
-        print(f' ({current} existing clients)')
-        print(f"...waiting for {max_voters_required - current} more voters to request ballot before shuffle commences...")
-
         name_prop = await websocket.recv()
         name, room = name_prop.split("_")
-        clients[client_id]["name"] = name
-        clients[client_id]["room"] = room
+        address = name  # Assuming name is the public address
+
+        # Check if this address is already connected
+        existing_client = None
+        for cid, info in clients.items():
+            if info["address"] == address:
+                existing_client = cid
+                break
+
+        if existing_client:
+            print(f"Existing connection found for {address}, closing it.")
+            await clients[existing_client]["websocket"].close()
+            del clients[existing_client]
+
+        client_id = str(uuid.uuid4())
+        clients[client_id] = {"websocket": websocket, "name": name, "room": room, "address": address, "last_seen": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
         if room not in rooms:
             rooms[room] = {}
@@ -142,13 +150,13 @@ async def client_handler(websocket, path):
 
         print(f"Martian: {name} joined for {room}")
         await websocket.send(f'Welcome to the Ballot issuing server. It will coordinate your request to vote by issuing a ballot that cannot be traced back to you but still audited by the community as originating from the voter registry thus securing cryptographically secured free and fair elections/votes, {name}')
-        await websocket.send(f'There are {len(clients) - 1} other Martian citizens connected awaiting a ballot issuance: {list(clients.values())}')
+        await websocket.send(f'There are {len(clients) - 1} other Martian citizens connected awaiting a ballot issuance: {list(info["address"] for info in clients.values())}')
         await restore_client_state(websocket, client_id)
         await websocket.send("JOINED_ACK")
 
         for client, _ in rooms[room].items():
             await client.send(f'{name} has joined the Ballot issuance procedures for proposal {room}')
-            await client.send(f"...waiting for {max_voters_required - current} more voters to join before ballot shuffle commences...")
+            await client.send(f"...waiting for {max_voters_required - len(rooms[room])} more voters to join before ballot shuffle commences...")
             await client.send("Please wait...")
 
         while True:
@@ -195,6 +203,9 @@ async def client_handler(websocket, path):
                         for client, _ in rooms[room].items():
                             await client.send(f'COMBINE_AND_BROADCAST#{json.dumps(SIGNATURES)}')
 
+                # Update client last seen time
+                clients[client_id]["last_seen"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
                 # Save client state after processing each message
                 await save_client_state(client_id, {"latest_message": message})
 
@@ -214,7 +225,8 @@ async def client_handler(websocket, path):
         print(f"Error during client handler setup: {e}")
     finally:
         await unregister(websocket)
-        del clients[client_id]
+        if client_id in clients:
+            del clients[client_id]
 
 start_server = websockets.serve(client_handler, str(BALLOT_SERVER_HOST), BALLOT_SERVER_PORT, ssl=ssl_context)
 
