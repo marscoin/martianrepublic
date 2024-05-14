@@ -336,40 +336,19 @@ class CongressController extends Controller
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
 			$proposal = Proposals::where('id', '=', $propid)->first();
 
-			if (!$profile) {
-				return redirect('/twofa');
-			} else {
-				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-					return redirect('/twofachallenge');
-				}
-			}
-			
 			$view = View::make('congress.ballot');
 			
-			if ($wallet) {
-				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$view->balance = ($cur_balance * 0.00000001);
-				$view->public_address = $wallet->public_addr;
-			} else {
-				$view->balance = 0;
-			}
-
 			$view->proposal = $proposal;
 			$view->fullname = Auth::user()->fullname;
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
-			$view->wallet_open = $profile->wallet_open;
+			$view->wallet_open = $civic_wallet->id;
 			$view->propid = $propid;
 			$view->random_bytes = bin2hex(random_bytes(16));
-
-			// echo "Hello, World";
-			// die();
-			$json = AppHelper::file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
+			$view->public_address = $civic_wallet->public_addr;
 
 			return $view;
 		}else{

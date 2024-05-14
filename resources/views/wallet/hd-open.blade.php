@@ -286,12 +286,8 @@
             </div>
 
 
-            <!-------------------------------------------------------------------------->
-            <!---- THE BASIC MODAL IN ACTION!!!!!!!!!!!! -->
-            <div id="basicModal" class="modal fade" aria-hidden="true" style="display: none;">
-
+            <div id="basicModal" class="modal fade" aria-hidden="true" data-backdrop="static" data-keyboard="false"  style="display: none;">
                 <div class="modal-dialog">
-
                     <div class="modal-content">
 
                         <div class="modal-header">

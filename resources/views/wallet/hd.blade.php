@@ -256,7 +256,7 @@ h5 {
 
     </div> <!-- /#wrapper -->
     <!--------------------------------------->
-    <div id="unlockWalletModal" class="modal modal-styled fade" data-keyboard="true">
+    <div id="unlockWalletModal" class="modal modal-styled fade" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog" style="width: 600px;">
             <div class="modal-content">
                 <div class="modal-header">
