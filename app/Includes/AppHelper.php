@@ -559,5 +559,27 @@ class AppHelper{
 		}
 
 
+		public static function createSlug($id, $title) {
+			// Step 1: Concatenate
+			$combined = $id . '-' . $title;
+			
+			// Step 2: Lowercase
+			$combined = strtolower($combined);
+			
+			// Step 3: Remove special characters
+			$combined = preg_replace('/[^a-z0-9\s-]/', '', $combined);
+			
+			// Step 4: Trim whitespace
+			$combined = trim($combined);
+			
+			// Step 5: Replace spaces and underscores with hyphens
+			$combined = preg_replace('/[\s_]+/', '-', $combined);
+			
+			// Step 6: Ensure uniqueness (not implemented here, depends on context)
+			
+			return $combined;
+		}
+
+
 
 }

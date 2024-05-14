@@ -269,7 +269,7 @@
             <?php if($isCitizen){?>
                 
                 @if($proposal->txid)
-                    <a data-toggle="modal" href="/congress/ballot/{{$proposal->id}}" id="" style="width: 100%; text-align: center;" class="btn-lg btn-primary demo-element "><i class="fa-solid fa-check-to-slot"></i> Request Ballot</a>
+                    <a data-toggle="modal" target="_blank" href="/congress/ballot/{{$proposal->id}}" id="" style="width: 100%; text-align: center;" class="btn-lg btn-primary demo-element "><i class="fa-solid fa-check-to-slot"></i> Request Ballot</a>
                 @endif
                     
             <?php }else{ ?>

@@ -166,14 +166,6 @@ class DashboardController extends Controller
 				$google2fa_secret = $profile->twofakey;
 				$valid = $google2fa->verifyKey($google2fa_secret, $secret);
 				if ($valid) {
-					$local = $request->input('local');
-
-					if ($local == "true") {
-						$profile->wallet_open = 1;
-					} else if ($local == "false") {
-						$profile->wallet_open = 0;
-					}
-
 
 					$profile->openchallenge = 0;
 					$profile->save();
@@ -469,7 +461,7 @@ class DashboardController extends Controller
 				$view->public_addr = $data->public_addr;
 				$view->encrypted_seed = $data->encrypted_seed;
 				$view->fullname = Auth::user()->fullname;
-				$view->wallet_open = 1;
+				$view->wallet_open = $data->id;
 
 				$end = microtime(true);
 				$timeTaken = $end - $start;
@@ -653,7 +645,7 @@ class DashboardController extends Controller
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$hd_wallet = HDWallet::where('user_id', '=', $uid)->get();
-			$profile->wallet_open = 1;
+			$profile->wallet_open = $hd_wallet->id;
 			$profile->save();
 
 			return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Open!');

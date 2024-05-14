@@ -20,7 +20,7 @@ class CivicWallet extends Model
 	 * The attributes excluded from the model's JSON form.
 	 *
 	 * @var array
-	 */
+	 */ 
 	public static $rules = array(
 		'password'=>'required|between:6,32'
 		);
