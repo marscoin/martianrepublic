@@ -15,6 +15,7 @@ use App\Models\Threads;
 use App\Models\Citizen;
 use App\Models\HDWallet;
 use App\Models\CivicWallet;
+use App\Models\MSession;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -378,6 +379,111 @@ class ApiController extends Controller
         }
 			
 	}
+
+    public function marsAuth(Request $request)
+    {
+        $this->setCorsHeaders();
+
+        if (!$request->isMethod('post')) {
+            return $this->fastcode(400, "bad request");
+        }
+
+        $challenge = $request->query('c');
+        $session_string = $request->query('sid');
+        $timestamp = hexdec($request->query('t'));
+        $pubk = $request->input('pubk');
+        $msg = $request->input('msg');
+        $sig = $request->input('sig');
+        $address = $request->input('addr');
+
+        if ($timestamp < (time() - 600)) {
+            return $this->fastcode(408, "request timed out");
+        }
+
+        $session = MSession::where('sid', $session_string)->first();
+
+        if ($session && in_array($challenge, explode(",", $session->v))) {
+            $marscoinECDSA = new MarscoinECDSA();
+            if ($marscoinECDSA->checkSignatureForMessage($address, $sig, $msg)) {
+                $session->s = $address;
+                $session->save();
+                return $this->fastcode(200, "successfully authenticated");
+            } else {
+                return $this->fastcode(406, "couldn't verify message");
+            }
+        } else {
+            return $this->fastcode(404, "no challenge found");
+        }
+    }
+
+    public function checkAuth(Request $request)
+    {
+        $session_string = $request->query('sid');
+        $session = MSession::where('sid', $session_string)->first();
+    
+        $authenticated = (!is_null($session) && !empty($session->s)) ? true : false; 
+    
+        return response()->json(['sid' => $session_string, 'authenticated' => $authenticated]);
+    }
+    
+    private function fastcode($status, $message)
+    {
+        return response()->json(["status" => $status, "message" => $message], $status);
+    }
+
+    private function setCorsHeaders()
+    {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Methods: GET, POST");
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    }
+
+    public function wauth(Request $request)
+    {
+        Log::debug('MarsAuth');
+        $sid = $request->query('sid');
+        Log::debug('MarsAuth');
+
+        if (!empty($sid)) {
+            $mars_session = MSession::where('sid', $sid)->first(); // Retrieve the session using Eloquent
+
+            if ($mars_session && !is_null($mars_session->s) && !empty($mars_session->s)) {
+                // Attempt to retrieve a user via the public address
+                $citizen = Citizen::where('public_address', $mars_session->s)->first();
+
+                if ($citizen) {
+                    // If a citizen record exists, retrieve the associated user
+                    $user = User::find($citizen->userid);
+                } else {
+                    // Create a new user and citizen if no citizen record exists
+                    $user = User::create([
+                        'email' => $mars_session->s . '@martianrepublic.org',
+                        'password' => Hash::make(Str::random(16)), // Generate a random password
+                    ]);
+
+                    $citizen = new Citizen([
+                        'userid' => $user->id,
+                        'firstname' => 'Unknown', // Set default or use input
+                        'lastname' => 'Uknown',
+                        'public_address' => $mars_session->s,
+                    ]);
+
+                    $citizen->save();
+                }
+
+                Auth::login($user); // Authenticate the user
+                session()->save(); // Ensure the session is saved immediately
+
+                Log::debug('User authenticated immediately after login: ' . (Auth::check() ? 'true' : 'false'));
+                return redirect('/wallet/dashboard');
+            }
+
+            return redirect('/login')->withErrors('Could not find User.');
+        } else {
+            // Handle invalid or expired SID
+            return redirect('/login')->withErrors('Your session has expired or is invalid.');
+        }
+    }
 
 
 
