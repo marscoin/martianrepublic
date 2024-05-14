@@ -20,6 +20,11 @@ class HDWallet extends Model {
 	public static $rules = array(
 		'password'=>'required|between:6,32'
 		);
+
+	protected $casts = [
+		'opened_at' => 'datetime',
+		'created_at' => 'datetime',
+	];
 }
 
 ?>

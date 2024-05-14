@@ -29,4 +29,9 @@ class CivicWallet extends Model
 	{
 		return $this->belongsTo(User::class);
 	}
+
+	protected $casts = [
+        'opened_at' => 'datetime',
+        'created_at' => 'datetime',
+    ];
 }
