@@ -62,7 +62,7 @@ async def ballotserver_start(room):
     encoded_response = {'order': json.dumps(response['order']),
                         'peers': json.dumps(response['peers'])}
     if not dostart:
-        abort(555, message="BallotShuffle already Started")
+        raise Exception("BallotShuffle already Started")
     for i in range(len(response['order']) - 1, -1, -1):
         ek = response['order'][i]
         addr = response['peers'][ek]
@@ -219,9 +219,14 @@ async def client_handler(websocket, path):
     except Exception as e:
         logging.error(f"Error during client handler setup: {e}")
     finally:
-        if client_id and client_id in clients:
-            del clients[client_id]
-        await unregister(websocket)
+        if client_id:
+            # Clean up client
+            if client_id in clients:
+                del clients[client_id]
+            # Ensure the client's websocket is removed from rooms
+            if room in rooms and websocket in rooms[room]:
+                del rooms[room][websocket]
+            await unregister(websocket)
         logging.debug(f"Final client state: {clients}")
         logging.debug(f"Final room state: {rooms}")
 
