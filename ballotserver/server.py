@@ -8,6 +8,7 @@ import os
 import ast
 from dotenv import load_dotenv
 from ballot_shuffle import CoinShuffleServer
+from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK, WebSocketException
 import hashlib
 
 load_dotenv("../.env")
@@ -135,96 +136,114 @@ rooms = {}  #: {websocket: proposalname}
 entity = {}
 
 async def client_handler(websocket, path):
-    print('New voter: '+ str(websocket.remote_address[0])+":"+str(websocket.remote_address[1]))
-    current = len(clients.items()) + 1
-    print(' ({} existing clients)'.format(current))
-    print("...waiting for " + str(max_voters_required - current) + " more voters to request ballot before shuffle commences...")
-    # The first line from the client is the name
-    name_prop = await websocket.recv()
-    name = name_prop.split("_")[0]
-    room = name_prop.split("_")[1]
-    print("Martian: " + str(name) + " joined for " + str(room))
-    await websocket.send('Welcome to the Ballot issuing server. It will coordinate your request to vote by issuing a ballot that cannot be traced back to you but still audited by the community as originating from the voter registry thus securing cryptographically secured free and fair elections/votes, {}'.format(name))
-    await websocket.send('There are {} other Martian citizens connected awaiting a ballot issuance: {}'.format(len(clients), list(clients.values())))
-    entity[websocket] = name
-    rooms[room] = entity
-    await websocket.send("JOINED_ACK")
+    try:
+        print('New voter: '+ str(websocket.remote_address[0])+":"+str(websocket.remote_address[1]))
+        current = len(clients.items()) + 1
+        print(' ({} existing clients)'.format(current))
+        print("...waiting for " + str(max_voters_required - current) + " more voters to request ballot before shuffle commences...")
+        # The first line from the client is the name
+        name_prop = await websocket.recv()
+        name = name_prop.split("_")[0]
+        room = name_prop.split("_")[1]
+        print("Martian: " + str(name) + " joined for " + str(room))
+        await websocket.send('Welcome to the Ballot issuing server. It will coordinate your request to vote by issuing a ballot that cannot be traced back to you but still audited by the community as originating from the voter registry thus securing cryptographically secured free and fair elections/votes, {}'.format(name))
+        await websocket.send('There are {} other Martian citizens connected awaiting a ballot issuance: {}'.format(len(clients), list(clients.values())))
+        entity[websocket] = name
+        rooms[room] = entity
+        await websocket.send("JOINED_ACK")
 
-    #let everyone else in the room know
-    for client, _ in rooms[room].items():
-        await client.send(name + ' has joined the Ballot issuance procedures for proposal ' + str(room))
-        await client.send("...waiting for " + str(max_voters_required - current) + " more voters to join before ballot shuffle commences...")
-        await client.send("Please wait...")
+        #let everyone else in the room know
+        for client, _ in rooms[room].items():
+            await client.send(name + ' has joined the Ballot issuance procedures for proposal ' + str(room))
+            await client.send("...waiting for " + str(max_voters_required - current) + " more voters to join before ballot shuffle commences...")
+            await client.send("Please wait...")
 
-    # Handle messages from this client
-    while True:
-        message = await websocket.recv()
-        if message is None:
-            their_name = clients[websocket]
-            del clients[websocket]
-            print('Client closed connection', websocket)
-            for client, _ in clients.items():
-                await client.send(their_name + ' has left, restart shuffle...')
-            break
+        # Handle messages from this client
+        while True:
+            try:
+                message = await websocket.recv()
+                if message is None:
+                    their_name = clients[websocket]
+                    del clients[websocket]
+                    print('Client closed connection', websocket)
+                    for client, _ in clients.items():
+                        await client.send(their_name + ' has left, restart shuffle...')
+                    break
 
-        if "SUBMIT_KEY" in message:
-            #requests.post(addr + '/coinshuffle/submitkey', data={'public_key': self.ek, 'address': self.addr})
-            key = message.split("#")[1]
-            server.submit_public_key(key, str(websocket.remote_address[0])+":"+str(websocket.remote_address[1]))
-            # Do we have enough ballot requests pending for a given proposal "polling station" (room)
-            if len(rooms[room].items()) >= max_voters_required:
-                # Let the most recent client that joined kick the shuffle process off
-                await ballotserver_start(rooms[room])
+                if "SUBMIT_KEY" in message:
+                    #requests.post(addr + '/coinshuffle/submitkey', data={'public_key': self.ek, 'address': self.addr})
+                    key = message.split("#")[1]
+                    server.submit_public_key(key, str(websocket.remote_address[0])+":"+str(websocket.remote_address[1]))
+                    # Do we have enough ballot requests pending for a given proposal "polling station" (room)
+                    if len(rooms[room].items()) >= max_voters_required:
+                        # Let the most recent client that joined kick the shuffle process off
+                        await ballotserver_start(rooms[room])
 
-        if "PERFORM_SHUFFLE_ACK" in message:
-            peer_index = int(message.split("#")[1])
-            SHUFFLE[peer_index] = message.split("#")[2]
+                if "PERFORM_SHUFFLE_ACK" in message:
+                    peer_index = int(message.split("#")[1])
+                    SHUFFLE[peer_index] = message.split("#")[2]
 
-            PEER_NUM = len(rooms[room].items())
-            print(SHUFFLE)
-            print(PEER_NUM)
-            print(len(SHUFFLE))
-            if len(SHUFFLE) <= PEER_NUM:
-                obj = SHUFFLE[peer_index]
-                print(obj)
-                obj = ast.literal_eval(obj)
-                print(obj['data'])
-                data = obj['data']
-                sources = obj['sources']
-                peer_index = peer_index + 1
-                ek = response['order'][peer_index]
-                addr = response['peers'][ek]
-                for client, _ in rooms[room].items():
-                    client_addr = str(client.remote_address[0]) + ":" + str(client.remote_address[1])
-                    if client_addr == addr:
-                        await client.send('PERFORM_SHUFFLE#' + json.dumps(data) + "#" + json.dumps(sources))
+                    PEER_NUM = len(rooms[room].items())
+                    print(SHUFFLE)
+                    print(PEER_NUM)
+                    print(len(SHUFFLE))
+                    if len(SHUFFLE) <= PEER_NUM:
+                        obj = SHUFFLE[peer_index]
+                        print(obj)
+                        obj = ast.literal_eval(obj)
+                        print(obj['data'])
+                        data = obj['data']
+                        sources = obj['sources']
+                        peer_index = peer_index + 1
+                        ek = response['order'][peer_index]
+                        addr = response['peers'][ek]
+                        for client, _ in rooms[room].items():
+                            client_addr = str(client.remote_address[0]) + ":" + str(client.remote_address[1])
+                            if client_addr == addr:
+                                await client.send('PERFORM_SHUFFLE#' + json.dumps(data) + "#" + json.dumps(sources))
 
-            else:
-                print("Now sign the transaction?")
+                    else:
+                        print("Now sign the transaction?")
 
-        if "COLLECT_SIGNATURES" in message:
-            raw_tx = message.split("#")[1]
-            for client, _ in rooms[room].items():
-                await client.send('SIGN_TX#' + raw_tx)
+                if "COLLECT_SIGNATURES" in message:
+                    raw_tx = message.split("#")[1]
+                    for client, _ in rooms[room].items():
+                        await client.send('SIGN_TX#' + raw_tx)
 
-        if "SIGN_TX_COMPLETE" in message:
-            peer_index = int(message.split("#")[1])
-            SIGNATURES[peer_index] = message.split("#")[2]
-            print("Peer: " + str(peer_index))
-            print(hashlib.md5(SIGNATURES[peer_index].encode()).hexdigest())
+                if "SIGN_TX_COMPLETE" in message:
+                    peer_index = int(message.split("#")[1])
+                    SIGNATURES[peer_index] = message.split("#")[2]
+                    print("Peer: " + str(peer_index))
+                    print(hashlib.md5(SIGNATURES[peer_index].encode()).hexdigest())
 
-            PEER_NUM = len(rooms[room].items())
-            # print(SIGNATURES)
-            # print(PEER_NUM)
-            print(len(SIGNATURES))
-            if len(SIGNATURES) == PEER_NUM:
-                #Send to all clients for combining and broadcasting...
-                for client, _ in rooms[room].items():
-                    await client.send('COMBINE_AND_BROADCAST#' + json.dumps(SIGNATURES))
+                    PEER_NUM = len(rooms[room].items())
+                    # print(SIGNATURES)
+                    # print(PEER_NUM)
+                    print(len(SIGNATURES))
+                    if len(SIGNATURES) == PEER_NUM:
+                        #Send to all clients for combining and broadcasting...
+                        for client, _ in rooms[room].items():
+                            await client.send('COMBINE_AND_BROADCAST#' + json.dumps(SIGNATURES))
 
-        # Send message to all clients
-        #for client, _ in clients.items():
-        #    await client.send('{}: {}'.format(name, message))
+                # Send message to all clients
+                #for client, _ in clients.items():
+                #    await client.send('{}: {}'.format(name, message))
+            except ConnectionClosedError:
+                print(f"Connection closed with error from client: {websocket.remote_address}")
+                break
+            except ConnectionClosedOK:
+                print(f"Connection closed gracefully by client: {websocket.remote_address}")
+                break
+            except WebSocketException as e:
+                print(f"WebSocket error: {e}")
+                break
+            except Exception as e:
+                print(f"Unexpected error: {e}")
+                break
+    except Exception as e:
+        print(f"Error during client handler setup: {e}")
+    finally:
+        await unregister(websocket)
 
 start_server = websockets.serve(client_handler, str(BALLOT_SERVER_HOST), BALLOT_SERVER_PORT, ssl=ssl_context)
 
