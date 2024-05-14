@@ -349,6 +349,7 @@ class CongressController extends Controller
 			$view->propid = $propid;
 			$view->random_bytes = bin2hex(random_bytes(16));
 			$view->public_address = $civic_wallet->public_addr;
+			$view->slug = AppHelper::createSlug($proposal->discussion, $proposal->title);
 
 			return $view;
 		}else{

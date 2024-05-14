@@ -62,7 +62,7 @@
                                     <p style="font-size: 2rem">
                                         {{ $proposal->title }}
                                     </p>
-                                    <a href='/forum/t/{{ $proposal->discussion }}' class="pull-right discussion-link">Citizen's discussion <i class="fa fa-external-link"></i></a>
+                                    <a target="_blank" href='/forum/t/{{ $slug }}' class="pull-right discussion-link">Citizen's discussion <i class="fa fa-external-link"></i></a>
                                 </li>
                                 </ul>
                             </div>
