@@ -21,7 +21,7 @@ SERVER_SSL_CERT = os.getenv('SSL_CERT')
 SERVER_SSL_KEY = os.getenv('SSL_KEY')
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 
 # Load SSL certificate and key
@@ -124,10 +124,12 @@ async def save_client_state(client_id, state):
 
 async def client_handler(websocket, path):
     try:
-        print('New voter: ' + str(websocket.remote_address[0]) + ":" + str(websocket.remote_address[1]))
+        logging.debug(f'New voter: {websocket.remote_address}')
         name_prop = await websocket.recv()
         name, room = name_prop.split("_")
         address = name  # Assuming name is the public address
+
+        logging.debug(f"Received name and room: {name}, {room}")
 
         # Check if this address is already connected
         existing_client = None
@@ -137,7 +139,7 @@ async def client_handler(websocket, path):
                 break
 
         if existing_client:
-            print(f"Existing connection found for {address}, closing it.")
+            logging.debug(f"Existing connection found for {address}, closing it.")
             await clients[existing_client]["websocket"].close()
             del clients[existing_client]
 
@@ -148,7 +150,7 @@ async def client_handler(websocket, path):
             rooms[room] = {}
         rooms[room][websocket] = name
 
-        print(f"Martian: {name} joined for {room}")
+        logging.debug(f"Martian: {name} joined for {room}")
         await websocket.send(f'Welcome to the Ballot issuing server. It will coordinate your request to vote by issuing a ballot that cannot be traced back to you but still audited by the community as originating from the voter registry thus securing cryptographically secured free and fair elections/votes, {name}')
         await websocket.send(f'There are {len(clients) - 1} other Martian citizens connected awaiting a ballot issuance: {list(info["address"] for info in clients.values())}')
         await restore_client_state(websocket, client_id)
@@ -162,6 +164,8 @@ async def client_handler(websocket, path):
         while True:
             try:
                 message = await websocket.recv()
+                logging.debug(f"Received message: {message}")
+
                 if not message:
                     break
 
@@ -188,7 +192,7 @@ async def client_handler(websocket, path):
                             if client_addr == addr:
                                 await client.send(f'PERFORM_SHUFFLE#{json.dumps(data)}#{json.dumps(sources)}')
                     else:
-                        print("Now sign the transaction?")
+                        logging.debug("Now sign the transaction?")
 
                 if "COLLECT_SIGNATURES" in message:
                     raw_tx = message.split("#")[1]
@@ -210,19 +214,19 @@ async def client_handler(websocket, path):
                 await save_client_state(client_id, {"latest_message": message})
 
             except ConnectionClosedError:
-                print(f"Connection closed with error from client: {websocket.remote_address}")
+                logging.error(f"Connection closed with error from client: {websocket.remote_address}")
                 break
             except ConnectionClosedOK:
-                print(f"Connection closed gracefully by client: {websocket.remote_address}")
+                logging.info(f"Connection closed gracefully by client: {websocket.remote_address}")
                 break
             except WebSocketException as e:
-                print(f"WebSocket error: {e}")
+                logging.error(f"WebSocket error: {e}")
                 break
             except Exception as e:
-                print(f"Unexpected error: {e}")
+                logging.error(f"Unexpected error: {e}")
                 break
     except Exception as e:
-        print(f"Error during client handler setup: {e}")
+        logging.error(f"Error during client handler setup: {e}")
     finally:
         await unregister(websocket)
         if client_id in clients:
