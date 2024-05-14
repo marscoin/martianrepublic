@@ -207,18 +207,8 @@ async def client_handler(websocket, path):
                     if len(SIGNATURES) == PEER_NUM:
                         for client, _ in rooms[room].items():
                             await client.send(f'COMBINE_AND_BROADCAST#{json.dumps(SIGNATURES)}')
-
-                # Update client last seen time
-                clients[client_id]["last_seen"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-                # Save client state after processing each message
-                await save_client_state(client_id, {"latest_message": message})
-
-            except ConnectionClosedError:
+            except (ConnectionClosedError, ConnectionClosedOK) as e:
                 logging.error(f"Connection closed with error from client: {websocket.remote_address}")
-                break
-            except ConnectionClosedOK:
-                logging.info(f"Connection closed gracefully by client: {websocket.remote_address}")
                 break
             except WebSocketException as e:
                 logging.error(f"WebSocket error: {e}")
@@ -229,12 +219,11 @@ async def client_handler(websocket, path):
     except Exception as e:
         logging.error(f"Error during client handler setup: {e}")
     finally:
-        await unregister(websocket)
-        if client_id in clients:
+        if client_id and client_id in clients:
             del clients[client_id]
-        if client_id:
-            logging.debug(f"Final client state: {clients}")
-            logging.debug(f"Final room state: {rooms}")
+        await unregister(websocket)
+        logging.debug(f"Final client state: {clients}")
+        logging.debug(f"Final room state: {rooms}")
 
 start_server = websockets.serve(client_handler, str(BALLOT_SERVER_HOST), BALLOT_SERVER_PORT, ssl=ssl_context)
 
