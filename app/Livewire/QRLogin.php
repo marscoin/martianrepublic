@@ -45,6 +45,7 @@ class QRLogin extends Component
 
             $this->qrCodeImage = base64_encode(QrCode::format('png')->size(250)->generate($url));
             Log::debug('QR Code generated', ['sid' => $this->sid]);
+            $this->dispatch('sidUpdated', ['sid' => $this->sid]);
         }
     }
 

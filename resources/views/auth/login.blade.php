@@ -206,34 +206,22 @@ border-radius: 10px;
                 </div>
                 </div>
                 <div class="text-left" bis_skin_checked="1">
-                <img src="https://img.freepik.com/free-icon/smartphone_318-548779.jpg" style="float: right;height: 46px;margin-right: 6px;/* margin-bottom: 10px; */margin: 19px;">
-                <p style="font-size: 10px;margin: 20px;" class="text-muted ">Biometrically Secured<br> FastAuth
-                    Login</p>
+                <img src="/assets/landing/img/secured.avif" style="float: right;height: 46px;margin-right: 6px;/* margin-bottom: 10px; */margin: 19px;">
+                <p style="font-size: 10px;margin: 20px;" class="text-muted ">Biometrically <br> & Cryptographically<br> Secured<br>  
+                  </p>
                 </div>
             </div>
 
             </form>
   </div> <!-- /.account-wrapper -->
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Core JS -->
 <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
 <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
-
-<!--[if lt IE 9]>
-<script src="/assets/wallet/js/libs/excanvas.compiled.js"></script>
-<![endif]-->
-<!-- App JS -->
 <script src="/assets/wallet/js/mvpready-core.js"></script>
 <script src="/assets/wallet/js/mvpready-admin.js"></script>
-
-<!-- Plugin JS -->
 <script src="/assets/wallet/js/mvpready-account.js"></script>
-
 <script>
   $(document).ready(function(){
-    // localStorage.clear();
    
   });
   </script>
@@ -257,18 +245,18 @@ border-radius: 10px;
     let currentSid = '';
 
     document.addEventListener('DOMContentLoaded', () => {
-        window.Livewire.on('sidUpdated', (sid) => {
-            currentSid = sid; // Update the current SID whenever the event is emitted
+        window.Livewire.on('sidUpdated', (data) => {
+            currentSid = data[0].sid; // Update the current SID whenever the event is emitted
         });
 
         const checkAuthStatus = () => {
             if (!currentSid) return; // Don't proceed if SID is empty
 
-            fetch(`/api/check?sid=${currentSid}`) // Use the current SID
+            fetch(`/api/checkauth?sid=${currentSid}`) // Use the current SID
                 .then(response => response.json())
                 .then(data => {
                     if (data.authenticated) {
-                        window.location.href = `/api/bwauth?sid=${currentSid}`;
+                        window.location.href = `/api/wauth?sid=${currentSid}`;
                     }
                 })
                 .catch(error => console.error('Error checking authentication status:', error));
