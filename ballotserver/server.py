@@ -123,6 +123,7 @@ async def save_client_state(client_id, state):
     client_states[client_id] = state
 
 async def client_handler(websocket, path):
+    client_id = None
     try:
         logging.debug(f'New voter: {websocket.remote_address}')
         name_prop = await websocket.recv()
@@ -231,6 +232,9 @@ async def client_handler(websocket, path):
         await unregister(websocket)
         if client_id in clients:
             del clients[client_id]
+        if client_id:
+            logging.debug(f"Final client state: {clients}")
+            logging.debug(f"Final room state: {rooms}")
 
 start_server = websockets.serve(client_handler, str(BALLOT_SERVER_HOST), BALLOT_SERVER_PORT, ssl=ssl_context)
 
