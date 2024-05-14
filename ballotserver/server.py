@@ -105,9 +105,9 @@ async def register(websocket):
     USERS.add(websocket)
     await notify_users()
 
-
 async def unregister(websocket):
-    USERS.remove(websocket)
+    if websocket in USERS:
+        USERS.remove(websocket)
     await notify_users()
 
 

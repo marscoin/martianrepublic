@@ -260,11 +260,11 @@ $(document).ready(function() {
 
     const init = async () => {
         hidden_target = getProposalOutputAddress();
-        $("#messages").prepend('<br>Generated: ' + hidden_target);
-        $("#messages").prepend('<br>Ballot shuffle in progress... ');
+        $("#messages").append('<br>Generated: ' + hidden_target);
+        $("#messages").append('<br>Ballot shuffle in progress... ');
         inputBlock = await getInputBlock()
-        $("#messages").prepend('<br>Generated: inputs for hidden target');
-        $("#messages").prepend('<br>Ballot shuffle in progress... ');
+        $("#messages").append('<br>Generated: inputs for hidden target');
+        $("#messages").append('<br>Ballot shuffle in progress... ');
         await getLocalKey()
     }
 
@@ -401,7 +401,7 @@ $(document).ready(function() {
         rb = '<?=$random_bytes?>';
         rb = parseHexString(createHexString(rb))
         mnemonic = my_bundle.bip39.entropyToMnemonic(rb)
-        $("#messages").prepend('<br>Ballot Seed: ' + mnemonic);
+        $("#messages").append('<br>Ballot Seed: ' + mnemonic);
         const wallet = genSeed(mnemonic)
         return wallet.address;
     }
@@ -541,25 +541,25 @@ $(document).ready(function() {
         socket = new WebSocket("wss://martianrepublic.org:3678");
 
     socket.onopen = function(e) {
-        $("#messages").prepend("'<br>[open] Connection established");
-        $("#messages").prepend("'<br>Sending to server");
+        $("#messages").append("'<br>[open] Connection established");
+        $("#messages").append("'<br>Sending to server");
         socket.send("{{$public_address}}_{{ strtoupper(substr(str_replace('https://ipfs.marscoin.org/ipfs/', '', $proposal->ipfs_hash), 1, 8)) }}");
     };
 
     socket.onmessage = function(event) {
         if(!event.data.includes("#") && !event.data.includes("_"))
-            $("#messages").prepend(`<br>[BALLOT SERVER]: ${event.data}`);
+            $("#messages").append(`<br>[BALLOT SERVER]: ${event.data}`);
         
         if(event.data == "JOINED_ACK")
         {
             //Generate a new receive address for the ballot
-            $("#messages").prepend('<br>[BALLOT SERVER]: Generating ballot for proposal');
+            $("#messages").append('<br>[BALLOT SERVER]: Generating ballot for proposal');
             //generate ephemeral public key and shuffling keypair
             socket.send("SUBMIT_KEY#"+ek+"#")
         }
         if(event.data.includes("INITIATE_SHUFFLE_"))
         {
-            $("#messages").prepend('<br>[BALLOT SERVER]: Initiating ballot shuffle...');
+            $("#messages").append('<br>[BALLOT SERVER]: Initiating ballot shuffle...');
             json = event.data.split("_")[2]
             data = JSON.parse(json);
             start_called = true
@@ -575,7 +575,7 @@ $(document).ready(function() {
         }
         if(event.data.includes("PERFORM_SHUFFLE"))
         {
-            $("#messages").prepend('<br>[BALLOT SERVER]: Performing ballot shuffle...');
+            $("#messages").append('<br>[BALLOT SERVER]: Performing ballot shuffle...');
             json = event.data.split("#")[1]
             data = JSON.parse(json);
             json = event.data.split("#")[2]
@@ -590,7 +590,7 @@ $(document).ready(function() {
             sources[index] = inputBlock; 
             data =  shuffle_data(data)
             if (index == num_peers - 1){
-                $("#messages").prepend('<br>[BALLOT SERVER]: Collecting signatures...');
+                $("#messages").append('<br>[BALLOT SERVER]: Collecting signatures...');
                 raw_tx = createRawTransaction(sources, data)
                 socket.send("COLLECT_SIGNATURES#" + raw_tx)
             }
@@ -607,7 +607,7 @@ $(document).ready(function() {
         }
         if(event.data.includes("COMBINE_AND_BROADCAST"))
         {
-            $("#messages").prepend('<br>[BALLOT SERVER]: Combining signatures and broadcasting...');
+            $("#messages").append('<br>[BALLOT SERVER]: Combining signatures and broadcasting...');
             raw_tx = event.data.split("#")[1];
             signed_raw_tx = combineAndBroadcastTransaction(raw_tx);
         }
@@ -617,12 +617,12 @@ $(document).ready(function() {
     if (event.wasClean) {
         alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
     } else {
-        $("#messages").prepend('<br>[close] Connection died');
+        $("#messages").append('<br>[close] Connection died');
     }
     };
 
     socket.onerror = function(error) {
-        $("#messages").prepend(`<br>[error] ${error.message}`);
+        $("#messages").append(`<br>[error] ${error.message}`);
     };
 
     
