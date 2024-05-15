@@ -342,9 +342,22 @@ class ApiController extends Controller
         }
         
         $citcache->save();
-        // Return the updated Citizen object as a JSON response
-        return response()->json($citcache);
-		
+        // Fetch profile data
+        $profile = Profile::where('userid', '=', $uid)->first();
+
+        // Merge citizen and profile data
+        $response = [
+            'citizen' => $citcache,
+            'profile' => [
+                'citizen' => $profile->citizen ?? null,
+                'endorse_cnt' => $profile->endorse_cnt ?? null,
+                'general_public' => $profile->general_public ?? null,
+                'has_application' => $profile->has_application ?? null,
+            ]
+        ];
+
+        // Return the merged data as a JSON response
+        return response()->json($response);
 	}
 
 
