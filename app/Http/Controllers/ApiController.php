@@ -103,28 +103,60 @@ class ApiController extends Controller
 
     
 
+    // public function allApplicants()
+    // {
+    //     $perPage = 25; 
+    
+    //     $applicants = User::whereHas('profile', function ($query) {
+    //         $query->where('has_application', 1);
+    //     })
+    //     ->with(['profile', 'hdWallet' => function($query) {
+    //         // If you only need the public_addr from HdWallet, select it specifically
+    //         $query->select('user_id', 'public_addr');
+    //     }])
+    //     ->orderByDesc('id')
+    //     ->paginate($perPage, ['id', 'fullname']); 
+    //     // Customize the result to match the raw query structure, if needed
+    //     $customResult = $applicants->getCollection()->transform(function ($user) {
+    //         return [
+    //             'userid' => $user->id,
+    //             'fullname' => $user->fullname,
+    //             'address' => $user->hdWallet ? $user->hdWallet->public_addr : null,
+    //         ];
+    //     });
+    
+    //     return response()->json([
+    //         'current_page' => $applicants->currentPage(),
+    //         'data' => $customResult,
+    //         'total' => $applicants->total(),
+    //         'per_page' => $applicants->perPage(),
+    //         'last_page' => $applicants->lastPage(),
+    //     ]);
+    // }
+
     public function allApplicants()
     {
         $perPage = 25; 
-    
+
         $applicants = User::whereHas('profile', function ($query) {
             $query->where('has_application', 1);
         })
+        ->where('id', '!=', 6462) // Exclude user with id 6462
         ->with(['profile', 'hdWallet' => function($query) {
-            // If you only need the public_addr from HdWallet, select it specifically
             $query->select('user_id', 'public_addr');
-        }])
+        }, 'citizen']) // Add citizen relationship
         ->orderByDesc('id')
         ->paginate($perPage, ['id', 'fullname']); 
-        // Customize the result to match the raw query structure, if needed
+
         $customResult = $applicants->getCollection()->transform(function ($user) {
             return [
                 'userid' => $user->id,
                 'fullname' => $user->fullname,
                 'address' => $user->hdWallet ? $user->hdWallet->public_addr : null,
+                'citizen' => $user->citizen, // Include citizen data
             ];
         });
-    
+
         return response()->json([
             'current_page' => $applicants->currentPage(),
             'data' => $customResult,
