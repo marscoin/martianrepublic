@@ -397,28 +397,32 @@ class ApiController extends Controller
 
 	public function pinvideo(Request $request){
 
+        Log::debug('pinvid');
         $uid = Auth::user()->id;
         $hash = "";
         $dataPic = $request->input('file');
         $type = $request->input('type');
         $public_address = $request->input('address');
+        Log::debug('public: ' . $public_address);
         if ($request->hasFile('file'))
         {
+            Log::debug('storing file');
             $file_path = "./assets/citizen/" . $public_address . "/";
             if (!file_exists($file_path)) {
                 mkdir($file_path);
+                Log::debug('making dir');
             }
             $file_path = "./assets/citizen/" . $public_address  . "/";
             $request->file('file')->move($file_path, "profile_video.webm" );
             $file_path = $file_path . "profile_video.webm";
             $hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
-
+            Log::debug('upload complete: ' . $hash);
             $citcache = Citizen::where('userid', '=', $uid)->first();
             if(is_null($citcache)) $citcache = new Citizen;	
             $citcache->userid = $uid;
             $citcache->liveness_link = "https://ipfs.marscoin.org/ipfs/".$hash;
             $citcache->save();
-
+            Log::debug('saved cit data');
             return (new Response(json_encode(array("Hash" => $hash)), 200))
             ->header('Content-Type', "application/json;");
         }
