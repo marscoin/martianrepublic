@@ -425,6 +425,8 @@ class ApiController extends Controller
             Log::debug('saved cit data');
             return (new Response(json_encode(array("Hash" => $hash)), 200))
             ->header('Content-Type', "application/json;");
+        }else{
+            Log::debug('no file found!');
         }
 			
 	}
