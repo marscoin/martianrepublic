@@ -426,7 +426,7 @@ class ApiController extends Controller
             return (new Response(json_encode(array("Hash" => $hash)), 200))
             ->header('Content-Type', "application/json;");
         }else{
-            Log::debug('no file found');
+            Log::debug('no file found!');
         }
 			
 	}
