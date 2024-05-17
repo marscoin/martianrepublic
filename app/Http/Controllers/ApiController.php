@@ -537,6 +537,71 @@ class ApiController extends Controller
     }
 
 
+    	/**
+	 * Handles JSON storage and pinning to a distributed file system.
+	 *
+	 * @hideFromAPIDocumentation
+	 */
+	public function pinjson(Request $request)
+	{
+		Log::info("in function");
+		$public_address = $request->input('address');
+		$type = $request->input('type');
+		$json = $request->input('payload');
+		$projectRoot = env('PROJECT_ROOT', base_path());
+		$base_path =  $projectRoot . "/assets/citizen/" . $public_address;
+
+		// Check and create the directory if it doesn't exist
+		Log::info($base_path);
+		clearstatcache();
+		if (!is_dir($base_path)) {
+			Log::info("Trying to create directory: " . $base_path);
+			if (!mkdir($base_path, 0755, true)) {
+				Log::error("Failed to create directory: " . $base_path);
+				return response()->json(["error" => "Failed to create directory. Check permissions."], 500);
+			}
+			Log::info("Directory created: " . $base_path);
+		}
+		
+		// Check if the directory is writable, regardless of whether it was just created or already existed
+		if (!is_writable($base_path)) {
+			Log::error("Directory not writable: " . $base_path);
+			return response()->json(["error" => "Directory is not writable. Check permissions."], 500);
+		}
+
+		$file_path = $base_path . "/" . $type . ".json";
+
+		// Attempt to write the JSON data to the file
+		if (file_put_contents($file_path, $json) === false) {
+			return response()->json(["error" => "Failed to write to file."], 500);
+		}
+
+		try {
+			Log::info("PermaJson: " . $file_path);
+		
+			// Check if the type contains the word 'log'
+			if (strpos($type, 'log') !== false) {
+				// The type contains 'log', use uploadFolder
+				$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
+			} else {
+				// The type does not contain 'log', use upload
+				$apiResponse = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+			}
+
+			if (is_string($apiResponse)) {
+				$formattedResponse = ['Hash' => $apiResponse];
+			} else {
+				Log::error("Upload error: Formatting");
+				return response()->json(["error"=>"formatting error"], 500);
+			}
+			
+			return response()->json($formattedResponse, 200)->header('Content-Type', "application/json;");
+		} catch (\Exception $e) {
+			// Handle exceptions during the upload and pinning process
+			Log::error("Upload error: " . $e->getMessage());
+			return response()->json(["error" => $e->getMessage()], 500);
+		}
+	}
 
 
 

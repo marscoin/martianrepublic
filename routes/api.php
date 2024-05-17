@@ -28,3 +28,4 @@ Route::get('/test', 'App\Http\Controllers\ApiController@test');
 Route::post('/scitizen', 'App\Http\Controllers\ApiController@scitizen')->middleware(['auth:sanctum'])->name('api_scitizen');
 Route::post('/pinpic', 'App\Http\Controllers\ApiController@pinpic')->middleware(['auth:sanctum'])->name('api_pinpic');
 Route::post('/pinvideo', 'App\Http\Controllers\ApiController@pinvideo')->middleware(['auth:sanctum'])->name('api_pinvideo');
+Route::post('/pinjson', 'App\Http\Controllers\ApiController@pinjson')->middleware(['auth:sanctum'])->name('api_pinjson');
