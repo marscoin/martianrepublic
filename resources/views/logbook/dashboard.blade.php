@@ -120,6 +120,10 @@
 
 <script>
 $(document).ready(function() {
+if (localStorage.getItem("key").trim() === null) {
+    alert("Error: Key is not loaded. Please make sure your key is properly loaded.");
+    return; 
+}
 
 $.ajaxSetup({
     headers: {
