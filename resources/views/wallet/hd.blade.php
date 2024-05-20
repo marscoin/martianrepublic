@@ -117,6 +117,7 @@ h5 {
                                                     @else
                                                         <i style="float: right; margin-top: 5px;" class="fa-solid fa-lock fa-xl "></i>
                                                     @endif
+                                                        
                                             </div><!-- /.col-xs-4 -->
                                         </div><!-- /.row -->
 
@@ -126,7 +127,6 @@ h5 {
                                             @elseif(isset($civic_wallet->created_at))
                                                     <i class="fa fa-clock-o"></i> Created: {{ \Carbon\Carbon::parse($civic_wallet->created_at)->toFormattedDateString() }} ({{ \Carbon\Carbon::parse($civic_wallet->created_at)->diffForHumans() }})
                                             @endif
-
                                             <button style="float: right; position: relative; margin-right: 5px;" type="button" class="btn btn-secondary btn-xs unlock-wallet-button" data-wallet-id="{{ $civic_wallet->id }}"  style="margin-top: 5px;"data-toggle="modal" href="#unlockWalletModal" data-keyboard="false" data-wallet='{{ json_encode($civic_wallet, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES) }}' id={{ $civic_wallet->public_addr }}>
                                                     <i class="fa fa-lock-open"></i> Unlock
                                                     </button>

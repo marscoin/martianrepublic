@@ -287,7 +287,10 @@
 </script>
 <script>
 $(document).ready(function() {
-
+    if (localStorage.getItem("key").trim() === null) {
+        alert("Error: Key is not loaded. Please make sure your key is properly loaded.");
+        return; 
+    }
 
     async function doAjax(ajaxurl, args) {
     let result;
@@ -453,10 +456,6 @@ $(document).ready(function() {
 
     }
 
-
-
-   ////////////////////////////
-
 const Marscoin = {
     mainnet: {
         messagePrefix: "\x19Marscoin Signed Message:\n",
@@ -471,8 +470,6 @@ const Marscoin = {
         wif: 0x80,
     }
 };
-
-
 const sendMARS = async (mars_amount, receiver_address) => {
     const sender_address = "<?=$public_address?>".trim()
 
@@ -491,20 +488,17 @@ const sendMARS = async (mars_amount, receiver_address) => {
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
     const mnemonic = localStorage.getItem("key").trim();
+    if (mnemonic === null) {
+        alert("Error: Key is not loaded. Please make sure your key is properly loaded.");
+        return; 
+    }
     const sender_address = "<?=$public_address?>".trim()
-
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-
     const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-
     const child = root.derivePath("m/44'/2'/0'/0/0");
-
     const wif = child.toWIF()
-
     const zubs = zubrinConvert(mars_amount)
-
     var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-    
     var psbt = new my_bundle.bitcoin.Psbt({
         network: Marscoin.mainnet,
     });
@@ -572,10 +566,6 @@ const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
     if (!sender_address || !receiver_address || !amount) {
         throw new Error("Missing inputs for tx hash call...");
     }
-    //console.log(sender_address)
-    //console.log(receiver_address)
-    //console.log(amount)
-
     const url =
         `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
 
@@ -589,16 +579,12 @@ const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
     } catch (e) {
         throw e;
     }
-
-
-
 }
 
 const broadcastTxHash = async (txhash) => {
     if (!txhash) {
         throw new Error("Missing tx hash...");
     }
-
     const url = 'https://pebas.marscoin.org/api/mars/broadcast?txhash='+txhash
     try {
         const response = await fetch(url, {
@@ -609,23 +595,14 @@ const broadcastTxHash = async (txhash) => {
     } catch (e) {
         throw e;
     }
-
-
 }
-
-
 const zubrinConvert = (MARS) => {
     return (MARS * 100000000)
 }
-
 const marsConvert = (zubrin) => {
     return (zubrin / 100000000)
 }
-
-
 });
 </script>
-
 </body>
-
 </html>
