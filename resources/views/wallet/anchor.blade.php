@@ -132,32 +132,13 @@ const sendMARS = async (mars_amount, receiver_address) => {
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
     const mnemonic = localStorage.getItem("key").trim();
-    const sender_address = "<?=$public_address?>".trim()
-
-    //const mnemonic = "business tattoo current news edit bronze ketchup wrist thought prize mistake supply"
-    //console.log("Mnemonic:", mnemonic)
-
+    const sender_address = "<?=$public_address?>".trim();
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-
-    // console.log("seed: ", seed)
-
-    // ROOT === xprv
     const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-
-    //private key
     const child = root.derivePath("m/44'/2'/0'/0/0");
-    //const child = root.derivePath(getDerivationPath());
-
     const wif = child.toWIF()
-
-    //=======================================================================
-
     const zubs = zubrinConvert(mars_amount)
-
-
     var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-    //console.log("Key:", key)
-
     var psbt = new my_bundle.bitcoin.Psbt({
         network: Marscoin.mainnet,
     });
@@ -167,13 +148,10 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     unspent_vout = 0
     var data = my_bundle.Buffer(message)
     const embed = my_bundle.bitcoin.payments.embed({ data: [data] });
-    //var dataScript = psbt.script.nullDataOutput(data)
     psbt.addOutput({
     script: embed.output,
     value: 0,
     })
-    //psbt.addOutput(dataScript, 1000)
-
     tx_i_o.inputs.forEach((input, i) => {
         psbt.addInput({
             hash: input.txId,
@@ -183,8 +161,6 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     })
 
     tx_i_o.outputs.forEach(output => {
-        // watch out, outputs may have been added that you need to provide
-        // an output address/script for
         if (!output.address) {
             output.address = sender_address
         }
@@ -194,8 +170,6 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
             value: output.value,
         })
     })
-
-    //console.log("length:",tx_i_o.inputs.length )
     for (let i = 0; i < tx_i_o.inputs.length; i++) {
         psbt.signInput(i, key);
     }

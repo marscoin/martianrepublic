@@ -816,34 +816,15 @@
             }
 
             const signMARS = async (mars_amount, tx_i_o, mnemonic) => {
-                // const mnemonic = localStorage.getItem("key").trim();
-
+                
                 const sender_address = "{{ $public_addr }}".trim()
-
-                //const mnemonic = "business tattoo current news edit bronze ketchup wrist thought prize mistake supply"
-                //console.log("Mnemonic:", mnemonic)
-
                 const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-
-                // console.log("seed: ", seed)
-
-                // ROOT === xprv
                 const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-
-                //private key
                 const child = root.derivePath("m/44'/2'/0'/0/0");
-                //const child = root.derivePath(getDerivationPath());
-
                 const wif = child.toWIF()
-
-                //=======================================================================
-
                 const zubs = zubrinConvert(mars_amount)
-
-
                 var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-                //console.log("Key:", key)
-
+                
                 var psbt = new my_bundle.bitcoin.Psbt({
                     network: Marscoin.mainnet,
                 });
