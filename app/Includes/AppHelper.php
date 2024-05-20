@@ -276,19 +276,35 @@ class AppHelper{
 		 */
 		public static function insertBlockchainCache($address, $uid, $action_tag, $message, $embedded_link, $txid)
 		{
+			// First, check if a duplicate entry exists
+			$existingFeed = Feed::where('address', $address)
+								->where('tag', $action_tag)
+								->where('txid', $txid)
+								->first();
+		
+			if ($existingFeed) {
+				// If a duplicate is found, return the txid
+				return $existingFeed->txid; 
+			}
+		
+			// If no duplicate, proceed to create a new entry
 			$feed = new Feed;
-			if($uid)
+			if ($uid) {
 				$feed->userid = $uid;
-			if(!$action_tag)
-				return FALSE;
+			}
+			if (!$action_tag) {
+				return false;
+			}
 			$feed->tag = $action_tag;
 			$feed->address = $address;
 			$feed->message = $message;
 			$feed->embedded_link = $embedded_link;
 			$feed->txid = $txid;
 			$feed->save();
-			return TRUE;
+		
+			return true; 
 		}
+		
 
 
 		public static function insertPublicationCache($uid, $local_path, $ipfs_hash, $title)

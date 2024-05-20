@@ -333,7 +333,6 @@ class ApiController extends Controller {
 			return (new Response(json_encode(array("Hash" => $txid)), 200))
               ->header('Content-Type', "application/json;");
 
-		
 		}else{
             return redirect('/login');
         }
@@ -653,16 +652,24 @@ class ApiController extends Controller {
 	}
 
 
-	protected function isValidCID($hash)
+	protected function isValidCID($input)
 	{
+		// Extract CID from the URL if embedded in a typical IPFS link format
+		$parsedUrl = parse_url($input);
+		$path = $parsedUrl['path'] ?? '';
+		// Regex to extract potential CIDs from paths; adjust according to typical link structures
+		preg_match('/(Qm[a-zA-Z1-9]{44}|b[a-z2-7]{58})/', $path, $matches);
+		$hash = $matches[0] ?? '';
+	
 		// Regex to check CIDv0; starts with 'Qm' and followed by 44 characters from Base58 set
 		$cidv0Regex = '/^Qm[a-zA-Z1-9]{44}$/';
 		// Regex for basic validation of CIDv1; broader due to variability in encoding and version
 		$cidv1Regex = '/^b[a-z2-7]{58}$/';  // Example for base32 encoding
-
+	
+		// Validate extracted hash
 		return preg_match($cidv0Regex, $hash) || preg_match($cidv1Regex, $hash);
 	}
-
+	
 
 
 }
