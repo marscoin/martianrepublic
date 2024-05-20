@@ -487,7 +487,7 @@ const sendMARS = async (mars_amount, receiver_address) => {
 }
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
-    const mnemonic = localStorage.getItem("key").trim();
+    const mnemonic = localStorage.getItem("key");
     if (mnemonic === null) {
         alert("Error: Key is not loaded. Please make sure your key is properly loaded.");
         return; 

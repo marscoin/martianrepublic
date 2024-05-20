@@ -184,7 +184,7 @@ $('#donateModal').on('show.bs.modal', function (event) {
 
 $(document).ready(function() {
 
-var mem = localStorage.getItem("key").trim();
+var mem = localStorage.getItem("key");
 if (!mem || mem == ""){
     alert("Coul not retrieve wallet key. Please disconnect and reconnect your wallet.")
 }

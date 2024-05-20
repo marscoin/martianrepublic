@@ -590,7 +590,7 @@ function isValidCID(hash) {
 }
 
 $(document).ready(function() {
-    if (localStorage.getItem("key").trim() === null) {
+    if (localStorage.getItem("key") === null) {
         alert("Error: Key is not loaded. Please make sure your key is properly loaded.");
         return; 
     }
