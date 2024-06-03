@@ -249,6 +249,12 @@ class ApiController extends Controller
                         'email' => $publicAddress . '@martianrepublic.org',
                         'password' => Hash::make(Str::random(10)), // Random password
                     ]);
+                    $profile = Profile::create([
+                        'userid' => $user->id,
+                        'wallet_open' => 0,
+                        'civic_wallet_open' => 0,
+                        'has_application' => 0,
+                    ]);
                 }
                 //create a citcache entry
                 $citcache = Citizen::where('userid', $user->id)->first();
@@ -714,6 +720,17 @@ class ApiController extends Controller
         return response()->json(['comments' => $commentsCollection]);
     }
     
+
+    public function getAllCategoriesWithThreads() {
+        $categories = DB::table('forum_categories')
+            ->get();
+    
+        foreach ($categories as $category) {
+            $category->threads = $this->fetchThreads($category->id);
+        }
+    
+        return response()->json(['categories' => $categories]);
+    }
 
 
 
