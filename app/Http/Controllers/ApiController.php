@@ -266,9 +266,6 @@ class ApiController extends Controller
                 if (!$citcache) {
                     $citizen = Citizen::create([
                         'userid' => $user->id,
-                        'firstname' => 'n/a',
-                        'lastname' => 'n/a',
-                        'displayname' => $publicAddress,
                         'public_address' => $publicAddress,
                         'created_at' => now(),
                         'updated_at' => now(),
