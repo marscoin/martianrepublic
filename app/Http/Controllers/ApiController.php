@@ -249,12 +249,17 @@ class ApiController extends Controller
                         'email' => $publicAddress . '@martianrepublic.org',
                         'password' => Hash::make(Str::random(10)), // Random password
                     ]);
+                    Log::debug("..created user");
+                }
+                $profile = Profile::where('userid', $user->id)->first();
+                if (!$profile) {
                     $profile = Profile::create([
                         'userid' => $user->id,
                         'wallet_open' => 0,
                         'civic_wallet_open' => 0,
                         'has_application' => 0,
                     ]);
+                    Log::debug("..created profile");
                 }
                 //create a citcache entry
                 $citcache = Citizen::where('userid', $user->id)->first();
@@ -268,6 +273,7 @@ class ApiController extends Controller
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+                    Log::debug("..created citizen cache");
                 }
                 // register civic wallet for the new user
                 $wallet = CivicWallet::create([
@@ -279,6 +285,7 @@ class ApiController extends Controller
                     'created_at' => now(),
                     'opened_at' => now()
                 ]);
+                Log::debug("..created civic wallet");
             }
             
             // Generate token for the user
