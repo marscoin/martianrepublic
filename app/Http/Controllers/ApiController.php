@@ -367,14 +367,23 @@ class ApiController extends Controller
             $user = User::where('id', '=', $uid)->first();
             $user->fullname = $fullname;
             $user->save();
+            $profile = Profile::where('userid', '=', $uid)->first();
+            $profile->has_application = 1;
+            $profile->save();
         }
         if(isset($shortbio))
         {
             $citcache->shortbio = $shortbio;
+            $profile = Profile::where('userid', '=', $uid)->first();
+            $profile->has_application = 1;
+            $profile->save();
         }
         if(isset($displayname))
         {
             $citcache->displayname = $displayname;
+            $profile = Profile::where('userid', '=', $uid)->first();
+            $profile->has_application = 1;
+            $profile->save();
         }
         
         $citcache->save();
