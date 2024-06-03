@@ -29,3 +29,8 @@ Route::post('/scitizen', 'App\Http\Controllers\ApiController@scitizen')->middlew
 Route::post('/pinpic', 'App\Http\Controllers\ApiController@pinpic')->middleware(['auth:sanctum'])->name('api_pinpic');
 Route::post('/pinvideo', 'App\Http\Controllers\ApiController@pinvideo')->middleware(['auth:sanctum'])->name('api_pinvideo');
 Route::post('/pinjson', 'App\Http\Controllers\ApiController@pinjson')->middleware(['auth:sanctum'])->name('api_pinjson');
+
+Route::get('/forum/thread/{threadId}/comments', 'App\Http\Controllers\ApiController@getThreadComments')->middleware(['auth:sanctum'])->name('api_forum_comments');
+
+Route::get('/forum/category/{categoryId}/threads', 'App\Http\Controllers\ApiController@getThreadsByCategory')->middleware(['auth:sanctum'])->name('api_forum_threads');
+Route::get('/forum/categories/threads', 'App\Http\Controllers\ApiController@getAllCategoriesWithThreads')->middleware(['auth:sanctum'])->name('api_forum_catthreads');

@@ -560,7 +560,7 @@ class ApiController extends Controller
     }
 
 
-    	/**
+    /**
 	 * Handles JSON storage and pinning to a distributed file system.
 	 *
 	 * @hideFromAPIDocumentation
@@ -625,6 +625,95 @@ class ApiController extends Controller
 			return response()->json(["error" => $e->getMessage()], 500);
 		}
 	}
+
+    public function getThreadsByCategory($categoryId) {
+        $threads = $this->fetchThreads($categoryId);
+        return response()->json(['threads' => $threads]);
+    }
+    
+    private function fetchThreads($categoryId) {
+        $threads = DB::table('forum_threads')
+            ->where('forum_threads.category_id', $categoryId)
+            ->leftJoin('users', 'forum_threads.author_id', '=', 'users.id')
+            ->leftJoin('profile', 'users.id', '=', 'profile.userid')
+            ->select(
+                'forum_threads.id',
+                'forum_threads.title',
+                'forum_threads.created_at',
+                'forum_threads.reply_count',
+                'users.fullname as author_name',
+                'profile.avatar_link as author_avatar'
+            )
+            ->orderBy('forum_threads.created_at', 'desc')
+            ->get();
+        return $threads;
+    }
+
+
+    public function getThreadComments($threadId) {
+        // Assume $threadId is passed correctly to the function
+        $comments = $this->fetchCommentsByThread($threadId);
+        return response()->json(['comments' => $comments]);
+    }
+    
+    private function fetchCommentsByThread($threadId) {
+        // The query as outlined above
+        // Return the collection of comments
+        $query = "
+            WITH RECURSIVE CommentTree AS (
+                SELECT 
+                    p.id,
+                    p.thread_id,
+                    p.author_id,
+                    p.content,
+                    p.post_id as pid,
+                    p.created_at,
+                    CHAR_LENGTH(p.content) as char_length_sum
+                FROM 
+                    forum_posts p
+                WHERE 
+                    p.thread_id = ? AND p.post_id IS NULL
+
+                UNION ALL
+
+                SELECT 
+                    p.id,
+                    p.thread_id,
+                    p.author_id,
+                    p.content,
+                    p.post_id,
+                    p.created_at,
+                    ct.char_length_sum + CHAR_LENGTH(p.content)
+                FROM 
+                    forum_posts p
+                INNER JOIN 
+                    CommentTree ct ON p.post_id = ct.id
+            )
+            SELECT 
+                ct.id,
+                ct.thread_id,
+                ct.author_id,
+                u.fullname,
+                pr.avatar_link as custom_profile_pic,
+                ct.content,
+                ct.created_at,
+                ct.pid,
+                CHAR_LENGTH(ct.content) as char_length_sum
+            FROM 
+                CommentTree ct
+            LEFT JOIN users u ON ct.author_id = u.id
+            LEFT JOIN profile pr ON ct.author_id = pr.userid
+            ORDER BY 
+                ct.pid ASC,
+                ct.created_at ASC;
+        ";
+
+        $comments = DB::select($query, [$threadId]);
+        $commentsCollection = collect($comments);
+
+        return response()->json(['comments' => $commentsCollection]);
+    }
+    
 
 
 
