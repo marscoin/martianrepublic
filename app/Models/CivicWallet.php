@@ -16,6 +16,10 @@ class CivicWallet extends Model
 	 */
 	protected $table = 'civic_wallet';
 
+	protected $fillable = [
+        'user_id', 'wallet_type', 'backup', 'encrypted_seed', 'public_addr'
+    ];
+
 	/**
 	 * The attributes excluded from the model's JSON form.
 	 *
