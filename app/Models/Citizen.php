@@ -12,7 +12,7 @@ class Citizen extends Model {
 
     protected $table = 'citizen';
     protected $fillable = [
-        'firstname', 'lastname', 'userid',
+        'firstname', 'lastname', 'userid', 'displayname', 'public_address'
     ];
 
     public function user()
