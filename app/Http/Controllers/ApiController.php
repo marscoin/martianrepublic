@@ -332,7 +332,7 @@ class ApiController extends Controller
             $user->fullname = $fullname;
             $user->save();
         }
-        if(isset($shotbio))
+        if(isset($shortbio))
         {
             $citcache->shortbio = $shortbio;
         }
