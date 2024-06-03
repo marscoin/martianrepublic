@@ -249,11 +249,13 @@ class ApiController extends Controller
                         'email' => $publicAddress . '@martianrepublic.org',
                         'password' => Hash::make(Str::random(10)), // Random password
                     ]);
-
+                }
+                $citcache = Citizen::where('userid', $user->id)->first();
+                if (!$citcache) {
                     $citizen = Citizen::create([
                         'userid' => $user->id,
-                        'firstname' => 'DefaultFirstName', // You may want to add input fields for these
-                        'lastname' => 'DefaultLastName',
+                        'firstname' => 'n/a',
+                        'lastname' => 'n/a',
                         'displayname' => $publicAddress,
                         'public_address' => $publicAddress,
                         'created_at' => now(),
