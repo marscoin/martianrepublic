@@ -250,6 +250,7 @@ class ApiController extends Controller
                         'password' => Hash::make(Str::random(10)), // Random password
                     ]);
                 }
+                //create a citcache entry
                 $citcache = Citizen::where('userid', $user->id)->first();
                 if (!$citcache) {
                     $citizen = Citizen::create([
@@ -262,6 +263,16 @@ class ApiController extends Controller
                         'updated_at' => now(),
                     ]);
                 }
+                // register civic wallet for the new user
+                $wallet = CivicWallet::create([
+                    'user_id' => $user->id,
+                    'wallet_type' => 'MARS',
+                    'backup' => 0,
+                    'encrypted_seed' => '',
+                    'public_addr' => $publicAddress,
+                    'created_at' => now(),
+                    'opened_at' => now()
+                ]);
             }
             
             // Generate token for the user
