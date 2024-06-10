@@ -185,8 +185,8 @@ class ApiController extends Controller
             ->join('users', 'feed.userid', '=', 'users.id')
             ->join('profile', 'feed.userid', '=', 'profile.userid')
             ->select('profile.userid', 'users.fullname', 'feed.tag', 'feed.mined') 
+            ->where('feed.userid', $martianWallet->user_id)
             ->orderBy('feed.id', 'desc')
-            ->limit(3)
             ->get();
 
         // Construct response
