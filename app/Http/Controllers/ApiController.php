@@ -660,8 +660,7 @@ class ApiController extends Controller
                 'forum_threads.title',
                 'forum_threads.created_at',
                 'forum_threads.reply_count',
-                'users.fullname as author_name',
-                'profile.avatar_link as author_avatar'
+                'users.fullname as author_name'
             )
             ->orderBy('forum_threads.created_at', 'desc')
             ->get();
@@ -713,7 +712,6 @@ class ApiController extends Controller
                 ct.thread_id,
                 ct.author_id,
                 u.fullname,
-                pr.avatar_link as custom_profile_pic,
                 ct.content,
                 ct.created_at,
                 ct.pid,
