@@ -170,7 +170,7 @@ class ApiController extends Controller
     public function showCitizen(Request $request, $address)
     {
         // Look up the Martian user by public address
-        $martianWallet = CivicWallet::where('public_address', $address)->first();
+        $martianWallet = CivicWallet::where('public_addr', $address)->first();
 
         if (!$martianWallet) {
             return response()->json(['message' => 'Martian not found.'], 404);
