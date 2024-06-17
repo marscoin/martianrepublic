@@ -28,7 +28,8 @@ class Feed extends Model {
             return null;
         }
 
-        return 'https://martianrepublic.org/assets/citizen/' . $this->address . '/profile_pic.png';
+        //return 'https://martianrepublic.org/assets/citizen/' . $this->address . '/profile_pic.png';
+        return null;
     }
 
     public function citizen()
