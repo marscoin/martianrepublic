@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use BitcoinPHP\BitcoinECDSA\BitcoinECDSA;
 use App\Includes\MarscoinECDSA;
+use App\Livewire\CitizenStats;
 
 class ApiController extends Controller
 {
@@ -177,6 +178,7 @@ class ApiController extends Controller
         }
 
         // Attempt to fetch the user's profile and additional data
+        $citizen = Citizen::where('public_address', $address)->first();
         $profile = Profile::where('userid', $martianWallet->user_id)->first();
         $feedItems = Feed::where('userid', $martianWallet->user_id)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
         
@@ -191,6 +193,7 @@ class ApiController extends Controller
 
         // Construct response
         $response = [
+            'citizen' => $citizen,
             'profile' => [
                 'general_public' => $profile ? $profile->general_public : null,
                 'isCitizen' => $profile ? $profile->citizen : null,
