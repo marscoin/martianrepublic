@@ -746,6 +746,65 @@ class ApiController extends Controller
     }
 
 
+    public function createThread(Request $request)
+    {
+        $request->validate([
+            'category_id' => 'required|exists:forum_categories,id',
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
+        $thread = new Threads();
+        $thread->category_id = $request->category_id;
+        $thread->author_id = Auth::id();
+        $thread->title = $request->title;
+        $thread->save();
+
+        $post = new Posts();
+        $post->thread_id = $thread->id;
+        $post->author_id = Auth::id();
+        $post->content = $request->content;
+        $post->save();
+
+        $thread->first_post_id = $post->id;
+        $thread->last_post_id = $post->id;
+        $thread->reply_count = 0;
+        $thread->save();
+
+        return response()->json([
+            'message' => 'Thread created successfully',
+            'thread_id' => $thread->id,
+            'post_id' => $post->id,
+        ], 201);
+    }
+
+    public function createComment(Request $request, $threadId)
+    {
+        $request->validate([
+            'content' => 'required|string',
+            'post_id' => 'nullable|exists:forum_posts,id',
+        ]);
+
+        $thread = Threads::findOrFail($threadId);
+
+        $post = new Posts();
+        $post->thread_id = $threadId;
+        $post->author_id = Auth::id();
+        $post->content = $request->content;
+        $post->post_id = $request->post_id; // This will be null for top-level comments
+        $post->save();
+
+        $thread->last_post_id = $post->id;
+        $thread->reply_count += 1;
+        $thread->save();
+
+        return response()->json([
+            'message' => 'Comment created successfully',
+            'post_id' => $post->id,
+        ], 201);
+    }
+
+
 
 
 }
