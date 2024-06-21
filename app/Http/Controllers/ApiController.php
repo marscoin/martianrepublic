@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use BitcoinPHP\BitcoinECDSA\BitcoinECDSA;
 use App\Includes\MarscoinECDSA;
+use App\Livewire\CitizenStats;
 
 class ApiController extends Controller
 {
@@ -170,13 +171,14 @@ class ApiController extends Controller
     public function showCitizen(Request $request, $address)
     {
         // Look up the Martian user by public address
-        $martianWallet = HDWallet::where('public_addr', $address)->first();
+        $martianWallet = CivicWallet::where('public_addr', $address)->first();
 
         if (!$martianWallet) {
             return response()->json(['message' => 'Martian not found.'], 404);
         }
 
         // Attempt to fetch the user's profile and additional data
+        $citizen = Citizen::where('public_address', $address)->first();
         $profile = Profile::where('userid', $martianWallet->user_id)->first();
         $feedItems = Feed::where('userid', $martianWallet->user_id)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
         
@@ -191,6 +193,7 @@ class ApiController extends Controller
 
         // Construct response
         $response = [
+            'citizen' => $citizen,
             'profile' => [
                 'general_public' => $profile ? $profile->general_public : null,
                 'isCitizen' => $profile ? $profile->citizen : null,
@@ -660,8 +663,7 @@ class ApiController extends Controller
                 'forum_threads.title',
                 'forum_threads.created_at',
                 'forum_threads.reply_count',
-                'users.fullname as author_name',
-                'profile.avatar_link as author_avatar'
+                'users.fullname as author_name'
             )
             ->orderBy('forum_threads.created_at', 'desc')
             ->get();
@@ -713,7 +715,6 @@ class ApiController extends Controller
                 ct.thread_id,
                 ct.author_id,
                 u.fullname,
-                pr.avatar_link as custom_profile_pic,
                 ct.content,
                 ct.created_at,
                 ct.pid,
