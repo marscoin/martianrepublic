@@ -12,6 +12,7 @@ use App\Models\Profile;
 use App\Models\User;
 use App\Models\Proposals;
 use App\Models\Threads;
+use App\Models\Posts;
 use App\Models\Citizen;
 use App\Models\HDWallet;
 use App\Models\CivicWallet;

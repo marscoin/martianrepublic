@@ -134,3 +134,7 @@ Route::post('/api/rename', 'Wallet\ApiController@renameWallet');
 // Mobile Authenticator Login
 // ================================================================================
 Route::get('/api/checkauth', 'App\Http\Controllers\ApiController@checkAuth')->name('api_marsauthcheck');
+
+
+//test
+// Route::any('/scitizen', 'App\Http\Controllers\ApiController@scitizen');
