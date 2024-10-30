@@ -356,7 +356,7 @@ def update_or_insert_applicant(cur, db, addr, application_data, userid):
         result = cur.fetchone()
 
         app_data = application_data.get('data', {})
-        
+        logger.info("Json fetched: " + str(app_data))
         # Then access the individual data points within this nested dictionary
         firstname = app_data.get('firstName', 'DefaultFirstName')
         lastname = app_data.get('lastName', 'DefaultLastName')
@@ -367,6 +367,9 @@ def update_or_insert_applicant(cur, db, addr, application_data, userid):
         public_address = addr  # Assuming addr is defined and available in the scope
         logger.info("nick: " + str(displayname))
         logger.info("avatar: " + str(avatar_link))
+        if not avatar_link:
+            logger.info("No avatar link found. Can't be. Not overwriting with empty data. Skipping.")
+            return None
         if result:
             # Update existing entry
             cur.execute("""UPDATE citizen SET firstname = %s, lastname = %s, displayname = %s, shortbio = %s, avatar_link = %s, liveness_link = %s, public_address = %s, updated_at = NOW() WHERE userid = %s""",
