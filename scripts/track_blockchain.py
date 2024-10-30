@@ -360,9 +360,9 @@ def update_or_insert_applicant(cur, db, addr, application_data, userid):
         # Then access the individual data points within this nested dictionary
         firstname = app_data.get('firstName', 'DefaultFirstName')
         lastname = app_data.get('lastName', 'DefaultLastName')
-        displayname = app_data.get('displayname', '')
-        shortbio = app_data.get('shortbio', '')
-        avatar_link = app_data.get('picture', '')
+        displayname = app_data.get('displayName', '')  # Corrected key
+        shortbio = app_data.get('bio', '')  # Corrected key
+        avatar_link = app_data.get('photo', '')  # Corrected key
         liveness_link = app_data.get('video', '')
         public_address = addr  # Assuming addr is defined and available in the scope
         logger.info("nick: " + str(displayname))
