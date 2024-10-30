@@ -351,30 +351,36 @@ def update_or_insert_applicant(cur, db, addr, application_data, userid):
     Updates or inserts the applicant data into the citizen table.
     """
     # Check if the user already exists in the citizen table
-    cur.execute("SELECT id FROM citizen WHERE userid = %s", (userid,))
-    result = cur.fetchone()
+    try:
+        cur.execute("SELECT id FROM citizen WHERE userid = %s", (userid,))
+        result = cur.fetchone()
 
-    app_data = application_data.get('data', {})
+        app_data = application_data.get('data', {})
+        
+        # Then access the individual data points within this nested dictionary
+        firstname = app_data.get('firstName', 'DefaultFirstName')
+        lastname = app_data.get('lastName', 'DefaultLastName')
+        displayname = app_data.get('displayname', '')
+        shortbio = app_data.get('shortbio', '')
+        avatar_link = app_data.get('picture', '')
+        liveness_link = app_data.get('video', '')
+        public_address = addr  # Assuming addr is defined and available in the scope
+        logger.info("nick: " + str(displayname))
+        logger.info("avatar: " + str(avatar_link))
+        if result:
+            # Update existing entry
+            cur.execute("""UPDATE citizen SET firstname = %s, lastname = %s, displayname = %s, shortbio = %s, avatar_link = %s, liveness_link = %s, public_address = %s, updated_at = NOW() WHERE userid = %s""",
+                        (firstname, lastname, displayname, shortbio, avatar_link, liveness_link, public_address, userid))
+        else:
+            # Insert new entry
+            cur.execute("""INSERT INTO citizen (userid, firstname, lastname, displayname, shortbio, avatar_link, liveness_link, public_address, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())""",
+                        (userid, firstname, lastname, displayname, shortbio, avatar_link, liveness_link, public_address))
+        
+        mark_application_submitted(cur, db, userid)
+    except Exception as e:
+        logger.error(f"Error retrieving author name for user ID {userid}: {e}")
+        return None  
     
-    # Then access the individual data points within this nested dictionary
-    firstname = app_data.get('firstName', 'DefaultFirstName')
-    lastname = app_data.get('lastName', 'DefaultLastName')
-    displayname = app_data.get('displayname', '')
-    shortbio = app_data.get('shortbio', '')
-    avatar_link = app_data.get('picture', '')
-    liveness_link = app_data.get('video', '')
-    public_address = addr  # Assuming addr is defined and available in the scope
-
-    if result:
-        # Update existing entry
-        cur.execute("""UPDATE citizen SET firstname = %s, lastname = %s, displayname = %s, shortbio = %s, avatar_link = %s, liveness_link = %s, public_address = %s, updated_at = NOW() WHERE userid = %s""",
-                    (firstname, lastname, displayname, shortbio, avatar_link, liveness_link, public_address, userid))
-    else:
-        # Insert new entry
-        cur.execute("""INSERT INTO citizen (userid, firstname, lastname, displayname, shortbio, avatar_link, liveness_link, public_address, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())""",
-                    (userid, firstname, lastname, displayname, shortbio, avatar_link, liveness_link, public_address))
-    
-    mark_application_submitted(cur, db, userid)
     logger.info("Application cached successfully")
     db.commit()
 
