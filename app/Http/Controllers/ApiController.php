@@ -33,7 +33,7 @@ class ApiController extends Controller
     {
         $perPage = 25;
         $cacheKey = 'all_public_cache'; // Define a unique cache key for this query
-        $excludedUserIds = [6462, 7601]; //ID of the user you want to exclude, for example, a test account
+        $excludedUserIds = [6462, 7601]; // ID of the user you want to exclude, for example, a test account
     
         // Attempt to get cached data. If not available, the closure will be run to fetch and cache the data.
         $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserIds) {
@@ -41,11 +41,20 @@ class ApiController extends Controller
                 $query->select('id', 'fullname', 'created_at')
                       ->where('id', '!=', $excludedUserIds); // Exclude the specific user by ID
             }, 'user.profile' => function ($query) {
-                $query->select('userid', 'general_public', 'endorse_cnt', 'citizen', 'has_application' ); // Only select general_public and the foreign key
+                $query->select('userid', 'general_public', 'endorse_cnt', 'citizen', 'has_application');
             }, 'user.citizen' => function ($query) {
-                $query->select('userid', 'avatar_link', 'liveness_link') // Select the userid and avatar_link
-                ->whereNotNull('avatar_link');
+                $query->select('userid', 'avatar_link', 'liveness_link')
+                      ->whereNotNull('avatar_link');
             }])
+            ->joinSub(
+                Feed::selectRaw('max(id) as latest_id, userid')
+                    ->where('tag', 'GP') // Ensure the tag is 'GP'
+                    ->groupBy('userid'),
+                'latest_feeds',
+                function($join) {
+                    $join->on('feed.id', '=', 'latest_feeds.latest_id');
+                }
+            )
             ->whereHas('user.profile', function ($query) {
                 $query->where('tag', 'GP');
             })
@@ -53,21 +62,24 @@ class ApiController extends Controller
                 $query->whereNotIn('id', $excludedUserIds);
             })
             ->orderByDesc('id')
-            ->take($perPage) // Directly take the perPage amount, removing the need for extra data fetching
+            ->take($perPage)
+            ->distinct()
             ->get();
-           
+    
             return $feeds; // Directly return the fetched feeds
         });
     
         return response()->json($feeds);
     }
+    
+    
 
 
     public function allCitizen()
     {
         $perPage = 25;
         $cacheKey = 'all_citizens_cache';
-        $excludedUserId = 6462;
+        $excludedUserId = '';
     
         $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserId) {
             return Feed::with([
