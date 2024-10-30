@@ -322,6 +322,14 @@ def mark_application_submitted(cur, db, userid):
     db.commit() 
 
 
+def mark_application_processed(cur, db, userid):
+    """
+    Marks in the user's profile that an application has been completed.
+    """
+    cur.execute("UPDATE profile SET  general_public = 1, has_application = 0 WHERE userid = %s", (userid,))
+    db.commit() 
+
+
 # IPFS handling
 ##################
 
@@ -691,6 +699,8 @@ def cache_general_applications(cur, db, addr, head, body, userid, txid, height, 
     except Exception as e:
         logger.error("Failed to cache application for txid %s: %s", txid, e)
         db.rollback()
+
+    mark_application_processed(cur, db, userid)
 
 
 def cache_logbook_entry(cur, db, addr, head, body, userid, txid, height, blockdate):
