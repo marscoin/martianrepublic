@@ -21,6 +21,11 @@ Route::get('/privacy', function () {
         return view('privacy')->render();
     });
 });
+Route::get('/tos', function () {
+    return Cache::remember('tos.page', 2, function () {
+        return view('tos')->render();
+    });
+});
 Route::get('/support', function () {
     return Cache::remember('support.page', 2, function () {
         return view('support')->render();
