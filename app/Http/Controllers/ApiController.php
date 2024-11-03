@@ -827,34 +827,29 @@ class ApiController extends Controller
             $user = User::findOrFail($id);
             
             
-            // Check if user already has _9999 suffix
-            if (str_ends_with($user->email, '_9999')) {
-                return response()->json([
-                    'message' => 'User already deleted'
-                ], 400);
-            }
-            
+            Log::debug("Deleting... ". $id);
             // Generate new email with _9999 suffix
-            $newEmail = preg_replace('/@/', '_9999@', $user->email);
+            $newEmail = $user->email .'_9999@';
             
             // Update the user's email
             $user->update([
                 'email' => $newEmail,
                 'remember_token' => null // Clear remember token for extra security
             ]);
+            Log::debug("Email updated");
             
             // Revoke all tokens
             if (method_exists($user, 'tokens')) {
                 $user->tokens()->delete();
             }
+            Log::debug("Token wiped...");
+
+            DB::commit();
             
             return response()->json([
-                'message' => 'User deleted successfully',
-                'user' => [
-                    'id' => $user->id,
-                    'email' => $user->email
-                ]
+                'message' => 'User deleted successfully'
             ], 200);
+            
             
         } catch (ModelNotFoundException $e) {
             return response()->json([
