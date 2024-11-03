@@ -300,8 +300,9 @@ class ApiController extends Controller
                 ]);
                 Log::debug("..created civic wallet");
             }
-            
-            // Generate token for the user
+            if($user->status == 'inactive')
+                return response()->json(['token' => 'inactive']);
+
             $token = $user->createToken('authToken')->plainTextToken;
             
             return response()->json(['token' => $token]);
@@ -828,15 +829,11 @@ class ApiController extends Controller
             
             
             Log::debug("Deleting... ". $id);
-            // Generate new email with _9999 suffix
-            $newEmail = $user->email .'_9999@';
-            
-            // Update the user's email
+           
             $user->update([
-                'email' => $newEmail,
-                'remember_token' => null // Clear remember token for extra security
+                'status' => 'inactive'
             ]);
-            Log::debug("Email updated");
+            Log::debug("Status updated");
             
             // Revoke all tokens
             if (method_exists($user, 'tokens')) {
