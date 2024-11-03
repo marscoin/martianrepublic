@@ -819,6 +819,56 @@ class ApiController extends Controller
     }
 
 
+    // App/Http/Controllers/ApiController.php
+    public function deleteUser(Request $request, $id)
+    {
+        try {
+            // Find the user
+            $user = User::findOrFail($id);
+            
+            
+            // Check if user already has _9999 suffix
+            if (str_ends_with($user->email, '_9999')) {
+                return response()->json([
+                    'message' => 'User already deleted'
+                ], 400);
+            }
+            
+            // Generate new email with _9999 suffix
+            $newEmail = preg_replace('/@/', '_9999@', $user->email);
+            
+            // Update the user's email
+            $user->update([
+                'email' => $newEmail,
+                'remember_token' => null // Clear remember token for extra security
+            ]);
+            
+            // Revoke all tokens
+            if (method_exists($user, 'tokens')) {
+                $user->tokens()->delete();
+            }
+            
+            return response()->json([
+                'message' => 'User deleted successfully',
+                'user' => [
+                    'id' => $user->id,
+                    'email' => $user->email
+                ]
+            ], 200);
+            
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'User not found'
+            ], 404);
+        } catch (\Exception $e) {
+            \Log::error('Error deleting user: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'An error occurred while deleting the user'
+            ], 500);
+        }
+    }
+
+
 
 
 }
