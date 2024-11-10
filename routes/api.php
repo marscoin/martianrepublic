@@ -31,6 +31,8 @@ Route::post('/pinvideo', 'App\Http\Controllers\ApiController@pinvideo')->middlew
 Route::post('/pinjson', 'App\Http\Controllers\ApiController@pinjson')->middleware(['auth:sanctum'])->name('api_pinjson');
 
 Route::post('/user/delete/{id}', 'App\Http\Controllers\ApiController@deleteUser')->middleware(['auth:sanctum'])->name('api_delete_user');
+Route::post('/user/block/{id}', 'App\Http\Controllers\ApiController@blockUser')->middleware(['auth:sanctum'])->name('api_block_user');
+
 
 Route::get('/forum/thread/{threadId}/comments', 'App\Http\Controllers\ApiController@getThreadComments')->middleware(['auth:sanctum'])->name('api_forum_comments');
 
