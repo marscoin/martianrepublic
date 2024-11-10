@@ -710,11 +710,11 @@ class ApiController extends Controller
     }
 
 
-    // public function getThreadComments($threadId) {
-    //     // Assume $threadId is passed correctly to the function
-    //     $comments = $this->fetchCommentsByThread($threadId);
-    //     return response()->json(['comments' => $comments]);
-    // }
+    public function getThreadComments($threadId) {
+        // Assume $threadId is passed correctly to the function
+        $comments = $this->fetchCommentsByThread($threadId);
+        return response()->json(['comments' => $comments]);
+    }
     
     // private function fetchCommentsByThread($threadId) {
     //     // The query as outlined above

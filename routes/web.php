@@ -94,6 +94,8 @@ Route::get('/congress/proposal/{id?}', 'Congress\CongressController@proposal');
 Route::post('/congress/vote/breakdown', 'Congress\CongressController@breakdown');
 
 
+Route::get('/forum/category/{categoryId}/threads', 'App\Http\Controllers\ApiController@getThreadsByCategory');
+
 
 // 
 // Logbook Routes
