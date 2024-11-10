@@ -34,6 +34,7 @@ Route::get('/support', function () {
 Route::post('/contact', 'ContactFormController@sendEmail')->name('contact.send');
 Route::get('/status', 'StatusController@showStatus');
 
+
 // 
 // Wallet
 // ==================================================================================
@@ -92,11 +93,6 @@ Route::post('/congress/createproposal', 'Congress\CongressController@postCreateP
 Route::get('/congress/ballot/{propid?}', 'Congress\CongressController@acquireBallot');
 Route::get('/congress/proposal/{id?}', 'Congress\CongressController@proposal');
 Route::post('/congress/vote/breakdown', 'Congress\CongressController@breakdown');
-
-
-Route::get('/forum/category/{categoryId}/threads', 'App\Http\Controllers\ApiController@getThreadsByCategory');
-Route::get('/forum/thread/{threadId}/comments', 'App\Http\Controllers\ApiController@getThreadComments');
-
 
 
 // 
