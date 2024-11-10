@@ -95,6 +95,8 @@ Route::post('/congress/vote/breakdown', 'Congress\CongressController@breakdown')
 
 
 Route::get('/forum/category/{categoryId}/threads', 'App\Http\Controllers\ApiController@getThreadsByCategory');
+Route::get('/forum/thread/{threadId}/comments', 'App\Http\Controllers\ApiController@getThreadComments');
+
 
 
 // 

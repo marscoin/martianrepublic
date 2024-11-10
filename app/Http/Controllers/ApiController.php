@@ -828,8 +828,7 @@ class ApiController extends Controller
     
         $comments = DB::select($query, [$threadId, $userId]);
         $commentsCollection = collect($comments);
-    
-        return $commentsCollection;
+        return response()->json(['comments' => $commentsCollection]);
     }
     
 
