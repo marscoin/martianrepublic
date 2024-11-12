@@ -905,9 +905,10 @@ class ApiController extends Controller
 
     public function blockUser(Request $request, $id) 
     {
-        
-        $uid = Auth::user()->id;
-        $blockedUserId = $id;
+        Log::debug("in function"); 
+	$uid = Auth::user()->id;
+	Log::debug("auth happened");
+        $blockedUserId = $id; 
     
         // Insert into `user_blocks` table if not already blocked
         DB::table('user_blocks')->updateOrInsert(
