@@ -918,6 +918,30 @@ class ApiController extends Controller
         return response()->json(['message' => 'User blocked successfully'], 201);
     }
 
+    public function handleEula(Request $request)
+    {
+        $uid = Auth::user()->id;
+        $profile = Profile::where('userid', $uid)->firstOrFail();
+        
+        return response()->json([
+            'is_signed' => (bool)$profile->signed_eula
+        ]); 
+    }
+
+    public function setEula(Request $request)
+    {
+        $uid = Auth::user()->id;
+        $profile = Profile::where('userid', $uid)->firstOrFail();
+        if (!$profile->signed_eula) {
+            $profile->signed_eula = 1;
+            $profile->save();
+        }
+        return response()->json([
+            'message' => 'EULA signed successfully',
+            'is_signed' => true
+        ]);
+    }
+
 
     // App/Http/Controllers/ApiController.php
     public function deleteUser(Request $request, $id)

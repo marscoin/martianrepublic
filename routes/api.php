@@ -33,6 +33,10 @@ Route::post('/pinjson', 'App\Http\Controllers\ApiController@pinjson')->middlewar
 Route::post('/user/delete/{id}', 'App\Http\Controllers\ApiController@deleteUser')->middleware(['auth:sanctum'])->name('api_delete_user');
 Route::get('/user/block/{id}', 'App\Http\Controllers\ApiController@blockUser')->middleware(['auth:sanctum'])->name('api_block_user');
 
+Route::get('/eula', 'App\Http\Controllers\ApiController@handleEula')->middleware(['auth:sanctum'])->name('api_handle_eula');
+Route::get('/set/eula', 'App\Http\Controllers\ApiController@setEula')->middleware(['auth:sanctum'])->name('api_set_eula');
+
+
 Route::get('/forum/thread/{threadId}/comments', 'App\Http\Controllers\ApiController@getThreadComments')->middleware(['auth:sanctum'])->name('api_forum_comments');
 
 Route::get('/forum/category/{categoryId}/threads', 'App\Http\Controllers\ApiController@getThreadsByCategory')->middleware(['auth:sanctum'])->name('api_forum_threads');
