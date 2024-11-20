@@ -481,7 +481,7 @@
               <p class="lead lead-small">Our purely on-chain, cryptographically secure voting process enables each citizen to participate directly in shaping a new society. The Martian Congress, formed by the very public it serves, operates without intermediaries, making governance fully transparent and directly accountable to its citizens.</p>
               <p class="lead lead-small">The app uses the Marscoin blockchain to timestamp every legislative proposal and securely register citizen identities, enhancing trust and transparency in the electoral process. With its intuitive interface, the app allows all participants to easily audit and verify the validity of each vote.</p>
               <p class="lead lead-small">Embracing an open source ethos, the app's code serves as the constitution. This groundbreaking approach ensures that every citizen can propose, amend, and vote on legislation directly from their device. </p>
-              <p>Best of all: it's all open source and soon on Mars!</p>
+              <p class="lead lead-small">Best of all: it's all open source and soon on Mars!</p>
               <br>
               <a target="_blank" data-aos="fade-up" data-aos-delay="150" href="https://apps.apple.com/us/app/martianrepublic/id6480416861" class="btn btn-default">Download</a>
           </div>
