@@ -171,9 +171,10 @@ class StatusController extends Controller {
 	}
 
 
-    private function getLastProcessedTimestamp() {
+	private function getLastProcessedTimestamp() {
 		$lastLog = DB::table('feed_log')->latest('processed_at')->first();
-		return Carbon::parse($lastLog->processed_at); // Don't force UTC
+		return Carbon::createFromFormat('Y-m-d H:i:s', $lastLog->processed_at, 'America/New_York')
+					 ->setTimezone('UTC');
 	}
 
 
