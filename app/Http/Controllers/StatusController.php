@@ -163,26 +163,26 @@ class StatusController extends Controller {
 
 	public function getSystemStatus() {
         $response = [
-            'ipfs_status' => 'danger',
-            'blockchain_tracker_status' => 'danger',
-            'ballot_server_status' => 'danger'
+            'ipfs_status' => 'offline',
+            'blockchain_tracker_status' => 'offline',
+            'ballot_server_status' => 'offline'
         ];
 
         // IPFS node check
         try {
             $a = AppHelper::file_get_contents_curl('http://127.0.0.1:5001/api/v0/swarm/peers');
-            $response['ipfs_status'] = $a ? 'success' : 'danger';
+            $response['ipfs_status'] = $a ? 'online' : 'offline';
         } catch (\Exception $e) {
-            $response['ipfs_status'] = 'danger';
+            $response['ipfs_status'] = 'offline';
         }
 
         // Blockchain tracker status
         try {
             $lastProcessed = $this->getLastProcessedTimestamp();
             $now = Carbon::now();
-            $response['blockchain_tracker_status'] = $lastProcessed->diffInMinutes($now) <= 15 ? 'success' : 'danger';
+            $response['blockchain_tracker_status'] = $lastProcessed->diffInMinutes($now) <= 15 ? 'online' : 'offline';
         } catch (\Exception $e) {
-            $response['blockchain_tracker_status'] = 'danger';
+            $response['blockchain_tracker_status'] = 'offline';
         }
 
         // Ballot server status
