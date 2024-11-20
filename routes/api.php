@@ -42,6 +42,8 @@ Route::get('/forum/thread/{threadId}/comments', 'App\Http\Controllers\ApiControl
 Route::get('/forum/category/{categoryId}/threads', 'App\Http\Controllers\ApiController@getThreadsByCategory')->middleware(['auth:sanctum'])->name('api_forum_threads');
 Route::get('/forum/categories/threads', 'App\Http\Controllers\ApiController@getAllCategoriesWithThreads')->middleware(['auth:sanctum'])->name('api_forum_catthreads');
 
-// New routes
 Route::post('/forum/thread', 'App\Http\Controllers\ApiController@createThread')->middleware(['auth:sanctum'])->name('api_create_thread');
 Route::post('/forum/thread/{threadId}/comment', 'App\Http\Controllers\ApiController@createComment')->middleware(['auth:sanctum'])->name('api_create_comment');
+
+
+Route::get('/status', 'App\Http\Controllers\StatusController@getSystemStatus')->middleware(['auth:sanctum'])->name('api_handle_eula');

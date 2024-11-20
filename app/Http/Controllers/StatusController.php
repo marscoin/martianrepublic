@@ -160,6 +160,52 @@ class StatusController extends Controller {
 		return $view;
 	}
 
+
+	public function getSystemStatus() {
+        $response = [
+            'ipfs_status' => 'danger',
+            'blockchain_tracker_status' => 'danger',
+            'ballot_server_status' => 'danger'
+        ];
+
+        // IPFS node check
+        try {
+            $a = AppHelper::file_get_contents_curl('http://127.0.0.1:5001/api/v0/swarm/peers');
+            $response['ipfs_status'] = $a ? 'success' : 'danger';
+        } catch (\Exception $e) {
+            $response['ipfs_status'] = 'danger';
+        }
+
+        // Blockchain tracker status
+        try {
+            $lastProcessed = $this->getLastProcessedTimestamp();
+            $now = Carbon::now();
+            $response['blockchain_tracker_status'] = $lastProcessed->diffInMinutes($now) <= 15 ? 'success' : 'danger';
+        } catch (\Exception $e) {
+            $response['blockchain_tracker_status'] = 'danger';
+        }
+
+        // Ballot server status
+        $response['ballot_server_status'] = $this->checkBallotServer();
+
+        return response()->json($response);
+    }
+
+    private function checkBallotServer($host = 'martianrepublic.org', $port = 3678) {
+        $socket = @fsockopen('ssl://' . $host, $port, $errno, $errstr, 5);
+        if ($socket) {
+            fclose($socket);
+            return "success";
+        }
+        return "danger";
+    }
+
+    private function getLastProcessedTimestamp() {
+        $lastLog = DB::table('feed_log')->latest('processed_at')->first();
+        return Carbon::createFromFormat('Y-m-d H:i:s', $lastLog->processed_at, 'America/New_York')
+                    ->setTimezone('UTC');
+    }
+
 	function checkBallotServer($host = 'martianrepublic.org', $port = 3678) {
 		$socket = @fsockopen('ssl://' . $host, $port, $errno, $errstr, 5);
 		
