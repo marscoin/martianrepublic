@@ -153,24 +153,15 @@ class StatusController extends Controller {
 		return $view;
 	}
 
-	function checkBallotServer($url = 'wss://martianrepublic.org:3678') {
-		$ch = curl_init($url);
+	function checkBallotServer($host = 'martianrepublic.org', $port = 3678) {
+		$socket = @fsockopen('ssl://' . $host, $port, $errno, $errstr, 5);
 		
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 5); // 5 second timeout
-		curl_setopt($ch, CURLOPT_NOBODY, true);
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'HEAD');
+		if ($socket) {
+			fclose($socket);
+			return "success";
+		}
 		
-		$result = curl_exec($ch);
-		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		curl_close($ch);
-		
-		$network = ($httpCode >= 200 && $httpCode < 300);
-		$ballot_server_status = $network ? "success" : "danger";
-		
-		return $ballot_server_status;
+		return "danger";
 	}
 
 
