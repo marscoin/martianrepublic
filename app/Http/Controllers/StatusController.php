@@ -126,9 +126,16 @@ class StatusController extends Controller {
 		// Check the blockchain tracker status
         $lastProcessed = $this->getLastProcessedTimestamp();
 		$now = Carbon::now('UTC');
+
+		Log::debug("Last Processed: " . $lastProcessed->toDateTimeString());
+		Log::debug("Now: " . $now->toDateTimeString());
+		Log::debug("Diff in minutes: " . $lastProcessed->diffInMinutes($now));
+
 		if ($lastProcessed->diffInMinutes($now) <= 15) {
+			Log::debug("Success - diff is under 15 mins");
 			$blockchain_tracker_status = "success";
 		} else {
+			Log::debug("Danger - diff is over 15 mins");
 			$blockchain_tracker_status = "danger";
 		}
 
