@@ -126,8 +126,8 @@ class StatusController extends Controller {
 		// Check the blockchain tracker status
         $lastProcessed = $this->getLastProcessedTimestamp();
 		Log::debug("Blocktracker: " . $lastProcessed);
-		Log::debug("Time now: " . Carbon::now());
-        if ($lastProcessed->diffInMinutes(Carbon::now()) <= 15) {
+		Log::debug("Time now: " .  Carbon::now()->setTimezone('America/New_York'));
+        if ($lastProcessed->diffInMinutes(Carbon::now()->setTimezone('America/New_York')) <= 15) {
 			Log::debug("Blocktracker: success");
             $blockchain_tracker_status = "success";
         } else {
@@ -169,7 +169,7 @@ class StatusController extends Controller {
     private function getLastProcessedTimestamp() {
         $lastLog = DB::table('feed_log')->latest('processed_at')->first();
 		Log::debug("lP: " . $lastLog->processed_at);
-        return Carbon::parse($lastLog->processed_at)->setTimezone('America/New_York');
+        return Carbon::parse($lastLog->processed_at);
     }
 
 
