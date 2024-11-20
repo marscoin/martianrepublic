@@ -124,11 +124,12 @@ class StatusController extends Controller {
 
 
 		// Check the blockchain tracker status
-        $lastProcessed = $this->getLastProcessedTimestamp();
-		$now = Carbon::now('UTC');
+		// In your check method
+		$lastProcessed = $this->getLastProcessedTimestamp();
+		$now = Carbon::now(); // Use same timezone as database
 
-		Log::debug("Last Processed: " . $lastProcessed->toDateTimeString());
-		Log::debug("Now: " . $now->toDateTimeString());
+		Log::debug("Last Processed: " . $lastProcessed);
+		Log::debug("Now: " . $now);
 		Log::debug("Diff in minutes: " . $lastProcessed->diffInMinutes($now));
 
 		if ($lastProcessed->diffInMinutes($now) <= 15) {
@@ -172,7 +173,7 @@ class StatusController extends Controller {
 
     private function getLastProcessedTimestamp() {
 		$lastLog = DB::table('feed_log')->latest('processed_at')->first();
-		return Carbon::parse($lastLog->processed_at)->setTimezone('UTC');
+		return Carbon::parse($lastLog->processed_at); // Don't force UTC
 	}
 
 
