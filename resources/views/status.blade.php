@@ -276,6 +276,17 @@
                 </div> <!-- /.col --> 
 
 
+                <div class="col-sm-4">
+                  <div class="pricing-plan">
+                    <div class="pricing-header">
+                      <h3 class="pricing-plan-title">Mobile Apps</h3>               
+                      <p class="pricing-plan-label">Companion app for all Martians</p>   
+                    </div>
+                    <a href="https://apps.apple.com/us/app/martianrepublic/id6480416861" class="btn btn-info"><i class="fa fa-apple"></i> iOS</a>
+                    <a href="#" class="btn btn-info"><i class="fa fa-android"></i> android</a>
+                    
+                  </div> <!-- /.pricing-plan -->
+                </div> <!-- /.col --> 
 
 
 

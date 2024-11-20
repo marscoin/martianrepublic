@@ -22,11 +22,8 @@
 <meta name="twitter:title" content="The Martian Congressional Republic">
 <meta name="twitter:description" content="Join our blockchain-based community and prepare for life on Mars.">
 <meta name="twitter:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
-
-<!-- Favicon -->
+<meta name="apple-itunes-app" content="app-id=6480416861">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
-
-<!-- Canonical URL -->
 <link rel="canonical" href="https://www.martianrepublic.org">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
@@ -168,6 +165,8 @@
                 </div> 
               </div> 
             </div> 
+
+
             <div class="item ">
               <div class="row">
                 <div class="col-md-6 masthead-text animated fadeInDownBig">
@@ -449,29 +448,51 @@
           </div> 
         </div> 
 
-
         <div class="row-divider divider-wider"></div> <!-- /.row-divider -->
 
 
         <div class="row">
-          <div class="col-sm-6 col-sm-push-6" data-aos="fade-in">
+           <div class="col-sm-6 col-sm-push-6 text-center">
+            <br><br>
+            <img data-aos="fade-left" class="img-responsive figure-shadow center-block shadow-lg" src="/assets/citizen/registry_screenshot.png" >
+          </div>
+          <div class="col-sm-6 col-sm-pull-6" data-aos="fade-in">
             <h4 class="mini-feature-title">
-              <span>Martian Congress</span>
+              <span>Proof-of-Humanity Martian Voter Registry</span>
             </h4>
-            <p class="lead lead-small">An on-chain, ultra-transparent end-to-end auditable governance system utilizing the non-custodial wallet, public voter registry and a coin-shuffle based, encrypted ballot distribution system to ensure fair voting on public proposals, bills, and amendments by secret ballot. </p>
-            <p class="lead lead-small">A purely on-chain, cryptographically secure voting process would allow each citizen to participate directly in the formation of a Republic in which matters of the "res publica" are decided by a congress consisting of the very public itself, without the need for intermediaries.</p>
-            <p class="lead lead-small">Utilizing the Marscoin blockchain to timestamp proposals and identify the members of the public is part of the solution in conjuction with a public voter registry. The Martian Congress favors a transparent and intuitive solution which allows all participants to easily audit and verify the validity of the vote.</p>
-            <p class="lead lead-small">By utilizing an open source model in which the code itself becomes the constitution, we opt for a server/client architecture in which citizens can initiate proposals, bills, and amendments. </p>
+            <p class="lead lead-small">Martian Citizen Registry : an on-chain "proof of humanity" registry using decentralized and cryptographically secured file storage to create a private/public identity attestation system.</p>
+            <p class="lead lead-small">It comes with a community driven identity attestation service in which an initial community dictates the terms to invite new members to join their group using clear programmatic guidelines that future proposal can modify, allowing a virtuous feedback loop in which the community is allowed to integrate new members.</p>
+            <p class="lead lead-small">We start out with a basic user submission form and liveness-test which could be further improved with kiosk-style self service terminals (upon arrival on Mars, for instance). After an initial registration the users are vetted by the community itself and integrated into the general public.</p>
             <br>
             <a data-aos="fade-up" data-aos-delay="150" href="/signup" class="btn btn-default">Join the Martian Republic</a>
           </div> 
-          <div class="col-sm-6 col-sm-pull-6 text-center">
-            <br><br>
-            <img data-aos="fade-right" class="img-responsive figure-shadow center-block shadow-lg" src="/assets/congress/proposal_screenshot.png" >
-          </div> 
         </div> 
 
+
         <div class="row-divider"></div> <!-- /.row-divider -->
+
+
+        <div class="row">
+          <div class="col-sm-6 col-sm-push-6" data-aos="fade-in">
+              <h4 class="mini-feature-title">
+                  <span>Explore the Martian Republic App!</span>
+              </h4>
+              <p class="lead lead-small">Step into the future of Martian governance with our mobile app, an extension of the MartianRepublic.org platform. This app integrates a non-custodial wallet and public voter registry with a coin-shuffle based, encrypted ballot distribution system, ensuring that every vote on public proposals, bills, and amendments is secure and private.</p>
+              <p class="lead lead-small">Our purely on-chain, cryptographically secure voting process enables each citizen to participate directly in shaping a new society. The Martian Congress, formed by the very public it serves, operates without intermediaries, making governance fully transparent and directly accountable to its citizens.</p>
+              <p class="lead lead-small">The app uses the Marscoin blockchain to timestamp every legislative proposal and securely register citizen identities, enhancing trust and transparency in the electoral process. With its intuitive interface, the app allows all participants to easily audit and verify the validity of each vote.</p>
+              <p class="lead lead-small">Embracing an open source ethos, the app's code serves as the constitution. This groundbreaking approach ensures that every citizen can propose, amend, and vote on legislation directly from their device.</p>
+              <br>
+              <a target="_blank" data-aos="fade-up" data-aos-delay="150" href="https://apps.apple.com/us/app/martianrepublic/id6480416861" class="btn btn-default">Download</a>
+          </div>
+          <div class="col-sm-6 col-sm-pull-6 text-center">
+              <br><br>
+              <a href="https://apps.apple.com/us/app/martianrepublic/id6480416861"><img data-aos="fade-right" style="width: 80%" class="img-responsive figure-shadow center-block shadow-lg" src="/assets/landing/img/ios.png"></a>
+          </div>
+      </div>
+
+      <div class="row-divider divider-wider"></div> <!-- /.row-divider -->
+
+
 
         <iframe title="Martian Republic - Research Paper" src="https://docs.google.com/presentation/d/e/2PACX-1vQFJLAKZc6YWBlqFxsCI3y9g0XkpB-k-_zIFxbtfey6EI3ck3ljOH7eUnwxz9Z6rrCN1VfV6VL0kpHV/embed?start=true&loop=true&delayms=5000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
 
