@@ -9,6 +9,7 @@ use App\Includes\AppHelper;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class StatusController extends Controller {
 
@@ -124,15 +125,18 @@ class StatusController extends Controller {
 
 		// Check the blockchain tracker status
         $lastProcessed = $this->getLastProcessedTimestamp();
+		Log::debug("Blocktracker: " . $lastProcessed);
         if ($lastProcessed->diffInMinutes(Carbon::now()) <= 15) {
+			Log::debug("Blocktracker: success");
             $blockchain_tracker_status = "success";
         } else {
+			Log::debug("Blocktracker: danger");
             $blockchain_tracker_status = "danger";
         }
 
 
-		
-
+		// Check the ballot shuffle server status
+		$ballot_server_status = $ballot_server_status = $this->checkBallotServer();
 
 		$view = View::make('status');
 
@@ -144,8 +148,29 @@ class StatusController extends Controller {
 		$view->pebas_status = $pebas_status;
 		$view->ipfs_status = $ipfs_status;
 		$view->blockchain_tracker_status = $blockchain_tracker_status;
+		$view->ballot_server_status = $ballot_server_status;
 
 		return $view;
+	}
+
+	function checkBallotServer($url = 'wss://martianrepublic.org:3678') {
+		$ch = curl_init($url);
+		
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 5); // 5 second timeout
+		curl_setopt($ch, CURLOPT_NOBODY, true);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'HEAD');
+		
+		$result = curl_exec($ch);
+		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+		
+		$network = ($httpCode >= 200 && $httpCode < 300);
+		$ballot_server_status = $network ? "success" : "danger";
+		
+		return $ballot_server_status;
 	}
 
 

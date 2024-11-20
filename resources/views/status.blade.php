@@ -252,7 +252,7 @@
                       <h3 class="pricing-plan-title">BlockAnalyzer</h3>               
                       <p class="pricing-plan-label">Tracks blockchain notarizations</p>   
                     </div>
-                    <?php if($ipfs_status == "success"){ ?>
+                    <?php if($blockchain_tracker_status == "success"){ ?>
                     <a href="#" class="btn btn-success">Online</a>
                     <?php }else { ?>
                     <a href="#" class="btn btn-danger">Offline</a>
@@ -261,6 +261,19 @@
                 </div> <!-- /.col --> 
 
 
+                <div class="col-sm-4">
+                  <div class="pricing-plan">
+                    <div class="pricing-header">
+                      <h3 class="pricing-plan-title">Ballot Server</h3>               
+                      <p class="pricing-plan-label">Orchestrates ballot shuffles</p>   
+                    </div>
+                    <?php if($ballot_server_status == "success"){ ?>
+                    <a href="#" class="btn btn-success">Online</a>
+                    <?php }else { ?>
+                    <a href="#" class="btn btn-danger">Offline</a>
+                    <?php } ?>
+                  </div> <!-- /.pricing-plan -->
+                </div> <!-- /.col --> 
 
 
 
