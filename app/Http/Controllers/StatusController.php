@@ -125,15 +125,12 @@ class StatusController extends Controller {
 
 		// Check the blockchain tracker status
         $lastProcessed = $this->getLastProcessedTimestamp();
-		Log::debug("Blocktracker: " . $lastProcessed);
-		Log::debug("Time now: " .  Carbon::now()->setTimezone('America/New_York'));
-        if ($lastProcessed->diffInMinutes(Carbon::now()->setTimezone('America/New_York')) <= 15) {
-			Log::debug("Blocktracker: success");
-            $blockchain_tracker_status = "success";
-        } else {
-			Log::debug("Blocktracker: danger");
-            $blockchain_tracker_status = "danger";
-        }
+		$now = Carbon::now('UTC');
+		if ($lastProcessed->diffInMinutes($now) <= 15) {
+			$blockchain_tracker_status = "success";
+		} else {
+			$blockchain_tracker_status = "danger";
+		}
 
 
 		// Check the ballot shuffle server status
@@ -167,10 +164,9 @@ class StatusController extends Controller {
 
 
     private function getLastProcessedTimestamp() {
-        $lastLog = DB::table('feed_log')->latest('processed_at')->first();
-		Log::debug("lP: " . $lastLog->processed_at);
-        return Carbon::parse($lastLog->processed_at);
-    }
+		$lastLog = DB::table('feed_log')->latest('processed_at')->first();
+		return Carbon::parse($lastLog->processed_at)->setTimezone('UTC');
+	}
 
 
 
