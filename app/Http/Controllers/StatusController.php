@@ -206,24 +206,6 @@ class StatusController extends Controller {
                     ->setTimezone('UTC');
     }
 
-	function checkBallotServer($host = 'martianrepublic.org', $port = 3678) {
-		$socket = @fsockopen('ssl://' . $host, $port, $errno, $errstr, 5);
-		
-		if ($socket) {
-			fclose($socket);
-			return "success";
-		}
-		
-		return "danger";
-	}
-
-
-	private function getLastProcessedTimestamp() {
-		$lastLog = DB::table('feed_log')->latest('processed_at')->first();
-		return Carbon::createFromFormat('Y-m-d H:i:s', $lastLog->processed_at, 'America/New_York')
-					 ->setTimezone('UTC');
-	}
-
 
 
 }
