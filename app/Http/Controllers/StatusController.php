@@ -60,23 +60,28 @@ class StatusController extends Controller {
 
 		try {
 			$data = json_decode(file_get_contents("/home/mars/constitution/marswallet.json"), true);
-			$RPC_Host = $data['rpc_host'];          // host for marscoin rpc
-			$RPC_Port = $data['rpc_port'];              // port for marscoin rpc
-			$RPC_User = $data['rpc_user'];      // username for marscoin rpc
-			$RPC_Pass = $data['rpc_pass'];     // password for marscoin rpc
-
+			$RPC_Host = $data['rpc_host'];
+			$RPC_Port = $data['rpc_port'];
+			$RPC_User = $data['rpc_user'];
+			$RPC_Pass = $data['rpc_pass'];
+			
 			$nu92u5p9u2np8uj5wr = "http://" . $RPC_User . ":" . $RPC_Pass . "@" . $RPC_Host . ":" . $RPC_Port . "/";
 			$Marscoind = new jsonRPCClient($nu92u5p9u2np8uj5wr);
-			$json = $Marscoind->getNetworkInfo	();
-			Log::debug($json);
-			$network = $json;
-			$marscoind_status = ($Marscoind && !empty($network)) ? "success" : "danger";
-    
+			$json = $Marscoind->getNetworkInfo();
+			
+			// Debug each condition separately
+			Log::debug('Marscoind object exists: ' . ($Marscoind ? 'true' : 'false'));
+			Log::debug('Network array not empty: ' . (!empty($network) ? 'true' : 'false'));
+			Log::debug('Network contents: ' . print_r($network, true));
+			
+			// Maybe try checking for specific expected fields instead
+			$marscoind_status = (isset($network['version']) || isset($network['protocolversion'])) ? "success" : "danger";
+			
 			Log::debug($network);
-
 		} catch (\Exception $e) {
-		    $marscoind_status = "danger";
-		    $network = array();
+			Log::debug('Exception caught: ' . $e->getMessage());
+			$marscoind_status = "danger";
+			$network = array();
 		}
 		
 
