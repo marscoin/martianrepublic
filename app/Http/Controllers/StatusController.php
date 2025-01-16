@@ -70,14 +70,9 @@ class StatusController extends Controller {
 			$json = $Marscoind->getNetworkInfo	();
 			Log::debug($json);
 			$network = $json;
-			if($a)
-    			$marscoind_status = "success";
-    		else $marscoind_status = "danger";
-
-    		if($network && count($network) > 0)
-    			$marscoind_status = "success";
-    		else
-    			$marscoind_status = "danger";
+			$marscoind_status = ($Marscoind && !empty($network)) ? "success" : "danger";
+    
+			Log::debug($network);
 
 		} catch (\Exception $e) {
 		    $marscoind_status = "danger";
