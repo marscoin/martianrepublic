@@ -2,6 +2,8 @@
 
 namespace App\Includes;
 
+use Exception;  
+
 /*
   				COPYRIGHT
 
