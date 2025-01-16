@@ -131,10 +131,15 @@ class jsonRPCClient {
 
 		// performs the HTTP POST
 		$opts = array ('http' => array (
-							'method'  => 'POST',
-							'header'  => 'Content-type: application/json',
-							'content' => $request
-							));
+			'method'  => 'POST',
+			'header'  => array(
+				'Content-Type: application/json',
+				'Connection: close'
+			),
+			'content' => $request,
+			'timeout' => 240.0,
+			'ignore_errors' => true // Add this to prevent fopen from failing on non-200 responses
+		));
 		$context  = stream_context_create($opts);
 		if ($fp = fopen($this->url, 'r', false, $context)) {
 			$response = '';

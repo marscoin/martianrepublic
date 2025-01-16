@@ -67,17 +67,18 @@ class StatusController extends Controller {
 			
 			$nu92u5p9u2np8uj5wr = "http://" . $RPC_User . ":" . $RPC_Pass . "@" . $RPC_Host . ":" . $RPC_Port . "/";
 			$Marscoind = new jsonRPCClient($nu92u5p9u2np8uj5wr);
-			$json = $Marscoind->getNetworkInfo();
 			
-			// Debug each condition separately
-			Log::debug('Marscoind object exists: ' . ($Marscoind ? 'true' : 'false'));
-			Log::debug('Network array not empty: ' . (!empty($network) ? 'true' : 'false'));
-			Log::debug('Network contents: ' . print_r($network, true));
+			// This will contain just the 'result' portion
+			$network = $Marscoind->getNetworkInfo();
 			
-			// Maybe try checking for specific expected fields instead
-			$marscoind_status = (isset($network['version']) || isset($network['protocolversion'])) ? "success" : "danger";
+			// Debug what we actually got
+			Log::debug('Network info received: ' . print_r($network, true));
 			
-			Log::debug($network);
+			// Check for specific fields we know should be there
+			$marscoind_status = (isset($network['version']) && isset($network['protocolversion'])) ? "success" : "danger";
+			
+			Log::debug('Status determined as: ' . $marscoind_status);
+			
 		} catch (\Exception $e) {
 			Log::debug('Exception caught: ' . $e->getMessage());
 			$marscoind_status = "danger";
