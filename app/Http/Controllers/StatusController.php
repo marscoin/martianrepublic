@@ -67,14 +67,12 @@ class StatusController extends Controller {
 			
 			$nu92u5p9u2np8uj5wr = "http://" . $RPC_User . ":" . $RPC_Pass . "@" . $RPC_Host . ":" . $RPC_Port . "/";
 			$Marscoind = new jsonRPCClient($nu92u5p9u2np8uj5wr);
-			
-			// This will contain just the 'result' portion
 			$network = $Marscoind->getNetworkInfo();
 			
-			// Debug what we actually got
-			Log::debug('Network info received: ' . print_r($network, true));
+			// Properly log array data
+			Log::debug('Network info received: ' . json_encode($network, JSON_PRETTY_PRINT));
 			
-			// Check for specific fields we know should be there
+			// Check specific fields in the response
 			$marscoind_status = (isset($network['version']) && isset($network['protocolversion'])) ? "success" : "danger";
 			
 			Log::debug('Status determined as: ' . $marscoind_status);
@@ -103,7 +101,7 @@ class StatusController extends Controller {
 		try {
     		$json = AppHelper::file_get_contents_curl('https://pebas.marscoin.org/api/mars/utxo?sender_address=MRKAuE7k9UhANQ8JjoU5A9KACic5Rt2Diz&receiver_address=MRKAuE7k9UhANQ8JjoU5A9KACic5Rt2Diz&amount=0.1');
     		$a = json_decode($json, true);
-			Log::debug($a);
+			//Log::debug($a);
     		if($a)
     			$pebas_status = "success";
     		else $pebas_status = "danger";
