@@ -27,3 +27,14 @@ public/assets/citizen/M*
 scripts/track_marscoin.log
 scripts/track_marscoin.log
 .env.example
+# Python cache files
+**/__pycache__/
+
+# nohup output files
+**/nohup.out
+
+# Public assets
+public/assets/citizen/data.json
+
+# Log files
+scripts/track_marscoin.log.*
