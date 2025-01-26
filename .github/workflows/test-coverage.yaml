@@ -14,6 +14,14 @@ jobs:
       with:
         php-version: '8.2'
         coverage: xdebug
+  
+  
+    - name: Install Dependencies
+      run: |
+            cp composer.json composer.json.backup
+            sed -i '/riari\/laravel-forum/d' composer.json
+            composer install
+            mv composer.json.backup composer.json
         
     - name: Install Dependencies
       run: composer install
