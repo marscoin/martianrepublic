@@ -21,9 +21,6 @@ jobs:
         cp composer_action.json composer.json
         composer install
         
-    - name: Install Dependencies
-      run: composer install
-
     - name: Run PHPStan
       run: ./vendor/bin/phpstan analyse --memory-limit=2G
       
