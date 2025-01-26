@@ -18,10 +18,8 @@ jobs:
   
     - name: Install Dependencies
       run: |
-            cp composer.json composer.json.backup
-            sed -i '/riari\/laravel-forum/d' composer.json
-            composer install
-            mv composer.json.backup composer.json
+        cp composer_action.json composer.json
+        composer install
         
     - name: Install Dependencies
       run: composer install
