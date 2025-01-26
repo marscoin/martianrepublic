@@ -99,21 +99,5 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "path",
-            "url": "./riari/laravel-forum",
-            "options": {
-                "symlink": true
-            }
-        },
-	{
-        "type": "path",
-        "url": "./laravel-nestedset",
-        "options": {
-            "symlink": true
-        }
-    }
-    ]
+    "prefer-stable": true
 }
