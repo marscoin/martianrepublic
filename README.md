@@ -1,3 +1,4 @@
+![Tests](https://github.com/marscoin/martianrepublic/actions/workflows/test-coverage/badge.svg)
 <p align="center"><a href="https://martianrepublic.org" target="_blank"><img src="https://github.com/marscoin/martianrepublic/blob/main/public/assets/landing/img/headerpic.png" width="100%"></a></p>
 
 ## About MartianRepublic
