@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.5",
         "livewire/livewire": "^3.4",
         "pragmarx/google2fa": "^8.0",
+        "riari/laravel-forum": "*",
         "symfony/http-client": "^7.0",
         "symfony/mailgun-mailer": "^7.0"
     },
