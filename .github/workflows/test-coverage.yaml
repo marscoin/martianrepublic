@@ -14,6 +14,7 @@ jobs:
       with:
         php-version: '8.2'
         coverage: xdebug
+        ini-values: xdebug.mode=coverage
   
   
     - name: Install Dependencies
@@ -25,7 +26,7 @@ jobs:
       run: ./vendor/bin/phpstan analyse --memory-limit=2G
       
     - name: Run Tests with Coverage
-      run: ./vendor/bin/pest --coverage --exclude-group wip --coverage-clover=clover.xml
+      run: XDEBUG_MODE=coverage ./vendor/bin/pest --coverage --exclude-group wip --coverage-clover=clover.xml
           
     - name: Upload coverage results to Coveralls
       env:
