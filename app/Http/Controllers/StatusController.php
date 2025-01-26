@@ -9,6 +9,7 @@ use App\Includes\AppHelper;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class StatusController extends Controller {

@@ -12,6 +12,7 @@ use App\Models\CivicWallet;
 use App\Models\Publication;
 use App\Includes\AppHelper;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 
 class LogbookController extends Controller
 {

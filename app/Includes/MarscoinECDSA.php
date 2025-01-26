@@ -944,8 +944,8 @@ class MarscoinECDSA
         }
 
         $key = $this->base58_decode($wif, true);
-
         $this->setPrivateKey(substr($key, 2, 64));
+        return true;
     }
 
     /***

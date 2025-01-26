@@ -38,6 +38,14 @@ class DashboardController extends Controller
 	}
 
 
+	public function index()
+    {
+        return Cache::rememberForever('home.dashboard', function () {
+            return view('dashboard')->render();
+        });
+    }
+
+
 	protected function showLogout()
 	{
 

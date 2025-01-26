@@ -1,12 +1,26 @@
 <?php
 
 namespace App\Models;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Cache for embedded data located or injected into the Marscoin Blockchain.
- *
- * @var string
+ * @property int $id
+ * @property string|null $address
+ * @property int|null $userid
+ * @property string|null $tag
+ * @property string|null $message
+ * @property string|null $embedded_link
+ * @property string|null $txid
+ * @property int|null $blockid
+ * @property \DateTime|null $mined
+ * @property \DateTime|null $updated_at
+ * @property \DateTime|null $created_at
+ * @property User $user
+ * @property Citizen $citizen
  */
 class Feed extends Model {
 
@@ -17,7 +31,18 @@ class Feed extends Model {
         'mined' => 'datetime',
     ];
 
-    public function user()
+    protected $fillable = [
+        'address',
+        'userid', 
+        'tag',
+        'message',
+        'embedded_link',
+        'txid',
+        'blockid',
+        'mined'
+     ];
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'userid'); // Assuming 'userid' is the foreign key in 'feeds' table
     }
@@ -31,7 +56,7 @@ class Feed extends Model {
         return 'https://martianrepublic.org/assets/citizen/' . $this->address . '/profile_pic.png';
     }
 
-    public function citizen()
+    public function citizen(): BelongsTo
     {
         return $this->belongsTo(Citizen::class, 'userid');
     }

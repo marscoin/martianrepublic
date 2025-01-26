@@ -23,13 +23,20 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
         "fakerphp/faker": "^1.9.1",
-        "knuckleswtf/scribe": "^4.35",
         "laravel/breeze": "^2.0",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^8.1",
         "spatie/laravel-ignition": "^2.0",
-        "simplesoftwareio/simple-qrcode": "^4.0"
+        "simplesoftwareio/simple-qrcode": "^4.0",
+	"larastan/larastan": "^3.0",
+        "laravel/pint": "^1.13",
+        "pestphp/pest": "^3.2",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "pheromone/phpcs-security-audit": "^2.0",
+        "squizlabs/php_codesniffer": "^3.7"
+
+
     },
     "autoload": {
         "psr-4": {
@@ -56,7 +63,24 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "analyze": [
+            "@php ./vendor/bin/phpstan analyse --memory-limit=2G"
+        ],
+        "check": [
+            "@php ./vendor/bin/phpcs --standard=PSR12 app/",
+            "@php ./vendor/bin/phpstan analyse --memory-limit=2G"
+        ],
+        "fix": [
+            "@php ./vendor/bin/phpcbf --standard=PSR12 app/",
+            "@php ./vendor/bin/pint"
+        ],
+        "security-check": [
+            "composer audit",
+            "@php artisan security-check:now",
+            "@php ./vendor/bin/phpcs -v --standard=Security app/"
         ]
+
     },
     "extra": {
         "laravel": {
@@ -68,6 +92,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
+            "pestphp/pest-plugin": true,
             "php-http/discovery": true
         }
     },

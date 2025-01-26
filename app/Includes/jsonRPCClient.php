@@ -1,9 +1,6 @@
 <?php
-
 namespace App\Includes;
-
 use Exception;  
-
 /*
   				COPYRIGHT
 
@@ -33,49 +30,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  * @author sergio <jsonrpcphp@inservibile.org>
  */
 class jsonRPCClient {
+    private $debug;
+    private $url;
+    private $id;
+    private $notification = false;
+    private $proxy = ''; // Add proxy property
 
-	/**
-	 * Debug state
-	 *
-	 * @var boolean
-	 */
-	private $debug;
+    public function __construct($url, $debug = false) {
+        $this->url = $url;
+        $this->debug = empty($debug) ? false : true;
+        $this->id = 1;
+    }
 
-	/**
-	 * The server URL
-	 *
-	 * @var string
-	 */
-	private $url;
-	/**
-	 * The request id
-	 *
-	 * @var integer
-	 */
-	private $id;
-	/**
-	 * If true, notifications are performed instead of requests
-	 *
-	 * @var boolean
-	 */
-	private $notification = false;
-
-	/**
-	 * Takes the connection parameters
-	 *
-	 * @param string $url
-	 * @param boolean $debug
-	 */
-	public function __construct($url,$debug = false) {
-		// server URL
-		$this->url = $url;
-		// proxy
-		empty($proxy) ? $this->proxy = '' : $this->proxy = $proxy;
-		// debug state
-		empty($debug) ? $this->debug = false : $this->debug = true;
-		// message id
-		$this->id = 1;
-	}
 
 	/**
 	 * Sets the notification state of the object. In this state, notifications are performed, instead of requests.
@@ -156,7 +122,7 @@ class jsonRPCClient {
 
 		// debug output
 		if ($this->debug) {
-			echo nl2br($debug);
+			echo nl2br($this->debug); // Change $debug to $this->debug
 		}
 
 		// final checks and return

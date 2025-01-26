@@ -3,29 +3,32 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Wallet\DashboardController;
 use Illuminate\Support\Facades\Cache;
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+use Illuminate\View\View;
 
 require __DIR__.'/auth.php';
 
-
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('dashboard');
+    
 Route::get('/', function () {
     return Cache::remember('home.page', 260000, function () {
         return view('landing')->render();
     });
 });
+
 Route::get('/privacy', function () {
     return Cache::remember('privacy.page', 2, function () {
         return view('privacy')->render();
     });
 });
+
 Route::get('/tos', function () {
     return Cache::remember('tos.page', 2, function () {
         return view('tos')->render();
     });
 });
+
 Route::get('/support', function () {
     return Cache::remember('support.page', 2, function () {
         return view('support')->render();

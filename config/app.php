@@ -14,6 +14,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'MartianRepublic'),
+    'project_root' => env('PROJECT_ROOT', base_path()),
 
     /*
     |--------------------------------------------------------------------------

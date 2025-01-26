@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HDWallet;
 use App\Models\CivicWallet;
 use App\Includes\AppHelper;
+use Illuminate\Support\Facades\Redirect;
 
 class InventoryController extends Controller
 {
@@ -36,10 +37,10 @@ class InventoryController extends Controller
 			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
 			if (!$profile) {
-				return Redirect::to('/twofa');
+				return redirect('/twofa');
 			} else {
 				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-					return Redirect::to('/twofachallenge');
+					return redirect('/twofachallenge');
 				}
 			}
 			
@@ -62,7 +63,7 @@ class InventoryController extends Controller
 
 
 		}else{
-            return Redirect::to('/login');
+            return redirect('/login');
         }
 
 		

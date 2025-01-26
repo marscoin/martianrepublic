@@ -30,12 +30,6 @@ class ApiController extends Controller {
 	}
 
 
-	public function addipfs($data){
-
-		$IPFS = new IPFSRoot;
-
-	}
-
 
 	/**
 	 * Internal
@@ -217,11 +211,6 @@ class ApiController extends Controller {
 			}
 
 		} catch (\Exception $e) {
-			// Close cURL session
-			if (isset($ch)) {
-				curl_close($ch);
-			}
-
 			// Handle error; possibly log it and return a user-friendly message
 			return response()->json(["error" => $e->getMessage()], 500);
 		}
@@ -251,7 +240,7 @@ class ApiController extends Controller {
 		$public_address = $request->input('address');
 		$type = $request->input('type');
 		$json = $request->input('payload');
-		$projectRoot = env('PROJECT_ROOT', base_path());
+		$projectRoot = config('app.project_root', base_path());
 		$base_path =  $projectRoot . "/assets/citizen/" . $public_address;
 
 		// Check and create the directory if it doesn't exist

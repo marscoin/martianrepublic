@@ -26,6 +26,8 @@ use Illuminate\Support\Facades\Log;
 use BitcoinPHP\BitcoinECDSA\BitcoinECDSA;
 use App\Includes\MarscoinECDSA;
 use App\Livewire\CitizenStats;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Includes\IPFSRoot; 
 
 class ApiController extends Controller
 {
@@ -607,7 +609,7 @@ class ApiController extends Controller
 		$public_address = $request->input('address');
 		$type = $request->input('type');
 		$json = $request->input('payload');
-		$projectRoot = env('PROJECT_ROOT', base_path());
+		$projectRoot = config('app.project_root', base_path());
 		$base_path =  $projectRoot . "/assets/citizen/" . $public_address;
 
 		// Check and create the directory if it doesn't exist
