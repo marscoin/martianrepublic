@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('hd_wallet', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('user_id')->index('user_id');
+            $table->string('wallet_type', 500);
+            $table->boolean('backup')->default(false);
+            $table->string('encrypted_seed', 500);
+            $table->string('public_addr', 50)->nullable()->index('public_addr');
+            $table->timestamps();
+            $table->timestamp('opened_at')->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('hd_wallet');
+    }
+};

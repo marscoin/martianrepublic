@@ -68,7 +68,6 @@ Route::post('/wallet/dashboard/buy', 'Wallet\DashboardController@postBuy');
 Route::any('/check', 'Wallet\DashboardController@showChallenge');
 Route::any('/twofa', 'Wallet\DashboardController@show2FA');
 Route::any('/twofachallenge', 'Wallet\DashboardController@show2FAChallenge');
-Route::any('/logout', 'Wallet\DashboardController@showLogout');
 
 
 // 

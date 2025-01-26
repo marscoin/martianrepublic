@@ -2,6 +2,8 @@
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -28,12 +30,12 @@ abstract class TestCase extends BaseTestCase
         require base_path('routes/api.php');
 
          // Debug database configuration
-        // fwrite(STDERR, sprintf(
-        //     "\n🔍 Before checks - Connection: %s, Driver: %s, Database: %s\n",
-        //     config('database.default'),
-        //     config('database.connections.' . config('database.default') . '.driver'),
-        //     config('database.connections.' . config('database.default') . '.database')
-        // ));
+        fwrite(STDERR, sprintf(
+            "\n🔍 Before checks - Connection: %s, Driver: %s, Database: %s\n",
+            config('database.default'),
+            config('database.connections.' . config('database.default') . '.driver'),
+            config('database.connections.' . config('database.default') . '.database')
+        ));
 
         
         // Add check for ALL configured connections
@@ -54,6 +56,19 @@ abstract class TestCase extends BaseTestCase
             }
         }
 
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->text('payload');
+            $table->integer('last_activity')->index();
+        });
+    
+        config([
+            'session.driver' => 'database',
+            'session.table' => 'sessions'
+        ]);
         $this->checkAllModelsForHardcodedConnections();
     }
 

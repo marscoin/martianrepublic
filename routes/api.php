@@ -46,4 +46,4 @@ Route::post('/forum/thread', 'App\Http\Controllers\ApiController@createThread')-
 Route::post('/forum/thread/{threadId}/comment', 'App\Http\Controllers\ApiController@createComment')->middleware(['auth:sanctum'])->name('api_create_comment');
 
 
-Route::get('/status', 'App\Http\Controllers\StatusController@getSystemStatus')->middleware(['auth:sanctum'])->name('api_handle_eula');
+Route::get('/mstatus', 'App\Http\Controllers\StatusController@getSystemStatus')->middleware(['auth:sanctum'])->name('api_mobile_status');

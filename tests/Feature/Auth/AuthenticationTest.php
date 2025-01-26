@@ -1,45 +1,85 @@
 <?php
 
-namespace Tests\Feature\Auth;
-
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\RedirectResponse;
 use Tests\TestCase;
 
-class AuthenticationTest extends TestCase
-{
-    use RefreshDatabase;
-
-    public function test_login_screen_can_be_rendered()
-    {
-        $response = $this->get('/login');
-
-        $response->assertStatus(200);
-    }
-
-    public function test_users_can_authenticate_using_the_login_screen()
-    {
-        $user = User::factory()->create();
-
-        $response = $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'password',
+uses(TestCase::class)
+    ->beforeEach(function () {
+        $this->artisan('migrate:fresh', [
+            '--path' => [
+                'database/migrations/2025_01_26_202544_create_users_table.php',
+                'database/migrations/2025_01_26_202544_create_mars_sessions_table.php',
+                'database/migrations/2025_01_26_202544_create_password_resets_table.php'
+                // Only include tables we actually need for auth
+            ]
         ]);
+    });
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(RouteServiceProvider::HOME);
+test('login screen can be rendered', function () {
+    $response = $this->get('/login');
+
+    // Add debugging
+    $debugData = [
+        'status' => $response->status(),
+        'content' => substr($response->getContent(), 0, 500),
+    ];
+
+    if ($response instanceof \Illuminate\Http\RedirectResponse) {
+        $debugData['url'] = $response->getTargetUrl();
+    } else {
+        $debugData['url'] = 'no redirect';
     }
 
-    public function test_users_can_not_authenticate_with_invalid_password()
-    {
-        $user = User::factory()->create();
+    $response->assertStatus(200);
+});
 
-        $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'wrong-password',
-        ]);
+test('users can login with correct credentials', function () {
+    $user = User::factory()->create();
 
-        $this->assertGuest();
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $response->assertSessionHasNoErrors();
+    $this->assertAuthenticated();
+    $response->assertRedirect('/check');
+});
+
+
+test('users cannot login with incorrect password', function () {
+    $user = User::factory()->create();
+
+    $response = $this->withSession([])
+        ->post('/login', [
+        'email' => $user->email,
+        'password' => 'wrong-password',
+    ]);
+
+    // Add debugging
+    $debugData = [
+        'status' => $response->status(),
+        'content' => substr($response->getContent(), 0, 500),
+    ];
+
+    if ($response instanceof RedirectResponse) {
+        $debugData['url'] = $response->getTargetUrl();
     }
-}
+
+    // dd($debugData);
+
+    $this->assertGuest();
+});
+
+test('users can logout successfully', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    
+    $response = $this->post('/logout');
+    Auth::forgetGuards();
+    
+    $this->assertGuest();
+    $response->assertRedirect('/');
+});
