@@ -1,8 +1,12 @@
 {
-    "name": "laravel/laravel",
+    "name": "MartianRepublic",
     "type": "project",
-    "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "version": "2.0.1",
+    "description": "The Martian Republic reference implementation.",
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.0",
@@ -85,7 +89,6 @@
             "@php artisan security-check:now",
             "@php ./vendor/bin/phpcs -v --standard=Security app/"
         ]
-
     },
     "extra": {
         "laravel": {
@@ -111,12 +114,12 @@
                 "symlink": true
             }
         },
-	{
-        "type": "path",
-        "url": "./laravel-nestedset",
-        "options": {
-            "symlink": true
+        {
+            "type": "path",
+            "url": "./laravel-nestedset",
+            "options": {
+                "symlink": true
+            }
         }
-    }
     ]
 }
