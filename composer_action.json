@@ -1,0 +1,103 @@
+{
+    "name": "laravel/laravel",
+    "type": "project",
+    "description": "The Laravel Framework.",
+    "keywords": ["framework", "laravel"],
+    "license": "MIT",
+    "require": {
+        "php": "^8.0",
+        "bacon/bacon-qr-code": "^2.0",
+        "bitcoin-php/bitcoin-ecdsa": "^1.3",
+        "guzzlehttp/guzzle": "^7.0.1",
+        "kalnoy/nestedset": "6.x-dev",
+        "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.0",
+        "laravel/telescope": "^5.0",
+        "laravel/tinker": "^2.5",
+        "livewire/livewire": "^3.4",
+        "pragmarx/google2fa": "^8.0",
+        "riari/laravel-forum": "^6.0",
+        "symfony/http-client": "^7.0",
+        "symfony/mailgun-mailer": "^7.0"
+    },
+    "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.6",
+        "fakerphp/faker": "^1.9.1",
+        "kitloong/laravel-migrations-generator": "^7.0",
+        "larastan/larastan": "^3.0",
+        "laravel/breeze": "^2.0",
+        "laravel/pint": "^1.13",
+        "laravel/sail": "^1.0.1",
+        "mockery/mockery": "^1.4.4",
+        "nunomaduro/collision": "^8.1",
+        "pestphp/pest": "^3.2",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "pheromone/phpcs-security-audit": "^2.0",
+        "simplesoftwareio/simple-qrcode": "^4.0",
+        "spatie/laravel-ignition": "^2.0",
+        "squizlabs/php_codesniffer": "^3.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
+        ],
+        "analyze": [
+            "@php ./vendor/bin/phpstan analyse --memory-limit=2G"
+        ],
+        "check": [
+            "@php ./vendor/bin/phpcs --standard=PSR12 app/",
+            "@php ./vendor/bin/phpstan analyse --memory-limit=2G"
+        ],
+        "fix": [
+            "@php ./vendor/bin/phpcbf --standard=PSR12 app/",
+            "@php ./vendor/bin/pint"
+        ],
+        "test": [
+            "@php ./vendor/bin/pest --coverage --exclude-group wip --coverage-clover=coverage.xml"
+        ],
+        "security-check": [
+            "composer audit",
+            "@php artisan security-check:now",
+            "@php ./vendor/bin/phpcs -v --standard=Security app/"
+        ]
+
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

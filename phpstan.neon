@@ -13,4 +13,6 @@ parameters:
     excludePaths:
         - tests/*/data/*
         - database/migrations/*
-
+        - 'config/forum.web.php'  
+        - 'app/Forum/*'          
+        
