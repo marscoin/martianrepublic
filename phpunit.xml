@@ -4,9 +4,13 @@
          bootstrap="vendor/autoload.php"
          colors="true">
     <coverage processUncoveredFiles="true">
-        <include>
-            <directory suffix=".php">./app</directory>
+         <include>
+            <directory>app</directory>
+            <directory>tests</directory>
         </include>
+        <report>
+            <clover outputFile="clover.xml"/>
+        </report>
     </coverage>
     <testsuites>
         <testsuite name="Unit">

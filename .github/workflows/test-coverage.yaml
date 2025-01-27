@@ -31,14 +31,20 @@ jobs:
     - name: Run PHPStan
       run: ./vendor/bin/phpstan analyse --memory-limit=2G
 
+    - name: List Tests
+      run: ./vendor/bin/pest --list-tests
+
     - name: Run Tests with Coverage
-      run: |
-        ./vendor/bin/pest --coverage-clover=clover.xml --migrate-configuration
+      run: ./vendor/bin/pest --coverage-clover=clover.xml --verbose
+
+    - name: Debug Directory Structure
+      run: ls -la
 
     - name: Validate Coverage File
       run: |
         if [ ! -f clover.xml ]; then
           echo "::error::Coverage file clover.xml not found!"
+          ls -la
           exit 1
         fi
 
