@@ -5,35 +5,48 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
         coverage: xdebug
         ini-values: xdebug.mode=coverage
-  
-  
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: composer-${{ hashFiles('composer.lock') }}
+        restore-keys: composer-
+
     - name: Install Dependencies
       run: |
         cp composer_action.json composer.json
-        composer install
-        
+        composer install --prefer-dist --no-progress --no-suggest
+
     - name: Run PHPStan
       run: ./vendor/bin/phpstan analyse --memory-limit=2G
-      
+
     - name: Run Tests with Coverage
       run: |
-        ./vendor/bin/pest --coverage-clover=clover.xml
-    
+        ./vendor/bin/pest --coverage-clover=clover.xml --migrate-configuration
+
+    - name: Validate Coverage File
+      run: |
+        if [ ! -f clover.xml ]; then
+          echo "::error::Coverage file clover.xml not found!"
+          exit 1
+        fi
+
     - name: Display Coverage File
       run: |
-        ls -la clover.xml || echo "clover.xml not found"
+        ls -la clover.xml
         pwd
-        
+
     - name: Upload coverage results to Coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
