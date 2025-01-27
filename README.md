@@ -1,4 +1,5 @@
-![Tests](https://github.com/marscoin/martianrepublic/actions/workflows/test-coverage/badge.svg)
+[![Test Coverage & Analysis](https://github.com/marscoin/martianrepublic/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/marscoin/martianrepublic/actions/workflows/test-coverage.yaml)
+[![Coverage Status](https://coveralls.io/repos/github/marscoin/martianrepublic/badge.svg)](https://coveralls.io/github/marscoin/martianrepublic)
 <p align="center"><a href="https://martianrepublic.org" target="_blank"><img src="https://github.com/marscoin/martianrepublic/blob/main/public/assets/landing/img/headerpic.png" width="100%"></a></p>
 
 ## About MartianRepublic
