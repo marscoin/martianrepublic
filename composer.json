@@ -1,5 +1,5 @@
 {
-    "name": "MartianRepublic",
+    "name": "marscoin/martian-republic",
     "type": "project",
     "version": "2.0.1",
     "description": "The Martian Republic reference implementation.",
