@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/feed/public', 'App\Http\Controllers\ApiController@allPublic')->name('api_allpublic');
 Route::get('/feed/citizen', 'App\Http\Controllers\ApiController@allCitizen')->name('api_allcitizen');
 Route::get('/feed/applicant', 'App\Http\Controllers\ApiController@allApplicants')->name('api_allapplicants');
+Route::get('/feed', 'App\Http\Controllers\ApiController@allFeed')->name('api_allfeed');
 Route::post('/marsauth', 'App\Http\Controllers\ApiController@marsAuth')->name('api_marsauth');
 
 Route::get('/citizen/{address}', 'App\Http\Controllers\ApiController@showCitizen')->name('api_show');

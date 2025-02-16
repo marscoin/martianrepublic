@@ -183,6 +183,68 @@ class ApiController extends Controller
     }
 
 
+    public function allFeed(Request $request)
+    {
+        $perPage = 25;
+        $page = $request->input('page', 1);
+        $excludedUserIds = [6462, 7601];
+        $cacheKey = 'all_feed_cache_' . $page;
+
+        $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserIds) {
+            return Feed::with(['user' => function ($query) use ($excludedUserIds) {
+                $query->select('id', 'fullname', 'created_at')
+                    ->whereNotIn('id', $excludedUserIds);
+            }, 'user.profile' => function ($query) {
+                $query->select('userid', 'general_public', 'endorse_cnt', 'citizen', 'has_application');
+            }, 'user.citizen' => function ($query) {
+                $query->select('userid', 'avatar_link', 'liveness_link')
+                    ->whereNotNull('avatar_link');
+            }])
+            ->whereHas('user', function ($query) use ($excludedUserIds) {
+                $query->whereNotIn('id', $excludedUserIds);
+            })
+            ->whereNotNull('mined')
+            ->select(
+                'id',
+                'address',
+                'userid',
+                'tag',
+                'message',
+                'embedded_link',
+                'txid',
+                'blockid',
+                'mined',
+                'created_at',
+                'updated_at'
+            )
+            ->orderByDesc('mined')
+            ->orderByDesc('id')
+            ->paginate($perPage);
+        });
+
+        return $this->paginatedResponse($feeds);
+    }
+
+    // Helper method to format paginated responses consistently
+    private function paginatedResponse($feeds)
+    {
+        return response()->json([
+            'current_page' => $feeds->currentPage(),
+            'data' => $feeds->items(),
+            'first_page_url' => $feeds->url(1),
+            'from' => $feeds->firstItem(),
+            'last_page' => $feeds->lastPage(),
+            'last_page_url' => $feeds->url($feeds->lastPage()),
+            'next_page_url' => $feeds->nextPageUrl(),
+            'path' => $feeds->path(),
+            'per_page' => $feeds->perPage(),
+            'prev_page_url' => $feeds->previousPageUrl(),
+            'to' => $feeds->lastItem(),
+            'total' => $feeds->total(),
+        ]);
+    }
+
+
     public function showCitizen(Request $request, $address)
     {
         // Look up the Martian user by public address
