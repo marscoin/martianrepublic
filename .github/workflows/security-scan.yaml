@@ -1,0 +1,75 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  gitleaks:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  php-security:
+    name: PHP Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install Dependencies
+        run: |
+          cp composer_action.json composer.json
+          composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Check for known vulnerabilities
+        run: composer audit || true
+
+      - name: Verify no PHP files in upload directories
+        run: |
+          echo "Checking for PHP files in upload directories..."
+          FOUND=$(find public/assets/citizen public/assets/wallet public/assets/landing public/assets/congress -name "*.php" -o -name "*.phtml" -o -name "*.php5" -o -name "*.phar" 2>/dev/null | head -20)
+          if [ -n "$FOUND" ]; then
+            echo "::error::PHP files found in upload directories!"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "Clean - no PHP files in upload directories."
+
+      - name: Verify .htaccess protection files exist
+        run: |
+          for dir in public/assets public/assets/citizen public/assets/wallet public/assets/landing public/assets/congress; do
+            if [ -f "$dir/.htaccess" ]; then
+              echo "✅ $dir/.htaccess exists"
+            else
+              echo "::warning::Missing .htaccess in $dir"
+            fi
+          done
+
+      - name: Check for sensitive files that should not be committed
+        run: |
+          SENSITIVE=""
+          for f in .env .env.local .env.production credentials.json service-account.json; do
+            if [ -f "$f" ]; then
+              SENSITIVE="$SENSITIVE $f"
+            fi
+          done
+          if [ -n "$SENSITIVE" ]; then
+            echo "::error::Sensitive files found in repo:$SENSITIVE"
+            exit 1
+          fi
+          echo "Clean - no sensitive files in repo."

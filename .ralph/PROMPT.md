@@ -121,12 +121,24 @@ Read the Gitbook docs and verify every documented feature works correctly:
 - Update fix_plan.md with your learnings
 - Use `sudo` when editing files owned by root in `/home/martianrepublic/`
 
-## Git Workflow (IMPORTANT)
+## Git Workflow (IMPORTANT — PUBLIC REPO)
+This project is **built in public** on GitHub. Your commits are visible to the world. Keep them clean and professional.
+
 - **Commit after EVERY meaningful change** - don't accumulate changes across loops
-- Use descriptive commit messages: `fix: <description>`, `feat: <description>`, `security: <description>`, `style: <description>`
-- **Commit at minimum once per loop**: `cd /home/martianrepublic && sudo git add -A && sudo git commit -m "..."`
-- Note: git push is not available yet (no SSH key configured). Commits are local only for now.
+- **Use Conventional Commits** format:
+  - `fix: correct null check in HodlerStats component`
+  - `feat: add endorsement threshold calculation`
+  - `security: add MIME validation to file upload endpoints`
+  - `style: improve mobile responsiveness of landing page`
+  - `refactor: extract upload validation to AppHelper`
+  - `test: add upload security test suite`
+  - `docs: update README with security hardening notes`
+  - `chore: update composer dependencies`
+- **Commit and push every loop**: `cd /home/martianrepublic && sudo git add -A && sudo git commit -m "..." && sudo git push`
+- **Gitleaks pre-commit hook is active** — if blocked, fix the leak, don't bypass the hook
 - **Update the version number** in `resources/views/footer.blade.php` (line 3: "Martian Republic v.X.Y") after significant changes. Bump minor for features, patch for fixes.
+- **Keep commits atomic** — one logical change per commit. Don't mix security fixes with UI changes in the same commit.
+- **Never force push** — this is a shared public repo
 
 ## Testing & Security Audits (IMPORTANT)
 - **Write tests** for every security-critical change. Use `php artisan test` to run them.
@@ -148,6 +160,25 @@ Read the Gitbook docs and verify every documented feature works correctly:
 
 ## Sudo Access
 The claude user has passwordless sudo access. Just use `sudo <command>` directly.
+
+## GitHub CLI (`gh`) Access
+The `gh` CLI is authenticated and available. You can use it for:
+- **CI/CD**: Create and manage GitHub Actions workflows in `.github/workflows/`
+- **Issues**: `gh issue create`, `gh issue list`, `gh issue close`
+- **PRs**: `gh pr create`, `gh pr list`, `gh pr merge`
+- **Releases**: `gh release create` for version tags
+- **Dependabot**: Check `gh api repos/marscoin/martianrepublic/vulnerability-alerts` for security alerts
+- **Actions**: `gh run list`, `gh run view` to monitor CI pipeline status
+
+### Existing CI/CD Pipelines:
+- `.github/workflows/test-coverage.yaml` — PHPStan + Pest tests + Coveralls coverage (on push/PR)
+- `.github/workflows/security-scan.yaml` — Gitleaks secret detection + PHP security audit + upload dir scanning (on push/PR to main)
+
+### CI/CD Improvements to Consider:
+- Add Laravel Pint (code style) check
+- Add deployment workflow (if applicable)
+- Add Dependabot config for automated dependency updates
+- Add branch protection rules via `gh api`
 
 ## Protected Files (DO NOT MODIFY)
 The following files and directories are part of Ralph's infrastructure.
