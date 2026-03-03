@@ -243,6 +243,7 @@ img.payment {
 
                 <h3 class="content-title"><u>Create a Proposal</u></h3>
 <form class="form account-form" method="POST" action="/congress/createproposal">
+    @csrf
     <div class="row">
         <div class="form-group">
 

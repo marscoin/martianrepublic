@@ -61,11 +61,11 @@ class IdentityController extends Controller
 			$view->endorsed = array();
 			
 			//6462 is our test account Roberta Draper
-			$view->everyPublic = DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = "GP" ORDER BY f.id DESC LIMIT 1) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = "GP" ORDER BY f.id DESC LIMIT 1) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = "GP") AND u.id NOT IN (6462, 7601) ORDER BY mined DESC;');
+			$view->everyPublic = DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = ?) AND u.id NOT IN (?, ?) ORDER BY mined DESC', ['GP', 'GP', 'GP', 6462, 7601]);
 			
-			$view->everyCitizen = DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = "CT" ORDER BY f.id DESC LIMIT 1 ) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = "CT" ORDER BY f.id DESC LIMIT 1 ) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = "CT" ) AND u.id NOT IN (6462) ORDER BY mined DESC; ');
+			$view->everyCitizen = DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1 ) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1 ) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = ? ) AND u.id NOT IN (?) ORDER BY mined DESC', ['CT', 'CT', 'CT', 6462]);
 			
-			$view->everyApplicant = DB::select('SELECT profile.userid, users.fullname, citizen.*, civic_wallet.public_addr AS address FROM users, profile, civic_wallet, citizen WHERE profile.userid = users.id AND users.id = civic_wallet.user_id AND citizen.userid = users.id AND profile.has_application = 1 AND users.id NOT IN (6462)');
+			$view->everyApplicant = DB::select('SELECT profile.userid, users.fullname, citizen.*, civic_wallet.public_addr AS address FROM users, profile, civic_wallet, citizen WHERE profile.userid = users.id AND users.id = civic_wallet.user_id AND citizen.userid = users.id AND profile.has_application = ? AND users.id NOT IN (?)', [1, 6462]);
 			
 			$view->recentActivityCount = Feed::where('userid', $uid)->where('mined', '>=', Carbon::now()->subDay())->count();
 

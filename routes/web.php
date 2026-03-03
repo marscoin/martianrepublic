@@ -119,11 +119,12 @@ Route::get('/map/embed', 'Planet\MapController@embed');
 // ==================================================================================
 Route::middleware(['auth'])->group(function () {
     Route::get('/api/balance/{account?}', 'Wallet\ApiController@getBalance');
-    Route::get('/api/account/{account?}', 'Wallet\ApiController@getAccount');
-    Route::post('/api/sendFrom/{account?}', 'Wallet\ApiController@sendFrom');
-    Route::post('/api/newAddress/{account?}', 'Wallet\ApiController@newAddress');
-    Route::post('/api/importPK/{account?}', 'Wallet\ApiController@importPK');
-    Route::post('/api/redeem', 'Wallet\ApiController@redeem');
+    // Routes below require controller methods to be implemented:
+    // Route::get('/api/account/{account?}', 'Wallet\ApiController@getAccount');
+    // Route::post('/api/sendFrom/{account?}', 'Wallet\ApiController@sendFrom');
+    // Route::post('/api/newAddress/{account?}', 'Wallet\ApiController@newAddress');
+    // Route::post('/api/importPK/{account?}', 'Wallet\ApiController@importPK');
+    // Route::post('/api/redeem', 'Wallet\ApiController@redeem');
     Route::post('/api/permapinpic', 'Wallet\ApiController@permapinpic');
     Route::post('/api/permapinvideo', 'Wallet\ApiController@permapinvideo');
     Route::post('/api/permapinlog', 'Wallet\ApiController@permapinlog');

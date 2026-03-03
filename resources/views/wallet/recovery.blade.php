@@ -49,6 +49,7 @@
                 <p>Please enter your offline Marscoin wallet address</p>
                 <hr>
                 <form class="form account-form" method="POST" action="/wallet/dashboard">
+                  @csrf
                   <div class="form-group" style="text-align: center;">
                     <input name="maddress" id="maddress" style="height: 48px; font-size: 22px; font-weight: 700;  text-align: center;" type="text" class="form-control" id="maddress" placeholder="Enter Marscoin address" tabindex="1" autofocus >
                     <button type="submit" class="btn btn-success btn-block btn-lg" tabindex="2">Submit &nbsp; <i class="fa fa-check"></i>

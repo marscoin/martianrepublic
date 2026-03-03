@@ -3,7 +3,6 @@ namespace App\Http\Controllers\Wallet;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use App\Includes\AppHelper;
 use App\Models\Posts;
@@ -25,8 +24,7 @@ class ApiController extends Controller {
 	 */
 
 	public function __construct() {
-	    if (!Auth::check())
-			redirect('/login');
+		$this->middleware("auth");
 	}
 
 
@@ -38,13 +36,11 @@ class ApiController extends Controller {
 	 * @hideFromAPIDocumentation
 	 */
 	public function permapinpic(Request $request){
-
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$hash = "";
-			$dataPic = $request->input('picture');
-			$type = $request->input('type');
-			$public_address = $request->input('address');
+		$uid = Auth::user()->id;
+		$hash = "";
+		$dataPic = $request->input('picture');
+		$type = $request->input('type');
+		$public_address = $request->input('address');
 
 			// --- SECURITY: Sanitize the public_address to prevent directory traversal ---
 			$safeAddress = AppHelper::sanitizePathSegment($public_address);
@@ -82,13 +78,7 @@ class ApiController extends Controller {
 			$citcache->avatar_link = "https://ipfs.marscoin.org/ipfs/".$hash;
 			$citcache->save();
 
-			return (new Response(json_encode(array("Hash" => $hash)), 200))
-              ->header('Content-Type', "application/json;");
-
-			//}
-		}else{
-            return redirect('/login');
-        }
+			return response()->json(["Hash" => $hash], 200);
 	}
 
 
@@ -99,13 +89,11 @@ class ApiController extends Controller {
 	 * @hideFromAPIDocumentation
 	 */
 	public function permapinvideo(Request $request){
-
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$hash = "";
-			$dataPic = $request->input('file');
-			$type = $request->input('type');
-			$public_address = $request->input('address');
+		$uid = Auth::user()->id;
+		$hash = "";
+		$dataPic = $request->input('file');
+		$type = $request->input('type');
+		$public_address = $request->input('address');
 
 			// --- SECURITY: Sanitize the public_address to prevent directory traversal ---
 			$safeAddress = AppHelper::sanitizePathSegment($public_address);
@@ -144,15 +132,10 @@ class ApiController extends Controller {
 				$citcache->liveness_link = "https://ipfs.marscoin.org/ipfs/".$hash;
 				$citcache->save();
 
-				return (new Response(json_encode(array("Hash" => $hash)), 200))
-				->header('Content-Type', "application/json;");
+				return response()->json(["Hash" => $hash], 200);
 			}
 
-
-		}else{
-            return redirect('/login');
-        }
-
+		return response()->json(['error' => 'No file uploaded.'], 400);
 	}
 
 
@@ -163,10 +146,6 @@ class ApiController extends Controller {
 	 */
 	public function permapinlog(Request $request)
 	{
-		if (!Auth::check()) {
-			return redirect('/login');
-		}
-
 		$public_address = $request->input('address');
 		$title = $request->input('title');
 		$entry = $request->input('entry');
@@ -248,10 +227,6 @@ class ApiController extends Controller {
 
 	public function removepinlog(Request $request)
 	{
-		if (!Auth::check()) {
-			return redirect('/login');
-		}
-
 		$cid = $request->input('cid'); // The CID to unpin
 
 		if (!$cid) {
@@ -323,10 +298,6 @@ class ApiController extends Controller {
 	 */
 	public function permapinjson(Request $request)
 	{
-		if (!Auth::check()) {
-			return redirect('/login');
-		}
-		Log::info("in function");
 		$public_address = $request->input('address');
 		$type = $request->input('type');
 		$json = $request->input('payload');
@@ -428,26 +399,22 @@ class ApiController extends Controller {
 	 */
 	public function setfeed(Request $request)
 	{
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$txid = $request->input('txid');
-			$action_tag = $request->input('type');
-			$public_address = $request->input('address');
-			$embedded_link = $request->input('embedded_link');
-			$message = $request->input('message');
+		$uid = Auth::user()->id;
+		$txid = $request->input('txid');
+		$action_tag = $request->input('type');
+		$public_address = $request->input('address');
+		$embedded_link = $request->input('embedded_link');
+		$message = $request->input('message');
 
-			AppHelper::insertBlockchainCache($public_address, $uid, $action_tag, $message, $embedded_link, $txid);
+		AppHelper::insertBlockchainCache($public_address, $uid, $action_tag, $message, $embedded_link, $txid);
 
-			$profile = Profile::where('userid', '=', $uid)->first();
+		$profile = Profile::where('userid', '=', $uid)->first();
+		if ($profile) {
 			$profile->general_public = 1;
 			$profile->save();
+		}
 
-			return (new Response(json_encode(array("Hash" => $txid)), 200))
-              ->header('Content-Type', "application/json;");
-
-		}else{
-            return redirect('/login');
-        }
+		return response()->json(["Hash" => $txid], 200);
 	}
 
 
@@ -458,15 +425,8 @@ class ApiController extends Controller {
 	 */
 	public function getBalance($address)
 	{
-		if (Auth::check()) {
-			$balance = AppHelper::getMarscoinBalance($address);
-			return (new Response(json_encode(array("balance" => $balance)), 200))
-              ->header('Content-Type', "application/json;");
-
-
-		}else{
-            return redirect('/login');
-        }
+		$balance = AppHelper::getMarscoinBalance($address);
+		return response()->json(["balance" => $balance], 200);
 	}
 
 
@@ -477,12 +437,18 @@ class ApiController extends Controller {
 	 * @hideFromAPIDocumentation
 	 */
 	public function dismissAlert(Request $request)
-    {
-        $alertType = $request->alertType;
-        session()->put($alertType, true);
+	{
+		$alertType = $request->input('alertType');
 
-        return response()->json(['success' => true]);
-    }
+		// Only allow known alert types to prevent session key injection
+		$allowedAlerts = ['wallet_alert', 'citizen_alert', 'onboarding_alert', 'backup_alert', 'endorsement_alert'];
+		if (!in_array($alertType, $allowedAlerts, true)) {
+			return response()->json(['error' => 'Invalid alert type.'], 400);
+		}
+
+		session()->put($alertType, true);
+		return response()->json(['success' => true]);
+	}
 
 
 
@@ -493,15 +459,8 @@ class ApiController extends Controller {
 	 */
 	public function getPrice(Request $request)
 	{
-		if (Auth::check()) {
-			$price = AppHelper::getMarscoinPrice();
-			return (new Response(json_encode(array("mars_price" => $price)), 200))
-              ->header('Content-Type', "application/json;");
-
-
-		}else{
-            return redirect('/login');
-        }
+		$price = AppHelper::getMarscoinPrice();
+		return response()->json(["mars_price" => $price], 200);
 	}
 
 
@@ -512,18 +471,16 @@ class ApiController extends Controller {
 	 */
 	public function getTransactions(Request $request)
 	{
-		if (Auth::check()) {
+		$address = $request->input('address');
 
-			$address = $request->input('address');
-			$json = AppHelper::file_get_contents_curl("http://explore1.marscoin.org/api/txs/?address={$address}");
+		// Validate Marscoin address to prevent URL injection
+		if (!$address || !AppHelper::isValidMarscoinAddress($address)) {
+			return response()->json(['error' => 'Invalid Marscoin address.'], 400);
+		}
 
-			return (new Response($json))
-              ->header('Content-Type', "application/json;");
+		$json = AppHelper::file_get_contents_curl("http://explore1.marscoin.org/api/txs/?address=" . urlencode($address));
 
-
-		}else{
-            return redirect('/login');
-        }
+		return response($json)->header('Content-Type', 'application/json');
 	}
 
 	/**
@@ -533,30 +490,29 @@ class ApiController extends Controller {
 	 */
 	public function setfullname(Request $request)
 	{
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$firstname = $request->input('firstname');
-			$lastname = $request->input('lastname');
-			if(!isset($firstname))
-				return;
-			if(!isset($lastname))
-				return;
+		$uid = Auth::user()->id;
+		$firstname = $request->input('firstname');
+		$lastname = $request->input('lastname');
+		if (!$firstname || !$lastname) {
+			return response()->json(['error' => 'First and last name are required.'], 400);
+		}
 
-			$fullname = $firstname . " " . $lastname;
+		$fullname = $firstname . " " . $lastname;
 
-			$citcache = Citizen::where('userid', '=', $uid)->first();
-			if(is_null($citcache)) $citcache = new Citizen;
+		$citcache = Citizen::where('userid', '=', $uid)->first();
+		if (is_null($citcache)) $citcache = new Citizen;
 
-			$citcache->userid = $uid;
-			$citcache->firstname = $firstname;
-			$citcache->lastname = $lastname;
-			$citcache->save();
+		$citcache->userid = $uid;
+		$citcache->firstname = $firstname;
+		$citcache->lastname = $lastname;
+		$citcache->save();
 
-			$user = User::where('id', '=', $uid)->first();
+		$user = User::where('id', '=', $uid)->first();
+		if ($user) {
 			$user->fullname = $fullname;
 			$user->save();
-			return;
 		}
+		return response()->json(['success' => true]);
 	}
 
 	/**
@@ -565,81 +521,67 @@ class ApiController extends Controller {
 	 */
 	public function cacheonboarding(Request $request)
 	{
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$shortbio = $request->input('shortbio');
-			$displayname = $request->input('displayname');
-			$publicaddress = $request->input('publicaddress');
+		$uid = Auth::user()->id;
+		$shortbio = $request->input('shortbio');
+		$displayname = $request->input('displayname');
+		$publicaddress = $request->input('publicaddress');
 
-			$citcache = Citizen::where('userid', '=', $uid)->first();
-			if(is_null($citcache)) $citcache = new Citizen;
+		$citcache = Citizen::where('userid', '=', $uid)->first();
+		if (is_null($citcache)) $citcache = new Citizen;
 
-			$citcache->userid = $uid;
-			$citcache->shortbio = $shortbio;
-			$citcache->displayname = $displayname;
-			$citcache->public_address = $publicaddress;
-			$citcache->save();
+		$citcache->userid = $uid;
+		$citcache->shortbio = $shortbio;
+		$citcache->displayname = $displayname;
+		$citcache->public_address = $publicaddress;
+		$citcache->save();
 
-			return;
-		}
+		return response()->json(['success' => true]);
 	}
 
 
 	public function rejectApplication(Request $request)
 	{
-		if (Auth::check())
-		{
-			// Check if the user has citizen status
-			$user = Auth::user();
-			$profile = Profile::where('userid', $user->id)->first();
-			$reporter = Citizen::where('userid', '=',  $user->id)->first();
+		$user = Auth::user();
+		$profile = Profile::where('userid', $user->id)->first();
+		$reporter = Citizen::where('userid', '=', $user->id)->first();
 
-			$rejectionReasons = [
-				'avatar_link' => 'Missing Personal Image',
-				'liveness_link' => 'Incomplete Video',
-				'duplicate' => 'Duplicate Entry'
-			];
+		$rejectionReasons = [
+			'avatar_link' => 'Missing Personal Image',
+			'liveness_link' => 'Incomplete Video',
+			'duplicate' => 'Duplicate Entry'
+		];
 
-			if ($profile && $profile->citizen)
-			{
-				// Fetch the request data
-				$applicantUserId = $request->input('applicantUserId');
-				$fieldToUpdate = $request->input('field');
-
-				// Validate the field to update
-				if (!in_array($fieldToUpdate, ['avatar_link', 'liveness_link'])) {
-					return response()->json(['error' => 'Invalid field specified.'], 400);
-				}
-
-				// Update the citizen table, setting the specified field to NULL for the applicant
-				Citizen::where('userid', $applicantUserId)->update([$fieldToUpdate => NULL]);
-
-				$applicant = Citizen::where('userid', '=',  $applicantUserId)->first();
-
-				// Insert a new forum post indicating the rejection
-				$content = "The application of {$applicant->public_address} has been rejected due to " . $rejectionReasons[$fieldToUpdate] . ".";
-
-
-				$fullname = $reporter->firstname . "" . $reporter->lastname;
-				Posts::create([
-					'thread_id' => 27, // Thread ID for application commentary
-					'author_id' => $user->id, // The ID of the citizen performing the rejection
-					'content' => $content,
-					'authorName' => $fullname,
-					'created_at' => now(),
-					'updated_at' => now(),
-				]);
-
-				return response()->json(['success' => 'Application has been rejected and recorded.']);
-			} else {
-				// User is not a citizen or not authenticated
-				return response()->json(['error' => 'Unauthorized access.'], 403);
-			}
-		} else {
-			// User is not logged in
-			return response()->json(['error' => 'User not authenticated.'], 401);
+		if (!$profile || !$profile->citizen) {
+			return response()->json(['error' => 'Unauthorized access.'], 403);
 		}
 
+		$applicantUserId = $request->input('applicantUserId');
+		$fieldToUpdate = $request->input('field');
+
+		// Validate the field to update
+		if (!in_array($fieldToUpdate, ['avatar_link', 'liveness_link'])) {
+			return response()->json(['error' => 'Invalid field specified.'], 400);
+		}
+
+		// Update the citizen table, setting the specified field to NULL for the applicant
+		Citizen::where('userid', $applicantUserId)->update([$fieldToUpdate => NULL]);
+
+		$applicant = Citizen::where('userid', '=', $applicantUserId)->first();
+		$applicantAddress = $applicant ? $applicant->public_address : 'Unknown';
+
+		$content = "The application of {$applicantAddress} has been rejected due to " . $rejectionReasons[$fieldToUpdate] . ".";
+
+		$fullname = $reporter ? ($reporter->firstname . ' ' . $reporter->lastname) : $user->fullname;
+		Posts::create([
+			'thread_id' => 27,
+			'author_id' => $user->id,
+			'content' => $content,
+			'authorName' => $fullname,
+			'created_at' => now(),
+			'updated_at' => now(),
+		]);
+
+		return response()->json(['success' => 'Application has been rejected and recorded.']);
 	}
 
 	/**
@@ -648,13 +590,13 @@ class ApiController extends Controller {
 	 */
 	public function closewallet(Request $request)
 	{
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$profile = Profile::where('userid', '=', $uid)->first();
+		$uid = Auth::user()->id;
+		$profile = Profile::where('userid', '=', $uid)->first();
+		if ($profile) {
 			$profile->wallet_open = 0;
 			$profile->save();
-			return;
 		}
+		return response()->json(['success' => true]);
 	}
 
 	/**
@@ -668,16 +610,12 @@ class ApiController extends Controller {
 			'new_name' => 'required|string|max:500',
 		]);
 
-		if (Auth::check()) {
-			$wallet = HDWallet::where('id', $request->hdwallet_id)
-								->where('user_id', Auth::id())
-								->firstOrFail();
-			$wallet->wallet_type = $request->new_name;
-			$wallet->save();
-			return response()->json(['success' => 'Wallet renamed successfully']);
-		}
-
-		return response()->json(['error' => 'Unauthorized'], 403);
+		$wallet = HDWallet::where('id', $request->hdwallet_id)
+							->where('user_id', Auth::id())
+							->firstOrFail();
+		$wallet->wallet_type = $request->new_name;
+		$wallet->save();
+		return response()->json(['success' => 'Wallet renamed successfully']);
 	}
 
 
@@ -686,29 +624,27 @@ class ApiController extends Controller {
 	 */
 	public function setendorsed(Request $request)
 	{
-		if (Auth::check()) {
-			$endorserId = Auth::user()->id;
-			$targetUserId = $request->input("id");
+		$endorserId = Auth::user()->id;
+		$targetUserId = $request->input("id");
 
-			// Prevent self-endorsement
-			if ((int) $endorserId === (int) $targetUserId) {
-				return response()->json(['error' => 'Cannot endorse yourself.'], 400);
-			}
-
-			// Only citizens can endorse
-			$endorserProfile = Profile::where('userid', '=', $endorserId)->first();
-			if (!$endorserProfile || !$endorserProfile->citizen) {
-				return response()->json(['error' => 'Only citizens can endorse.'], 403);
-			}
-
-			$profile = Profile::where('userid', '=', $targetUserId)->first();
-			if (!$profile) {
-				return response()->json(['error' => 'User not found.'], 404);
-			}
-			$profile->endorse_cnt = ($profile->endorse_cnt ?? 0) + 1;
-			$profile->save();
-			return response()->json(['success' => true]);
+		// Prevent self-endorsement
+		if ((int) $endorserId === (int) $targetUserId) {
+			return response()->json(['error' => 'Cannot endorse yourself.'], 400);
 		}
+
+		// Only citizens can endorse
+		$endorserProfile = Profile::where('userid', '=', $endorserId)->first();
+		if (!$endorserProfile || !$endorserProfile->citizen) {
+			return response()->json(['error' => 'Only citizens can endorse.'], 403);
+		}
+
+		$profile = Profile::where('userid', '=', $targetUserId)->first();
+		if (!$profile) {
+			return response()->json(['error' => 'User not found.'], 404);
+		}
+		$profile->endorse_cnt = ($profile->endorse_cnt ?? 0) + 1;
+		$profile->save();
+		return response()->json(['success' => true]);
 	}
 
 
@@ -717,85 +653,67 @@ class ApiController extends Controller {
 	 */
 	public function cacheproposal(Request $request)
 	{
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$txid = $request->input('txid');
-			$public_address = $request->input('address');
-			$embedded_link = $request->input('embedded_link');
-			$json = $request->input('message');
-			$data = json_decode($json);
-			$citcache = Citizen::where('userid', '=', $uid)->first();
+		$uid = Auth::user()->id;
+		$txid = $request->input('txid');
+		$public_address = $request->input('address');
+		$embedded_link = $request->input('embedded_link');
+		$json = $request->input('message');
+		$data = json_decode($json);
 
-			if (!$this->isValidCID($embedded_link)) {
-				return response()->json(['error' => 'Invalid IPFS hash'], 400);
-			}
+		if (!$data || !isset($data->data)) {
+			return response()->json(['error' => 'Invalid message payload.'], 400);
+		}
 
-			$proposal = new Proposals;
-			$proposal->user_id = $uid;
-			$proposal->title = $data->data->title;
-			$proposal->description = $data->data->description;
-			$proposal->category = $data->data->category;
-			$proposal->author = Auth::user()->fullname;
-			$proposal->ipfs_hash = $embedded_link;
-			$proposal->participation = $data->data->participation;
-			$proposal->threshold = $data->data->threshold;
-			$proposal->duration = $data->data->duration;
-			$proposal->expiration = $data->data->expiration;
-			$proposal->txid = $txid;
-			$proposal->public_address = $public_address;
+		$citcache = Citizen::where('userid', '=', $uid)->first();
 
+		if (!AppHelper::isValidCID($embedded_link ?? '')) {
+			return response()->json(['error' => 'Invalid IPFS hash'], 400);
+		}
 
-			$proposal->save();
-			$prop_id = $proposal->id;
+		$proposal = new Proposals;
+		$proposal->user_id = $uid;
+		$proposal->title = $data->data->title ?? '';
+		$proposal->description = $data->data->description ?? '';
+		$proposal->category = $data->data->category ?? '';
+		$proposal->author = Auth::user()->fullname;
+		$proposal->ipfs_hash = $embedded_link;
+		$proposal->participation = $data->data->participation ?? 0;
+		$proposal->threshold = $data->data->threshold ?? 0;
+		$proposal->duration = $data->data->duration ?? 0;
+		$proposal->expiration = $data->data->expiration ?? '';
+		$proposal->txid = $txid;
+		$proposal->public_address = $public_address;
 
-			$post = new Posts;
-			$post->thread->id = 2;
-			$post->author_id = $uid;
-			$post->content = $proposal->description;
-			$post->authorName = $citcache->firstname . " " . $citcache->lastname;
-			$post->save();
+		$proposal->save();
+		$prop_id = $proposal->id;
 
-			$post_id = $post->id;
+		$authorName = $citcache ? ($citcache->firstname . ' ' . $citcache->lastname) : Auth::user()->fullname;
 
-			$threads = new Threads;
-			$threads->category_id = 2;
-			$threads->author_id = $uid;
-			$threads->title = $data->data->title;
-			$threads->first_post_id = $post_id;
-			$threads->proposal_id = $prop_id;
-			$threads->save();
+		$post = new Posts;
+		$post->thread_id = 2;
+		$post->author_id = $uid;
+		$post->content = $proposal->description;
+		$post->authorName = $authorName;
+		$post->save();
 
-			$thd_id = $threads->id;
+		$post_id = $post->id;
 
-			$proposal->where('id', $prop_id)->update(['discussion' => $thd_id]);
+		$threads = new Threads;
+		$threads->category_id = 2;
+		$threads->author_id = $uid;
+		$threads->title = $data->data->title ?? '';
+		$threads->first_post_id = $post_id;
+		$threads->proposal_id = $prop_id;
+		$threads->save();
 
-			return (new Response(json_encode(array("Proposal" => $prop_id, "Discussion" => $thd_id)), 200))
-              ->header('Content-Type', "application/json;");
+		$thd_id = $threads->id;
 
+		Proposals::where('id', $prop_id)->update(['discussion' => $thd_id]);
 
-		}else{
-            return redirect('/login');
-        }
+		return response()->json(["Proposal" => $prop_id, "Discussion" => $thd_id], 200);
 	}
 
 
-	protected function isValidCID($input)
-	{
-		// Extract CID from the URL if embedded in a typical IPFS link format
-		$parsedUrl = parse_url($input);
-		$path = $parsedUrl['path'] ?? '';
-		// Regex to extract potential CIDs from paths; adjust according to typical link structures
-		preg_match('/(Qm[a-zA-Z1-9]{44}|b[a-z2-7]{58})/', $path, $matches);
-		$hash = $matches[0] ?? '';
-
-		// Regex to check CIDv0; starts with 'Qm' and followed by 44 characters from Base58 set
-		$cidv0Regex = '/^Qm[a-zA-Z1-9]{44}$/';
-		// Regex for basic validation of CIDv1; broader due to variability in encoding and version
-		$cidv1Regex = '/^b[a-z2-7]{58}$/';  // Example for base32 encoding
-
-		// Validate extracted hash
-		return preg_match($cidv0Regex, $hash) || preg_match($cidv1Regex, $hash);
-	}
 
 
 

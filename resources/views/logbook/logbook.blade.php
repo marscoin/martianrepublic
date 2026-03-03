@@ -1,5 +1,6 @@
 <h3 class="content-title"><u>Create a log entry</u></h3>
 <form class="form account-form" method="POST" action="/logbook/createentry">
+    @csrf
     <div class="row">
         <fieldset class="content-group">
 

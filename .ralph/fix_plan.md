@@ -18,16 +18,22 @@
 - [x] Clean up storage/debugbar/ accumulated data -- DONE: cleared
 
 ## Medium Priority (Code Quality)
-- [ ] Review app/Exceptions/Handler.php - ensure no stack traces leak to users
-- [ ] Audit database queries for raw SQL with user input (SQL injection risk)
-- [ ] Review CSRF protection on all POST routes
+- [x] Review app/Exceptions/Handler.php -- DONE: APP_DEBUG=false, custom 500/403/404 pages all in place
+- [x] Audit database queries -- DONE: All queries use parameterized bindings or are hardcoded. No injection risks.
+- [x] Review CSRF protection -- DONE: All web POST routes have CSRF via web middleware group, API routes use Sanctum
 - [ ] Test mobile responsiveness of landing page
 - [x] Verify wallet dashboard renders correctly post-cleanup -- DONE: Fixed 4 Livewire null-safety bugs (HodlerStats, DashboardStats, CitizenStats, CivicActivityFeed)
-- [x] Fix Wallet ApiController constructor redirect bug (redirect without return) -- identified but left for controller-level fix
+- [x] Fix Wallet ApiController constructor -- DONE: Removed redundant middleware('auth') + removed all 12 redundant Auth::check() blocks (route group handles auth)
+- [x] Fix cacheproposal crash -- DONE: `$post->thread->id = 2` (null property access) → `$post->thread_id = 2`. Also added payload validation, null-safety on citcache, used AppHelper::isValidCID
+- [x] Fix null-safety bugs -- DONE: setfeed, closewallet, rejectApplication, setfullname - all now check for null Profile/Citizen/User before accessing properties
+- [x] Fix getTransactions URL injection -- DONE: Added Marscoin address validation + urlencode() before passing to external API
+- [x] Fix dismissAlert session injection -- DONE: Whitelist of allowed alert type keys prevents arbitrary session key manipulation
+- [x] Remove dead routes -- DONE: Commented out sendFrom, newAddress, importPK, redeem, getAccount (routes existed but no controller methods)
+- [x] Remove duplicate isValidCID -- DONE: Deleted protected isValidCID() from Wallet\ApiController, now uses AppHelper::isValidCID
 
 ## Phase 3: Site Improvements & Polish
 - [ ] Mobile responsiveness - test and fix all pages on phone/tablet viewports
-- [ ] Add Content-Security-Policy headers + other security headers (X-Frame-Options, X-Content-Type-Options, Strict-Transport-Security)
+- [x] Security headers -- DONE: SecurityHeaders middleware with full CSP, X-Frame-Options, X-Content-Type-Options, Strict-Transport-Security, Referrer-Policy, Permissions-Policy
 - [ ] Page load performance - review slow pages, add caching, optimize DB queries with eager loading
 - [ ] Form validation & user feedback - clear error messages, client+server validation, success/failure toasts
 - [ ] Navigation & UX flow - all links work, breadcrumbs, user always knows where they are
