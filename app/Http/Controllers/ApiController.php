@@ -27,7 +27,7 @@ use BitcoinPHP\BitcoinECDSA\BitcoinECDSA;
 use App\Includes\MarscoinECDSA;
 use App\Livewire\CitizenStats;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use App\Includes\IPFSRoot; 
+use App\Includes\IPFSRoot;
 
 class ApiController extends Controller
 {
@@ -36,7 +36,7 @@ class ApiController extends Controller
         $perPage = 25;
         $cacheKey = 'all_public_cache'; // Define a unique cache key for this query
         $excludedUserIds = [6462, 7601]; // ID of the user you want to exclude, for example, a test account
-    
+
         // Attempt to get cached data. If not available, the closure will be run to fetch and cache the data.
         $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserIds) {
             $feeds = Feed::with(['user' => function ($query) use ($excludedUserIds) {
@@ -67,14 +67,14 @@ class ApiController extends Controller
             ->take($perPage)
             ->distinct()
             ->get();
-    
+
             return $feeds; // Directly return the fetched feeds
         });
-    
+
         return response()->json($feeds);
     }
-    
-    
+
+
 
 
     public function allCitizen()
@@ -82,7 +82,7 @@ class ApiController extends Controller
         $perPage = 25;
         $cacheKey = 'all_citizens_cache';
         $excludedUserId = '';
-    
+
         $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserId) {
             return Feed::with([
                 'user' => function ($query) use ($excludedUserId) {
@@ -111,18 +111,18 @@ class ApiController extends Controller
             ->take($perPage)
             ->get();
         });
-    
+
         return response()->json($feeds);
     }
-    
-    
 
-    
+
+
+
 
     // public function allApplicants()
     // {
-    //     $perPage = 25; 
-    
+    //     $perPage = 25;
+
     //     $applicants = User::whereHas('profile', function ($query) {
     //         $query->where('has_application', 1);
     //     })
@@ -131,7 +131,7 @@ class ApiController extends Controller
     //         $query->select('user_id', 'public_addr');
     //     }])
     //     ->orderByDesc('id')
-    //     ->paginate($perPage, ['id', 'fullname']); 
+    //     ->paginate($perPage, ['id', 'fullname']);
     //     // Customize the result to match the raw query structure, if needed
     //     $customResult = $applicants->getCollection()->transform(function ($user) {
     //         return [
@@ -140,7 +140,7 @@ class ApiController extends Controller
     //             'address' => $user->hdWallet ? $user->hdWallet->public_addr : null,
     //         ];
     //     });
-    
+
     //     return response()->json([
     //         'current_page' => $applicants->currentPage(),
     //         'data' => $customResult,
@@ -152,7 +152,7 @@ class ApiController extends Controller
 
     public function allApplicants()
     {
-        $perPage = 25; 
+        $perPage = 25;
 
         $applicants = User::whereHas('profile', function ($query) {
             $query->where('has_application', 1);
@@ -162,7 +162,7 @@ class ApiController extends Controller
             $query->select('user_id', 'public_addr');
         }, 'citizen']) // Add citizen relationship
         ->orderByDesc('id')
-        ->paginate($perPage, ['id', 'fullname']); 
+        ->paginate($perPage, ['id', 'fullname']);
 
         $customResult = $applicants->getCollection()->transform(function ($user) {
             return [
@@ -258,12 +258,12 @@ class ApiController extends Controller
         $citizen = Citizen::where('public_address', $address)->first();
         $profile = Profile::where('userid', $martianWallet->user_id)->first();
         $feedItems = Feed::where('userid', $martianWallet->user_id)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
-        
+
         // Fetch the latest 3 activities
         $activity = DB::table('feed')
             ->join('users', 'feed.userid', '=', 'users.id')
             ->join('profile', 'feed.userid', '=', 'profile.userid')
-            ->select('profile.userid', 'users.fullname', 'feed.tag', 'feed.mined') 
+            ->select('profile.userid', 'users.fullname', 'feed.tag', 'feed.mined')
             ->where('feed.userid', $martianWallet->user_id)
             ->orderBy('feed.id', 'desc')
             ->get();
@@ -284,7 +284,7 @@ class ApiController extends Controller
 
 
 
-    public function token(Request $request) 
+    public function token(Request $request)
     {
         $publicAddress = $request->input('a');
         $msg = $request->input('m');
@@ -311,9 +311,9 @@ class ApiController extends Controller
             return response()->json(['error' => 'Request timestamp is too old.'], 401);
         }
 
-        $bitcoinECDSA = new BitcoinECDSA();          
+        $bitcoinECDSA = new BitcoinECDSA();
         $marscoinECDSA = new MarscoinECDSA();
-        if ($marscoinECDSA->checkSignatureForMessage($publicAddress, $sig, $msg))    
+        if ($marscoinECDSA->checkSignatureForMessage($publicAddress, $sig, $msg))
         {
             $wallet = CivicWallet::where('public_addr', $publicAddress)->first();
 
@@ -368,9 +368,9 @@ class ApiController extends Controller
                 return response()->json(['token' => 'inactive']);
 
             $token = $user->createToken('authToken')->plainTextToken;
-            
+
             return response()->json(['token' => $token]);
-        } 
+        }
         else {
             return response()->json(['message' => 'couldnt verify message'], 406);
         }
@@ -383,7 +383,7 @@ class ApiController extends Controller
         $addressM="MCHe2XTUEegyqsYc5ePe2dQiPtixLfhppR";
         $signatureM="H+Qrav6eWNrB0P5DiRaGRRR/RVtD8qd5dKlWA3FOfeiFc4h04769HtfMbsmxrrNPk0MeTJmwPCR9xg67f1NatOA=";
 
-        $bitcoinECDSA = new BitcoinECDSA(); 
+        $bitcoinECDSA = new BitcoinECDSA();
         $bitcoinECDSA->generateRandomPrivateKey(); //generate new random private key
         $address = $bitcoinECDSA->getAddress();
         $message = "Test message";
@@ -425,21 +425,21 @@ class ApiController extends Controller
     //token access
     public function scitizen(Request $request)
 	{
-		
+
         $uid = Auth::user()->id;
         $citcache = Citizen::where('userid', '=', $uid)->first();
-        if(is_null($citcache)) $citcache = new Citizen;	
+        if(is_null($citcache)) $citcache = new Citizen;
         $citcache->userid = $uid;
-        
+
         $firstname = $request->input('firstname');
         $lastname = $request->input('lastname');
         $shortbio = $request->input('shortbio');
         $displayname = $request->input('displayname');
-        
+
         if(isset($firstname) && isset($lastname))
         {
             $fullname = $firstname . " " . $lastname;
-            
+
             $citcache->firstname = $firstname;
             $citcache->lastname = $lastname;
             $user = User::where('id', '=', $uid)->first();
@@ -463,7 +463,7 @@ class ApiController extends Controller
             $profile->has_application = 1;
             $profile->save();
         }
-        
+
         $citcache->save();
         // Fetch profile data
         $profile = Profile::where('userid', '=', $uid)->first();
@@ -491,22 +491,39 @@ class ApiController extends Controller
         $dataPic = $request->input('picture');
         $type = $request->input('type');
         $public_address = $request->input('address');
-        $file_path = "./assets/citizen/" . $public_address . "/";
-        if (!file_exists($file_path)) {
-            mkdir($file_path);
+
+        // --- SECURITY: Sanitize the public_address to prevent directory traversal ---
+        $safeAddress = AppHelper::sanitizePathSegment($public_address);
+        if ($safeAddress === null) {
+            return response()->json(['error' => 'Invalid address format.'], 400);
         }
-        list($type, $dataPic) = explode(';', $dataPic);
-        list(, $type) = explode('/', $type);
-        $file_path = "./assets/citizen/" . $public_address . "/profile_pic." . $type;
-        //if (!file_exists($file_path)) { overwrite by default
-        
-        list(, $dataPic) = explode(',', $dataPic);
-        $dataPic = base64_decode($dataPic);
-        file_put_contents($file_path, $dataPic);
+
+        // --- SECURITY: Validate the base64 image data (extension, MIME, size, PHP code) ---
+        $validation = AppHelper::validateBase64Image($dataPic);
+        if (!$validation['valid']) {
+            Log::warning('pinpic upload rejected: ' . $validation['error'] . ' (user: ' . $uid . ')');
+            return response()->json(['error' => $validation['error']], 422);
+        }
+
+        $safeExtension = $validation['extension'];
+        $decodedData = $validation['data'];
+
+        $file_path = "./assets/citizen/" . $safeAddress . "/";
+        if (!file_exists($file_path)) {
+            mkdir($file_path, 0755, true);
+        }
+
+        // --- SECURITY: Write .htaccess to prevent PHP execution in upload dir ---
+        AppHelper::writeUploadHtaccess($file_path);
+
+        // Use validated extension, not user-supplied one
+        $file_path = "./assets/citizen/" . $safeAddress . "/profile_pic." . $safeExtension;
+
+        file_put_contents($file_path, $decodedData);
         $hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
 
         $citcache = Citizen::where('userid', '=', $uid)->first();
-        if(is_null($citcache)) $citcache = new Citizen;	
+        if(is_null($citcache)) $citcache = new Citizen;
         $citcache->userid = $uid;
         $citcache->avatar_link = "https://ipfs.marscoin.org/ipfs/".$hash;
         $citcache->save();
@@ -526,22 +543,43 @@ class ApiController extends Controller
         $dataPic = $request->input('file');
         $type = $request->input('type');
         $public_address = $request->input('address');
-        Log::debug('public: ' . $public_address);
+
+        // --- SECURITY: Sanitize the public_address to prevent directory traversal ---
+        $safeAddress = AppHelper::sanitizePathSegment($public_address);
+        if ($safeAddress === null) {
+            return response()->json(['error' => 'Invalid address format.'], 400);
+        }
+
+        Log::debug('public: ' . $safeAddress);
         if ($request->hasFile('file'))
         {
+            // --- SECURITY: Validate the uploaded file (extension, MIME, size, PHP code) ---
+            $uploadedFile = $request->file('file');
+            $validation = AppHelper::validateUploadedFile($uploadedFile, [
+                'webm' => ['video/webm', 'audio/webm'],
+            ]);
+            if (!$validation['valid']) {
+                Log::warning('pinvideo upload rejected: ' . $validation['error'] . ' (user: ' . $uid . ')');
+                return response()->json(['error' => $validation['error']], 422);
+            }
+
             Log::debug('storing file');
-            $file_path = "./assets/citizen/" . $public_address . "/";
+            $file_path = "./assets/citizen/" . $safeAddress . "/";
             if (!file_exists($file_path)) {
-                mkdir($file_path);
+                mkdir($file_path, 0755, true);
                 Log::debug('making dir');
             }
-            $file_path = "./assets/citizen/" . $public_address  . "/";
+
+            // --- SECURITY: Write .htaccess to prevent PHP execution in upload dir ---
+            AppHelper::writeUploadHtaccess($file_path);
+
+            $file_path = "./assets/citizen/" . $safeAddress  . "/";
             $request->file('file')->move($file_path, "profile_video.webm" );
             $file_path = $file_path . "profile_video.webm";
             $hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
             Log::debug('upload complete: ' . $hash);
             $citcache = Citizen::where('userid', '=', $uid)->first();
-            if(is_null($citcache)) $citcache = new Citizen;	
+            if(is_null($citcache)) $citcache = new Citizen;
             $citcache->userid = $uid;
             $citcache->liveness_link = "https://ipfs.marscoin.org/ipfs/".$hash;
             $citcache->save();
@@ -551,7 +589,7 @@ class ApiController extends Controller
         }else{
             Log::debug('no file found!');
         }
-			
+
 	}
 
     public function marsAuth(Request $request)
@@ -594,12 +632,12 @@ class ApiController extends Controller
     {
         $session_string = $request->query('sid');
         $session = MSession::where('sid', $session_string)->first();
-    
-        $authenticated = (!is_null($session) && !empty($session->s)) ? true : false; 
-    
+
+        $authenticated = (!is_null($session) && !empty($session->s)) ? true : false;
+
         return response()->json(['sid' => $session_string, 'authenticated' => $authenticated]);
     }
-    
+
     private function fastcode($status, $message)
     {
         return response()->json(["status" => $status, "message" => $message], $status);
@@ -671,8 +709,38 @@ class ApiController extends Controller
 		$public_address = $request->input('address');
 		$type = $request->input('type');
 		$json = $request->input('payload');
+
+		// --- SECURITY: Sanitize the public_address to prevent directory traversal ---
+		$safeAddress = AppHelper::sanitizePathSegment($public_address);
+		if ($safeAddress === null) {
+			return response()->json(['error' => 'Invalid address format.'], 400);
+		}
+
+		// --- SECURITY: Sanitize the type parameter to prevent path traversal ---
+		$safeType = AppHelper::sanitizePathSegment($type);
+		if ($safeType === null) {
+			return response()->json(['error' => 'Invalid type format.'], 400);
+		}
+
+		// --- SECURITY: Check file size (max 5MB) ---
+		if (strlen($json) > 5242880) {
+			return response()->json(['error' => 'Payload exceeds maximum size of 5MB.'], 422);
+		}
+
+		// --- SECURITY: Reject payloads containing PHP code ---
+		if (AppHelper::containsPhpCode($json)) {
+			Log::warning('pinjson rejected: payload contains PHP code');
+			return response()->json(['error' => 'Payload contains potentially dangerous content.'], 422);
+		}
+
+		// --- SECURITY: Validate that payload is valid JSON ---
+		$decodedJson = json_decode($json);
+		if ($json !== '' && json_last_error() !== JSON_ERROR_NONE) {
+			return response()->json(['error' => 'Invalid JSON payload.'], 422);
+		}
+
 		$projectRoot = config('app.project_root', base_path());
-		$base_path =  $projectRoot . "/assets/citizen/" . $public_address;
+		$base_path =  $projectRoot . "/assets/citizen/" . $safeAddress;
 
 		// Check and create the directory if it doesn't exist
 		Log::info($base_path);
@@ -685,14 +753,17 @@ class ApiController extends Controller
 			}
 			Log::info("Directory created: " . $base_path);
 		}
-		
+
 		// Check if the directory is writable, regardless of whether it was just created or already existed
 		if (!is_writable($base_path)) {
 			Log::error("Directory not writable: " . $base_path);
 			return response()->json(["error" => "Directory is not writable. Check permissions."], 500);
 		}
 
-		$file_path = $base_path . "/" . $type . ".json";
+		// --- SECURITY: Write .htaccess to prevent PHP execution in upload dir ---
+		AppHelper::writeUploadHtaccess($base_path);
+
+		$file_path = $base_path . "/" . $safeType . ".json";
 
 		// Attempt to write the JSON data to the file
 		if (file_put_contents($file_path, $json) === false) {
@@ -701,9 +772,9 @@ class ApiController extends Controller
 
 		try {
 			Log::info("PermaJson: " . $file_path);
-		
+
 			// Check if the type contains the word 'log'
-			if (strpos($type, 'log') !== false) {
+			if (strpos($safeType, 'log') !== false) {
 				// The type contains 'log', use uploadFolder
 				$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
 			} else {
@@ -717,7 +788,7 @@ class ApiController extends Controller
 				Log::error("Upload error: Formatting");
 				return response()->json(["error"=>"formatting error"], 500);
 			}
-			
+
 			return response()->json($formattedResponse, 200)->header('Content-Type', "application/json;");
 		} catch (\Exception $e) {
 			// Handle exceptions during the upload and pinning process
@@ -730,7 +801,7 @@ class ApiController extends Controller
         $threads = $this->fetchThreads($categoryId);
         return response()->json(['threads' => $threads]);
     }
-    
+
     // private function fetchThreads($categoryId) {
     //     $threads = DB::table('forum_threads')
     //         ->where('forum_threads.category_id', $categoryId)
@@ -750,7 +821,7 @@ class ApiController extends Controller
 
     private function fetchThreads($categoryId) {
         $userId = Auth::id();
-    
+
         $threads = DB::table('forum_threads')
             ->where('forum_threads.category_id', $categoryId)
             ->leftJoin('users', 'forum_threads.author_id', '=', 'users.id')
@@ -769,7 +840,7 @@ class ApiController extends Controller
             )
             ->orderBy('forum_threads.created_at', 'desc')
             ->get();
-    
+
         return $threads;
     }
 
@@ -779,13 +850,13 @@ class ApiController extends Controller
         $comments = $this->fetchCommentsByThread($threadId);
         return response()->json(['comments' => $comments]);
     }
-    
+
     // private function fetchCommentsByThread($threadId) {
     //     // The query as outlined above
     //     // Return the collection of comments
     //     $query = "
     //         WITH RECURSIVE CommentTree AS (
-    //             SELECT 
+    //             SELECT
     //                 p.id,
     //                 p.thread_id,
     //                 p.author_id,
@@ -793,14 +864,14 @@ class ApiController extends Controller
     //                 p.post_id as pid,
     //                 p.created_at,
     //                 CHAR_LENGTH(p.content) as char_length_sum
-    //             FROM 
+    //             FROM
     //                 forum_posts p
-    //             WHERE 
+    //             WHERE
     //                 p.thread_id = ? AND p.post_id IS NULL
 
     //             UNION ALL
 
-    //             SELECT 
+    //             SELECT
     //                 p.id,
     //                 p.thread_id,
     //                 p.author_id,
@@ -808,12 +879,12 @@ class ApiController extends Controller
     //                 p.post_id,
     //                 p.created_at,
     //                 ct.char_length_sum + CHAR_LENGTH(p.content)
-    //             FROM 
+    //             FROM
     //                 forum_posts p
-    //             INNER JOIN 
+    //             INNER JOIN
     //                 CommentTree ct ON p.post_id = ct.id
     //         )
-    //         SELECT 
+    //         SELECT
     //             ct.id,
     //             ct.thread_id,
     //             ct.author_id,
@@ -822,11 +893,11 @@ class ApiController extends Controller
     //             ct.created_at,
     //             ct.pid,
     //             CHAR_LENGTH(ct.content) as char_length_sum
-    //         FROM 
+    //         FROM
     //             CommentTree ct
     //         LEFT JOIN users u ON ct.author_id = u.id
     //         LEFT JOIN profile pr ON ct.author_id = pr.userid
-    //         ORDER BY 
+    //         ORDER BY
     //             ct.pid ASC,
     //             ct.created_at ASC;
     //     ";
@@ -839,10 +910,10 @@ class ApiController extends Controller
 
     private function fetchCommentsByThread($threadId) {
         $userId = Auth::id();
-        
+
         $query = "
             WITH RECURSIVE CommentTree AS (
-                SELECT 
+                SELECT
                     p.id,
                     p.thread_id,
                     p.author_id,
@@ -850,14 +921,14 @@ class ApiController extends Controller
                     p.post_id as pid,
                     p.created_at,
                     CHAR_LENGTH(p.content) as char_length_sum
-                FROM 
+                FROM
                     forum_posts p
-                WHERE 
+                WHERE
                     p.thread_id = ? AND p.post_id IS NULL
-    
+
                 UNION ALL
-    
-                SELECT 
+
+                SELECT
                     p.id,
                     p.thread_id,
                     p.author_id,
@@ -865,12 +936,12 @@ class ApiController extends Controller
                     p.post_id,
                     p.created_at,
                     ct.char_length_sum + CHAR_LENGTH(p.content)
-                FROM 
+                FROM
                     forum_posts p
-                INNER JOIN 
+                INNER JOIN
                     CommentTree ct ON p.post_id = ct.id
             )
-            SELECT 
+            SELECT
                 ct.id,
                 ct.thread_id,
                 ct.author_id,
@@ -880,30 +951,30 @@ class ApiController extends Controller
                 ct.pid,
                 CHAR_LENGTH(ct.content) as char_length_sum,
                 IF(ub.blocked_user_id IS NOT NULL, true, false) as is_blocked
-            FROM 
+            FROM
                 CommentTree ct
             LEFT JOIN users u ON ct.author_id = u.id
             LEFT JOIN profile pr ON ct.author_id = pr.userid
             LEFT JOIN user_blocks ub ON ub.blocked_user_id = ct.author_id AND ub.user_id = ?
-            ORDER BY 
+            ORDER BY
                 ct.pid ASC,
                 ct.created_at ASC;
         ";
-    
+
         $comments = DB::select($query, [$threadId, $userId]);
         $commentsCollection = collect($comments);
         return response()->json(['comments' => $commentsCollection]);
     }
-    
+
 
     public function getAllCategoriesWithThreads() {
         $categories = DB::table('forum_categories')
             ->get();
-    
+
         foreach ($categories as $category) {
             $category->threads = $this->fetchThreads($category->id);
         }
-    
+
         return response()->json(['categories' => $categories]);
     }
 
@@ -967,18 +1038,18 @@ class ApiController extends Controller
     }
 
 
-    public function blockUser(Request $request, $id) 
+    public function blockUser(Request $request, $id)
     {
-        Log::debug("in function"); 
+        Log::debug("in function");
 	$uid = Auth::user()->id;
 	Log::debug("auth happened");
-        $blockedUserId = $id; 
-    
+        $blockedUserId = $id;
+
         // Insert into `user_blocks` table if not already blocked
         DB::table('user_blocks')->updateOrInsert(
             ['user_id' => $uid, 'blocked_user_id' => $blockedUserId]
         );
-    
+
         return response()->json(['message' => 'User blocked successfully'], 201);
     }
 
@@ -986,10 +1057,10 @@ class ApiController extends Controller
     {
         $uid = Auth::user()->id;
         $profile = Profile::where('userid', $uid)->firstOrFail();
-        
+
         return response()->json([
             'is_signed' => (bool)$profile->signed_eula
-        ]); 
+        ]);
     }
 
     public function setEula(Request $request)
@@ -1007,34 +1078,35 @@ class ApiController extends Controller
     }
 
 
-    // App/Http/Controllers/ApiController.php
     public function deleteUser(Request $request, $id)
     {
         try {
-            // Find the user
+            // Users can only deactivate their own account
+            $authUser = Auth::user();
+            if ((int) $authUser->id !== (int) $id) {
+                return response()->json(['message' => 'Unauthorized: you can only delete your own account.'], 403);
+            }
+
             $user = User::findOrFail($id);
-            
-            
-            Log::debug("Deleting... ". $id);
-           
+
+            Log::debug("Deleting... " . $id);
+
             $user->update([
                 'status' => 'inactive'
             ]);
             Log::debug("Status updated");
-            
+
             // Revoke all tokens
             if (method_exists($user, 'tokens')) {
                 $user->tokens()->delete();
             }
             Log::debug("Token wiped...");
 
-            DB::commit();
-            
             return response()->json([
                 'message' => 'User deleted successfully'
             ], 200);
-            
-            
+
+
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'User not found'

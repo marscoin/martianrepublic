@@ -18,7 +18,7 @@ class CitizenStats extends Component
         $uid = Auth::user()->id;
 		$civic = CivicWallet::where('user_id', '=', $uid)->first();
         $this->userId = $uid;
-        $this->userAddress = $civic->public_addr;
+        $this->userAddress = $civic ? $civic->public_addr : '';
     }
 
     public function render()

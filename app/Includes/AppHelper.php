@@ -14,6 +14,281 @@ use App\Models\Citizen;
 
 class AppHelper{
 
+		/**
+		 * =========================================================================
+		 * FILE UPLOAD SECURITY HELPERS
+		 * =========================================================================
+		 * Added to prevent malicious file uploads (PHP shells, etc.).
+		 * Every upload endpoint MUST call one of these validation methods.
+		 */
+
+		/**
+		 * Dangerous file extensions that must never be uploaded.
+		 * This blocklist prevents execution of server-side scripts.
+		 */
+		private static $blockedExtensions = [
+			'php', 'phtml', 'php5', 'php7', 'php8', 'phar', 'phps',
+			'cgi', 'pl', 'py', 'sh', 'bash', 'exe', 'bat', 'cmd',
+			'asp', 'aspx', 'jsp', 'shtml', 'htaccess', 'svg',
+		];
+
+		/**
+		 * Allowed image extensions and their corresponding MIME types.
+		 */
+		private static $allowedImageTypes = [
+			'jpg'  => ['image/jpeg'],
+			'jpeg' => ['image/jpeg'],
+			'png'  => ['image/png'],
+			'gif'  => ['image/gif'],
+			'webp' => ['image/webp'],
+		];
+
+		/**
+		 * Allowed extensions for general file uploads (images + json + webm video).
+		 */
+		private static $allowedUploadTypes = [
+			'jpg'  => ['image/jpeg'],
+			'jpeg' => ['image/jpeg'],
+			'png'  => ['image/png'],
+			'gif'  => ['image/gif'],
+			'webp' => ['image/webp'],
+			'json' => ['application/json', 'text/plain'],
+			'webm' => ['video/webm', 'audio/webm'],
+			'markdown' => ['text/plain', 'text/markdown'],
+		];
+
+		/**
+		 * Maximum upload file size in bytes (5 MB).
+		 */
+		private static $maxFileSize = 5242880;
+
+		/**
+		 * Check if a file extension is on the blocklist.
+		 *
+		 * @param string $extension
+		 * @return bool True if the extension is blocked (dangerous).
+		 */
+		public static function isExtensionBlocked(string $extension): bool
+		{
+			return in_array(strtolower(trim($extension)), self::$blockedExtensions, true);
+		}
+
+		/**
+		 * Validate an uploaded file (from $request->file()) for security.
+		 * Checks extension blocklist, allowed extensions, MIME type, and file size.
+		 *
+		 * @param \Illuminate\Http\UploadedFile $file
+		 * @param array|null $allowedTypes Associative array of ext => [mimes]. Defaults to $allowedUploadTypes.
+		 * @return array ['valid' => bool, 'error' => string|null]
+		 */
+		public static function validateUploadedFile($file, ?array $allowedTypes = null): array
+		{
+			if (!$file || !$file->isValid()) {
+				return ['valid' => false, 'error' => 'No valid file provided.'];
+			}
+
+			$allowedTypes = $allowedTypes ?? self::$allowedUploadTypes;
+
+			// Check file size (max 5MB)
+			if ($file->getSize() > self::$maxFileSize) {
+				return ['valid' => false, 'error' => 'File exceeds maximum size of 5MB.'];
+			}
+
+			// Get and check extension against blocklist
+			$extension = strtolower($file->getClientOriginalExtension());
+			if (self::isExtensionBlocked($extension)) {
+				Log::warning('Blocked file upload attempt with dangerous extension: ' . $extension);
+				return ['valid' => false, 'error' => 'File type is not allowed (blocked extension: ' . $extension . ').'];
+			}
+
+			// Check extension is in the allowed list
+			if (!array_key_exists($extension, $allowedTypes)) {
+				return ['valid' => false, 'error' => 'File extension .' . $extension . ' is not permitted.'];
+			}
+
+			// Validate MIME type server-side using finfo (do NOT trust client-reported type)
+			$finfo = new \finfo(FILEINFO_MIME_TYPE);
+			$detectedMime = $finfo->file($file->getRealPath());
+			$allowedMimes = $allowedTypes[$extension];
+
+			if (!in_array($detectedMime, $allowedMimes, true)) {
+				Log::warning('File MIME mismatch: extension=' . $extension . ', detected=' . $detectedMime);
+				return ['valid' => false, 'error' => 'File MIME type (' . $detectedMime . ') does not match expected type for .' . $extension . '.'];
+			}
+
+			// Check for embedded PHP code in the file contents
+			$contents = file_get_contents($file->getRealPath());
+			if ($contents !== false && self::containsPhpCode($contents)) {
+				Log::warning('Blocked file upload containing PHP code');
+				return ['valid' => false, 'error' => 'File contains potentially dangerous content.'];
+			}
+
+			return ['valid' => true, 'error' => null];
+		}
+
+		/**
+		 * Validate a base64-decoded image for security.
+		 * Checks the extracted extension against blocklist and allowed list,
+		 * validates the decoded binary data MIME type via finfo, and checks size.
+		 *
+		 * @param string $dataUri The full data URI (e.g. "data:image/png;base64,iVBOR...")
+		 * @return array ['valid' => bool, 'error' => string|null, 'extension' => string|null, 'data' => string|null]
+		 */
+		public static function validateBase64Image(string $dataUri): array
+		{
+			// Parse the data URI -- expected format: "data:image/png;base64,XXXX"
+			$parts = explode(';', $dataUri, 2);
+			if (count($parts) < 2) {
+				return ['valid' => false, 'error' => 'Invalid data URI format.', 'extension' => null, 'data' => null];
+			}
+
+			// Extract the MIME type from the data URI header (e.g. "data:image/png")
+			$typePart = $parts[0];
+			$mimeFromUri = '';
+			if (strpos($typePart, '/') !== false) {
+				$colonPos = strpos($typePart, ':');
+				if ($colonPos !== false) {
+					$mimeFromUri = substr($typePart, $colonPos + 1);
+				}
+			}
+
+			// Extract the extension from the MIME type
+			$extension = '';
+			if (strpos($mimeFromUri, '/') !== false) {
+				list(, $extension) = explode('/', $mimeFromUri, 2);
+			}
+			$extension = strtolower(trim($extension));
+
+			// Normalize jpeg -> jpg for consistency
+			$lookupExt = ($extension === 'jpeg') ? 'jpg' : $extension;
+
+			// Check blocked extensions
+			if (self::isExtensionBlocked($extension) || self::isExtensionBlocked($lookupExt)) {
+				Log::warning('Blocked base64 upload attempt with dangerous type: ' . $extension);
+				return ['valid' => false, 'error' => 'File type is not allowed (blocked type: ' . $extension . ').', 'extension' => null, 'data' => null];
+			}
+
+			// Check allowed image types
+			if (!array_key_exists($lookupExt, self::$allowedImageTypes)) {
+				return ['valid' => false, 'error' => 'Image type .' . $lookupExt . ' is not permitted. Allowed: jpg, png, gif, webp.', 'extension' => null, 'data' => null];
+			}
+
+			// Decode the base64 data
+			$dataPart = $parts[1];
+			if (strpos($dataPart, ',') === false) {
+				return ['valid' => false, 'error' => 'Invalid base64 data format.', 'extension' => null, 'data' => null];
+			}
+			list(, $base64Data) = explode(',', $dataPart, 2);
+			$decodedData = base64_decode($base64Data, true);
+
+			if ($decodedData === false) {
+				return ['valid' => false, 'error' => 'Failed to decode base64 data.', 'extension' => null, 'data' => null];
+			}
+
+			// Check file size (max 5MB)
+			if (strlen($decodedData) > self::$maxFileSize) {
+				return ['valid' => false, 'error' => 'Image exceeds maximum size of 5MB.', 'extension' => null, 'data' => null];
+			}
+
+			// Validate actual MIME type of the decoded binary data using finfo
+			$finfo = new \finfo(FILEINFO_MIME_TYPE);
+			$detectedMime = $finfo->buffer($decodedData);
+
+			$acceptableMimes = self::$allowedImageTypes[$lookupExt] ?? [];
+			if (!in_array($detectedMime, $acceptableMimes, true)) {
+				Log::warning('Base64 image MIME mismatch: claimed=' . $extension . ', detected=' . $detectedMime);
+				return ['valid' => false, 'error' => 'Detected MIME type (' . $detectedMime . ') does not match claimed image type (' . $lookupExt . ').', 'extension' => null, 'data' => null];
+			}
+
+			// Check for embedded PHP code
+			if (self::containsPhpCode($decodedData)) {
+				Log::warning('Blocked base64 image upload containing PHP code');
+				return ['valid' => false, 'error' => 'Image contains potentially dangerous content.', 'extension' => null, 'data' => null];
+			}
+
+			return ['valid' => true, 'error' => null, 'extension' => $lookupExt, 'data' => $decodedData];
+		}
+
+		/**
+		 * Sanitize a path segment (e.g. a public address) for safe use in file paths.
+		 * Prevents directory traversal attacks by stripping path separators and
+		 * enforcing an alphanumeric-only pattern.
+		 *
+		 * @param string $input
+		 * @return string|null Returns sanitized string or null if invalid.
+		 */
+		public static function sanitizePathSegment(string $input): ?string
+		{
+			// Use basename to strip any directory components
+			$sanitized = basename($input);
+			// Only allow alphanumeric characters, underscores, and hyphens
+			if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $sanitized) || empty($sanitized)) {
+				return null;
+			}
+			return $sanitized;
+		}
+
+		/**
+		 * Validate a Marscoin address format (Base58Check starting with 'M').
+		 * Valid Marscoin addresses are 25-35 characters, start with 'M',
+		 * and only use Base58 characters (no 0, O, I, l).
+		 */
+		public static function isValidMarscoinAddress(string $address): bool
+		{
+			return (bool) preg_match('/^M[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{24,34}$/', $address);
+		}
+
+		/**
+		 * Validate an IPFS CID format (CIDv0 starting with 'Qm' or CIDv1 starting with 'b').
+		 */
+		public static function isValidCID(string $cid): bool
+		{
+			// CIDv0: starts with Qm, 46 chars total, Base58
+			$cidv0 = '/^Qm[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{44}$/';
+			// CIDv1: starts with b, base32 encoded
+			$cidv1 = '/^b[a-z2-7]{58,}$/';
+			return (bool) (preg_match($cidv0, $cid) || preg_match($cidv1, $cid));
+		}
+
+		/**
+		 * Check if content contains PHP code markers that could be executed
+		 * if the file is somehow served through the web server.
+		 *
+		 * @param string $content
+		 * @return bool True if content contains PHP code indicators.
+		 */
+		public static function containsPhpCode(string $content): bool
+		{
+			$patterns = ['<?php', '<?=', '<? ', "<?\n", "<?\r", '<%', '<script language="php"', '<script language=\'php\''];
+			foreach ($patterns as $pattern) {
+				if (stripos($content, $pattern) !== false) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * Write an .htaccess file in the upload directory to prevent PHP execution.
+		 * This is a defense-in-depth measure.
+		 *
+		 * @param string $directory
+		 * @return void
+		 */
+		public static function writeUploadHtaccess(string $directory): void
+		{
+			$htaccessPath = rtrim($directory, '/') . '/.htaccess';
+			if (!file_exists($htaccessPath)) {
+				$htaccessContent = "# Prevent PHP execution in upload directories\n";
+				$htaccessContent .= "php_flag engine off\n";
+				$htaccessContent .= "<FilesMatch \"\\.(php|phtml|php5|php7|php8|phar|phps|cgi|pl|py|sh|asp|aspx|jsp)$\">\n";
+				$htaccessContent .= "    Require all denied\n";
+				$htaccessContent .= "</FilesMatch>\n";
+				$htaccessContent .= "AddHandler default-handler .php .phtml .php5 .phar\n";
+				@file_put_contents($htaccessPath, $htaccessContent);
+			}
+		}
+
 
 		public static function ago($time)
 		{
@@ -48,7 +323,7 @@ class AppHelper{
 			$total = json_decode($json2, true);
 			if ($total && count($total) > 0)
 				$array["coincount"] = round($total['txoutsetinfo']['total_amount'], 2);
-			
+
 			return $array;
 		}
 
@@ -79,7 +354,7 @@ class AppHelper{
 			$headers = array("Content-Type" => "multipart/form-data");
 			$curl_handle = curl_init();
 			curl_setopt($curl_handle, CURLOPT_URL, $url);
-	
+
 			curl_setopt($curl_handle, CURLOPT_HTTPHEADER, $headers);
 			curl_setopt($curl_handle, CURLOPT_POST, TRUE);
 			curl_setopt($curl_handle, CURLOPT_POSTFIELDS, $postField);
@@ -125,24 +400,24 @@ class AppHelper{
 			if (!is_dir($filepath) || !is_readable($filepath)) {
 				throw new \Exception("Directory is not accessible");
 			}
-		
+
 			$files = scandir($filepath);
 			$data = [];
 			$headers = ["Content-Type: multipart/form-data"];
 			$ch = curl_init($url);
-		
+
 			foreach ($files as $i => $filep) {
 				$filename = realpath($filepath . "/" . $filep);
 				if (!is_file($filename)) {
 					continue;
 				}
-		
+
 				$finfo = new \finfo(FILEINFO_MIME_TYPE);
 				$mimetype = $finfo->file($filename);
 				$cfile = curl_file_create($filename, $mimetype, basename($filename));
 				$data['file['.$i.']'] = $cfile;
 			}
-		
+
 			curl_setopt_array($ch, [
 				CURLOPT_URL => $url,
 				CURLOPT_POST => true,
@@ -150,17 +425,17 @@ class AppHelper{
 				CURLOPT_HTTPHEADER => $headers,
 				CURLOPT_RETURNTRANSFER => true,
 			]);
-		
+
 			$result = curl_exec($ch);
 			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			curl_close($ch);
-		
+
 			if ($httpCode < 200 || $httpCode >= 300) {
 				$details = json_decode($result, true);
 				$errorMsg = $details['msg'] ?? 'Unknown error occurred';
 				throw new \Exception($errorMsg);
 			}
-		
+
 			//print_r($result);
 			//die;
 			// Prepare the result string by wrapping with brackets and replacing the '}{'
@@ -169,11 +444,11 @@ class AppHelper{
 
 			// Decode the JSON array string
 			$jsonResult = json_decode($resultArrayString, true);
-		
+
 			if (json_last_error() !== JSON_ERROR_NONE) {
 				throw new \Exception('Invalid JSON returned from API');
 			}
-		
+
 			// Now $jsonResult is a proper array
 			// Search for the folder hash by finding the object with an empty "Name"
 			$folderHash = "";
@@ -191,7 +466,7 @@ class AppHelper{
 				// Handle the case where no folder hash was found
 				throw new \Exception('Folder hash not found in API response');
 			}
-		
+
 		}
 
 
@@ -232,7 +507,7 @@ class AppHelper{
 			return $user;
 		}
 
-		
+
 		/**
 		 * @todo Pulls in user data from IPFS links as per blockchain
 		 */
@@ -271,7 +546,7 @@ class AppHelper{
 
 
 		/**
-		 * Helper function keeping a local cache of the Marscoin blockchain embedded data feed 
+		 * Helper function keeping a local cache of the Marscoin blockchain embedded data feed
 		 * as it pertains to MartianRepublic protocol anchors.
 		 */
 		public static function insertBlockchainCache($address, $uid, $action_tag, $message, $embedded_link, $txid)
@@ -281,12 +556,12 @@ class AppHelper{
 								->where('tag', $action_tag)
 								->where('txid', $txid)
 								->first();
-		
+
 			if ($existingFeed) {
 				// If a duplicate is found, return the txid
-				return $existingFeed->txid; 
+				return $existingFeed->txid;
 			}
-		
+
 			// If no duplicate, proceed to create a new entry
 			$feed = new Feed;
 			if ($uid) {
@@ -301,10 +576,10 @@ class AppHelper{
 			$feed->embedded_link = $embedded_link;
 			$feed->txid = $txid;
 			$feed->save();
-		
-			return true; 
+
+			return true;
 		}
-		
+
 
 
 		public static function insertPublicationCache($uid, $local_path, $ipfs_hash, $title)
@@ -322,7 +597,7 @@ class AppHelper{
 		}
 
 
-		public static function time_elapsed_string($datetime, $full = false) 
+		public static function time_elapsed_string($datetime, $full = false)
 		{
 			date_default_timezone_set('America/New_York');
 		    $now = new DateTime;
@@ -353,18 +628,18 @@ class AppHelper{
 		    return $string ? implode(', ', $string) . ' ago' : 'just now';
 		}
 
-		public static function days_elapsed_string($datetime, $full = false) 
+		public static function days_elapsed_string($datetime, $full = false)
 		{
 			date_default_timezone_set('America/New_York');
 		    $now = new DateTime;
 		    $ago = new DateTime($datetime);
 				$diff = $now->diff($ago);
-				
+
 				return $diff->days;
 		}
 
 
-		public static function hex2str($hex) 
+		public static function hex2str($hex)
 		{
 		    $str = '';
 		    for($i=0;$i<strlen($hex);$i+=2) $str .= chr(hexdec(substr($hex,$i,2)));
@@ -496,7 +771,7 @@ class AppHelper{
 		{
 			$url = "http://explore2.marscoin.org/api/status?q=getInfo";
 			$cacheKey = 'marscoin_network_info';
-		
+
 			$networkInfo = Cache::remember($cacheKey, 60, function () use ($url) {
 				try {
 					$response = file_get_contents($url);
@@ -510,13 +785,13 @@ class AppHelper{
 				}
 				return []; // Also return an empty array if the API does not return a valid response
 			});
-		
+
 			return $networkInfo;
 		}
 
 		 /**
 		 * Check for recent posts in the forum.
-		 * 
+		 *
 		 * @return int Number of recent posts.
 		 */
 		public static function checkForRecentPosts()
@@ -533,7 +808,7 @@ class AppHelper{
 
 		/**
 		 * Determines the Citizen Status of a user.
-		 * 
+		 *
 		 * @param int $userId The ID of the user.
 		 * @return object An associative array containing the 'status' and 'type'.
 		 */
@@ -560,7 +835,7 @@ class AppHelper{
 						'type' => 'GP',
 					];
 				}
-				
+
 				// Check if the user is a citizen.
 				$isCitizen = Citizen::where('userid', $userId)->exists();
 				if ($isCitizen) {
@@ -578,21 +853,21 @@ class AppHelper{
 		public static function createSlug($id, $title) {
 			// Step 1: Concatenate
 			$combined = $id . '-' . $title;
-			
+
 			// Step 2: Lowercase
 			$combined = strtolower($combined);
-			
+
 			// Step 3: Remove special characters
 			$combined = preg_replace('/[^a-z0-9\s-]/', '', $combined);
-			
+
 			// Step 4: Trim whitespace
 			$combined = trim($combined);
-			
+
 			// Step 5: Replace spaces and underscores with hyphens
 			$combined = preg_replace('/[\s_]+/', '-', $combined);
-			
+
 			// Step 6: Ensure uniqueness (not implemented here, depends on context)
-			
+
 			return $combined;
 		}
 

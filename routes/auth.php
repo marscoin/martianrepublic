@@ -17,21 +17,21 @@ Route::middleware(['web'])->group(function ()
                     ->name('register');
 
     Route::post('/signup', [RegisteredUserController::class, 'store'])
-                    ->middleware('guest');
+                    ->middleware(['guest', 'throttle:5,1']);
 
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])
                     ->middleware('guest')
                     ->name('login');
 
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-                    ->middleware('guest');
+                    ->middleware(['guest', 'throttle:10,1']);
 
     Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
                     ->middleware('guest')
                     ->name('password.request');
 
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
-                    ->middleware('guest')
+                    ->middleware(['guest', 'throttle:5,1'])
                     ->name('password.email');
 
     Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])
@@ -39,7 +39,7 @@ Route::middleware(['web'])->group(function ()
                     ->name('password.reset');
 
     Route::post('/reset-password', [NewPasswordController::class, 'store'])
-                    ->middleware('guest')
+                    ->middleware(['guest', 'throttle:5,1'])
                     ->name('password.update');
 
     Route::get('/verify-email', [EmailVerificationPromptController::class, '__invoke'])
@@ -61,7 +61,7 @@ Route::middleware(['web'])->group(function ()
     Route::post('/confirm-password', [ConfirmablePasswordController::class, 'store'])
                     ->middleware('auth');
 
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    Route::match(['get', 'post'], '/logout', [AuthenticatedSessionController::class, 'destroy'])
                     ->middleware('auth')
                     ->name('logout');
                 

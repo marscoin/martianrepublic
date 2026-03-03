@@ -24,14 +24,18 @@ class CivicActivityFeed extends Component
     {
         // Assuming you want to load activities related to the logged-in user
         $this->citcache = Citizen::where('userid', $this->userId)->first();
+        if (!$this->citcache) {
+            $this->activities = collect();
+            return;
+        }
         $publicAddress = $this->citcache->public_address;
         $this->activities = Feed::where(function ($query) use ($publicAddress) {
             $query->where('userid', $this->userId)
                   ->orWhere('message', 'like', '%' . $publicAddress . '%');
         })
-        ->whereIn('tag', ['ED', 'SP', 'GP', 'CT', 'LB']) 
-        ->orderBy('mined', 'desc') 
-        ->orderBy('id', 'desc') 
+        ->whereIn('tag', ['ED', 'SP', 'GP', 'CT', 'LB'])
+        ->orderBy('mined', 'desc')
+        ->orderBy('id', 'desc')
         ->take(10)
         ->get();
         

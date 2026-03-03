@@ -17,15 +17,15 @@ class DashboardStats extends Component
         $uid = Auth::user()->id;
         $profile = Profile::where('userid', '=', $uid)->first();
         $openwallet = null;
-        if($profile->wallet_open > 0)
+        if($profile && $profile->wallet_open > 0)
         {
             $openwallet = HDWallet::where('id', '=', $profile->wallet_open)->first();
-            $this->public_addr =  $openwallet->public_address;
+            $this->public_addr = $openwallet ? $openwallet->public_address : 'n/a';
         }
-        else if ($profile->civic_wallet_open > 0)
+        else if ($profile && $profile->civic_wallet_open > 0)
         {
             $openwallet = CivicWallet::where('id', '=', $profile->civic_wallet_open)->first();
-            $this->public_addr =  $openwallet->public_address;
+            $this->public_addr = $openwallet ? $openwallet->public_address : 'n/a';
         }
         else{
             $this->public_addr =  "n/a";
@@ -34,7 +34,8 @@ class DashboardStats extends Component
         $this->sent = 0;
         $this->forum_count = AppHelper::checkForRecentPosts();
         $this->proposal_count = Proposals::countOpenProposals();
-        $this->citizen_status = AppHelper::getCitizenStatus($uid)->type;
+        $citizenStatus = AppHelper::getCitizenStatus($uid);
+        $this->citizen_status = $citizenStatus ? $citizenStatus->type : 'unknown';
         $this->balance = 0;
     }
 
@@ -63,7 +64,8 @@ class DashboardStats extends Component
 
         $this->forum_count = AppHelper::checkForRecentPosts();
         $this->proposal_count = Proposals::countOpenProposals();
-        $this->citizen_status = AppHelper::getCitizenStatus($user->id)->type;
+        $citizenStatus = AppHelper::getCitizenStatus($user->id);
+        $this->citizen_status = $citizenStatus ? $citizenStatus->type : 'unknown';
         $this->isLoaded = true;
     }
 

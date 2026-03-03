@@ -45,22 +45,39 @@ class ApiController extends Controller {
 			$dataPic = $request->input('picture');
 			$type = $request->input('type');
 			$public_address = $request->input('address');
-			$file_path = "./assets/citizen/" . $public_address . "/";
-			if (!file_exists($file_path)) {
-				mkdir($file_path);
+
+			// --- SECURITY: Sanitize the public_address to prevent directory traversal ---
+			$safeAddress = AppHelper::sanitizePathSegment($public_address);
+			if ($safeAddress === null) {
+				return response()->json(['error' => 'Invalid address format.'], 400);
 			}
-			list($type, $dataPic) = explode(';', $dataPic);
-			list(, $type) = explode('/', $type);
-			$file_path = "./assets/citizen/" . $public_address . "/profile_pic." . $type;
-			//if (!file_exists($file_path)) { overwrite by default
-			
-			list(, $dataPic) = explode(',', $dataPic);
-			$dataPic = base64_decode($dataPic);
-			file_put_contents($file_path, $dataPic);
+
+			// --- SECURITY: Validate the base64 image data (extension, MIME, size, PHP code) ---
+			$validation = AppHelper::validateBase64Image($dataPic);
+			if (!$validation['valid']) {
+				Log::warning('permapinpic upload rejected: ' . $validation['error'] . ' (user: ' . $uid . ')');
+				return response()->json(['error' => $validation['error']], 422);
+			}
+
+			$safeExtension = $validation['extension'];
+			$decodedData = $validation['data'];
+
+			$file_path = "./assets/citizen/" . $safeAddress . "/";
+			if (!file_exists($file_path)) {
+				mkdir($file_path, 0755, true);
+			}
+
+			// --- SECURITY: Write .htaccess to prevent PHP execution in upload dir ---
+			AppHelper::writeUploadHtaccess($file_path);
+
+			// Use validated extension, not user-supplied one
+			$file_path = "./assets/citizen/" . $safeAddress . "/profile_pic." . $safeExtension;
+
+			file_put_contents($file_path, $decodedData);
 			$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
 
 			$citcache = Citizen::where('userid', '=', $uid)->first();
-			if(is_null($citcache)) $citcache = new Citizen;	
+			if(is_null($citcache)) $citcache = new Citizen;
 			$citcache->userid = $uid;
 			$citcache->avatar_link = "https://ipfs.marscoin.org/ipfs/".$hash;
 			$citcache->save();
@@ -89,19 +106,40 @@ class ApiController extends Controller {
 			$dataPic = $request->input('file');
 			$type = $request->input('type');
 			$public_address = $request->input('address');
+
+			// --- SECURITY: Sanitize the public_address to prevent directory traversal ---
+			$safeAddress = AppHelper::sanitizePathSegment($public_address);
+			if ($safeAddress === null) {
+				return response()->json(['error' => 'Invalid address format.'], 400);
+			}
+
 			if ($request->hasFile('file'))
 			{
-				$file_path = "./assets/citizen/" . $public_address . "/";
-				if (!file_exists($file_path)) {
-					mkdir($file_path);
+				// --- SECURITY: Validate the uploaded file (extension, MIME, size, PHP code) ---
+				$uploadedFile = $request->file('file');
+				$validation = AppHelper::validateUploadedFile($uploadedFile, [
+					'webm' => ['video/webm', 'audio/webm'],
+				]);
+				if (!$validation['valid']) {
+					Log::warning('permapinvideo upload rejected: ' . $validation['error'] . ' (user: ' . $uid . ')');
+					return response()->json(['error' => $validation['error']], 422);
 				}
-				$file_path = "./assets/citizen/" . $public_address  . "/";
+
+				$file_path = "./assets/citizen/" . $safeAddress . "/";
+				if (!file_exists($file_path)) {
+					mkdir($file_path, 0755, true);
+				}
+
+				// --- SECURITY: Write .htaccess to prevent PHP execution in upload dir ---
+				AppHelper::writeUploadHtaccess($file_path);
+
+				$file_path = "./assets/citizen/" . $safeAddress  . "/";
 				$request->file('file')->move($file_path, "profile_video.webm" );
 				$file_path = $file_path . "profile_video.webm";
 				$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
 
 				$citcache = Citizen::where('userid', '=', $uid)->first();
-				if(is_null($citcache)) $citcache = new Citizen;	
+				if(is_null($citcache)) $citcache = new Citizen;
 				$citcache->userid = $uid;
 				$citcache->liveness_link = "https://ipfs.marscoin.org/ipfs/".$hash;
 				$citcache->save();
@@ -109,13 +147,12 @@ class ApiController extends Controller {
 				return (new Response(json_encode(array("Hash" => $hash)), 200))
 				->header('Content-Type', "application/json;");
 			}
-			
 
-		
+
 		}else{
             return redirect('/login');
         }
-			
+
 	}
 
 
@@ -134,19 +171,62 @@ class ApiController extends Controller {
 		$title = $request->input('title');
 		$entry = $request->input('entry');
 		$uid = Auth::user()->id;
-		$file_path = "./assets/citizen/" . $public_address . "/logbook/" . md5($title);
+
+		// --- SECURITY: Sanitize the public_address to prevent directory traversal ---
+		$safeAddress = AppHelper::sanitizePathSegment($public_address);
+		if ($safeAddress === null) {
+			return response()->json(['error' => 'Invalid address format.'], 400);
+		}
+
+		// --- SECURITY: Sanitize title for use in path (md5 hash is safe, but validate title exists) ---
+		if (empty($title)) {
+			return response()->json(['error' => 'Title is required.'], 400);
+		}
+
+		$file_path = "./assets/citizen/" . $safeAddress . "/logbook/" . md5($title);
 
 		if (!file_exists($file_path)) {
 			mkdir($file_path, 0755, true); // More secure permissions
 		}
 
+		// --- SECURITY: Write .htaccess to prevent PHP execution in upload dir ---
+		AppHelper::writeUploadHtaccess($file_path);
+
+		// --- SECURITY: Check content for PHP code ---
+		$logContent = $title . "\n\n" . $entry;
+		if (AppHelper::containsPhpCode($logContent)) {
+			Log::warning('permapinlog rejected: content contains PHP code (user: ' . $uid . ')');
+			return response()->json(['error' => 'Content contains potentially dangerous code.'], 422);
+		}
+
+		// --- SECURITY: Check content size (max 5MB) ---
+		if (strlen($logContent) > 5242880) {
+			return response()->json(['error' => 'Content exceeds maximum size of 5MB.'], 422);
+		}
+
 		$file = $file_path . "/log.markdown";
-		file_put_contents($file, $title . "\n\n" . $entry);
+		file_put_contents($file, $logContent);
 
 		$files = $request->file('filenames');
 		if ($files && is_array($files)) {
 			foreach ($files as $f) {
+				// --- SECURITY: Validate each uploaded file ---
+				$validation = AppHelper::validateUploadedFile($f);
+				if (!$validation['valid']) {
+					Log::warning('permapinlog file rejected: ' . $validation['error'] . ' (user: ' . $uid . ', file: ' . $f->getClientOriginalName() . ')');
+					// Skip invalid files but continue processing valid ones
+					continue;
+				}
+
 				$name = $f->hashName(); // Generates a unique, random name...
+
+				// --- SECURITY: Ensure the generated filename does not have a dangerous extension ---
+				$ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+				if (AppHelper::isExtensionBlocked($ext)) {
+					Log::warning('permapinlog blocked dangerous file extension: ' . $ext . ' (user: ' . $uid . ')');
+					continue;
+				}
+
 				$f->move($file_path, $name);
 			}
 		}
@@ -178,8 +258,19 @@ class ApiController extends Controller {
 			return response()->json(["error" => "CID is required"], 400);
 		}
 
+		// Validate CID format to prevent injection into the IPFS API URL
+		if (!AppHelper::isValidCID($cid)) {
+			return response()->json(["error" => "Invalid CID format"], 400);
+		}
+
+		// Verify the publication belongs to the current user
 		$uid = Auth::user()->id;
-		$ipfsApiUrl = 'http://127.0.0.1:5001/api/v0/pin/rm?arg=' . $cid . "&recursive=true";
+		$publication = Publication::where('ipfs_hash', $cid)->first();
+		if ($publication && $publication->userid != $uid) {
+			return response()->json(["error" => "Unauthorized: you can only remove your own publications."], 403);
+		}
+
+		$ipfsApiUrl = 'http://127.0.0.1:5001/api/v0/pin/rm?arg=' . urlencode($cid) . "&recursive=true";
 		Log::debug($ipfsApiUrl);
 		try {
 			// Initialize cURL session
@@ -223,7 +314,6 @@ class ApiController extends Controller {
 			->header('Content-Type', "application/json;");
 	}
 
-	
 
 
 	/**
@@ -240,8 +330,38 @@ class ApiController extends Controller {
 		$public_address = $request->input('address');
 		$type = $request->input('type');
 		$json = $request->input('payload');
+
+		// --- SECURITY: Sanitize the public_address to prevent directory traversal ---
+		$safeAddress = AppHelper::sanitizePathSegment($public_address);
+		if ($safeAddress === null) {
+			return response()->json(['error' => 'Invalid address format.'], 400);
+		}
+
+		// --- SECURITY: Sanitize the type parameter to prevent path traversal ---
+		$safeType = AppHelper::sanitizePathSegment($type);
+		if ($safeType === null) {
+			return response()->json(['error' => 'Invalid type format.'], 400);
+		}
+
+		// --- SECURITY: Check file size (max 5MB) ---
+		if (strlen($json) > 5242880) {
+			return response()->json(['error' => 'Payload exceeds maximum size of 5MB.'], 422);
+		}
+
+		// --- SECURITY: Reject payloads containing PHP code ---
+		if (AppHelper::containsPhpCode($json)) {
+			Log::warning('permapinjson rejected: payload contains PHP code');
+			return response()->json(['error' => 'Payload contains potentially dangerous content.'], 422);
+		}
+
+		// --- SECURITY: Validate that payload is valid JSON ---
+		$decodedJson = json_decode($json);
+		if ($json !== '' && json_last_error() !== JSON_ERROR_NONE) {
+			return response()->json(['error' => 'Invalid JSON payload.'], 422);
+		}
+
 		$projectRoot = config('app.project_root', base_path());
-		$base_path =  $projectRoot . "/assets/citizen/" . $public_address;
+		$base_path =  $projectRoot . "/assets/citizen/" . $safeAddress;
 
 		// Check and create the directory if it doesn't exist
 		Log::info($base_path);
@@ -254,14 +374,17 @@ class ApiController extends Controller {
 			}
 			Log::info("Directory created: " . $base_path);
 		}
-		
+
 		// Check if the directory is writable, regardless of whether it was just created or already existed
 		if (!is_writable($base_path)) {
 			Log::error("Directory not writable: " . $base_path);
 			return response()->json(["error" => "Directory is not writable. Check permissions."], 500);
 		}
 
-		$file_path = $base_path . "/" . $type . ".json";
+		// --- SECURITY: Write .htaccess to prevent PHP execution in upload dir ---
+		AppHelper::writeUploadHtaccess($base_path);
+
+		$file_path = $base_path . "/" . $safeType . ".json";
 
 		// Attempt to write the JSON data to the file
 		if (file_put_contents($file_path, $json) === false) {
@@ -270,9 +393,9 @@ class ApiController extends Controller {
 
 		try {
 			Log::info("PermaJson: " . $file_path);
-		
+
 			// Check if the type contains the word 'log'
-			if (strpos($type, 'log') !== false) {
+			if (strpos($safeType, 'log') !== false) {
 				// The type contains 'log', use uploadFolder
 				$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
 			} else {
@@ -286,7 +409,7 @@ class ApiController extends Controller {
 				Log::error("Upload error: Formatting");
 				return response()->json(["error"=>"formatting error"], 500);
 			}
-			
+
 			return response()->json($formattedResponse, 200)->header('Content-Type', "application/json;");
 		} catch (\Exception $e) {
 			// Handle exceptions during the upload and pinning process
@@ -340,7 +463,7 @@ class ApiController extends Controller {
 			return (new Response(json_encode(array("balance" => $balance)), 200))
               ->header('Content-Type', "application/json;");
 
-		
+
 		}else{
             return redirect('/login');
         }
@@ -375,7 +498,7 @@ class ApiController extends Controller {
 			return (new Response(json_encode(array("mars_price" => $price)), 200))
               ->header('Content-Type', "application/json;");
 
-		
+
 		}else{
             return redirect('/login');
         }
@@ -390,14 +513,14 @@ class ApiController extends Controller {
 	public function getTransactions(Request $request)
 	{
 		if (Auth::check()) {
-			
+
 			$address = $request->input('address');
 			$json = AppHelper::file_get_contents_curl("http://explore1.marscoin.org/api/txs/?address={$address}");
-			
+
 			return (new Response($json))
               ->header('Content-Type', "application/json;");
 
-		
+
 		}else{
             return redirect('/login');
         }
@@ -422,8 +545,8 @@ class ApiController extends Controller {
 			$fullname = $firstname . " " . $lastname;
 
 			$citcache = Citizen::where('userid', '=', $uid)->first();
-			if(is_null($citcache)) $citcache = new Citizen;	
-			
+			if(is_null($citcache)) $citcache = new Citizen;
+
 			$citcache->userid = $uid;
 			$citcache->firstname = $firstname;
 			$citcache->lastname = $lastname;
@@ -447,10 +570,10 @@ class ApiController extends Controller {
 			$shortbio = $request->input('shortbio');
 			$displayname = $request->input('displayname');
 			$publicaddress = $request->input('publicaddress');
-			
+
 			$citcache = Citizen::where('userid', '=', $uid)->first();
-			if(is_null($citcache)) $citcache = new Citizen;	
-			
+			if(is_null($citcache)) $citcache = new Citizen;
+
 			$citcache->userid = $uid;
 			$citcache->shortbio = $shortbio;
 			$citcache->displayname = $displayname;
@@ -464,39 +587,39 @@ class ApiController extends Controller {
 
 	public function rejectApplication(Request $request)
 	{
-		if (Auth::check()) 
+		if (Auth::check())
 		{
 			// Check if the user has citizen status
 			$user = Auth::user();
 			$profile = Profile::where('userid', $user->id)->first();
 			$reporter = Citizen::where('userid', '=',  $user->id)->first();
-			
+
 			$rejectionReasons = [
 				'avatar_link' => 'Missing Personal Image',
 				'liveness_link' => 'Incomplete Video',
 				'duplicate' => 'Duplicate Entry'
 			];
-			
-			if ($profile && $profile->citizen) 
+
+			if ($profile && $profile->citizen)
 			{
 				// Fetch the request data
 				$applicantUserId = $request->input('applicantUserId');
 				$fieldToUpdate = $request->input('field');
-	
+
 				// Validate the field to update
 				if (!in_array($fieldToUpdate, ['avatar_link', 'liveness_link'])) {
 					return response()->json(['error' => 'Invalid field specified.'], 400);
 				}
-	
+
 				// Update the citizen table, setting the specified field to NULL for the applicant
 				Citizen::where('userid', $applicantUserId)->update([$fieldToUpdate => NULL]);
 
 				$applicant = Citizen::where('userid', '=',  $applicantUserId)->first();
-	
+
 				// Insert a new forum post indicating the rejection
 				$content = "The application of {$applicant->public_address} has been rejected due to " . $rejectionReasons[$fieldToUpdate] . ".";
 
-				
+
 				$fullname = $reporter->firstname . "" . $reporter->lastname;
 				Posts::create([
 					'thread_id' => 27, // Thread ID for application commentary
@@ -506,7 +629,7 @@ class ApiController extends Controller {
 					'created_at' => now(),
 					'updated_at' => now(),
 				]);
-	
+
 				return response()->json(['success' => 'Application has been rejected and recorded.']);
 			} else {
 				// User is not a citizen or not authenticated
@@ -516,7 +639,7 @@ class ApiController extends Controller {
 			// User is not logged in
 			return response()->json(['error' => 'User not authenticated.'], 401);
 		}
-		
+
 	}
 
 	/**
@@ -564,12 +687,27 @@ class ApiController extends Controller {
 	public function setendorsed(Request $request)
 	{
 		if (Auth::check()) {
-			$uid = $request->input("id");
-			$profile = Profile::where('userid', '=', $uid)->first();
-			$cnt = $profile->endorse_cnt;
-			$profile->endorse_cnt = $cnt + 1;
+			$endorserId = Auth::user()->id;
+			$targetUserId = $request->input("id");
+
+			// Prevent self-endorsement
+			if ((int) $endorserId === (int) $targetUserId) {
+				return response()->json(['error' => 'Cannot endorse yourself.'], 400);
+			}
+
+			// Only citizens can endorse
+			$endorserProfile = Profile::where('userid', '=', $endorserId)->first();
+			if (!$endorserProfile || !$endorserProfile->citizen) {
+				return response()->json(['error' => 'Only citizens can endorse.'], 403);
+			}
+
+			$profile = Profile::where('userid', '=', $targetUserId)->first();
+			if (!$profile) {
+				return response()->json(['error' => 'User not found.'], 404);
+			}
+			$profile->endorse_cnt = ($profile->endorse_cnt ?? 0) + 1;
 			$profile->save();
-			return;
+			return response()->json(['success' => true]);
 		}
 	}
 
@@ -592,7 +730,7 @@ class ApiController extends Controller {
 				return response()->json(['error' => 'Invalid IPFS hash'], 400);
 			}
 
-			$proposal = new Proposals;	
+			$proposal = new Proposals;
 			$proposal->user_id = $uid;
 			$proposal->title = $data->data->title;
 			$proposal->description = $data->data->description;
@@ -628,13 +766,13 @@ class ApiController extends Controller {
 			$threads->save();
 
 			$thd_id = $threads->id;
-			
+
 			$proposal->where('id', $prop_id)->update(['discussion' => $thd_id]);
 
 			return (new Response(json_encode(array("Proposal" => $prop_id, "Discussion" => $thd_id)), 200))
               ->header('Content-Type', "application/json;");
 
-		
+
 		}else{
             return redirect('/login');
         }
@@ -649,16 +787,16 @@ class ApiController extends Controller {
 		// Regex to extract potential CIDs from paths; adjust according to typical link structures
 		preg_match('/(Qm[a-zA-Z1-9]{44}|b[a-z2-7]{58})/', $path, $matches);
 		$hash = $matches[0] ?? '';
-	
+
 		// Regex to check CIDv0; starts with 'Qm' and followed by 44 characters from Base58 set
 		$cidv0Regex = '/^Qm[a-zA-Z1-9]{44}$/';
 		// Regex for basic validation of CIDv1; broader due to variability in encoding and version
 		$cidv1Regex = '/^b[a-z2-7]{58}$/';  // Example for base32 encoding
-	
+
 		// Validate extracted hash
 		return preg_match($cidv0Regex, $hash) || preg_match($cidv1Regex, $hash);
 	}
-	
+
 
 
 }

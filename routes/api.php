@@ -19,20 +19,22 @@ Route::get('/feed/public', 'App\Http\Controllers\ApiController@allPublic')->name
 Route::get('/feed/citizen', 'App\Http\Controllers\ApiController@allCitizen')->name('api_allcitizen');
 Route::get('/feed/applicant', 'App\Http\Controllers\ApiController@allApplicants')->name('api_allapplicants');
 Route::get('/feed', 'App\Http\Controllers\ApiController@allFeed')->name('api_allfeed');
-Route::post('/marsauth', 'App\Http\Controllers\ApiController@marsAuth')->name('api_marsauth');
+Route::post('/marsauth', 'App\Http\Controllers\ApiController@marsAuth')->middleware('throttle:10,1')->name('api_marsauth');
 
 Route::get('/citizen/{address}', 'App\Http\Controllers\ApiController@showCitizen')->name('api_show');
 
-Route::post('/token', 'App\Http\Controllers\ApiController@token');
-Route::get('/test', 'App\Http\Controllers\ApiController@test');
+Route::post('/token', 'App\Http\Controllers\ApiController@token')->middleware('throttle:10,1');
+
+// Test route disabled in production for security
+// Route::get('/test', 'App\Http\Controllers\ApiController@test');
 
 Route::post('/scitizen', 'App\Http\Controllers\ApiController@scitizen')->middleware(['auth:sanctum'])->name('api_scitizen');
 Route::post('/pinpic', 'App\Http\Controllers\ApiController@pinpic')->middleware(['auth:sanctum'])->name('api_pinpic');
 Route::post('/pinvideo', 'App\Http\Controllers\ApiController@pinvideo')->middleware(['auth:sanctum'])->name('api_pinvideo');
 Route::post('/pinjson', 'App\Http\Controllers\ApiController@pinjson')->middleware(['auth:sanctum'])->name('api_pinjson');
 
-Route::post('/user/delete/{id}', 'App\Http\Controllers\ApiController@deleteUser')->middleware(['auth:sanctum'])->name('api_delete_user');
-Route::get('/user/block/{id}', 'App\Http\Controllers\ApiController@blockUser')->middleware(['auth:sanctum'])->name('api_block_user');
+Route::post('/user/delete/{id}', 'App\Http\Controllers\ApiController@deleteUser')->middleware(['auth:sanctum', 'throttle:3,1'])->name('api_delete_user');
+Route::post('/user/block/{id}', 'App\Http\Controllers\ApiController@blockUser')->middleware(['auth:sanctum'])->name('api_block_user');
 
 Route::get('/eula', 'App\Http\Controllers\ApiController@handleEula')->middleware(['auth:sanctum'])->name('api_handle_eula');
 Route::get('/set/eula', 'App\Http\Controllers\ApiController@setEula')->middleware(['auth:sanctum'])->name('api_set_eula');
