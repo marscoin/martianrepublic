@@ -21,20 +21,51 @@ Homestead.json
 .phpunit.result.cache
 composer.lock
 
-# cached blockchain data
+# User-uploaded data (citizen PII, wallet data, videos, etc.) - NEVER commit
 public/assets/citizen/M*
+public/assets/citizen/data.json
+public/assets/wallet/M*
+public/assets/congress/M*
+public/assets/landing/uploads/
+
+# Cached/generated data
 *.log
 scripts/track_marscoin.log
-scripts/track_marscoin.log
+
 .env.example
+
 # Python cache files
 **/__pycache__/
 
 # nohup output files
 **/nohup.out
 
-# Public assets
-public/assets/citizen/data.json
-
 # Log files
 scripts/track_marscoin.log.*
+
+# Sensitive files - NEVER commit these
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.crt
+credentials.json
+service-account.json
+
+# Ralph internal state (logs, status - not the config)
+.ralph/logs/
+.ralph/status.json
+.ralph/docs/generated/
+
+# Backup files
+*.bak
+*.orig
+*.swp
+
+# IDE
+.idea/
+.vscode/
+
+# Ralph config may contain sensitive tool permissions
+.ralphrc

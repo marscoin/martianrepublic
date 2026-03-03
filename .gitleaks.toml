@@ -1,0 +1,21 @@
+# Gitleaks configuration for Martian Republic
+# This project is BUILT IN PUBLIC - extra vigilance required
+
+title = "Martian Republic Gitleaks Config"
+
+[allowlist]
+paths = [
+    '''vendor/''',
+    '''node_modules/''',
+    '''public/assets/citizen/M.*''',
+    '''public/assets/wallet/M.*''',
+    '''public/assets/congress/M.*''',
+    '''\.ralph/logs/''',
+    '''storage/''',
+]
+
+[[rules]]
+id = "martian-env-leak"
+description = "Detect .env values being hardcoded"
+regex = '''(?i)(DB_PASSWORD|APP_KEY|MAIL_PASSWORD|AWS_SECRET|PUSHER_SECRET)\s*=\s*['"][^'"]+['"]'''
+tags = ["env", "secret"]
