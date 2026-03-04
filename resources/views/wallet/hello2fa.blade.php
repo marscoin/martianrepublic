@@ -1,155 +1,214 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html lang="en" class="no-js">
-<!--<![endif]-->
-
+<html lang="en">
 <head>
-    <title>Marscoin - Wallet Login</title>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <!-- Google Font: Open Sans -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap"
-        rel="stylesheet">
-
-    <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
-
-    <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
-    <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
-    <!-- <link href="/assets/wallet/css/custom.css" rel="stylesheet">-->
-
+  <title>Martian Republic - 2FA Setup</title>
+  @include('partials.public-head')
+  <style>
+    .mr-2fa-input {
+      width: 100%;
+      height: 72px;
+      font-size: 36px;
+      font-weight: 700;
+      font-family: var(--mr-font-mono);
+      letter-spacing: 12px;
+      text-align: center;
+      background: var(--mr-void);
+      border: 2px solid var(--mr-border-bright);
+      border-radius: 12px;
+      color: var(--mr-cyan);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .mr-2fa-input:focus {
+      border-color: var(--mr-cyan);
+      box-shadow: 0 0 0 4px var(--mr-cyan-dim), 0 0 32px rgba(0,228,255,0.1);
+    }
+    .mr-2fa-input::placeholder {
+      color: var(--mr-text-faint);
+      font-size: 18px;
+      letter-spacing: 2px;
+    }
+    .mr-2fa-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: var(--mr-cyan-dim);
+      border: 1px solid rgba(0,228,255,0.2);
+      margin: 0 auto 24px;
+      font-size: 28px;
+      color: var(--mr-cyan);
+    }
+    .mr-qr-display {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .mr-qr-display img {
+      background: #fff;
+      padding: 12px;
+      border-radius: 12px;
+    }
+    .mr-2fa-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: var(--mr-text-dim);
+    }
+    .mr-2fa-step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--mr-cyan-dim);
+      border: 1px solid rgba(0,228,255,0.2);
+      color: var(--mr-cyan);
+      font-family: var(--mr-font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mr-result-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      font-size: 32px;
+    }
+    .mr-result-icon.success {
+      background: rgba(52,211,153,0.1);
+      border: 2px solid rgba(52,211,153,0.3);
+      color: var(--mr-green);
+    }
+    .mr-result-icon.error {
+      background: rgba(239,68,68,0.1);
+      border: 2px solid rgba(239,68,68,0.3);
+      color: var(--mr-red);
+    }
+  </style>
 </head>
 
-<body class="account-bg" style="background-image: url(/assets/landing/img/mcolony.jpg); background-size: cover;">
+<body class="mr-theme">
 
-    <header class="navbar navbar-inverse" role="banner">
+  @include('partials.public-nav')
 
-        <div class="container">
+  <main class="mr-auth-page">
+    <div class="container">
 
-            <div class="navbar-header">
-                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <i class="fa fa-cog"></i>
-                </button>
+      @if (!is_null($qrcode_image))
+        <div class="mr-form-card" style="max-width: 480px;">
+          <div class="mr-2fa-icon">
+            <i class="fa fa-shield-halved"></i>
+          </div>
 
-                <a href="/" class="navbar-brand navbar-brand-img" style="font-family: 'Orbitron', sans-serif;">
-                    <img style="font-family: 'Orbitron', sans-serif;width: 67px;"
-                        src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic Logo">
-                    Martian Republic
-                </a>
-            </div> <!-- /.navbar-header -->
+          <h2>Setup 2FA</h2>
+          <p class="mr-form-sub">Secure your account with two-factor authentication</p>
 
-            <nav class="collapse navbar-collapse" role="navigation">
-                <ul class="nav navbar-nav navbar-right">
-                    <li>
+          <div class="mr-2fa-step">
+            <span class="mr-2fa-step-num">1</span>
+            <span>Open Google Authenticator or Authy on your phone</span>
+          </div>
+          <div class="mr-2fa-step">
+            <span class="mr-2fa-step-num">2</span>
+            <span>Scan the QR code below</span>
+          </div>
 
-                    </li>
-                </ul>
-            </nav>
+          <div class="mr-qr-display">
+            <img src="data:image/png;base64, {{ $qrcode_image }}" alt="2FA QR Code">
+          </div>
 
-        </div> <!-- /.container -->
+          <div class="mr-2fa-step">
+            <span class="mr-2fa-step-num">3</span>
+            <span>Enter the 6-digit code from the app</span>
+          </div>
 
-    </header>
-
-    <div class="account-wrapper">
-
-        @if (!is_null($qrcode_image))
-            <div class="account-body">
-                <h2>Two Factor Authentication</h2>
-                <h5>Use the following QR code to setup your Google Authenticator or Authy application</h5>
-                <form class="form account-form" method="POST" action="/twofa">
-                    @csrf
-                    <div class="form-group">
-                        <label for="forgot-email" class="placeholder-hidden">Your Email</label>
-                        <div style="text-align: center;"><img src="data:image/png;base64, {{ $qrcode_image }} " />
-                        </div>
-                    </div> <!-- /.form-group -->
-                    <div class="form-group" style="text-align: center;">
-                        <input name="secret" id="secret"
-                            style="height: 68px; font-size: 42px; font-weight: 700;  text-align: center;" type="text"
-                            class="form-control" id="register-2fa" placeholder="Enter code" tabindex="1">
-                        <button type="submit" class="btn btn-success btn-block btn-lg" tabindex="2">Complete 2FA &nbsp;
-                            <i class="fa fa-refresh"></i>
-                        </button>
-                    </div> <!-- /.form-group -->
-                    <div class="form-group">
-                        <a href="/logout"><i class="fa fa-angle-double-left"></i> &nbsp;Back to Login</a>
-                    </div> <!-- /.form-group -->
-                    <input type="hidden" value="meow" class="local" name="local"/>
-
-                </form>
+          <form method="POST" action="/twofa">
+            @csrf
+            <div class="mr-form-group">
+              <input name="secret" id="secret" type="text" class="mr-2fa-input"
+                     placeholder="000000" maxlength="6" inputmode="numeric"
+                     autocomplete="one-time-code" tabindex="1" autofocus>
             </div>
-        @endif
-        @if (!is_null($isvalid) && $isvalid)
-            <div class="account-body">
-                <h2>Two Factor Authentication Setup completed successfully</h2>
-                <form class="form account-form" method="POST" action="/check">
-                    @csrf
-                    <div class="form-group" style="text-align: center;">
-                        <a href="/wallet/dashboard" class="btn btn-success btn-block btn-lg" tabindex="2">Go to
-                            Dashboard</a>
-                    </div>
-                    <input type="hidden" value="meow" class="local" name="local"/>
 
-                </form>
+            <div class="mr-form-group">
+              <button type="submit" class="mr-btn mr-btn-primary" tabindex="2">
+                Verify &amp; Enable 2FA <i class="fa fa-check"></i>
+              </button>
             </div>
-        @endif
-        @if (!is_null($isvalid) && !$isvalid)
-            <div class="account-body">
-                <h2>Two Factor Authentication Setup FAILED</h2>
-                <form class="form account-form" method="POST" action="/twofa">
-                    @csrf
-                    <div class="form-group" style="text-align: center;">
-                        <a href="/wallet/dashboard" class="btn btn-danger btn-block btn-lg" tabindex="2">Try again</a>
-                    </div>
-                    <input type="hidden" value="meow" class="local" name="local"/>
 
-                </form>
+            <input type="hidden" value="meow" class="local" name="local" />
+          </form>
+
+          <div class="mr-form-footer">
+            <a href="/logout"><i class="fa fa-arrow-left"></i> &nbsp;Back to Login</a>
+          </div>
+        </div>
+      @endif
+
+      @if (!is_null($isvalid) && $isvalid)
+        <div class="mr-form-card" style="max-width: 440px;">
+          <div class="mr-result-icon success">
+            <i class="fa fa-check"></i>
+          </div>
+          <h2>2FA Enabled</h2>
+          <p class="mr-form-sub">Your account is now protected with two-factor authentication</p>
+
+          <form method="POST" action="/check">
+            @csrf
+            <div class="mr-form-group">
+              <a href="/wallet/dashboard" class="mr-btn mr-btn-primary">
+                Go to Dashboard <i class="fa fa-arrow-right"></i>
+              </a>
             </div>
-        @endif
+            <input type="hidden" value="meow" class="local" name="local" />
+          </form>
+        </div>
+      @endif
+
+      @if (!is_null($isvalid) && !$isvalid)
+        <div class="mr-form-card" style="max-width: 440px;">
+          <div class="mr-result-icon error">
+            <i class="fa fa-xmark"></i>
+          </div>
+          <h2>Setup Failed</h2>
+          <p class="mr-form-sub">The verification code was incorrect. Please try again.</p>
+
+          <form method="POST" action="/twofa">
+            @csrf
+            <div class="mr-form-group">
+              <a href="/wallet/dashboard" class="mr-btn mr-btn-primary">
+                Try Again <i class="fa fa-rotate"></i>
+              </a>
+            </div>
+            <input type="hidden" value="meow" class="local" name="local" />
+          </form>
+        </div>
+      @endif
 
     </div>
+  </main>
 
-    <!-- Bootstrap core JavaScript
-================================================== -->
-    <!-- Core JS -->
-    <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
-    <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
-    <script src="/assets/wallet/js/mvpready-core.js"></script>
-    <script src="/assets/wallet/js/mvpready-admin.js"></script>
-    <script src="/assets/wallet/js/mvpready-account.js"></script>
-    <script>
-        $(document).ready(function() {
+  @include('partials.public-footer')
 
-            // document.onload = function() {
-            //     localStorage.clear();
-
-            // }
-            let item = localStorage.getItem("key")
-
-            if (item != null) {
-                $(".local").val("true")
-                
-            } else {
-                $(".local").val("false")
-            }
-
-
-        })
-    </script>
-
-
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      let item = localStorage.getItem("key");
+      if (item != null) {
+        $(".local").val("true");
+      } else {
+        $(".local").val("false");
+      }
+    });
+  </script>
 </body>
-
 </html>
