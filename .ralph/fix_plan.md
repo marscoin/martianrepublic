@@ -40,12 +40,13 @@
 - [ ] Review and update composer dependencies for security patches
 
 ## Phase 4: Feature Completeness (per Gitbook Docs)
-- [ ] Wallet: Verify HD wallet creation, seed phrase generation, send/receive, QR scanning, encrypted backup/recovery, dashboard analytics
-- [ ] Citizen: Verify registration flow (name, photo, liveness video), IPFS storage, blockchain notarization, voter registry, endorsement system (1 per 10 citizens, max 5), auto-upgrade
-- [ ] Congress: Verify proposal creation (IPFS+blockchain), coin-shuffle ballot distribution, voting mechanism, on-chain tallying, results display, archiving
-- [ ] Forum: Verify Hacker News/Reddit-style discussions, post timestamping, notarization
-- [ ] Logbook: Verify log entries with file attachments, IPFS pinning
-- [ ] Inventory: Verify asset tracking functionality
+- [x] Wallet: Dashboard analytics (balance, transactions, price charts) WORKING. QR scanning WORKING. HD wallet creation partial (seed generation/derivation/send not implemented - needs external crypto service). Encrypted backup/recovery minimal.
+- [x] Citizen: Registration flow WORKING (name, photo, liveness video → IPFS → blockchain). Voter registry WORKING (cached queries). Endorsement system NOW COMPLETE: duplicate prevention, limit enforcement (1 per 10 citizens, max 5), auto-upgrade to citizen when endorsement threshold met.
+- [x] Congress: Proposal creation WORKING (IPFS+blockchain via cacheproposal API, auto-creates forum thread). Voting UI WORKING. Vote tallying WORKING. Fixed voting API using test URL instead of production (was pointing to localhost:3001). Removed dead createproposal route.
+- [x] Forum: API endpoints WORKING (thread listing, nested comments, post creation). Web UI exists via vendor/forum package. Post notarization not implemented.
+- [x] Logbook: Entry creation WORKING (IPFS pinning + file attachments via permapinlog API). Notarization WORKING (blockchain signing via client-side JS). Delete WORKING. Added empty states. Fixed uncached balance API call (was hitting explore.marscoin.org directly, now uses cached AppHelper::getMarscoinBalance).
+- [ ] Inventory: Only scaffolding exists (route + empty controller + "under construction" view). Needs full implementation.
+- [ ] Wallet HD: Seed phrase generation, BIP32/BIP44 key derivation, address generation, send transactions, backup/recovery - all missing. Crypto libraries bundled but not called. Would need significant crypto engineering.
 
 ## Phase 5: Design & Visual Excellence
 - [ ] Landing page polish - hero, feature cards, citizen registry preview, app showcase, footer all world-class
@@ -62,7 +63,7 @@
 - [ ] Citizen registration UX - clear path from General Public to Citizen, show progress
 - [ ] Voting UX - proposal -> ballot -> vote -> result flow should be intuitive
 - [ ] Error recovery - helpful error messages instead of 500 pages, retry mechanisms
-- [ ] Empty states - helpful messages + CTAs when no transactions, proposals, logs, etc.
+- [x] Empty states - PARTIAL: Added empty states to logbook (my entries + all entries). Congress active proposals already has empty state. Remaining: wallet transactions, citizen registry, forum.
 - [x] Add rate limiting to login/signup endpoints -- DONE
 
 ## Completed
