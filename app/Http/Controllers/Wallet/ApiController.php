@@ -13,6 +13,8 @@ use App\Models\Publication;
 use App\Models\Threads;
 use App\Models\Citizen;
 use App\Models\HDWallet;
+use App\Models\Feed;
+use App\Models\CivicWallet;
 use Illuminate\Support\Facades\Log;
 
 class ApiController extends Controller {
@@ -638,13 +640,65 @@ class ApiController extends Controller {
 			return response()->json(['error' => 'Only citizens can endorse.'], 403);
 		}
 
-		$profile = Profile::where('userid', '=', $targetUserId)->first();
-		if (!$profile) {
+		$targetProfile = Profile::where('userid', '=', $targetUserId)->first();
+		if (!$targetProfile) {
 			return response()->json(['error' => 'User not found.'], 404);
 		}
-		$profile->endorse_cnt = ($profile->endorse_cnt ?? 0) + 1;
-		$profile->save();
-		return response()->json(['success' => true]);
+
+		// Cannot endorse someone who is already a citizen
+		if ($targetProfile->citizen) {
+			return response()->json(['error' => 'This user is already a citizen.'], 400);
+		}
+
+		// Check for duplicate endorsement (endorser already endorsed this target)
+		$targetCitizen = Citizen::where('userid', '=', $targetUserId)->first();
+		$targetAddress = $targetCitizen ? $targetCitizen->public_address : null;
+		if (!$targetAddress) {
+			$targetWallet = CivicWallet::where('user_id', '=', $targetUserId)->first();
+			$targetAddress = $targetWallet ? $targetWallet->public_addr : null;
+		}
+
+		if ($targetAddress) {
+			$alreadyEndorsed = Feed::where('userid', '=', $endorserId)
+				->where('tag', '=', 'ED')
+				->where('message', '=', $targetAddress)
+				->exists();
+			if ($alreadyEndorsed) {
+				return response()->json(['error' => 'You have already endorsed this person.'], 400);
+			}
+		}
+
+		// Enforce endorsement limit: 1 endorsement per 10 citizens, max 5
+		$citizenCount = Profile::where('citizen', '=', 1)->count();
+		$endorsementAllowance = min(5, max(1, (int) floor($citizenCount / 10)));
+		$endorsementsGiven = Feed::where('userid', '=', $endorserId)
+			->where('tag', '=', 'ED')
+			->count();
+		if ($endorsementsGiven >= $endorsementAllowance) {
+			return response()->json([
+				'error' => "You have reached your endorsement limit ({$endorsementAllowance}). Each citizen may give 1 endorsement per 10 citizens in the republic (max 5)."
+			], 400);
+		}
+
+		// Increment endorsement count
+		$targetProfile->endorse_cnt = ($targetProfile->endorse_cnt ?? 0) + 1;
+		$targetProfile->save();
+
+		// Check if target now meets the threshold for auto-upgrade to citizen
+		$endorsementThreshold = min(5, max(1, (int) ceil($citizenCount * 0.1)));
+		if ($targetProfile->endorse_cnt >= $endorsementThreshold) {
+			$targetProfile->citizen = 1;
+			$targetProfile->save();
+
+			Log::info("Auto-upgrade to citizen: user {$targetUserId} reached {$targetProfile->endorse_cnt} endorsements (threshold: {$endorsementThreshold})");
+		}
+
+		return response()->json([
+			'success' => true,
+			'endorse_cnt' => $targetProfile->endorse_cnt,
+			'threshold' => $endorsementThreshold,
+			'promoted' => (bool) $targetProfile->citizen,
+		]);
 	}
 
 

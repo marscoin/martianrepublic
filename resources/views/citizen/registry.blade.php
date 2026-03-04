@@ -340,18 +340,19 @@ $("#publish").click(async (e) => {
 
 
 async function doAjax(ajaxurl, args) {
-    let result;
-
     try {
-        result = await $.ajax({
+        const result = await $.ajax({
             url: ajaxurl,
             type: 'POST',
             data: args
         });
-
         return result;
     } catch (error) {
         console.error(error);
+        if (error.responseJSON) {
+            return error.responseJSON;
+        }
+        return { error: error.statusText || 'Request failed' };
     }
 }
 
@@ -478,14 +479,27 @@ $("#confirm-endorse-btn").click(async (e)=>
             $("#confirm-transaction-hash").text(tx.tx_hash)
             $("#confirm-loading").hide();
             const edata = await doAjax("/api/setendorsed", {id: id});
+            if (edata.error) {
+                $("#modal-message-error").text(edata.error).show();
+                $("#modal-message-success").hide();
+                return;
+            }
             const data = await doAjax("/api/setfeed", {"type": "ED", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "message": address, "address": '<?=$public_address?>'});
             if(data.Hash){
-                if(!alert('Submitted to Blockchain successfully')){window.location.reload();}
+                var msg = 'Endorsement submitted to Blockchain successfully!';
+                if (edata.promoted) {
+                    msg += ' This person has been promoted to Citizen status!';
+                } else {
+                    msg += ' (' + edata.endorse_cnt + '/' + edata.threshold + ' endorsements toward citizenship)';
+                }
+                if(!alert(msg)){window.location.reload();}
             }
         }
 
     } catch (e) {
-        throw e;
+        $("#confirm-loading").hide();
+        $("#modal-message-error").text("Endorsement failed: " + (e.message || "Unknown error")).show();
+        console.error("Endorsement error:", e);
     }
 
 })
