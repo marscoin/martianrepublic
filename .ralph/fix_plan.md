@@ -57,10 +57,10 @@
   - Cache-busted CSS via {{ time() }} query param in public-head partial
 - [x] Consistent design system -- DONE: mr-theme.css with CSS custom properties, shared partials (public-head, public-nav, public-footer), dark theme across all public pages
 - [x] Remove ALL template placeholder content -- DONE (completed in Phase 3)
-- [ ] Dashboard design - clean typography, proper spacing, elegant stat cards, smooth Livewire (INTERNAL/AUTHENTICATED PAGES - the wallet/* section)
-- [ ] Citizen pages - professional profiles with photos, endorsement counts, status badges (INTERNAL)
-- [ ] Congress pages - governmental feel, clear proposal cards, voting progress, result visualizations (INTERNAL)
-- [ ] Loading states - proper spinners/skeletons for Livewire components
+- [x] Dashboard design -- DONE: 788-line dashboard.css dark theme overlay (CSS variables, body/navbar/mainnav/portlets/tables/DataTables/buttons/alerts/forms/charts/modals/tabs/wells/pagination). Applied via mainnav.blade.php to all 20+ authenticated pages.
+- [x] Citizen pages -- DONE: Dark theme for Bootstrap labels (success/warning/danger/info/default), list-groups, thumbnails, text-primary/muted, feed items, share widgets, content-title. All citizen sub-templates (allcitizens, allpublic, allapplicants, profile, martian) now themed.
+- [x] Congress pages -- DONE: Dark theme for wells, alerts, panels/accordions, progress bars, row-stat/icon-stat, voting progress/vote breakdown. Vote chart colors updated (green/red). Voting.css dark overrides for voting-nav, price-box, feed items, comments.
+- [x] Loading states -- DONE: CSS skeleton shimmer animation, spinner-border component, wire:loading overlay pattern, Livewire loading indicators on voting-progress and vote-breakdown components. Dashboard-stats already had loading states.
 
 ## Phase 6: Flow & Experience
 - [ ] Onboarding flow - signup -> 2FA -> wallet creation should feel smooth and guided

@@ -502,6 +502,279 @@ label {
   color: var(--mr-cyan) !important;
 }
 
+/* ---- LIVEWIRE LOADING STATES ---- */
+[wire\:loading] {
+  text-align: center;
+  padding: 12px;
+}
+.mr-loading-overlay {
+  position: relative;
+}
+.mr-loading-overlay [wire\:loading] {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 6, 12, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 10;
+  border-radius: 4px;
+}
+.mr-skeleton {
+  background: linear-gradient(90deg, var(--mr-surface) 25%, rgba(255,255,255,0.06) 50%, var(--mr-surface) 75%);
+  background-size: 200% 100%;
+  animation: mr-shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+  height: 1em;
+  margin: 4px 0;
+}
+@keyframes mr-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.spinner-border {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  border: 2px solid var(--mr-border-bright);
+  border-right-color: var(--mr-cyan);
+  border-radius: 50%;
+  animation: mr-spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+.spinner-border span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+/* Progress bars (voting) */
+.progress {
+  background: var(--mr-dark) !important;
+  border: 1px solid var(--mr-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.progress-bar-success {
+  background: rgba(16, 185, 129, 0.7) !important;
+}
+.progress-bar-danger {
+  background: rgba(239, 68, 68, 0.7) !important;
+}
+
+/* ---- BOOTSTRAP LABELS & BADGES ---- */
+.label {
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+.label-success {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.label-warning {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.label-danger {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.label-info {
+  background: rgba(0, 228, 255, 0.15) !important;
+  color: var(--mr-cyan) !important;
+  border: 1px solid rgba(0, 228, 255, 0.3);
+}
+.label-default, .label-secondary {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--mr-text-secondary) !important;
+  border: 1px solid var(--mr-border);
+}
+.badge {
+  background: rgba(0, 228, 255, 0.15) !important;
+  color: var(--mr-cyan) !important;
+}
+.badge-primary {
+  background: rgba(200, 65, 37, 0.25) !important;
+  color: var(--mr-mars) !important;
+}
+
+/* ---- BOOTSTRAP ALERTS (dark variants) ---- */
+.alert-info {
+  background: rgba(0, 228, 255, 0.1) !important;
+  color: var(--mr-cyan) !important;
+  border-color: rgba(0, 228, 255, 0.25) !important;
+}
+.alert-warning {
+  background: rgba(245, 158, 11, 0.1) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+.alert-danger {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #f87171 !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+.alert-success {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+/* ---- BOOTSTRAP WELLS ---- */
+.well {
+  background: var(--mr-surface) !important;
+  border: 1px solid var(--mr-border) !important;
+  color: var(--mr-text) !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ---- LIST GROUPS ---- */
+.list-group {
+  background: transparent;
+}
+.list-group-item {
+  background: var(--mr-surface) !important;
+  border-color: var(--mr-border) !important;
+  color: var(--mr-text) !important;
+}
+.list-group-item:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+.list-group-item .text-primary {
+  color: var(--mr-cyan) !important;
+}
+.list-group-chevron {
+  color: var(--mr-text-secondary) !important;
+}
+
+/* ---- THUMBNAILS ---- */
+.thumbnail {
+  background: var(--mr-dark) !important;
+  border-color: var(--mr-border) !important;
+}
+.thumbnail-table {
+  background: transparent !important;
+}
+.thumbnail-table td {
+  border-color: var(--mr-border) !important;
+}
+
+/* ---- TEXT UTILITIES ---- */
+.text-primary {
+  color: var(--mr-cyan) !important;
+}
+.text-muted {
+  color: var(--mr-text-secondary) !important;
+}
+.content-title {
+  color: var(--mr-text) !important;
+}
+
+/* ---- FEED ITEMS (citizen/congress) ---- */
+.feed-item {
+  background: var(--mr-surface) !important;
+  border-color: var(--mr-border) !important;
+}
+.feed-icon {
+  background: rgba(0, 228, 255, 0.12) !important;
+  color: var(--mr-cyan) !important;
+}
+.feed-icon.feed-icon-idea {
+  background: rgba(245, 158, 11, 0.12) !important;
+  color: #fbbf24 !important;
+}
+.feed-subject {
+  color: var(--mr-text) !important;
+}
+.feed-subject a {
+  color: var(--mr-cyan) !important;
+}
+.feed-subject a:hover {
+  color: #33eaff !important;
+}
+.feed-content {
+  color: var(--mr-text-secondary) !important;
+  border-top-color: var(--mr-border) !important;
+}
+.feed-actions a {
+  color: var(--mr-text-secondary) !important;
+}
+.feed-actions a:hover {
+  color: var(--mr-cyan) !important;
+}
+
+/* ---- SHARE WIDGET (citizen profile) ---- */
+.share-widget {
+  background: var(--mr-surface) !important;
+  border-color: var(--mr-border) !important;
+}
+.share-widget-textarea {
+  background: var(--mr-dark) !important;
+  border-color: var(--mr-border) !important;
+  color: var(--mr-text) !important;
+}
+.share-widget-textarea:focus {
+  border-color: var(--mr-cyan) !important;
+}
+.share-widget-actions {
+  border-top-color: var(--mr-border) !important;
+}
+
+/* ---- PANELS / ACCORDIONS ---- */
+.panel {
+  background: var(--mr-surface) !important;
+  border-color: var(--mr-border) !important;
+}
+.panel-default > .panel-heading {
+  background: var(--mr-dark) !important;
+  border-color: var(--mr-border) !important;
+  color: var(--mr-text) !important;
+}
+.panel-title {
+  color: var(--mr-text) !important;
+}
+.panel-title a {
+  color: var(--mr-cyan) !important;
+}
+.panel-body {
+  background: var(--mr-surface) !important;
+  color: var(--mr-text) !important;
+}
+.accordion-panel .panel {
+  border-color: var(--mr-border) !important;
+}
+
+/* ---- CONGRESS-SPECIFIC ---- */
+.row-stat .stat {
+  color: var(--mr-text) !important;
+}
+.row-stat .stat small {
+  color: var(--mr-text-secondary) !important;
+}
+.icon-stat {
+  background: var(--mr-surface) !important;
+  border-color: var(--mr-border) !important;
+}
+.icon-stat .icon-stat-label {
+  color: var(--mr-text-secondary) !important;
+}
+.icon-stat .icon-stat-value {
+  color: var(--mr-text) !important;
+}
+
+/* ---- TABLE STRIPED (dark) ---- */
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+.table-striped > tbody > tr:nth-of-type(even) {
+  background: transparent !important;
+}
+
 /* ---- RESPONSIVE ---- */
 @media (max-width: 767px) {
   .portlet { padding: 16px !important; }

@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="/assets/wallet/css/dashboard/dashboard.css?v=2.5">
+<link rel="stylesheet" href="/assets/wallet/css/dashboard/dashboard.css?v=2.6">
 <link rel="stylesheet" href="/assets/wallet/css/mainnav/mainnav.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 <div class="mainnav">

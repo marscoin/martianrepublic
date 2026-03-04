@@ -1,4 +1,5 @@
-<div wire:init="loadVotes">
+<div wire:init="loadVotes" class="mr-loading-overlay">
+    <div wire:loading><i class="fa fa-spinner fa-spin"></i></div>
     <canvas id="voteChart" width="400" height="400"></canvas>
 
     @push('scripts')
@@ -12,14 +13,14 @@
                 labels: ['Yay', 'Nay'],
                 datasets: [{
                     label: 'Vote Breakdown',
-                    data: [@this.yayPercent, @this.nayPercent], // Using Livewire property binding
+                    data: [@this.yayPercent, @this.nayPercent],
                     backgroundColor: [
-                        'rgba(54, 162, 235, 0.6)',
-                        'rgba(255, 99, 132, 0.6)'
+                        'rgba(16, 185, 129, 0.6)',
+                        'rgba(239, 68, 68, 0.6)'
                     ],
                     borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 99, 132, 1)'
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(239, 68, 68, 1)'
                     ],
                     borderWidth: 1
                 }]
@@ -28,6 +29,9 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
+                    legend: {
+                        labels: { color: '#c4c3d2' }
+                    },
                     tooltip: {
                         enabled: true
                     }
