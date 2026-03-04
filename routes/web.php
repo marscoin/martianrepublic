@@ -93,7 +93,6 @@ Route::get('/congress/proposal/{id?}', 'Congress\CongressController@proposal');
 Route::middleware(['auth'])->group(function () {
     Route::any('/congress/voting', 'Congress\CongressController@showVoting');
     Route::any('/congress/voting/new', 'Congress\CongressController@newProposal');
-    Route::post('/congress/createproposal', 'Congress\CongressController@postCreateProposal');
     Route::get('/congress/ballot/{propid?}', 'Congress\CongressController@acquireBallot');
     Route::post('/congress/vote/breakdown', 'Congress\CongressController@breakdown');
 });

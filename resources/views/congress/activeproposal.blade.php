@@ -267,7 +267,7 @@
         //console.log(amount)
 
         const url =
-            `${TEST}/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
+            `${PROD}/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
 
         try {
             const response = await fetch(url, {
@@ -291,7 +291,7 @@
         }
 
         const url =
-            `${TEST}/api/mars/broadcast?txhash=${txhash}`
+            `${PROD}/api/mars/broadcast?txhash=${txhash}`
         try {
             const response = await fetch(url, {
                 method: 'GET'
