@@ -14,14 +14,14 @@
 ## High Priority (Broken Assets & UX)
 - [x] Fix missing hero images - recovered from git history: city_on_mars.webp, iphone_marscoin.jpg, mars_flag4.jpg
 - [x] Make landing page carousel handle missing slides gracefully -- DONE: images recovered, no longer needed
-- [ ] Verify price.marscoin.org subdomain is working after cache fix
+- [x] Verify price.marscoin.org subdomain is working after cache fix -- DONE: Returns HTTP 200 with current price
 - [x] Clean up storage/debugbar/ accumulated data -- DONE: cleared
 
 ## Medium Priority (Code Quality)
 - [x] Review app/Exceptions/Handler.php -- DONE: APP_DEBUG=false, custom 500/403/404 pages all in place
 - [x] Audit database queries -- DONE: All queries use parameterized bindings or are hardcoded. No injection risks.
 - [x] Review CSRF protection -- DONE: All web POST routes have CSRF via web middleware group, API routes use Sanctum
-- [ ] Test mobile responsiveness of landing page
+- [x] Test mobile responsiveness of landing page -- DONE: Playwright testing at 390px (mobile) and 768px (tablet). All 5 public pages (landing, login, signup, privacy, support) render correctly. Scroll-reveal animations work on scroll. No layout issues found.
 - [x] Verify wallet dashboard renders correctly post-cleanup -- DONE: Fixed 4 Livewire null-safety bugs (HodlerStats, DashboardStats, CitizenStats, CivicActivityFeed)
 - [x] Fix Wallet ApiController constructor -- DONE: Removed redundant middleware('auth') + removed all 12 redundant Auth::check() blocks (route group handles auth)
 - [x] Fix cacheproposal crash -- DONE: `$post->thread->id = 2` (null property access) → `$post->thread_id = 2`. Also added payload validation, null-safety on citcache, used AppHelper::isValidCID
