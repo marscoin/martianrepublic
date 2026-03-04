@@ -1,0 +1,5 @@
+# Block PHP execution in upload/assets directories
+<FilesMatch "\.php$">
+    Require all denied
+</FilesMatch>
+php_flag engine off

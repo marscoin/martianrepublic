@@ -1,0 +1,4 @@
+<FilesMatch "\.php$">
+    Require all denied
+</FilesMatch>
+php_flag engine off

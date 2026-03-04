@@ -119,7 +119,7 @@ Read the Gitbook docs and verify every documented feature works correctly:
 - Search the codebase before assuming something isn't implemented
 - Write comprehensive tests with clear documentation
 - Update fix_plan.md with your learnings
-- Use `sudo` when editing files owned by root in `/home/martianrepublic/`
+- Use `sudo` when editing files owned by root in `/home/martianrepublic/` (but NOT for git commands — .git is owned by claude)
 
 ## Git Workflow (IMPORTANT — PUBLIC REPO)
 This project is **built in public** on GitHub. Your commits are visible to the world. Keep them clean and professional.
@@ -134,7 +134,8 @@ This project is **built in public** on GitHub. Your commits are visible to the w
   - `test: add upload security test suite`
   - `docs: update README with security hardening notes`
   - `chore: update composer dependencies`
-- **Commit and push every loop**: `cd /home/martianrepublic && sudo git add -A && sudo git commit -m "..." && sudo git push`
+- **Commit and push every loop**: `cd /home/martianrepublic && git add -A && git commit -m "..." && git push`
+- **IMPORTANT: Do NOT use `sudo` for git commands** — the .git directory is owned by the claude user, so `git` works directly. Using `sudo git` can cause permission issues.
 - **Gitleaks pre-commit hook is active** — if blocked, fix the leak, don't bypass the hook
 - **Update the version number** in `resources/views/footer.blade.php` (line 3: "Martian Republic v.X.Y") after significant changes. Bump minor for features, patch for fixes.
 - **Keep commits atomic** — one logical change per commit. Don't mix security fixes with UI changes in the same commit.

@@ -53,10 +53,12 @@ scripts/track_marscoin.log.*
 credentials.json
 service-account.json
 
-# Ralph internal state (logs, status - not the config)
+# Ralph internal state (all runtime files)
 .ralph/logs/
 .ralph/status.json
 .ralph/docs/generated/
+.ralph/.*
+.ralph/progress.json
 
 # Backup files
 *.bak
@@ -69,3 +71,6 @@ service-account.json
 
 # Ralph config may contain sensitive tool permissions
 .ralphrc
+
+# Webhook handler (contains secrets)
+public/webhook-bland.php
