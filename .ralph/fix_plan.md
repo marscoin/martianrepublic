@@ -35,8 +35,8 @@
 - [x] Mobile responsiveness -- DONE: Landing page (masthead, buttons, clients list, iframe, footer), wallet dashboard (table-responsive, portlets), congress voting (voting-nav, price-box, posts, comments). Removed duplicate Voter Registry section. Fixed stray `<style>` tag in voting.css.
 - [x] Security headers -- DONE: SecurityHeaders middleware with full CSP, X-Frame-Options, X-Content-Type-Options, Strict-Transport-Security, Referrer-Policy, Permissions-Policy
 - [x] Page load performance -- DONE: Increased balance/received/sent API cache TTL 5s→300s, cached dashboard stats (forum count, proposal count), cached citizen registry queries (everyPublic/everyCitizen/everyApplicant), replaced 3 uncached network API calls with cached AppHelper::getMarscoinNetworkInfo(), fixed N+1 in getAllCategoriesWithThreads (single joined query), removed excessive microtime debug logging, removed dead showChart endpoint with hardcoded API key
-- [ ] Form validation & user feedback - clear error messages, client+server validation, success/failure toasts
-- [ ] Navigation & UX flow - all links work, breadcrumbs, user always knows where they are
+- [x] Form validation & user feedback -- DONE: Added server-side validation to ContactFormController, added validation error display + old() persistence to support page, added global toastr flash handler to mainnav (success/error/warning), fixed wallet failWallet() using error flash instead of success
+- [x] Navigation & UX flow -- DONE: Fixed hardcoded martianrepublic.local URL in newproposal, fixed external URL in navbarright to relative path, replaced all placeholder content (Lorem ipsum, Nikita Williams, jumpstartthemes, MVP Ready), rewrote profile page with actual user data, fixed social links in footers
 - [ ] Review and update composer dependencies for security patches
 
 ## Phase 4: Feature Completeness (per Gitbook Docs)
