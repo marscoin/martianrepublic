@@ -32,7 +32,7 @@
 - [x] Remove duplicate isValidCID -- DONE: Deleted protected isValidCID() from Wallet\ApiController, now uses AppHelper::isValidCID
 
 ## Phase 3: Site Improvements & Polish
-- [ ] Mobile responsiveness - test and fix all pages on phone/tablet viewports
+- [x] Mobile responsiveness -- DONE: Landing page (masthead, buttons, clients list, iframe, footer), wallet dashboard (table-responsive, portlets), congress voting (voting-nav, price-box, posts, comments). Removed duplicate Voter Registry section. Fixed stray `<style>` tag in voting.css.
 - [x] Security headers -- DONE: SecurityHeaders middleware with full CSP, X-Frame-Options, X-Content-Type-Options, Strict-Transport-Security, Referrer-Policy, Permissions-Policy
 - [ ] Page load performance - review slow pages, add caching, optimize DB queries with eager loading
 - [ ] Form validation & user feedback - clear error messages, client+server validation, success/failure toasts

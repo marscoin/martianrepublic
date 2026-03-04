@@ -13,7 +13,6 @@
 */
 
 
-<style>
 span.qrcodeicon span {
     position: absolute;
     display: block;
@@ -32,7 +31,8 @@ margin: 0 auto;
 background: #E9E9E9;
 border-radius: 10px;
 padding: 40px 15px;
-width: 500px;
+max-width: 500px;
+width: 100%;
 }
 
 .ui-widget-content {
@@ -217,6 +217,7 @@ min-height: 968px;
     justify-content: space-around;
     align-items: center;
     width: 35%;
+    min-width: 280px;
     box-shadow: 1px 1px 20px 1px rgba(24, 24, 24, 0.199);
 }
 
@@ -244,7 +245,7 @@ min-height: 968px;
 
 .archival{
     background-color: #d74b4b;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: space-between;
     padding: 10px 15px 10px 15px;
@@ -252,9 +253,7 @@ min-height: 968px;
     font-weight: 700;
     color:rgb(255, 255, 255);
     border-radius: 8px;
-    width: 10%;
-
-    
+    min-width: 120px;
 }
 .archival:hover{
     text-decoration: none;
@@ -631,7 +630,8 @@ margin: 0 auto;
 background: #E9E9E9;
 border-radius: 10px;
 padding: 40px 15px;
-width: 500px;
+max-width: 500px;
+width: 100%;
 }
 
 .ui-widget-content {
@@ -1040,5 +1040,50 @@ min-height: 968px;
 @media (min-width: 768px) {
   .icon-stat {
     margin-bottom: 2em;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 767px) {
+  .voting-nav {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+  .voting-nav li a {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+  .feed-item {
+    margin: 10px 5px;
+  }
+  .post {
+    display: block;
+    padding-right: 0;
+  }
+  .post-aside {
+    display: block;
+    width: auto;
+    margin-bottom: 10px;
+  }
+  .post-main {
+    display: block;
+    padding-left: 0;
+  }
+  .comment-list .comment {
+    margin-left: 0;
+    padding: 15px 10px;
+  }
+  .comment-list .comment-avatar {
+    position: static;
+    margin-bottom: 10px;
+  }
+  .CodeMirror, .CodeMirror-scroll {
+    min-height: 300px;
+  }
+  .help-text {
+    position: static;
+    width: auto;
+    text-align: left;
   }
 }

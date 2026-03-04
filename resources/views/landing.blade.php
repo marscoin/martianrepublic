@@ -35,6 +35,111 @@
 <link href="/assets/landing/css/animate.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="shortcut icon" href="/assets/favicon.ico">
+<style>
+/* Responsive iframe wrapper */
+.responsive-iframe-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding-bottom: 59.27%; /* 569/960 aspect ratio */
+  height: 0;
+  overflow: hidden;
+}
+.responsive-iframe-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 767px) {
+  .masthead-title {
+    font-size: 26px;
+    line-height: 1.2;
+  }
+  .masthead-text {
+    font-size: 15px;
+    padding-top: 10px;
+  }
+  .masthead-carousel .carousel-inner {
+    min-height: 0;
+  }
+  .masthead-img img {
+    max-width: 80%;
+    margin-top: 1em;
+  }
+  .masthead-actions .btn {
+    display: block;
+    width: 100%;
+    margin: 0 0 10px 0;
+  }
+  .masthead-actions .btn:last-child {
+    margin-right: 0;
+  }
+  .content-title {
+    font-size: 22px !important;
+  }
+  .content .row .col-sm-6 img {
+    max-width: 100%;
+    margin-top: 1em;
+  }
+  /* Un-push/pull columns on mobile so text comes first */
+  .col-sm-push-6, .col-sm-pull-6 {
+    left: auto;
+    right: auto;
+  }
+  .clients-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .clients-list li {
+    float: none;
+    width: 45%;
+    height: auto;
+    line-height: normal;
+    margin: 10px 2%;
+  }
+  .clients-list li img {
+    width: 100%;
+    height: auto;
+  }
+  .footer .col-sm-3 {
+    margin-bottom: 20px;
+  }
+  .copyright .pull-right {
+    float: none !important;
+    text-align: left;
+  }
+  .copyright .row .col-sm-6 {
+    line-height: 1.5;
+  }
+  .carousel-container {
+    overflow: hidden;
+  }
+  .lead.lead-small {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .masthead-title {
+    font-size: 22px;
+  }
+  .navbar-brand {
+    font-size: 14px !important;
+  }
+  .navbar-brand img {
+    width: 40px !important;
+  }
+  .mini-feature {
+    margin-bottom: 1.5em;
+  }
+}
+</style>
 </head>
 <body class=" ">
 <div id="wrapper">
@@ -448,27 +553,6 @@
           </div> 
         </div> 
 
-        <div class="row-divider divider-wider"></div> <!-- /.row-divider -->
-
-
-        <div class="row">
-           <div class="col-sm-6 col-sm-push-6 text-center">
-            <br><br>
-            <img data-aos="fade-left" class="img-responsive figure-shadow center-block shadow-lg" src="/assets/citizen/registry_screenshot.png" >
-          </div>
-          <div class="col-sm-6 col-sm-pull-6" data-aos="fade-in">
-            <h4 class="mini-feature-title">
-              <span>Proof-of-Humanity Martian Voter Registry</span>
-            </h4>
-            <p class="lead lead-small">Martian Citizen Registry : an on-chain "proof of humanity" registry using decentralized and cryptographically secured file storage to create a private/public identity attestation system.</p>
-            <p class="lead lead-small">It comes with a community driven identity attestation service in which an initial community dictates the terms to invite new members to join their group using clear programmatic guidelines that future proposal can modify, allowing a virtuous feedback loop in which the community is allowed to integrate new members.</p>
-            <p class="lead lead-small">We start out with a basic user submission form and liveness-test which could be further improved with kiosk-style self service terminals (upon arrival on Mars, for instance). After an initial registration the users are vetted by the community itself and integrated into the general public.</p>
-            <br>
-            <a data-aos="fade-up" data-aos-delay="150" href="/signup" class="btn btn-default">Join the Martian Republic</a>
-          </div> 
-        </div> 
-
-
         <div class="row-divider"></div> <!-- /.row-divider -->
 
 
@@ -495,7 +579,9 @@
 
 
 
-        <iframe title="Martian Republic - Research Paper" src="https://docs.google.com/presentation/d/e/2PACX-1vQFJLAKZc6YWBlqFxsCI3y9g0XkpB-k-_zIFxbtfey6EI3ck3ljOH7eUnwxz9Z6rrCN1VfV6VL0kpHV/embed?start=true&loop=true&delayms=5000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+        <div class="responsive-iframe-wrapper">
+          <iframe title="Martian Republic - Research Paper" src="https://docs.google.com/presentation/d/e/2PACX-1vQFJLAKZc6YWBlqFxsCI3y9g0XkpB-k-_zIFxbtfey6EI3ck3ljOH7eUnwxz9Z6rrCN1VfV6VL0kpHV/embed?start=true&loop=true&delayms=5000" frameborder="0" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+        </div>
 
         <div class="carousel-container">
         <div class="row">

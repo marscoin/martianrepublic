@@ -19,6 +19,44 @@
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     @livewireStyles
+    <style>
+    /* Mobile responsiveness for wallet dashboard */
+    @media (max-width: 767px) {
+        .table-responsive, .dataTables_wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .dataTable th, .dataTable td {
+            white-space: nowrap;
+            font-size: 12px;
+        }
+        .portlet {
+            margin-bottom: 15px;
+        }
+        .portlet-title {
+            font-size: 16px;
+        }
+        .content .container {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        #chart {
+            min-height: 200px;
+        }
+        coingecko-coin-price-chart-widget {
+            max-width: 100%;
+            overflow: hidden;
+        }
+    }
+    @media (max-width: 480px) {
+        .navbar-brand {
+            font-size: 14px !important;
+        }
+        .navbar-brand img {
+            width: 40px !important;
+        }
+    }
+    </style>
 </head>
 
 <body class=" ">
@@ -109,6 +147,7 @@
                                     <h4 class="portlet-title">
                                         <u>Wallet Transactions</u>
                                     </h4>
+                                    <div class="table-responsive">
                                     <table class="table table-striped table-bordered dataTable" id="table-2"
                                         aria-describedby="table-2">
                                         <thead>
@@ -150,6 +189,7 @@
 
                                         </tbody>
                                     </table>
+                                    </div><!-- /.table-responsive -->
 
                                 </div>
                             </div>
