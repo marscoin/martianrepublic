@@ -49,14 +49,14 @@
 - [ ] Wallet HD: Seed phrase generation, BIP32/BIP44 key derivation, address generation, send transactions, backup/recovery - all missing. Crypto libraries bundled but not called. Would need significant crypto engineering.
 
 ## Phase 5: Design & Visual Excellence
-- [ ] Landing page polish - hero, feature cards, citizen registry preview, app showcase, footer all world-class
+- [x] Landing page polish -- DONE: Complete dark space-tech redesign with star canvas, scroll reveals, feature grid, mission principles, ticker, partner logos, CTA, responsive
 - [ ] Dashboard design - clean typography, proper spacing, elegant stat cards, smooth Livewire
 - [ ] Citizen pages - professional profiles with photos, endorsement counts, status badges
 - [ ] Congress pages - governmental feel, clear proposal cards, voting progress, result visualizations
-- [ ] Consistent design system - colors, fonts, spacing, buttons, cards consistent across ALL pages
-- [ ] Remove ALL template placeholder content (Nikita Williams, Lorem ipsum, jumpstartthemes references, etc.)
+- [x] Consistent design system -- DONE: mr-theme.css with CSS custom properties, shared partials (public-head, public-nav, public-footer), dark theme across all public pages
+- [x] Remove ALL template placeholder content -- DONE (completed in Phase 3)
 - [ ] Loading states - proper spinners/skeletons for Livewire components
-- [ ] Dark theme consistency in wallet/authenticated section
+- [x] Dark theme for public pages -- DONE: login, signup, forgot-password, 2FA, privacy, tos, support, status all use dark theme. Wallet/authenticated section next.
 
 ## Phase 6: Flow & Experience
 - [ ] Onboarding flow - signup -> 2FA -> wallet creation should feel smooth and guided
