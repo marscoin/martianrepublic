@@ -1,97 +1,47 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<html lang="en">
 <head>
-  <title>Martian Republic - Login</title>
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="">
-  <meta name="author" content="">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
-  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
-  <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
-  <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
-  <!-- <link href="/assets/wallet/css/custom.css" rel="stylesheet">-->
-  <link rel="shortcut icon" href="/assets/favicon.ico">
+  <title>Martian Republic - Reset Password</title>
+  @include('partials.public-head')
 </head>
 
-<body class="account-bg" style="background-image: url(/assets/landing/img/u8jQzd5.jpg); background-size: cover;">
+<body class="mr-theme">
 
-  <header class="navbar navbar-inverse" role="banner">
+  @include('partials.public-nav')
 
+  <main class="mr-auth-page">
     <div class="container">
+      <div class="mr-form-card">
 
-      <div class="navbar-header">
-        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <i class="fa fa-cog"></i>
-        </button>
+        <h2>Reset Password</h2>
+        <p class="mr-form-sub">Enter your email and we'll send you a reset link</p>
 
-        <a href="/" class="navbar-brand navbar-brand-img" style="font-family: 'Orbitron', sans-serif;">
-          <img style="font-family: 'Orbitron', sans-serif;width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic Logo" >
-        Martian Republic
-        </a>
-      </div> <!-- /.navbar-header -->
+        <x-auth-validation-errors class="mr-alert mr-alert-error" :errors="$errors" />
 
-      <nav class="collapse navbar-collapse" role="navigation">
-        <ul class="nav navbar-nav navbar-right">
-          <li>
-            <a href="/"><i class="fa fa-angle-double-left"></i> &nbsp;Back to Home</a>
-          </li>
-        </ul>
-      </nav>
+        <form method="POST" action="{{ route('password.email') }}">
+          @csrf
 
-    </div> <!-- /.container -->
+          <div class="mr-form-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" placeholder="Enter your email" required>
+          </div>
 
-  </header>
+          <div class="mr-form-group">
+            <button type="submit" class="mr-btn mr-btn-primary">Send Reset Link</button>
+          </div>
 
-  <div class="account-wrapper">
+          <div class="mr-form-footer">
+            <a href="{{ route('login') }}">Back to Login</a>
+          </div>
 
-          <div class="account-body">
+        </form>
 
-            <h2>Password Reset</h2>
+      </div>
+    </div>
+  </main>
 
-            <h5>Please enter your email to reset password</h5>
-            <x-auth-validation-errors class="mb-4" :errors="$errors" />
- <form class="form account-form" method="POST" action="{{ route('password.email') }}">
-            @csrf
+  @include('partials.public-footer')
 
-            <div class="form-group">
-              <input type="email" name="email" class="form-control" id="email" placeholder="Email" tabindex="2">
-            </div> <!-- /.form-group -->
-            <div class="form-group">
-              <button type="submit" class="btn btn-primary btn-block btn-lg" tabindex="4">Submit &nbsp; <i class="fa fa-play-circle"></i></button>
-            </div> <!-- /.form-group -->
-
-  </form>
-            
-          </div> <!-- /.account-body -->
-
-        </div>
-
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Core JS -->
-<script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
-<script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
-
-<!--[if lt IE 9]>
-<script src="/assets/wallet/js/libs/excanvas.compiled.js"></script>
-<![endif]-->
-<!-- App JS -->
-<script src="/assets/wallet/js/mvpready-core.js"></script>
-<script src="/assets/wallet/js/mvpready-admin.js"></script>
-
-<!-- Plugin JS -->
-<script src="/assets/wallet/js/mvpready-account.js"></script>
-
-
-
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </body>
 </html>

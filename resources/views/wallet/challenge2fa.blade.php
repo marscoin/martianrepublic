@@ -1,120 +1,126 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html lang="en" class="no-js">
-<!--<![endif]-->
-
+<html lang="en">
 <head>
-    <title>Marscoin - Wallet Login</title>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
-    <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
-    <link rel="shortcut icon" href="favicon.ico">
+  <title>Martian Republic - 2FA Challenge</title>
+  @include('partials.public-head')
+  <style>
+    .mr-2fa-input {
+      width: 100%;
+      height: 72px;
+      font-size: 36px;
+      font-weight: 700;
+      font-family: var(--mr-font-mono);
+      letter-spacing: 12px;
+      text-align: center;
+      background: var(--mr-void);
+      border: 2px solid var(--mr-border-bright);
+      border-radius: 12px;
+      color: var(--mr-cyan);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .mr-2fa-input:focus {
+      border-color: var(--mr-cyan);
+      box-shadow: 0 0 0 4px var(--mr-cyan-dim), 0 0 32px rgba(0,228,255,0.1);
+    }
+    .mr-2fa-input::placeholder {
+      color: var(--mr-text-faint);
+      font-size: 18px;
+      letter-spacing: 2px;
+    }
+    .mr-2fa-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: var(--mr-cyan-dim);
+      border: 1px solid rgba(0,228,255,0.2);
+      margin: 0 auto 24px;
+      font-size: 28px;
+      color: var(--mr-cyan);
+    }
+    .mr-2fa-hint {
+      text-align: center;
+      font-size: 13px;
+      color: var(--mr-text-faint);
+      margin-top: 16px;
+      font-family: var(--mr-font-mono);
+    }
+    .mr-spinner .fa-arrow-right { display: inline; }
+    .mr-spinner .fa-spinner { display: none; }
+    .mr-spinner.submitting .fa-arrow-right { display: none; }
+    .mr-spinner.submitting .fa-spinner { display: inline; }
+  </style>
 </head>
 
-<body class="account-bg" style="background-image: url(/assets/landing/img/mcolony.jpg); background-size: cover;">
+<body class="mr-theme">
 
-    <header class="navbar navbar-inverse" role="banner">
+  @include('partials.public-nav')
 
-        <div class="container">
+  <main class="mr-auth-page">
+    <div class="container">
+      <div class="mr-form-card" style="max-width: 440px;">
 
-            <div class="navbar-header">
-                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <i class="fa fa-cog"></i>
-                </button>
-
-                <a href="/" class="navbar-brand navbar-brand-img" style="font-family: 'Orbitron', sans-serif;">
-                    <img style="font-family: 'Orbitron', sans-serif;width: 67px;"
-                        src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic Logo">
-                    Martian Republic
-                </a>
-            </div> <!-- /.navbar-header -->
-
-            <nav class="collapse navbar-collapse" role="navigation">
-                <ul class="nav navbar-nav navbar-right">
-                    <li>
-
-                    </li>
-                </ul>
-            </nav>
-        </div> <!-- /.container -->
-    </header>
-
-    <div class="account-wrapper">
-
-        <div class="account-body">
-            <h2>Enter 2FA Authentication Code</h2>
-            <form id="form" class="form account-form" method="POST" action="/twofachallenge">
-                @csrf
-                <div  class="form-group" style="text-align: center;">
-                    <input name="secret" id="secret"
-                        style="height: 68px; font-size: 42px; font-weight: 700;  text-align: center;" type="text"
-                        class="form-control" id="register-2fa" placeholder="Enter code" tabindex="1" autofocus>
-                    <button type="submit"  class="btn btn-success btn-block btn-lg" tabindex="2">Complete 2FA challenge
-                        &nbsp; <i id="btn" class="fa fa-arrow-right"></i>
-                    </button>
-                </div>
-                <input type="hidden" value="meow" class="local" name="local" />
-
-            </form>
-            <a href="/logout"><i class="fa fa-angle-double-left"></i> &nbsp;Back to Login</a>
+        <div class="mr-2fa-icon">
+          <i class="fa fa-shield-halved"></i>
         </div>
 
+        <h2>2FA Verification</h2>
+        <p class="mr-form-sub">Enter the 6-digit code from your authenticator app</p>
 
+        <form id="form" method="POST" action="/twofachallenge">
+          @csrf
+
+          <div class="mr-form-group">
+            <input name="secret" id="secret" type="text" class="mr-2fa-input"
+                   placeholder="000000" maxlength="6" inputmode="numeric"
+                   autocomplete="one-time-code" tabindex="1" autofocus>
+          </div>
+
+          <div class="mr-form-group">
+            <button type="submit" class="mr-btn mr-btn-primary mr-spinner" id="submitBtn" tabindex="2">
+              Verify &nbsp;
+              <i class="fa fa-arrow-right"></i>
+              <i class="fa fa-spinner fa-spin"></i>
+            </button>
+          </div>
+
+          <input type="hidden" value="meow" class="local" name="local" />
+
+          <p class="mr-2fa-hint">Code auto-submits when 6 digits entered</p>
+        </form>
+
+        <div class="mr-form-footer">
+          <a href="/logout"><i class="fa fa-arrow-left"></i> &nbsp;Back to Login</a>
+        </div>
+
+      </div>
     </div>
-    <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
-    <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
-    <script src="/assets/wallet/js/mvpready-core.js"></script>
-    <script src="/assets/wallet/js/mvpready-admin.js"></script>
-    <script src="/assets/wallet/js/mvpready-account.js"></script>
-    <script>
-        $(document).ready(function() {
+  </main>
 
-            // document.onload = function() {
-            //     localStorage.clear();
+  @include('partials.public-footer')
 
-            // }
-            let item = localStorage.getItem("key")
-
-            if (item != null && wordCount(item) == 12) {
-                $(".local").val("true")
-            } else {
-                $(".local").val("false")
-            }
-
-            function wordCount(str) {
-                return str.split(" ").length;
-            }
-
-        })
-    </script>
-    <script type="text/javascript">
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script>
     $(document).ready(function() {
+      // Check for local wallet key
+      let item = localStorage.getItem("key");
+      if (item != null && item.split(" ").length === 12) {
+        $(".local").val("true");
+      } else {
+        $(".local").val("false");
+      }
 
-        $("#secret").keyup(function() {
-            if ($(this).val().length >= 6) {
-                $("#btn").removeClass('fa-arrow-right');
-                $("#btn").addClass('fa-spinner fa-spin');
-                $("#form").submit();
-            }
-        });
+      // Auto-submit on 6 digits
+      $("#secret").on("keyup input", function() {
+        if ($(this).val().length >= 6) {
+          $("#submitBtn").addClass("submitting");
+          $("#form").submit();
+        }
+      });
     });
-    </script>
+  </script>
 </body>
-
 </html>
