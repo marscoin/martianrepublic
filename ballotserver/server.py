@@ -231,10 +231,6 @@ async def client_handler(websocket, path):
         logging.debug(f"Final room state: {rooms}")
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> refs/remotes/origin/main
 async def main():
     server = await websockets.serve(client_handler, str(BALLOT_SERVER_HOST), BALLOT_SERVER_PORT, ssl=ssl_context)
     await server.wait_closed()
@@ -249,12 +245,3 @@ if __name__ == "__main__":
         pass
     finally:
         loop.close()
-<<<<<<< HEAD
-
-
-#start_server = websockets.serve(client_handler, str(BALLOT_SERVER_HOST), BALLOT_SERVER_PORT, ssl=ssl_context)
-
-#asyncio.get_event_loop().run_until_complete(start_server)
-#asyncio.get_event_loop().run_forever()
-=======
->>>>>>> refs/remotes/origin/main
