@@ -33,5 +33,5 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect('/wallet/dashboard');  // Remove route() helper since 'check' isn't a named route
+    $response->assertRedirect('/check');  // Signup redirects through /check for 2FA setup
 });
