@@ -2,6 +2,13 @@
 
 <div class="row">
     <div class="col-md-10">
+        @if(count($allPublications) === 0)
+        <div style="text-align: center; padding: 40px 20px; color: #888;">
+            <i class="fa fa-globe" style="font-size: 48px; margin-bottom: 15px; display: block;"></i>
+            <h4>No public logbook entries yet</h4>
+            <p>Be the first to document research for the Martian Republic. Entries are stored permanently on IPFS and can be notarized on the Marscoin blockchain.</p>
+        </div>
+        @else
         <div class="table-responsive">
             <table class="table table-striped table-bordered thumbnail-table datatable allentries">
                 <thead>
@@ -35,5 +42,6 @@
             </table>
 
         </div>
+        @endif
     </div>
 </div>

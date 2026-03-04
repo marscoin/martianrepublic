@@ -51,8 +51,7 @@ class InventoryController extends Controller
 			$view->balance = 0; //for now, could move to stats helper function as well
 			
 			if ($wallet) {
-				$cur_balance = AppHelper::file_get_contents_curl("https://explore.marscoin.org/api/addr/{$wallet['public_addr']}/balance");
-				$view->balance = ($cur_balance * 0.00000001);
+				$view->balance = AppHelper::getMarscoinBalance($wallet['public_addr']);
 				$view->public_address = $wallet['public_addr'];
 			} else {
 				$view->balance = 0;

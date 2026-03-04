@@ -2,6 +2,14 @@
 
 <div class="row">
     <div class="col-md-10">
+        @if(count($myPublications) === 0)
+        <div style="text-align: center; padding: 40px 20px; color: #888;">
+            <i class="fa fa-book" style="font-size: 48px; margin-bottom: 15px; display: block;"></i>
+            <h4>No logbook entries yet</h4>
+            <p>Start documenting your research and experiments. Create your first entry in the "New Entry" tab.</p>
+            <a href="#New-Entry" data-toggle="tab" class="btn btn-primary" onclick="$('#myTab1 a[href=\'#New-Entry\']').tab('show');">Create First Entry</a>
+        </div>
+        @else
         <div class="table-responsive">
             <table class="table table-striped table-bordered thumbnail-table datatable myentries">
                 <thead>
@@ -49,6 +57,7 @@
             </table>
 
         </div>
+        @endif
     </div>
 </div>
 
