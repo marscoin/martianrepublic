@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class StatusController extends Controller {
 
@@ -27,7 +28,26 @@ class StatusController extends Controller {
 
 	protected function showStatus()
 	{
+		// Cache status results for 60 seconds to avoid slow RPC calls on every page load
+		$cached = Cache::remember('status_page_data', 60, function () {
+			return $this->collectStatusData();
+		});
 
+		$view = View::make('status');
+		$view->web_status = $cached['web_status'];
+		$view->mysql_status = $cached['mysql_status'];
+		$view->marscoind_status = $cached['marscoind_status'];
+		$view->network = $cached['network'];
+		$view->blockexplorer = $cached['blockexplorer'];
+		$view->pebas_status = $cached['pebas_status'];
+		$view->ipfs_status = $cached['ipfs_status'];
+		$view->blockchain_tracker_status = $cached['blockchain_tracker_status'];
+		$view->ballot_server_status = $cached['ballot_server_status'];
+		return $view;
+	}
+
+	protected function collectStatusData()
+	{
 		$web_status = "danger";
 		$mysql_status = "danger";
 		$marscoind_status = "danger";
@@ -69,14 +89,19 @@ class StatusController extends Controller {
 			$nu92u5p9u2np8uj5wr = "http://" . $RPC_User . ":" . $RPC_Pass . "@" . $RPC_Host . ":" . $RPC_Port . "/";
 			$Marscoind = new jsonRPCClient($nu92u5p9u2np8uj5wr);
 			$network = $Marscoind->getNetworkInfo();
-			
-			// Properly log array data
-			Log::debug('Network info received: ' . json_encode($network, JSON_PRETTY_PRINT));
-			
+
+			// Also fetch blockchain info for blocks/difficulty (separate RPC call in v28+)
+			try {
+				$blockchain = $Marscoind->getBlockchainInfo();
+				$network['blocks'] = $blockchain['blocks'] ?? 0;
+				$network['difficulty'] = $blockchain['difficulty'] ?? 0;
+			} catch (\Exception $e) {
+				$network['blocks'] = 0;
+				$network['difficulty'] = 0;
+			}
+
 			// Check specific fields in the response
 			$marscoind_status = (isset($network['version']) && isset($network['protocolversion'])) ? "success" : "danger";
-			
-			Log::debug('Status determined as: ' . $marscoind_status);
 			
 		} catch (\Exception $e) {
 			Log::debug('Exception caught: ' . $e->getMessage());
@@ -144,21 +169,19 @@ class StatusController extends Controller {
 
 
 		// Check the ballot shuffle server status
-		$ballot_server_status = $ballot_server_status = $this->checkBallotServer();
+		$ballot_server_status = $this->checkBallotServer();
 
-		$view = View::make('status');
-
-		$view->web_status = $web_status;
-		$view->mysql_status = $mysql_status;
-		$view->marscoind_status = $marscoind_status;
-		$view->network = $network;
-		$view->blockexplorer = $blockexplorer;
-		$view->pebas_status = $pebas_status;
-		$view->ipfs_status = $ipfs_status;
-		$view->blockchain_tracker_status = $blockchain_tracker_status;
-		$view->ballot_server_status = $ballot_server_status;
-
-		return $view;
+		return [
+			'web_status' => $web_status,
+			'mysql_status' => $mysql_status,
+			'marscoind_status' => $marscoind_status,
+			'network' => $network,
+			'blockexplorer' => $blockexplorer,
+			'pebas_status' => $pebas_status,
+			'ipfs_status' => $ipfs_status,
+			'blockchain_tracker_status' => $blockchain_tracker_status,
+			'ballot_server_status' => $ballot_server_status,
+		];
 	}
 
 
@@ -192,8 +215,15 @@ class StatusController extends Controller {
         return response()->json($response);
     }
 
-    private function checkBallotServer($host = 'martianrepublic.org', $port = 3678) {
-        $socket = @fsockopen('ssl://' . $host, $port, $errno, $errstr, 5);
+    private function checkBallotServer($host = '127.0.0.1', $port = 3678) {
+        $context = stream_context_create([
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true,
+            ]
+        ]);
+        $socket = @stream_socket_client('ssl://' . $host . ':' . $port, $errno, $errstr, 5, STREAM_CLIENT_CONNECT, $context);
         if ($socket) {
             fclose($socket);
             return "success";

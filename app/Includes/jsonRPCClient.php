@@ -84,55 +84,63 @@ class jsonRPCClient {
 			$currentId = $this->id;
 		}
 
-		// prepares the request
+		// prepares the request (method name must be lowercase for Marscoin v28+)
 		$request = array(
-						'method' => $method,
+						'jsonrpc' => '1.0',
+						'method' => strtolower($method),
 						'params' => $params,
-						'id' => $currentId,
-						'http'=>array(
-						    'timeout' => 240.0
-						  )
+						'id' => $currentId
 						);
 		$request = json_encode($request);
-		// echo "<br>".$request."<br>";
 		$this->debug && $this->debug.='***** Request *****'."\n".$request."\n".'***** End Of request *****'."\n\n";
 
-		// performs the HTTP POST
-		$opts = array ('http' => array (
-			'method'  => 'POST',
-			'header'  => array(
-				'Content-Type: application/json',
-				'Connection: close'
-			),
-			'content' => $request,
-			'timeout' => 240.0,
-			'ignore_errors' => true // Add this to prevent fopen from failing on non-200 responses
+		// performs the HTTP POST using curl (compatible with Marscoin v28+)
+		$ch = curl_init($this->url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type: application/json',
+			'Connection: close'
 		));
-		$context  = stream_context_create($opts);
-		if ($fp = fopen($this->url, 'r', false, $context)) {
-			$response = '';
-			while($row = fgets($fp)) {
-				$response.= trim($row)."\n";
-			}
-			$this->debug && $this->debug.='***** Server response *****'."\n".$response.'***** End of server response *****'."\n";
-			$response = json_decode($response,true);
-		} else {
-			throw new Exception('Unable to connect to '.$this->url);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+
+		// Extract credentials from URL for Basic Auth
+		$urlParts = parse_url($this->url);
+		if (isset($urlParts['user']) && isset($urlParts['pass'])) {
+			curl_setopt($ch, CURLOPT_USERPWD, $urlParts['user'] . ':' . $urlParts['pass']);
+		}
+
+		$responseRaw = curl_exec($ch);
+		$curlError = curl_error($ch);
+		curl_close($ch);
+
+		if ($responseRaw === false || empty($responseRaw)) {
+			throw new Exception('Unable to connect to '.$this->url.($curlError ? ': '.$curlError : ''));
+		}
+
+		$this->debug && $this->debug.='***** Server response *****'."\n".$responseRaw.'***** End of server response *****'."\n";
+		$response = json_decode($responseRaw, true);
+
+		if (!is_array($response)) {
+			throw new Exception('Invalid JSON response from server');
 		}
 
 		// debug output
 		if ($this->debug) {
-			echo nl2br($this->debug); // Change $debug to $this->debug
+			echo nl2br($this->debug);
 		}
 
 		// final checks and return
 		if (!$this->notification) {
 			// check
-			if ($response['id'] != $currentId) {
+			if (isset($response['id']) && $response['id'] != $currentId) {
 				throw new Exception('Incorrect response id (request id: '.$currentId.', response id: '.$response['id'].')');
 			}
-			if (!is_null($response['error'])) {
-				throw new Exception('Request error: '.$response['error']);
+			if (isset($response['error']) && !is_null($response['error'])) {
+				$errorMsg = is_array($response['error']) ? json_encode($response['error']) : $response['error'];
+				throw new Exception('Request error: '.$errorMsg);
 			}
 
 			return $response['result'];

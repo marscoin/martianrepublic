@@ -327,7 +327,7 @@ class AppHelper{
 			return $array;
 		}
 
-		public static function file_get_contents_curl($url)
+		public static function file_get_contents_curl($url, $timeout = 10)
 		{
 			$ch = curl_init();
 
@@ -337,6 +337,8 @@ class AppHelper{
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+			curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 
 			$data = curl_exec($ch);
 			curl_close($ch);
