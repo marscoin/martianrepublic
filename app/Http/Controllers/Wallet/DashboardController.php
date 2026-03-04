@@ -351,6 +351,9 @@ class DashboardController extends Controller
 			{
 				$view->civic_balance = AppHelper::getMarscoinBalance($civic_wallet->public_addr);
 				$view->network = AppHelper::getMarscoinNetworkInfo();
+			$view->user = $user;
+			$view->citizen = $citizen;
+			$view->profile = $profile;
 				$view->public_addr = null;
 
 				$view->general_public = $profile->general_public;
@@ -617,7 +620,7 @@ class DashboardController extends Controller
 	{
 
 
-		return redirect('wallet/dashboard/hd')->with('message', 'Wallet Unsuccessful!');
+		return redirect('wallet/dashboard/hd')->with('error', 'Wallet unlock failed. Please check your credentials and try again.');
 	}
 
 
@@ -650,8 +653,13 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
+			$user = Auth::user();
+			$citizen = $user->citizen;
 			$view = View::make('wallet.profile');
 			$view->network = AppHelper::getMarscoinNetworkInfo();
+			$view->user = $user;
+			$view->citizen = $citizen;
+			$view->profile = $profile;
 
 			return $view;
 		} else {
@@ -674,6 +682,9 @@ class DashboardController extends Controller
 			}
 			$view = View::make('wallet.reports');
 			$view->network = AppHelper::getMarscoinNetworkInfo();
+			$view->user = $user;
+			$view->citizen = $citizen;
+			$view->profile = $profile;
 			return $view;
 		} else {
 			return redirect('/login');
@@ -726,6 +737,9 @@ class DashboardController extends Controller
 			$view = View::make('wallet.camera');
 			$view->email = Auth::user()->email;
 			$view->network = AppHelper::getMarscoinNetworkInfo();
+			$view->user = $user;
+			$view->citizen = $citizen;
+			$view->profile = $profile;
 
 			return $view;
 		} else {

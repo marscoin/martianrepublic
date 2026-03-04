@@ -42,7 +42,7 @@
 
       <div class="navbar-header">
         <a href="/" class="navbar-brand navbar-brand-img"  style="font-family: 'Orbitron', sans-serif;">
-          <img style="width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="MVP Ready">
+          <img style="width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic">
         Martian Republic
         </a>
 
@@ -142,6 +142,15 @@
             <h4 class="content-title">
               <span>Send an Email</span>
             </h4>
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul style="margin-bottom: 0;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             @if(session('message_sent'))
                 <div class="alert alert-success">
                     {{ session('message_sent') }}
@@ -152,26 +161,26 @@
               <div class="form-group">
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                   <label>Name: <span class="required">*</span></label>
-                  <input class="form-control" id="name" name="name" type="text" value="" required="">
+                  <input class="form-control" id="name" name="name" type="text" value="{{ old('name') }}" required="">
                 </div>
 
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                   <label>Email: <span class="required">*</span></label>
-                  <input class="form-control" type="email" id="email" name="email" value="" required="">
+                  <input class="form-control" type="email" id="email" name="email" value="{{ old('email') }}" required="">
                 </div>
               </div>
 
               <div class="form-group">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <label>Subject: <span class="required">*</span></label>
-                  <input class="form-control" id="subject" name="subject" type="text" value="" required="">
+                  <input class="form-control" id="subject" name="subject" type="text" value="{{ old('subject') }}" required="">
                 </div>
               </div>
 
               <div class="form-group">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                   <label>Message: <span class="required">*</span></label>
-                  <textarea class="form-control" id="text" name="text" rows="6" cols="40" required=""></textarea>
+                  <textarea class="form-control" id="text" name="text" rows="6" cols="40" required="">{{ old('text') }}</textarea>
                 </div>
               </div>
 
@@ -239,18 +248,18 @@
 
           <ul class="footer-social-link">
             <li>
-              <a href="javascript:;" class="ui-tooltip" title="Facebook" data-placement="bottom">
+              <a href="https://facebook.com/marscoin" target="_blank" class="ui-tooltip" title="Facebook" data-placement="bottom">
                 <i class="fa fa-facebook"></i>
               </a>
             </li>
             <li>
-              <a href="javascript:;" class="ui-tooltip" title="Twitter" data-placement="bottom">
+              <a href="https://twitter.com/marscoinorg" target="_blank" class="ui-tooltip" title="Twitter" data-placement="bottom">
                 <i class="fa fa-twitter"></i>
               </a>
             </li>
             <li>
-              <a href="javascript:;" class="ui-tooltip" title="Google+" data-placement="bottom">
-                <i class="fa fa-google-plus"></i>
+              <a href="https://discord.gg/6vVKH6QdYb" target="_blank" class="ui-tooltip" title="Discord" data-placement="bottom">
+                <i class="fa fa-comments"></i>
               </a>
             </li>
           </ul>
@@ -264,7 +273,7 @@
           <span>Stay Updated</span>
         </h4>
 
-        <p>Get emails about new theme launches &amp;  future updates.</p>
+        <p>Join the Martian Republic community for updates.</p>
 
         <form action="/" class="form">
 

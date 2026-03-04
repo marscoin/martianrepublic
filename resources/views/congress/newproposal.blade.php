@@ -685,7 +685,7 @@ $("#proposalModalBtn").click(async (e) => {
                                     const data = await doAjax("/api/cacheproposal", {"type": "PR", "txid": tx.tx_hash, message: jsonString, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
                                     if(data.Discussion){
                                         console.log('Submitted to Blockchain successfully redirect to /forum/'+data.Discussion)
-                                        location.href="http://martianrepublic.local/forum/c/2-proposals";
+                                        location.href="/forum/c/2-proposals";
 
                                     }
                                 }

@@ -102,14 +102,14 @@
 <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-    // const nav_key = localStorage.getItem("key");
-    // if (nav_key != null) {
-    //     $(".wallet-is-open").show()
-    //     $(".wallet-is-not-open").hide()
-
-    // } else {
-    //     $(".wallet-is-not-open").show()
-    //     $(".wallet-is-open").hide()
-
-    // }
+    toastr.options = { "positionClass": "toast-top-right", "timeOut": "4000", "closeButton": true };
+    @if(session('message'))
+        toastr.success("{!! addslashes(session('message')) !!}");
+    @endif
+    @if(session('error'))
+        toastr.error("{!! addslashes(session('error')) !!}");
+    @endif
+    @if(session('warning'))
+        toastr.warning("{!! addslashes(session('warning')) !!}");
+    @endif
 </script>

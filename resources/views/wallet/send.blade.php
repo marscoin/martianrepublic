@@ -27,7 +27,7 @@
           <i class="fa fa-cog"></i>
         </button>
         <a href="/wallet/dashboard" class="navbar-brand navbar-brand-img">
-          <img style="width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="MVP Ready">
+          <img style="width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic">
         Marscoin Wallet
         </a>
       </div> <!-- /.navbar-header -->
@@ -130,7 +130,7 @@
             </div> <!-- /.tab-pane -->
             <div class="tab-pane fade" id="password-tab">
               <h3 class="content-title"><u>Change Password</u></h3>
-              <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes.</p>
+              <p>Update your account password. Choose a strong password with a mix of letters, numbers, and symbols.</p>
               <br><br>
               <form action="./page-settings.html" class="form-horizontal">
                 <div class="form-group">
@@ -163,7 +163,7 @@
             </div> <!-- /.tab-pane -->
             <div class="tab-pane fade" id="messaging">
               <h3 class="content-title"><u>Notification Settings</u></h3>
-              <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes.</p>
+              <p>Update your account password. Choose a strong password with a mix of letters, numbers, and symbols.</p>
               <br><br>
               <form action="./page-settings.html" class="form form-horizontal">
                 <div class="form-group">
@@ -184,13 +184,13 @@
                     <div class="checkbox">
                       <label>
                       <input value="" type="checkbox">
-                      Lorem ipsum dolor sit amet
+                      Send me community updates
                       </label>
                     </div> <!-- /.checkbox -->
                     <div class="checkbox">
                       <label>
                       <input value="" type="checkbox">
-                      Laborum, quam iure quibusdam
+                      Send me proposal notifications
                       </label>
                     </div> <!-- /.checkbox -->
                   </div> <!-- /.col -->
@@ -199,9 +199,7 @@
                   <label class="col-md-3">Email for Notifications</label>
                   <div class="col-md-7">
                     <select name="email_notifications" class="form-control">
-                      <option value="1">john@mvpready.com</option>
-                      <option value="2">mary@mvpready.com</option>
-                      <option value="3">chris@mvpready.com</option>
+                      <option value="1">{{ Auth::user()->email ?? "" }}</option>
                     </select>
                   </div> <!-- /.col -->
                 </div> <!-- /.form-group -->
@@ -216,13 +214,13 @@
             </div> <!-- /.tab-pane -->
             <div class="tab-pane fade" id="payments">
               <h3 class="content-title"><u>Payments Settings</u></h3>
-              <p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh mi whatever gluten-free, carles pitchfork biodiesel fixie etsy retro mlkshk vice blog. Scenester cred you probably haven't heard of them, vinyl craft beer blog stumptown. Pitchfork sustainable tofu synth chambray yr.</p>
-              <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
+              <p>Configure your transaction and notification preferences.</p>
+              <p></p>
             </div> <!-- /.tab-pane -->
             <div class="tab-pane fade" id="reports">
               <h3 class="content-title"><u>Reports Settings</u></h3>
-              <p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh mi whatever gluten-free, carles pitchfork biodiesel fixie etsy retro mlkshk vice blog. Scenester cred you probably haven't heard of them, vinyl craft beer blog stumptown. Pitchfork sustainable tofu synth chambray yr.</p>
-              <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
+              <p>Configure your transaction and notification preferences.</p>
+              <p></p>
             </div> <!-- /.tab-pane -->
           </div> <!-- /.tab-content -->
         </div> <!-- /.col -->

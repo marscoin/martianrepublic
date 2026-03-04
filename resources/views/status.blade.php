@@ -42,7 +42,7 @@
 
       <div class="navbar-header">
         <a href="/" class="navbar-brand navbar-brand-img"  style="font-family: 'Orbitron', sans-serif;">
-          <img style="width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="MVP Ready">
+          <img style="width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic">
         Martian Republic
         </a>
 
@@ -523,7 +523,7 @@
           <span>Stay Updated</span>
         </h4>
 
-        <p>Get emails about new theme launches &amp;  future updates.</p>
+        <p>Join the Martian Republic community for updates.</p>
 
         <form action="/" class="form">
 

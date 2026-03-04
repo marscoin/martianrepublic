@@ -55,7 +55,7 @@
                   </span>
                   <span class="noticebar-item-body">
                     <strong class="noticebar-item-title">New Message</strong>
-                    <span class="noticebar-item-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit...</span>
+                    <span class="noticebar-item-text">Welcome to the Martian Republic!</span>
                     <span class="noticebar-item-time"><i class="fa fa-clock-o"></i> 20 minutes ago</span>
                   </span>
                 </a>
@@ -67,7 +67,7 @@
                   </span>
                   <span class="noticebar-item-body">
                     <strong class="noticebar-item-title">New Message</strong>
-                    <span class="noticebar-item-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit...</span>
+                    <span class="noticebar-item-text">Welcome to the Martian Republic!</span>
                     <span class="noticebar-item-time"><i class="fa fa-clock-o"></i> 5 hours ago</span>
                   </span>
                 </a>

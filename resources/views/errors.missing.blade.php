@@ -333,7 +333,7 @@ li a:hover {
 
       <div class="navbar-header">
         <a href="/" class="navbar-brand navbar-brand-img"  style="font-family: 'Orbitron', sans-serif;">
-          <img style="width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="MVP Ready">
+          <img style="width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic">
         Martian Republic
         </a>
 

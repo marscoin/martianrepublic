@@ -9,9 +9,14 @@ class ContactFormController extends Controller
 {
     public function sendEmail(Request $request)
     {
-        $details = $request->only(['name', 'email', 'subject', 'text']);
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'subject' => ['required', 'string', 'max:255'],
+            'text' => ['required', 'string', 'max:5000'],
+        ]);
 
-        Mail::to('info@marscoin.org')->send(new ContactFormMail($details));
+        Mail::to('info@marscoin.org')->send(new ContactFormMail($validated));
 
         return back()->with('message_sent', 'Your message has been sent successfully!');
     }

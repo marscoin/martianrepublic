@@ -43,7 +43,7 @@ z-index: 1;
           <i class="fa fa-cog"></i>
         </button>
         <a href="/wallet/dashboard" class="navbar-brand navbar-brand-img">
-          <img style="width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="MVP Ready">
+          <img style="width: 67px;" src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic">
         Marscoin Wallet
         </a>
       </div> <!-- /.navbar-header -->
