@@ -52,7 +52,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wallet/features', 'Wallet\DashboardController@showFeatures');
     Route::get('/wallet/camera', 'Wallet\DashboardController@showCamera');
     Route::get('/wallet/dashboard/transactions', 'Wallet\DashboardController@showTransactions');
-    Route::get('/wallet/chart', 'Wallet\DashboardController@showChart');
     Route::get('/wallet/anchor', 'Wallet\DashboardController@anchor');
     Route::post('/wallet/forget', 'Wallet\DashboardController@forgetWallet');
 

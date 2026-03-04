@@ -219,7 +219,6 @@ class DashboardController extends Controller
 
 	protected function showDashboard()
 	{
-		$start = microtime(true);
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
@@ -235,45 +234,18 @@ class DashboardController extends Controller
 			$view = View::make('wallet.dashboard');
 			$view->public_addr = "";
 
-			$end = microtime(true);
-			$timeTaken = $end - $start;
-			Log::info('Time taken for section: ' . $timeTaken . ' seconds.');
-
-			// 3 States of Wallets: 
-			// 1) NO civic + No wallets
-			// 2) Civic + No wallets
-			// 3) Civic + wallets
-			//try {
-
-				if (!$civic_wallet && !$wallet) {
-					$view->balance = 0;
-					$view->received = 0;
-					$view->sent = 0;
-					$view->has_civic_wallet = false;
-					$view->has_wallet = false;
-					$view->wallet_open = false;
-				}
-
-				if($profile->wallet_open > 0){
-					$openhdwallet = HDWallet::where('id', '=', $profile->wallet_open)->first();
+			if($profile->wallet_open > 0){
+				$openhdwallet = HDWallet::where('id', '=', $profile->wallet_open)->first();
+				if ($openhdwallet) {
 					$view->public_addr = $openhdwallet->public_addr;
 					$view->received = AppHelper::getMarscoinTotalReceived($openhdwallet->public_addr);
 					$view->sent = AppHelper::getMarscoinTotalSent($openhdwallet->public_addr);
 					$view->has_civic_wallet = true;
 					$view->has_wallet = true;
 					$view->wallet_open = true;
-				}
-				else if($profile->civic_wallet_open > 0)
-				{
-					$view->public_addr = $civic_wallet->public_addr;
-					$view->received = AppHelper::getMarscoinTotalReceived($civic_wallet->public_addr);
-					$view->sent = AppHelper::getMarscoinTotalSent($civic_wallet->public_addr);
-					$view->has_civic_wallet = true;
-					$view->has_wallet = true;
-					$view->wallet_open = true;
-				} 
-				else
-				{
+				} else {
+					$profile->wallet_open = 0;
+					$profile->save();
 					$view->balance = 0;
 					$view->received = 0;
 					$view->sent = 0;
@@ -281,32 +253,40 @@ class DashboardController extends Controller
 					$view->has_wallet = false;
 					$view->wallet_open = false;
 				}
+			}
+			else if($profile->civic_wallet_open > 0 && $civic_wallet)
+			{
+				$view->public_addr = $civic_wallet->public_addr;
+				$view->received = AppHelper::getMarscoinTotalReceived($civic_wallet->public_addr);
+				$view->sent = AppHelper::getMarscoinTotalSent($civic_wallet->public_addr);
+				$view->has_civic_wallet = true;
+				$view->has_wallet = true;
+				$view->wallet_open = true;
+			}
+			else
+			{
+				$view->balance = 0;
+				$view->received = 0;
+				$view->sent = 0;
+				$view->has_civic_wallet = false;
+				$view->has_wallet = false;
+				$view->wallet_open = false;
+			}
 
-				$end = microtime(true);
-				$timeTaken = $end - $start;
-				Log::info('Time taken for section: ' . $timeTaken . ' seconds.');
+			$view->transactions = array();
 
-				$view->transactions = array();
+			// Cache dashboard stats to reduce DB/API calls on every page load
+			$view->coincount = AppHelper::getMarscoinTotalAmount();
+			$view->forum_count = Cache::remember('forum_recent_count', 300, function () {
+				return AppHelper::checkForRecentPosts();
+			});
+			$view->proposal_count = Cache::remember('proposal_open_count', 300, function () {
+				return Proposals::countOpenProposals();
+			});
+			$citizenStatus = AppHelper::getCitizenStatus($uid);
+			$view->citizen_status = $citizenStatus ? $citizenStatus->type : 'GP';
 
-				$end = microtime(true);
-				$timeTaken = $end - $start;
-				Log::info('Time taken for section: ' . $timeTaken . ' seconds.');
-				
-				$view->coincount = AppHelper::getMarscoinTotalAmount();
-				$view->forum_count = AppHelper::checkForRecentPosts();
-				$view->proposal_count = Proposals::countOpenProposals();
-				$view->citizen_status = AppHelper::getCitizenStatus($uid)->type;
-
-				$end = microtime(true);
-				$timeTaken = $end - $start;
-				Log::info('Time taken for section: ' . $timeTaken . ' seconds.');
-
-				return $view;
-			// } catch (Exception $e) {
-			// 	// $view = View::make('wallet.downtime');
-			// 	// return $view;
-			// 	Log::debug('Error: ' . $e);
-			// }
+			return $view;
 		} else {
 			return redirect('/login');
 		}
@@ -410,16 +390,11 @@ class DashboardController extends Controller
 	// /wallet/dashboard/hd-open
 	protected function showHDOpen(Request $request)
 	{
-		$start = microtime(true);
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$wallets = HDWallet::where('user_id', '=', $uid)->get();
 			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
-
-			$end = microtime(true);
-			$timeTaken = $end - $start;
-			Log::info('Time taken for section: ' . $timeTaken . ' seconds.');
 
 			if (!$profile) {
 				return redirect('/twofa');
@@ -428,40 +403,25 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			Log::info("Start Rendering open wallet data!");
 			$data = json_decode($request->input("wallet"));
 
-			$end = microtime(true);
-			$timeTaken = $end - $start;
-			Log::info('Time taken for section: ' . $timeTaken . ' seconds.');
-			
-
 			if ($data || ($wallets || $civic_wallet)) {
-				Log::debug("Attempting loading wallet...");
-				
-				//fetch wallet info of open wallet from profile if this is not a newly unlocked wallet
+				// Fetch wallet info from profile if this is not a newly unlocked wallet
 				if(is_null($data)){
-					Log::debug("Loading Hd Wallet...");
 					$data = HDWallet::where('id', '=', $profile->wallet_open)->first();
 				}
 				if(is_null($data)){
-					Log::debug("Loading civic wallet...");
 					$data = CivicWallet::where('user_id', '=', $uid)->first();
 				}
 				if (is_null($data)) {
-					Log::debug("No wallet found...");
 					$profile->wallet_open = 0;
 					$profile->civic_wallet_open = 0;
 					$profile->save();
 					return redirect('/wallet/dashboard/hd');
 				}
 
-				$end = microtime(true);
-				$timeTaken = $end - $start;
-				Log::info('Time taken for section: ' . $timeTaken . ' seconds.');
-
 				$view = View::make('wallet.hd-open');
-				
+
 				$codes = json_decode(file_get_contents("/home/mars/constitution/marswallet.json"), true);
 				$view->SALT = $codes['salt'];
 				$view->iv = $codes['iv'];
@@ -470,11 +430,6 @@ class DashboardController extends Controller
 				$view->encrypted_seed = $data->encrypted_seed;
 				$view->fullname = Auth::user()->fullname;
 				$view->wallet_open = $data->id;
-
-				$end = microtime(true);
-				$timeTaken = $end - $start;
-				Log::info('Time taken for section: ' . $timeTaken . ' seconds.');
-				
 
 				$isCivicWalletOpen = $civic_wallet && $data && $civic_wallet->id === $data->id;
 
@@ -488,10 +443,6 @@ class DashboardController extends Controller
 					$view->is_civic_wallet = 0;
 				}
 				$profile->save();
-
-				$end = microtime(true);
-				$timeTaken = $end - $start;
-				Log::info('Time taken for section: ' . $timeTaken . ' seconds.');
 
 				return $view;
 			}else{
@@ -700,26 +651,13 @@ class DashboardController extends Controller
 				}
 			}
 			$view = View::make('wallet.profile');
-			
-			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
+			$view->network = AppHelper::getMarscoinNetworkInfo();
 
 			return $view;
 		} else {
 			return redirect('/login');
 		}
 	}
-
-
-	protected function showChart()
-	{
-		$json = $this->file_get_contents_curl('https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/historical?id=154');
-		$latest = json_decode($json, true);
-		print_r($latest);
-		die();
-	}
-
 
 
 	protected function showReports()
@@ -735,10 +673,7 @@ class DashboardController extends Controller
 				}
 			}
 			$view = View::make('wallet.reports');
-			
-			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
+			$view->network = AppHelper::getMarscoinNetworkInfo();
 			return $view;
 		} else {
 			return redirect('/login');
@@ -790,10 +725,7 @@ class DashboardController extends Controller
 			}
 			$view = View::make('wallet.camera');
 			$view->email = Auth::user()->email;
-
-			$json = $this->file_get_contents_curl('http://explore2.marscoin.org/api/status?q=getInfo');
-			$network = json_decode($json, true);
-			$view->network = $network;
+			$view->network = AppHelper::getMarscoinNetworkInfo();
 
 			return $view;
 		} else {
@@ -802,21 +734,4 @@ class DashboardController extends Controller
 	}
 
 
-	private function file_get_contents_curl($url)
-	{
-		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-CMC_PRO_API_KEY: cf191ba7-4840-4a9a-bee4-617608afd8a4'));
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-
-		$data = curl_exec($ch);
-		curl_close($ch);
-
-		return $data;
-	}
 }

@@ -34,7 +34,7 @@
 ## Phase 3: Site Improvements & Polish
 - [x] Mobile responsiveness -- DONE: Landing page (masthead, buttons, clients list, iframe, footer), wallet dashboard (table-responsive, portlets), congress voting (voting-nav, price-box, posts, comments). Removed duplicate Voter Registry section. Fixed stray `<style>` tag in voting.css.
 - [x] Security headers -- DONE: SecurityHeaders middleware with full CSP, X-Frame-Options, X-Content-Type-Options, Strict-Transport-Security, Referrer-Policy, Permissions-Policy
-- [ ] Page load performance - review slow pages, add caching, optimize DB queries with eager loading
+- [x] Page load performance -- DONE: Increased balance/received/sent API cache TTL 5s→300s, cached dashboard stats (forum count, proposal count), cached citizen registry queries (everyPublic/everyCitizen/everyApplicant), replaced 3 uncached network API calls with cached AppHelper::getMarscoinNetworkInfo(), fixed N+1 in getAllCategoriesWithThreads (single joined query), removed excessive microtime debug logging, removed dead showChart endpoint with hardcoded API key
 - [ ] Form validation & user feedback - clear error messages, client+server validation, success/failure toasts
 - [ ] Navigation & UX flow - all links work, breadcrumbs, user always knows where they are
 - [ ] Review and update composer dependencies for security patches

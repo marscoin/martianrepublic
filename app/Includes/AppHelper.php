@@ -681,7 +681,7 @@ class AppHelper{
 			$cacheKey = 'marscoin_balance_' . $publicAddr;
 
 			// Use the Cache facade with the remember method
-			$curBalance = Cache::remember($cacheKey, 5, function () use ($url) {
+			$curBalance = Cache::remember($cacheKey, 300, function () use ($url) {
 				// Inside the closure, fetch the balance from the explorer
 				try {
 					$response = file_get_contents($url);
@@ -707,7 +707,7 @@ class AppHelper{
 			$url = "https://explore.marscoin.org/api/addr/{$publicAddr}/totalReceived";
 			$cacheKey = 'marscoin_total_received_' . $publicAddr;
 
-			$totalReceived = Cache::remember($cacheKey, 5, function () use ($url) {
+			$totalReceived = Cache::remember($cacheKey, 300, function () use ($url) {
 				try {
 					$response = file_get_contents($url);
 					return $response; // Assuming the response is the total amount received
@@ -729,7 +729,7 @@ class AppHelper{
 			$url = "https://explore.marscoin.org/api/addr/{$publicAddr}/totalSent";
 			$cacheKey = 'marscoin_total_sent_' . $publicAddr;
 
-			$totalSent = Cache::remember($cacheKey, 5, function () use ($url) {
+			$totalSent = Cache::remember($cacheKey, 300, function () use ($url) {
 				try {
 					$response = file_get_contents($url);
 					return $response; // Assuming the response is the total amount sent

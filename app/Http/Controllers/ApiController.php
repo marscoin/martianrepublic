@@ -968,11 +968,33 @@ class ApiController extends Controller
 
 
     public function getAllCategoriesWithThreads() {
-        $categories = DB::table('forum_categories')
-            ->get();
+        $userId = Auth::id();
+
+        $categories = DB::table('forum_categories')->get();
+
+        // Fetch all threads in a single query instead of N+1
+        $threads = DB::table('forum_threads')
+            ->leftJoin('users', 'forum_threads.author_id', '=', 'users.id')
+            ->leftJoin('profile', 'users.id', '=', 'profile.userid')
+            ->leftJoin('user_blocks as ub', function($join) use ($userId) {
+                $join->on('forum_threads.author_id', '=', 'ub.blocked_user_id')
+                     ->where('ub.user_id', '=', $userId);
+            })
+            ->select(
+                'forum_threads.id',
+                'forum_threads.category_id',
+                'forum_threads.title',
+                'forum_threads.created_at',
+                'forum_threads.reply_count',
+                'users.fullname as author_name',
+                DB::raw('IF(ub.blocked_user_id IS NOT NULL, true, false) as is_blocked')
+            )
+            ->orderBy('forum_threads.created_at', 'desc')
+            ->get()
+            ->groupBy('category_id');
 
         foreach ($categories as $category) {
-            $category->threads = $this->fetchThreads($category->id);
+            $category->threads = $threads->get($category->id, collect());
         }
 
         return response()->json(['categories' => $categories]);
