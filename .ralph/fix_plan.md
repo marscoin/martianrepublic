@@ -50,13 +50,17 @@
 
 ## Phase 5: Design & Visual Excellence
 - [x] Landing page polish -- DONE: Complete dark space-tech redesign with star canvas, scroll reveals, feature grid, mission principles, ticker, partner logos, CTA, responsive
-- [ ] Dashboard design - clean typography, proper spacing, elegant stat cards, smooth Livewire
-- [ ] Citizen pages - professional profiles with photos, endorsement counts, status badges
-- [ ] Congress pages - governmental feel, clear proposal cards, voting progress, result visualizations
+- [x] ALL public pages redesigned -- DONE (by human + claude): All 11 standalone public-facing pages converted to dark space-tech theme:
+  - Landing (/), Login, Signup, Forgot Password, Reset Password, Privacy, TOS, Support, Status, 2FA Challenge, 2FA Setup
+  - Shared architecture: mr-theme.css + partials/public-head.blade.php + partials/public-nav.blade.php + partials/public-footer.blade.php
+  - Fonts: Chakra Petch (display), DM Sans (body), JetBrains Mono (mono). Colors: --mr-void, --mr-mars, --mr-cyan, --mr-amber
+  - Cache-busted CSS via {{ time() }} query param in public-head partial
 - [x] Consistent design system -- DONE: mr-theme.css with CSS custom properties, shared partials (public-head, public-nav, public-footer), dark theme across all public pages
 - [x] Remove ALL template placeholder content -- DONE (completed in Phase 3)
+- [ ] Dashboard design - clean typography, proper spacing, elegant stat cards, smooth Livewire (INTERNAL/AUTHENTICATED PAGES - the wallet/* section)
+- [ ] Citizen pages - professional profiles with photos, endorsement counts, status badges (INTERNAL)
+- [ ] Congress pages - governmental feel, clear proposal cards, voting progress, result visualizations (INTERNAL)
 - [ ] Loading states - proper spinners/skeletons for Livewire components
-- [x] Dark theme for public pages -- DONE: login, signup, forgot-password, 2FA, privacy, tos, support, status all use dark theme. Wallet/authenticated section next.
 
 ## Phase 6: Flow & Experience
 - [ ] Onboarding flow - signup -> 2FA -> wallet creation should feel smooth and guided

@@ -509,44 +509,55 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
 
                     // ApexCharts options
                     var options = {
+
                     series: [{
                         name: 'Balance',
                         data: seriesData,
-                        color: '#d74b4b',
+                        color: '#c84125',
                     }],
                     chart: {
                         type: 'area',
                         height: 350,
-                        zoom: {
-                        enabled: false
-                        },
-                        toolbar: {
-                        show: false
+                        zoom: { enabled: false },
+                        toolbar: { show: false },
+                        foreColor: '#8a8998',
+                        background: 'transparent'
+                    },
+                    dataLabels: { enabled: false },
+                    stroke: { curve: 'smooth', width: 2 },
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.4,
+                            opacityTo: 0.05,
+                            stops: [0, 100]
                         }
                     },
-                    dataLabels: {
-                        enabled: false
-                    },
-                    stroke: {
-                        curve: 'smooth'
+                    grid: {
+                        borderColor: 'rgba(255,255,255,0.06)',
+                        strokeDashArray: 4
                     },
                     xaxis: {
-                        type: 'datetime'
+                        type: 'datetime',
+                        labels: { style: { colors: '#5a5968' } },
+                        axisBorder: { color: 'rgba(255,255,255,0.06)' },
+                        axisTicks: { color: 'rgba(255,255,255,0.06)' }
                     },
                     tooltip: {
-                        x: {
-                        format: 'dd MMM yyyy'
-                        }
+                        theme: 'dark',
+                        x: { format: 'dd MMM yyyy' }
                     },
                     yaxis: {
-                            min: 0,
-                            max: maxYValue ,
-                            labels: {
+                        min: 0,
+                        max: maxYValue,
+                        labels: {
+                            style: { colors: '#5a5968' },
                             formatter: function (value) {
-                                return value.toFixed(2); // Rounds the label to two decimal places
+                                return value.toFixed(2);
                             }
-                            },
                         }
+                    }
                     };
 
                     // Initialize ApexCharts
