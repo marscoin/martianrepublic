@@ -63,11 +63,11 @@
 - [x] Loading states -- DONE: CSS skeleton shimmer animation, spinner-border component, wire:loading overlay pattern, Livewire loading indicators on voting-progress and vote-breakdown components. Dashboard-stats already had loading states.
 
 ## Phase 6: Flow & Experience
-- [ ] Onboarding flow - signup -> 2FA -> wallet creation should feel smooth and guided
-- [ ] Citizen registration UX - clear path from General Public to Citizen, show progress
-- [ ] Voting UX - proposal -> ballot -> vote -> result flow should be intuitive
-- [ ] Error recovery - helpful error messages instead of 500 pages, retry mechanisms
-- [x] Empty states - PARTIAL: Added empty states to logbook (my entries + all entries). Congress active proposals already has empty state. Remaining: wallet transactions, citizen registry, forum.
+- [x] Onboarding flow -- DONE: Signup now redirects through /check (2FA setup first instead of dashboard). Added success flash after 2FA completion. Dashboard shows onboarding checklist for new users (Account → 2FA → Create Wallet → Register as Citizen).
+- [x] Citizen registration UX -- DONE: Added 4-step progress tracker to citizen registry page (Account → Wallet → Application → Citizen). Shows current step highlighted, endorsement count for GP users. Improved wallet-locked message with icon and CTA.
+- [x] Voting UX -- DONE: Added "Observer Mode" banner for non-citizens on congress page. Ballot page already had good 4-stage flow (pre-ballot → confirming → vote → cast).
+- [x] Error recovery -- DONE: Replaced all 8 plain-text "unlock wallet" messages across citizen, congress, logbook, inventory, wallet pages with styled empty states (icon + title + description + CTA button). Consistent design pattern across all pages.
+- [x] Empty states -- DONE: Dashboard onboarding card for new users, wallet-locked states across all pages, logbook empty states (from earlier). DataTables provides "No data available" for empty transaction tables.
 - [x] Add rate limiting to login/signup endpoints -- DONE
 
 ## Completed

@@ -52,6 +52,66 @@
             <div class="container">
 
                 <?php if($wallet_open){ ?>
+
+                {{-- Citizenship Progress Tracker --}}
+                <div class="portlet" style="padding: 20px 24px;">
+                    <div style="display: flex; align-items: center; gap: 0; justify-content: center; flex-wrap: wrap;">
+                        {{-- Step 1: Account --}}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(16,185,129,0.2); border: 2px solid #34d399; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa fa-check" style="color: #34d399; font-size: 14px;"></i>
+                            </div>
+                            <span style="font-size: 13px; color: #34d399; font-weight: 500;">Account</span>
+                        </div>
+                        <div style="width: 40px; height: 2px; background: #34d399; margin: 0 4px;"></div>
+
+                        {{-- Step 2: Wallet --}}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(16,185,129,0.2); border: 2px solid #34d399; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa fa-check" style="color: #34d399; font-size: 14px;"></i>
+                            </div>
+                            <span style="font-size: 13px; color: #34d399; font-weight: 500;">Wallet</span>
+                        </div>
+                        <div style="width: 40px; height: 2px; background: {{ $isGP || $isCitizen ? '#34d399' : 'var(--mr-border, rgba(255,255,255,0.1))' }}; margin: 0 4px;"></div>
+
+                        {{-- Step 3: Application --}}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            @if($isGP || $isCitizen)
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(16,185,129,0.2); border: 2px solid #34d399; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa fa-check" style="color: #34d399; font-size: 14px;"></i>
+                            </div>
+                            <span style="font-size: 13px; color: #34d399; font-weight: 500;">Application</span>
+                            @else
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0,228,255,0.15); border: 2px solid var(--mr-cyan, #00e4ff); display: flex; align-items: center; justify-content: center;">
+                                <span style="color: var(--mr-cyan, #00e4ff); font-size: 14px; font-weight: 700;">3</span>
+                            </div>
+                            <span style="font-size: 13px; color: var(--mr-cyan, #00e4ff); font-weight: 500;">Application</span>
+                            @endif
+                        </div>
+                        <div style="width: 40px; height: 2px; background: {{ $isCitizen ? '#34d399' : 'var(--mr-border, rgba(255,255,255,0.1))' }}; margin: 0 4px;"></div>
+
+                        {{-- Step 4: Citizen --}}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            @if($isCitizen)
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(16,185,129,0.2); border: 2px solid #34d399; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa fa-check" style="color: #34d399; font-size: 14px;"></i>
+                            </div>
+                            <span style="font-size: 13px; color: #34d399; font-weight: 500;">Citizen</span>
+                            @elseif($isGP)
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0,228,255,0.15); border: 2px solid var(--mr-cyan, #00e4ff); display: flex; align-items: center; justify-content: center;">
+                                <span style="color: var(--mr-cyan, #00e4ff); font-size: 14px; font-weight: 700;">4</span>
+                            </div>
+                            <span style="font-size: 13px; color: var(--mr-cyan, #00e4ff); font-weight: 500;">{{ count($endorsed ?? []) }}/3 Endorsements</span>
+                            @else
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.04); border: 2px solid var(--mr-border, rgba(255,255,255,0.1)); display: flex; align-items: center; justify-content: center;">
+                                <span style="color: var(--mr-text-secondary, #8a8998); font-size: 14px; font-weight: 700;">4</span>
+                            </div>
+                            <span style="font-size: 13px; color: var(--mr-text-secondary, #8a8998); font-weight: 500;">Citizen</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
                 <div class="portlet">
                     <div class="portlet-body">
 
@@ -100,12 +160,11 @@
                     </div>
                 </div>
             <?php }else{ ?>
-                <div class="portlet">
-                    <div class="portlet-body">
-                        <h3>
-                        Please <a href="/wallet/dashboard/hd">unlock</a> your civic wallet in order to access the Citizen platform.
-                        </h3>
-                    </div>
+                <div class="portlet" style="text-align: center; padding: 40px 20px;">
+                    <i class="fa fa-lock" style="font-size: 48px; color: var(--mr-text-secondary, #8a8998); margin-bottom: 16px;"></i>
+                    <h3 style="margin-bottom: 12px;">Wallet Required</h3>
+                    <p style="color: var(--mr-text-secondary, #8a8998); margin-bottom: 20px;">Please unlock your civic wallet to access the Citizen platform.</p>
+                    <a href="/wallet/dashboard/hd" class="btn btn-lg btn-primary"><i class="fa fa-unlock-alt"></i> Unlock Wallet</a>
                 </div>
             <?php } ?>    
 

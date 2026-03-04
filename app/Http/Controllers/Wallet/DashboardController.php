@@ -85,7 +85,7 @@ class DashboardController extends Controller
 					$profile->twofaset = 1;
 					$profile->save();
 					$view->isvalid = "Success";
-					return redirect('wallet/dashboard');
+					return redirect('wallet/dashboard')->with('success', 'Two-factor authentication enabled! Your account is now secured.');
 				} else {
 					$view->isvalid = "Failed";
 				}

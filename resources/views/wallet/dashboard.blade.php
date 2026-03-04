@@ -101,31 +101,54 @@
                                 </div> 
                             @else
                                 @if ($has_civic_wallet || $has_wallet)
-                                    <div>
-                                        <h4 class="portlet-title">
-                                            <u>Open Marscoin Wallet</u>
-                                        </h4>
-
-                                        <div
-                                            style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                                            <h3>Unlock your wallet 🚀</h3>
-                                            <a data-aos="fade-up" data-aos-duration="1000" id="" type="button" class="btn-lg btn-primary "
-                                                href="/wallet/dashboard/hd">Unlock
-                                                Wallet</a>
+                                    <div style="padding: 30px 20px; text-align: center;">
+                                        <h4 class="portlet-title"><u>Marscoin Wallet</u></h4>
+                                        <div style="margin: 24px 0;">
+                                            <i class="fa fa-lock" style="font-size: 48px; color: var(--mr-text-secondary, #8a8998); margin-bottom: 16px; display: block;"></i>
+                                            <p style="color: var(--mr-text-secondary, #8a8998); margin-bottom: 20px;">Your wallet is locked. Unlock it to view your balance and make transactions.</p>
+                                            <a href="/wallet/dashboard/hd" class="btn btn-lg btn-primary">
+                                                <i class="fa fa-unlock-alt"></i> Unlock Wallet
+                                            </a>
                                         </div>
                                     </div>
                                 @else
-                                    <div class="wallet-is-not-open">
-                                        <h4 class="portlet-title">
-                                            <u>Open Marscoin Wallet</u>
-                                        </h4>
+                                    <div class="wallet-is-not-open" style="padding: 30px 20px;">
+                                        <h4 class="portlet-title"><u>Welcome to the Martian Republic</u></h4>
+                                        <p style="color: var(--mr-text-secondary, #8a8998); margin-bottom: 24px;">Complete these steps to get started as a Martian citizen.</p>
 
-                                        <div
-                                            style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                                            <h3>Open your first Marscoin wallet today! 🚀</h3>
-                                            <a id="" type="button" class="btn-lg btn-primary "
-                                                href="/wallet/dashboard/hd">Open
-                                                Wallet</a>
+                                        <div style="display: flex; flex-direction: column; gap: 16px; max-width: 480px;">
+                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px;">
+                                                <i class="fa fa-check-circle" style="color: #34d399; font-size: 22px;"></i>
+                                                <div>
+                                                    <strong style="color: #34d399;">Account Created</strong>
+                                                    <div style="color: var(--mr-text-secondary, #8a8998); font-size: 13px;">Your Martian Republic account is active</div>
+                                                </div>
+                                            </div>
+
+                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px;">
+                                                <i class="fa fa-check-circle" style="color: #34d399; font-size: 22px;"></i>
+                                                <div>
+                                                    <strong style="color: #34d399;">2FA Secured</strong>
+                                                    <div style="color: var(--mr-text-secondary, #8a8998); font-size: 13px;">Two-factor authentication is protecting your account</div>
+                                                </div>
+                                            </div>
+
+                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(0,228,255,0.08); border: 1px solid rgba(0,228,255,0.25); border-radius: 8px;">
+                                                <i class="fa fa-arrow-circle-right" style="color: var(--mr-cyan, #00e4ff); font-size: 22px;"></i>
+                                                <div style="flex: 1;">
+                                                    <strong style="color: var(--mr-cyan, #00e4ff);">Create Your Wallet</strong>
+                                                    <div style="color: var(--mr-text-secondary, #8a8998); font-size: 13px;">Set up your Marscoin wallet to participate in the Republic</div>
+                                                </div>
+                                                <a href="/wallet/dashboard/hd" class="btn btn-primary" style="white-space: nowrap;">Create Wallet</a>
+                                            </div>
+
+                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(255,255,255,0.03); border: 1px solid var(--mr-border, rgba(255,255,255,0.08)); border-radius: 8px; opacity: 0.5;">
+                                                <i class="fa fa-circle-o" style="color: var(--mr-text-secondary, #8a8998); font-size: 22px;"></i>
+                                                <div>
+                                                    <strong>Register as Citizen</strong>
+                                                    <div style="color: var(--mr-text-secondary, #8a8998); font-size: 13px;">Submit your identity to join the Martian citizenry</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 @endif

@@ -50,6 +50,11 @@
                     <h3 class="">
                          <a style="float:right;margin-top: -25px;" href="/congress/voting/new" class="btn-lg btn-primary demo-element" data-backdrop="static" data-keyboard="false"><i class="fa-solid fa-pen-to-square"></i> New Proposal</a>
                     </h3>
+                    <?php }else{ ?>
+                    <div class="alert alert-info" style="margin-bottom: 0;">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <strong>Observer Mode</strong> &mdash; You can view proposals, but only <a href="/citizen/all">registered Citizens</a> can create proposals and vote.
+                    </div>
                     <?php } ?>
 
                     <div class="portlet-body">
@@ -102,12 +107,11 @@
 
                 </div>
                 <?php }else{ ?>
-                <div class="portlet">
-                    <div class="portlet-body">
-                        <h3>
-                        Please <a href="/wallet/dashboard/hd">unlock</a> your civic wallet in order to access the Citizen platform.
-                        </h3>
-                    </div>
+                <div class="portlet" style="text-align: center; padding: 40px 20px;">
+                    <i class="fa-solid fa-landmark" style="font-size: 48px; color: var(--mr-text-secondary, #8a8998); margin-bottom: 16px;"></i>
+                    <h3 style="margin-bottom: 12px;">Wallet Required</h3>
+                    <p style="color: var(--mr-text-secondary, #8a8998); margin-bottom: 20px;">Please unlock your civic wallet to access the Martian Congress.</p>
+                    <a href="/wallet/dashboard/hd" class="btn btn-lg btn-primary"><i class="fa-solid fa-lock-open"></i> Unlock Wallet</a>
                 </div>
             <?php } ?>    
 

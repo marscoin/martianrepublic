@@ -69,12 +69,11 @@
                     </div>
                 </div>
                  <?php }else{ ?>
-                <div class="portlet">
-                    <div class="portlet-body">
-                        <h3>
-                        Please <a href="/wallet/dashboard/hd">unlock</a> your civic wallet in order to access the Research Logbook.
-                        </h3>
-                    </div>
+                <div class="portlet" style="text-align: center; padding: 40px 20px;">
+                    <i class="fa fa-lock" style="font-size: 48px; color: var(--mr-text-secondary, #8a8998); margin-bottom: 16px; display: block;"></i>
+                    <h3 style="margin-bottom: 12px;">Wallet Required</h3>
+                    <p style="color: var(--mr-text-secondary, #8a8998); margin-bottom: 20px;">Please unlock your civic wallet to access the Research Logbook.</p>
+                    <a href="/wallet/dashboard/hd" class="btn btn-lg btn-primary"><i class="fa fa-unlock-alt"></i> Unlock Wallet</a>
                 </div>
             <?php } ?>
             </div> <!-- /.container --> 
