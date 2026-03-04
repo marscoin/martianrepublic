@@ -64,8 +64,7 @@
                 </a>
                 </li>
 
-                <!-- @todo -->
-                <!-- @if ($active === 'inventory')
+                @if ($active === 'inventory')
                     <li class="dropdown active">
                     @else
                     <li class="dropdown">
@@ -73,7 +72,7 @@
                 <a href="/inventory/all">
                     Inventory
                 </a>
-                </li> -->
+                </li>
 
                 @if ($active === 'logbook')
                     <li class="dropdown active">

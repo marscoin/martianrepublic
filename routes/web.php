@@ -79,10 +79,15 @@ Route::get('/citizen/printout2', 'Citizen\IdentityController@printout2');
 Route::get('/citizen/printout3', 'Citizen\IdentityController@printout3');
 Route::get('/citizen/id/{address?}', 'Citizen\IdentityController@showId');
 
-// 
+//
 // Inventory Routes
 // ==================================================================================
 Route::get('/inventory/all', 'Inventory\InventoryController@showAll');
+Route::middleware(['auth'])->group(function () {
+    Route::post('/inventory/store', 'Inventory\InventoryController@store');
+    Route::post('/inventory/{id}/update', 'Inventory\InventoryController@update');
+    Route::post('/inventory/{id}/delete', 'Inventory\InventoryController@destroy');
+});
 
 
 //

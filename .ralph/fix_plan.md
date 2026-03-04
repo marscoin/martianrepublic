@@ -45,7 +45,7 @@
 - [x] Congress: Proposal creation WORKING (IPFS+blockchain via cacheproposal API, auto-creates forum thread). Voting UI WORKING. Vote tallying WORKING. Fixed voting API using test URL instead of production (was pointing to localhost:3001). Removed dead createproposal route.
 - [x] Forum: API endpoints WORKING (thread listing, nested comments, post creation). Web UI exists via vendor/forum package. Post notarization not implemented.
 - [x] Logbook: Entry creation WORKING (IPFS pinning + file attachments via permapinlog API). Notarization WORKING (blockchain signing via client-side JS). Delete WORKING. Added empty states. Fixed uncached balance API call (was hitting explore.marscoin.org directly, now uses cached AppHelper::getMarscoinBalance).
-- [ ] Inventory: Only scaffolding exists (route + empty controller + "under construction" view). Needs full implementation.
+- [x] Inventory: Full CRUD implementation -- DONE: Created inventory_items table (migration), InventoryItem model with categories/conditions constants, full controller (showAll/store/update/destroy with auth + ownership checks + validation), 4 blade views (dashboard with tabs, additem form, myitems table with edit/delete modals, allitems colony registry). DataTables integration. Enabled nav link in mainnav.
 - [ ] Wallet HD: Seed phrase generation, BIP32/BIP44 key derivation, address generation, send transactions, backup/recovery - all missing. Crypto libraries bundled but not called. Would need significant crypto engineering.
 
 ## Phase 5: Design & Visual Excellence

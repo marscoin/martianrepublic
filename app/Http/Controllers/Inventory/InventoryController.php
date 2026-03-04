@@ -4,73 +4,138 @@ namespace App\Http\Controllers\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Profile;
+use App\Models\InventoryItem;
 use Illuminate\Support\Facades\View;
-use App\Includes\jsonRPCClient;
 use App\Http\Controllers\Controller;
-use App\Models\HDWallet;
 use App\Models\CivicWallet;
 use App\Includes\AppHelper;
-use Illuminate\Support\Facades\Redirect;
 
 class InventoryController extends Controller
 {
-
-	/**
-	 * Setup the layout used by the controller.
-	 *
-	 * @return void
-	 */
 
 	public function __construct()
 	{
 	}
 
-
-	//Get all inventory data and display table
-	//
-    protected function showAll()
+	protected function showAll()
 	{
-		
-		if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
+		if (!Auth::check()) {
+			return redirect('/login');
+		}
 
-			if (!$profile) {
-				return redirect('/twofa');
-			} else {
-				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-					return redirect('/twofachallenge');
-				}
-			}
-			
-			$view = View::make('inventory.dashboard');
-			$view->wallet_open = $profile->civic_wallet_open;
-			$view->isCitizen = $profile->citizen;
-			$view->isGP  = $profile->general_public;
-			$view->balance = 0; //for now, could move to stats helper function as well
-			
-			if ($wallet) {
-				$view->balance = AppHelper::getMarscoinBalance($wallet['public_addr']);
-				$view->public_address = $wallet['public_addr'];
-			} else {
-				$view->balance = 0;
-				$view->public_address = "";
-			}
+		$uid = Auth::user()->id;
+		$profile = Profile::where('userid', '=', $uid)->first();
+		$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
-			return $view;
+		if (!$profile) {
+			return redirect('/twofa');
+		}
+		if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
+			return redirect('/twofachallenge');
+		}
 
+		$view = View::make('inventory.dashboard');
+		$view->wallet_open = $profile->civic_wallet_open;
+		$view->isCitizen = $profile->citizen;
+		$view->isGP = $profile->general_public;
+		$view->balance = 0;
+		$view->public_address = "";
 
-		}else{
-            return redirect('/login');
-        }
+		if ($wallet) {
+			$view->balance = AppHelper::getMarscoinBalance($wallet['public_addr']);
+			$view->public_address = $wallet['public_addr'];
+		}
 
-		
+		if ($profile->civic_wallet_open) {
+			$view->myItems = InventoryItem::where('userid', '=', $uid)->orderBy('created_at', 'desc')->get();
+			$view->allItems = InventoryItem::orderBy('created_at', 'desc')->get();
+			$view->categories = InventoryItem::CATEGORIES;
+			$view->conditions = InventoryItem::CONDITIONS;
+		}
+
+		return $view;
 	}
 
+	protected function store(Request $request)
+	{
+		if (!Auth::check()) {
+			return redirect('/login');
+		}
 
+		$uid = Auth::user()->id;
+		$profile = Profile::where('userid', '=', $uid)->first();
 
+		if (!$profile || !$profile->civic_wallet_open) {
+			return redirect('/inventory/all')->with('error', 'Wallet must be unlocked to add items.');
+		}
 
+		$request->validate([
+			'name' => 'required|string|max:255',
+			'description' => 'nullable|string|max:2000',
+			'category' => 'required|string|in:' . implode(',', array_keys(InventoryItem::CATEGORIES)),
+			'quantity' => 'required|integer|min:1|max:999999',
+			'unit' => 'nullable|string|max:50',
+			'location' => 'nullable|string|max:255',
+			'condition' => 'required|string|in:' . implode(',', array_keys(InventoryItem::CONDITIONS)),
+		]);
 
+		InventoryItem::create([
+			'userid' => $uid,
+			'name' => $request->input('name'),
+			'description' => $request->input('description'),
+			'category' => $request->input('category'),
+			'quantity' => $request->input('quantity'),
+			'unit' => $request->input('unit'),
+			'location' => $request->input('location'),
+			'condition' => $request->input('condition'),
+		]);
 
+		return redirect('/inventory/all')->with('success', 'Item added to inventory.');
+	}
+
+	protected function update(Request $request, $id)
+	{
+		if (!Auth::check()) {
+			return redirect('/login');
+		}
+
+		$uid = Auth::user()->id;
+		$item = InventoryItem::where('id', $id)->where('userid', $uid)->first();
+
+		if (!$item) {
+			return redirect('/inventory/all')->with('error', 'Item not found.');
+		}
+
+		$request->validate([
+			'name' => 'required|string|max:255',
+			'description' => 'nullable|string|max:2000',
+			'category' => 'required|string|in:' . implode(',', array_keys(InventoryItem::CATEGORIES)),
+			'quantity' => 'required|integer|min:1|max:999999',
+			'unit' => 'nullable|string|max:50',
+			'location' => 'nullable|string|max:255',
+			'condition' => 'required|string|in:' . implode(',', array_keys(InventoryItem::CONDITIONS)),
+		]);
+
+		$item->update($request->only(['name', 'description', 'category', 'quantity', 'unit', 'location', 'condition']));
+
+		return redirect('/inventory/all')->with('success', 'Item updated.');
+	}
+
+	protected function destroy($id)
+	{
+		if (!Auth::check()) {
+			return redirect('/login');
+		}
+
+		$uid = Auth::user()->id;
+		$item = InventoryItem::where('id', $id)->where('userid', $uid)->first();
+
+		if (!$item) {
+			return redirect('/inventory/all')->with('error', 'Item not found.');
+		}
+
+		$item->delete();
+
+		return redirect('/inventory/all')->with('success', 'Item removed from inventory.');
+	}
 }
