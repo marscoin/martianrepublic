@@ -951,8 +951,10 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
             if vo['value'] > max_value:
                 max_value = vo['value']
                 # Extract the address from this output, if available
+                # Marscoin v28+ uses 'address' (singular), older versions use 'addresses' (plural)
                 addresses = script.get('addresses', [])
-                owner_address = addresses[0] if addresses else None
+                single_addr = script.get('address', None)
+                owner_address = addresses[0] if addresses else single_addr
     
     print("Here")
     if plain and owner_address:

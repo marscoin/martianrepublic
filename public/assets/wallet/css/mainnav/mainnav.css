@@ -16,3 +16,12 @@
     font-family:   'Open Sans', 'Trebuchet MS', arial, sans-serif;
     font-weight: 600;
 }
+
+/* Override white gradient below mainnav for dark theme */
+.mainnav:after,
+.mainnav::after {
+    background-image: none !important;
+    background: transparent !important;
+    filter: none !important;
+    height: 0 !important;
+}

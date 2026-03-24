@@ -482,8 +482,9 @@ $('.dynamic-vote-modal').on('hidden.bs.modal', function () {
 $(".endorse-btn").click(async (e)=>
 {
 
-if ("{{ $balance }}" < 1) {
-    alert("Not enough Marscoin to endorse...")
+if (parseFloat("{{ $balance }}") < 0.1) {
+    alert("Not enough Marscoin to endorse. You need at least 0.1 MARS.")
+    return;
 }else{
 
     let id = e.target.getAttribute("data-endorse")
