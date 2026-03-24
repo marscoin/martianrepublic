@@ -243,7 +243,7 @@ $('#donateModal').on('show.bs.modal', function (event) {
 
 $(document).ready(function() {
 
-var mem = localStorage.getItem("key");
+var mem = WalletKey.get();
 if (!mem || mem == ""){
     alert("Coul not retrieve wallet key. Please disconnect and reconnect your wallet.")
 }
@@ -638,14 +638,14 @@ const sendMARS = async (mars_amount, receiver_address) => {
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
 
-    if(!localStorage.getItem("key"))
+    if(!WalletKey.get())
     {
         //unencrypt key first
         alert("Unencrypt first");
         return;
     }
 
-    const mnemonic = localStorage.getItem("key");
+    const mnemonic = WalletKey.get();
     const sender_address = "<?=$public_address?>".trim()
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
     const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
@@ -713,12 +713,12 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
 
 const signMARSRegular = async (mars_amount, tx_i_o) => {
 
-if(!localStorage.getItem("key"))
+if(!WalletKey.get())
 {
     alert("Unencrypt first");
     return;
 }
-const mnemonic = localStorage.getItem("key");
+const mnemonic = WalletKey.get();
 const sender_address = "<?=$public_address?>".trim()
 const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
 const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)

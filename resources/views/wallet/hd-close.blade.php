@@ -75,7 +75,7 @@
     {
         $.post("/api/closewallet", {} , function(data) {
 
-            localStorage.removeItem("key");
+            WalletKey.clear();
             localStorage.removeItem("Key");
 
         });

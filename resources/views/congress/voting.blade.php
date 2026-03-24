@@ -291,7 +291,7 @@
 </script>
 <script>
 $(document).ready(function() {
-    if (localStorage.getItem("key").trim() === null) {
+    if (WalletKey.get().trim() === null) {
         alert("Error: Key is not loaded. Please make sure your key is properly loaded.");
         return; 
     }
@@ -491,7 +491,7 @@ const sendMARS = async (mars_amount, receiver_address) => {
 }
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
-    const mnemonic = localStorage.getItem("key");
+    const mnemonic = WalletKey.get();
     if (mnemonic === null) {
         alert("Error: Key is not loaded. Please make sure your key is properly loaded.");
         return; 

@@ -78,15 +78,15 @@
   function flushLocalStorage () {
 
 
-      localStorage.clear();
-      localStorage.removeItem('key');
+      WalletKey.clear();
+      // handled by WalletKey.clear();
 
 
       // fallback double check if key exists...
       if("key" in localStorage)
       {
-          localStorage.clear()
-          localStorage.removeItem('key');
+          WalletKey.clear()
+          // handled by WalletKey.clear();
       }
 
       return

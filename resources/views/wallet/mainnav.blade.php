@@ -112,4 +112,60 @@
     @if(session('warning'))
         toastr.warning("{!! addslashes(session('warning')) !!}");
     @endif
+
+    // Wallet Key Manager - encrypts mnemonic in localStorage with session token
+    window.WalletKey = (function() {
+        const SESSION_TOKEN = "{{ csrf_token() }}";
+        const STORAGE_KEY = "key";
+        const STORAGE_KEY_ENC = "wk_enc";
+
+        function xorEncrypt(text, key) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+            }
+            return btoa(result);
+        }
+
+        function xorDecrypt(encoded, key) {
+            try {
+                const text = atob(encoded);
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+                }
+                return result;
+            } catch(e) {
+                return null;
+            }
+        }
+
+        return {
+            set: function(mnemonic) {
+                // Store encrypted version
+                localStorage.setItem(STORAGE_KEY_ENC, xorEncrypt(mnemonic, SESSION_TOKEN));
+                // Keep plaintext for backward compat during transition
+                localStorage.setItem(STORAGE_KEY, mnemonic);
+            },
+            get: function() {
+                // Try encrypted first
+                const enc = localStorage.getItem(STORAGE_KEY_ENC);
+                if (enc) {
+                    const decrypted = xorDecrypt(enc, SESSION_TOKEN);
+                    if (decrypted && decrypted.split(' ').length >= 12) {
+                        return decrypted;
+                    }
+                }
+                // Fall back to plaintext (legacy)
+                return localStorage.getItem(STORAGE_KEY);
+            },
+            clear: function() {
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem(STORAGE_KEY_ENC);
+            },
+            has: function() {
+                return !!(localStorage.getItem(STORAGE_KEY_ENC) || localStorage.getItem(STORAGE_KEY));
+            }
+        };
+    })();
 </script>

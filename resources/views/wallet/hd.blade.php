@@ -1259,7 +1259,7 @@ h5 {
                     if (response.address == "{{ $public_addr }}") {
                         // Existing wallet - store mnemonic as key, then navigate
                         e.preventDefault();
-                        localStorage.setItem("key", response.mnemonic)
+                        WalletKey.set(response.mnemonic)
                         console.log("Key stored for address:", response.address)
                         window.location.href = "/wallet/getwallet";
                         return false;
@@ -1275,7 +1275,7 @@ h5 {
 
                         $.post('/wallet/createwallet', postData)
                         .done(function(data) {
-                            localStorage.setItem("key", response.mnemonic);
+                            WalletKey.set(response.mnemonic);
                             location.href = "/wallet/dashboard/hd-open";
                         })
                         .fail(function(error) {
@@ -1354,7 +1354,7 @@ h5 {
 
                     $.post('/wallet/createwallet', postData)
                     .done(function(data) {
-                        localStorage.setItem("key", response.mnemonic);
+                        WalletKey.set(response.mnemonic);
                         location.href = "/wallet/dashboard/hd-open";
                     })
                     .fail(function(error) {
@@ -1399,7 +1399,7 @@ h5 {
                 }
 
                 if (decrypted) {
-                    localStorage.setItem("key", decrypted);
+                    WalletKey.set(decrypted);
                     if (usedLegacy) {
                         // Re-encrypt with stronger hash on next createwallet call
                         console.log("Legacy wallet detected - upgrading encryption");
@@ -1452,7 +1452,7 @@ h5 {
             //     // console.log("response:", response)
             //     if (response.address == user_wallet.public_addr) {
             //         // Logging in was successful... Opening wallet...
-            //         // localStorage.setItem("key", decrypted)
+            //         // WalletKey.set(decrypted)
             //         localStorage.setItem("key", encrypted_mnem)
 
 
@@ -1532,7 +1532,7 @@ h5 {
 
                 if (response.address == user_wallet.public_addr) {
                     flushLocalStorage()
-                    localStorage.setItem("key", decrypted)
+                    WalletKey.set(decrypted)
                     $("#selected_wallet").val(JSON.stringify(selected_wallet))
 
                     // If unlocked with legacy hash, re-encrypt with stronger hash
@@ -1597,7 +1597,7 @@ h5 {
 
 
                 localStorage.clear();
-                localStorage.removeItem('key');
+                WalletKey.clear();
 
 
                 // fallback double check if key exists...

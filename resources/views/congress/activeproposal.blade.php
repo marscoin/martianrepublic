@@ -160,7 +160,7 @@
 
     const signMARS = async (message, mars_amount, tx_i_o) => {
 
-        const mnemonic = localStorage.getItem("key").trim();
+        const mnemonic = WalletKey.get().trim();
         
         const sender_address = "{{$public_address}}".trim()
 

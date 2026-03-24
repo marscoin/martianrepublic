@@ -497,7 +497,7 @@
     }
 
         $(document).ready(function() {
-            const unlockedWallet = localStorage.getItem("key")
+            const unlockedWallet = WalletKey.get()
 
             if(!unlockedWallet)
             {
@@ -754,7 +754,7 @@
                 $("#send-mars").click(async () => {
 
 
-                    const unlockedWallet = localStorage.getItem("key").trim();
+                    const unlockedWallet = WalletKey.get().trim();
 
                     if (unlockedWallet) {
                         console.log("successfully unlocked..")
@@ -1134,7 +1134,7 @@
 
 
         function onDownloadWallet() {
-            const mnemonic = localStorage.getItem("key");
+            const mnemonic = WalletKey.get();
             if (!mnemonic) {
                 alert("No wallet key found. Please unlock your wallet first.");
                 return;

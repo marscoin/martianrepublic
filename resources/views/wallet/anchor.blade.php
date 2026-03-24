@@ -131,7 +131,7 @@ const sendMARS = async (mars_amount, receiver_address) => {
 }
 
 const signMARS = async (message, mars_amount, tx_i_o) => {
-    const mnemonic = localStorage.getItem("key").trim();
+    const mnemonic = WalletKey.get().trim();
     const sender_address = "<?=$public_address?>".trim();
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
     const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
