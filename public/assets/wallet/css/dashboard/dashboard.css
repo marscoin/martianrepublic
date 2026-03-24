@@ -847,9 +847,18 @@ label {
   color: var(--mr-cyan, #00e4ff) !important;
 }
 .card-body .text-muted,
-.card-body small {
+.card-body small,
+.card-body p.text-muted,
+.card-body .description {
   color: var(--mr-text-dim, #8a8998) !important;
-  font-size: 13px;
+  font-size: 13.5px;
+  letter-spacing: 0.2px;
+}
+/* Category subtitle descriptions */
+.card-body h5 + p,
+.card-body h5 ~ small,
+.card-body h5 ~ .text-muted {
+  color: #9a99a8 !important;
 }
 
 /* ---- Thread list ---- */
@@ -942,7 +951,7 @@ a.card-link:hover {
 /* ---- Timestamps ---- */
 .timestamp,
 time.timestamp {
-  color: var(--mr-text-faint, #5a5968) !important;
+  color: var(--mr-text-dim, #8a8998) !important;
   font-size: 12px;
 }
 
