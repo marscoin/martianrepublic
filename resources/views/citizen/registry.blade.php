@@ -687,15 +687,26 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
         })
     })
 
+    // Derive the address from the key to verify it matches
+    const derivedAddr = my_bundle.bitcoin.payments.p2pkh({pubkey: key.publicKey, network: Marscoin.mainnet}).address;
+    console.log("Signing with key for address:", derivedAddr, "expected:", sender_address);
+
     for (let i = 0; i < tx_i_o.inputs.length; i++) {
         try{
             psbt.signInput(i, key);
         } catch (e) {
-            alert("Problem while trying to sign with your key. Please try to reconnect your wallet...");
+            console.error("signInput failed for input " + i + ":", e.message);
+            // If address mismatch, the mnemonic might derive a different address
+            if (derivedAddr !== sender_address) {
+                alert("Your wallet key derives address " + derivedAddr + " but your civic wallet is " + sender_address + ". These don't match - you may need to reconnect with the correct seed phrase.");
+            } else {
+                alert("Signing failed: " + e.message + ". Please try reconnecting your wallet.");
+            }
+            throw e;
         }
     }
 
-    const tx = psbt.finalizeAllInputs().extractTransaction(); 
+    const tx = psbt.finalizeAllInputs().extractTransaction();
     const txhash = tx.toHex()
     console.log(txhash)
 
