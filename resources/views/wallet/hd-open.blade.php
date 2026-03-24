@@ -637,8 +637,18 @@
                 discoverHDAddresses(unlockedWallet).then(result => {
                     renderAddressDiscovery(result);
 
+                    // Update the nav balance widget with HD total
+                    if (result.totalBalance > 0) {
+                        $('.nav-wallet-balance').html(
+                            '<img src="/assets/wallet/img/marscoin-350x350.png" width="20" height="20" /> ' +
+                            result.totalBalance.toFixed(4) + ' MARS'
+                        );
+                        // Also show the wallet-is-open state if it was showing not-open
+                        $('.wallet-is-not-open').hide();
+                        $('.wallet-is-open').show();
+                    }
+
                     // Check if any discovered address matches the user's civic wallet
-                    // If so, link it so civic-only features become accessible
                     const civicAddr = "{{ $civic_addr ?? '' }}";
                     if (civicAddr && result.discovered) {
                         const matchesCivic = result.discovered.find(a => a.address === civicAddr);

@@ -26,21 +26,45 @@ class WalletStatus extends Component
         }
         $profile = Profile::where('userid', '=', $user->id)->first();
 
-        if ($profile && $profile->wallet_open > 0) {
-            $wallet = HDWallet::where('user_id', '=', $user->id)->first();
-        } elseif ($profile && $profile->civic_wallet_open > 0) {
-            $wallet = CivicWallet::where('user_id', '=', $user->id)->first();
-        } else {
-            $wallet = null;
+        if (!$profile || ($profile->wallet_open == 0 && $profile->civic_wallet_open == 0)) {
+            $this->wallet_open = false;
+            $this->balance = 0;
+            $this->loading = false;
+            return;
         }
 
-        if ($wallet) {
+        // Aggregate balance across all user wallets
+        $totalBalance = 0;
+        $hasWallet = false;
+
+        // Check civic wallet
+        if ($profile->civic_wallet_open > 0) {
+            $civicWallet = CivicWallet::where('user_id', '=', $user->id)->first();
+            if ($civicWallet) {
+                $hasWallet = true;
+                $totalBalance += AppHelper::getMarscoinBalance($civicWallet->public_addr);
+            }
+        }
+
+        // Check HD wallet (if different from civic)
+        if ($profile->wallet_open > 0) {
+            $hdWallet = HDWallet::find($profile->wallet_open);
+            if ($hdWallet) {
+                $hasWallet = true;
+                // Avoid double-counting if HD and civic share the same address
+                $civicAddr = CivicWallet::where('user_id', $user->id)->value('public_addr');
+                if ($hdWallet->public_addr !== $civicAddr) {
+                    $totalBalance += AppHelper::getMarscoinBalance($hdWallet->public_addr);
+                }
+            }
+        }
+
+        if ($hasWallet) {
             $this->wallet_open = true;
-            $new_balance = AppHelper::getMarscoinBalance($wallet->public_addr);
-            if ($this->balance != $new_balance) {
+            if ($this->balance != $totalBalance) {
                 $this->previous_balance = $this->balance;
-                $this->balance = $new_balance;
-                $this->dispatch('balanceUpdated'); 
+                $this->balance = $totalBalance;
+                $this->dispatch('balanceUpdated');
             }
         } else {
             $this->wallet_open = false;
