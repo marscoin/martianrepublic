@@ -39,9 +39,13 @@ class IdentityController extends Controller
 	//
     public function showAll()
 	{
+		if (!Auth::check()) {
+			return redirect('/login');
+		}
+
 		$view = View::make('citizen.registry');
 
-		// Shared public data - cached registry lists
+		// Shared data - cached registry lists
 		$view->everyPublic = Cache::remember('registry_every_public', 300, function () {
 			return DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = ?) AND u.id NOT IN (?, ?) ORDER BY mined DESC', ['GP', 'GP', 'GP', 6462, 7601]);
 		});
@@ -84,20 +88,8 @@ class IdentityController extends Controller
 				$view->balance = 0;
 				$view->public_address = "";
 			}
-		} else {
-			// Public read-only defaults
-			$view->wallet_open = false;
-			$view->isCitizen = false;
-			$view->citcache = null;
-			$view->isGP = false;
-			$view->mePublic = null;
-			$view->meCitizen = null;
-			$view->feed = collect();
-			$view->endorsed = array();
-			$view->recentActivityCount = 0;
-			$view->balance = 0;
-			$view->public_address = "";
 		}
+		// Auth check at top of function ensures we never reach here unauthenticated
 
 		return $view;
 
