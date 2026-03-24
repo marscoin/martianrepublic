@@ -478,8 +478,12 @@ class DashboardController extends Controller
 			$profile->civic_wallet_open = 0;
 			$profile->save();
 
-			return redirect('wallet/dashboard/hd');
-			
+			// Render the close view so client-side JS can clear localStorage,
+			// then redirect via JS. Previously this was a server redirect which
+			// meant the close() JS function never ran and keys persisted.
+			$view = View::make('wallet.hd-close');
+			$view->wallet_open = 0;
+			return $view;
 
 		} else {
 			return redirect('/login');

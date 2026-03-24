@@ -73,13 +73,23 @@
 
     function close()
     {
-        $.post("/api/closewallet", {} , function(data) {
-
+        // Clear keys immediately
+        if (typeof WalletKey !== 'undefined') {
             WalletKey.clear();
-            localStorage.removeItem("Key");
+        }
+        localStorage.removeItem("key");
+        localStorage.removeItem("Key");
+        localStorage.removeItem("wk_enc");
 
+        // Notify server, then redirect
+        $.post("/api/closewallet", {}).always(function() {
+            window.location.href = "/wallet/dashboard/hd";
         });
 
+        // Fallback redirect if AJAX takes too long
+        setTimeout(function() {
+            window.location.href = "/wallet/dashboard/hd";
+        }, 3000);
     }     
 
 
