@@ -677,31 +677,35 @@ class AppHelper{
 
 		public static function getMarscoinBalance($publicAddr)
 		{
-			$url = "https://explore.marscoin.org/api/addr/{$publicAddr}/balance";
-
-			// Unique cache key to store the balance for each address
 			$cacheKey = 'marscoin_balance_' . $publicAddr;
 
-			// Use the Cache facade with the remember method
-			$curBalance = Cache::remember($cacheKey, 300, function () use ($url) {
-				// Inside the closure, fetch the balance from the explorer
+			// Cache for 2 minutes to reduce API load while staying reasonably fresh
+			return Cache::remember($cacheKey, 120, function () use ($publicAddr) {
+				// Primary: use local pebas (Electrum-based, more reliable)
 				try {
-					$response = file_get_contents($url);
-					return $response; // Assuming the response is the balance
+					$response = @file_get_contents("http://localhost:3001/api/mars/balance?address={$publicAddr}");
+					if ($response) {
+						$data = json_decode($response, true);
+						if (isset($data['balance'])) {
+							return (float) $data['balance'];
+						}
+					}
 				} catch (\Exception $e) {
-					// Handle the exception if the API call fails
-					return null;
+					// Fall through to explorer
 				}
+
+				// Fallback: explorer API (returns balance in satoshis)
+				try {
+					$response = @file_get_contents("https://explore.marscoin.org/api/addr/{$publicAddr}/balance");
+					if ($response !== false && is_numeric($response)) {
+						return $response * 0.00000001;
+					}
+				} catch (\Exception $e) {
+					// Both failed
+				}
+
+				return 0;
 			});
-
-			if ($curBalance !== null) {
-				// Assuming the balance is returned in satoshis, convert to Marscoin if necessary
-				// The conversion logic depends on the API's response format
-				return $curBalance * 0.00000001; // Example conversion, adjust based on actual response
-			}
-
-			// Handle the case where the API call was not successful or caching failed
-			return 0;
 		}
 
 		public static function getMarscoinTotalReceived($publicAddr)
