@@ -529,10 +529,14 @@
             const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
             const xpub = root.derivePath("m/44'/2'/0'").neutered().toBase58();
 
-            // Use pebas server-side HD discovery (single API call)
+            // Use same-origin proxy to pebas HD discovery (avoids Cloudflare CSP)
             try {
-                const resp = await fetch(`https://pebas.marscoin.org/api/mars/discover?xpub=${xpub}&gap_limit=20`);
-                const data = await resp.json();
+                const resp = await $.ajax({
+                    url: '/api/discover',
+                    type: 'POST',
+                    data: { xpub: xpub, gap_limit: 20 },
+                });
+                const data = resp;
 
                 if (data.error) throw new Error(data.error);
 

@@ -609,6 +609,31 @@ class ApiController extends Controller {
 	 * Called after HD discovery finds an address matching the user's civic wallet.
 	 * Links the HD session to the civic wallet so civic-only features are accessible.
 	 */
+	/**
+	 * Proxy for pebas HD discovery - avoids CSP issues with Cloudflare
+	 */
+	public function discoverAddresses(Request $request)
+	{
+		$xpub = $request->input('xpub');
+		$gapLimit = $request->input('gap_limit', 20);
+
+		if (!$xpub) {
+			return response()->json(['error' => 'xpub required'], 400);
+		}
+
+		try {
+			$response = \Illuminate\Support\Facades\Http::timeout(30)
+				->get("http://localhost:3001/api/mars/discover", [
+					'xpub' => $xpub,
+					'gap_limit' => $gapLimit,
+				]);
+
+			return response()->json($response->json());
+		} catch (\Exception $e) {
+			return response()->json(['error' => 'Discovery failed: ' . $e->getMessage()], 500);
+		}
+	}
+
 	public function linkCivicWallet(Request $request)
 	{
 		$uid = Auth::user()->id;
