@@ -636,6 +636,25 @@
                 // Kick off HD address scan in background
                 discoverHDAddresses(unlockedWallet).then(result => {
                     renderAddressDiscovery(result);
+
+                    // Check if any discovered address matches the user's civic wallet
+                    // If so, link it so civic-only features become accessible
+                    const civicAddr = "{{ $civic_addr ?? '' }}";
+                    if (civicAddr && result.discovered) {
+                        const matchesCivic = result.discovered.find(a => a.address === civicAddr);
+                        if (matchesCivic) {
+                            $.post('/api/link-civic', { address: civicAddr })
+                            .done(function(data) {
+                                console.log("Civic wallet linked:", data);
+                                if (typeof toastr !== 'undefined') {
+                                    toastr.success('Civic wallet connected. All features unlocked.', '', {timeOut: 4000});
+                                }
+                            })
+                            .fail(function(err) {
+                                console.warn("Failed to link civic wallet:", err);
+                            });
+                        }
+                    }
                 }).catch(err => {
                     console.error("HD discovery failed:", err);
                     $('#hd-total-balance').text('{{ $balance ?? "0" }} MARS');

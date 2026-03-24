@@ -605,6 +605,41 @@ class ApiController extends Controller {
 	 *
 	 * @hideFromAPIDocumentation
 	 */
+	/**
+	 * Called after HD discovery finds an address matching the user's civic wallet.
+	 * Links the HD session to the civic wallet so civic-only features are accessible.
+	 */
+	public function linkCivicWallet(Request $request)
+	{
+		$uid = Auth::user()->id;
+		$address = $request->input('address');
+
+		if (!$address || !AppHelper::isValidMarscoinAddress($address)) {
+			return response()->json(['error' => 'Invalid address'], 400);
+		}
+
+		$civicWallet = CivicWallet::where('user_id', $uid)
+			->where('public_addr', $address)
+			->first();
+
+		if (!$civicWallet) {
+			return response()->json(['error' => 'No matching civic wallet found'], 404);
+		}
+
+		$profile = Profile::where('userid', $uid)->first();
+		if ($profile) {
+			$profile->civic_wallet_open = $civicWallet->id;
+			$profile->save();
+			Log::info("Civic wallet linked for user {$uid}: {$address}");
+		}
+
+		return response()->json([
+			'success' => true,
+			'civic_wallet_id' => $civicWallet->id,
+			'address' => $address,
+		]);
+	}
+
 	public function renameWallet(Request $request)
 	{
 		$request->validate([

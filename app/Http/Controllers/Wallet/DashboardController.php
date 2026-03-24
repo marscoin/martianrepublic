@@ -448,6 +448,9 @@ class DashboardController extends Controller
 				}
 				$profile->save();
 
+				// Pass civic wallet address for HD discovery linking
+				$view->civic_addr = $civic_wallet ? $civic_wallet->public_addr : '';
+
 				return $view;
 			}else{
 				return redirect('/wallet/dashboard/hd');
