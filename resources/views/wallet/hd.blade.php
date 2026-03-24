@@ -757,29 +757,85 @@ h5 {
 
                 $(".dot").hide()
 
-                 // Check if the password fields are empty
+                // Check if the password fields are empty
                 var password = $('#password').val().trim();
                 var rePassword = $('#re-password').val().trim();
 
-                // If both password fields are empty, show a warning message
                 if (password === '' && rePassword === '') {
                     var userConfirmed = confirm("Warning: If you do not provide a password, you will not be able to unlock the wallet by password and access may be lost unless you have written down the seed phrase or downloaded the keyfile. Do you want to continue without setting a password?");
-                    
-                    // If user did not confirm, stop the function
                     if (!userConfirmed) {
                         return;
                     }
                 }
-                
-                $(".tab-3").removeClass("disabled").addClass("active")
 
-                $(".tab-2").removeClass("active")
-                $("#mnemonic").removeClass("active in")
-                $("#done").show()
-                $("#done").addClass("active in")
-                $("#next-mnemonic").hide();
-                $("#mnemonic").hide()
-                $("#next-entropy").hide()
+                // Mnemonic confirmation - pick 3 random words for user to verify
+                const mnemWords = $('.mnemonic-text').html().trim().split(/\s+/);
+                const indices = [];
+                while (indices.length < 3) {
+                    const idx = Math.floor(Math.random() * 12);
+                    if (!indices.includes(idx)) indices.push(idx);
+                }
+                indices.sort((a, b) => a - b);
+
+                const confirmHtml = `
+                    <div style="text-align: center; padding: 20px;">
+                        <h4 style="color: var(--mr-mars, #c84125); margin-bottom: 16px;">Verify Your Seed Phrase</h4>
+                        <p style="color: var(--mr-text-dim, #8a8998); margin-bottom: 24px;">
+                            Please enter the following words from your seed phrase to confirm you've saved it.
+                        </p>
+                        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                            ${indices.map(idx => `
+                                <div style="text-align: center;">
+                                    <label style="color: var(--mr-text-dim); font-size: 12px;">Word #${idx + 1}</label>
+                                    <input type="text" class="seed-input mnemonic-verify-input" data-word-index="${idx}"
+                                        style="display: block; text-align: center;" placeholder="Word ${idx + 1}" autocomplete="off">
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="margin-top: 24px;">
+                            <button class="btn btn-primary" id="confirm-mnemonic-btn">Confirm & Continue</button>
+                            <button class="btn btn-secondary" id="cancel-mnemonic-btn" style="margin-left: 10px;">Go Back</button>
+                        </div>
+                        <p id="mnemonic-verify-error" style="color: var(--mr-red, #ef4444); margin-top: 12px; display: none;">
+                            Incorrect words. Please check your seed phrase and try again.
+                        </p>
+                    </div>`;
+
+                // Show verification in the mnemonic tab area
+                const origContent = $('#mnemonic .next-btn').html();
+                $('#mnemonic .next-btn').html(confirmHtml);
+                $('#next-mnemonic').hide();
+
+                $('#confirm-mnemonic-btn').click(() => {
+                    let allCorrect = true;
+                    $('.mnemonic-verify-input').each(function() {
+                        const idx = parseInt($(this).data('word-index'));
+                        const entered = $(this).val().trim().toLowerCase();
+                        if (entered !== mnemWords[idx].toLowerCase()) {
+                            allCorrect = false;
+                        }
+                    });
+
+                    if (allCorrect) {
+                        // Verification passed - proceed to wallet generation
+                        $(".tab-3").removeClass("disabled").addClass("active")
+                        $(".tab-2").removeClass("active")
+                        $("#mnemonic").removeClass("active in")
+                        $("#done").show()
+                        $("#done").addClass("active in")
+                        $("#next-mnemonic").hide();
+                        $("#mnemonic").hide()
+                        $("#next-entropy").hide()
+                    } else {
+                        $('#mnemonic-verify-error').show();
+                        $('.mnemonic-verify-input').css('border-color', 'var(--mr-red, #ef4444)');
+                    }
+                });
+
+                $('#cancel-mnemonic-btn').click(() => {
+                    $('#mnemonic .next-btn').html(origContent);
+                    $('#next-mnemonic').show();
+                });
 
             })
 
@@ -907,28 +963,21 @@ h5 {
             }
             handleMakeWallet()
 
-            const hashPassword = (passcode) => {
+            const PBKDF2_ROUNDS = 100000;
+            const PBKDF2_LEGACY_ROUNDS = 1;
 
+            const hashPassword = (passcode) => {
                 const ret = my_bundle.pbkdf2.pbkdf2Sync(
                     passcode,
-                    "{{ $SALT }}", 1, 16, 'sha512').toString('hex')
-
+                    "{{ $SALT }}", PBKDF2_ROUNDS, 16, 'sha512').toString('hex')
                 return ret
             }
 
-
-            const hashPasswordWithRounds = (passcode, rounds) => {
-
-                for (let i = 0; i < rounds; i++) {
-                    console.log(`hash round: ${i}`)
-
-                }
-
-
+            // For unlocking wallets created with the old 1-round hash
+            const hashPasswordLegacy = (passcode) => {
                 const ret = my_bundle.pbkdf2.pbkdf2Sync(
                     passcode,
-                    "{{ $SALT }}", 1, 16, 'sha512').toString('hex')
-
+                    "{{ $SALT }}", PBKDF2_LEGACY_ROUNDS, 16, 'sha512').toString('hex')
                 return ret
             }
 
@@ -1242,7 +1291,7 @@ h5 {
 
             })
 
-            // LOGIN USING KEYFILE 
+            // LOGIN USING KEYFILE
             document.getElementById('uploadButton').addEventListener('click', function() {
                 var fileInput = document.getElementById('jsonFile');
 
@@ -1257,10 +1306,34 @@ h5 {
                 reader.onload = function(e) {
                     try {
                         var jsonData = JSON.parse(e.target.result);
-                        var mnemonic = jsonData.key; // Assuming the JSON structure is { "key": "mnemonic words here" }
-                        processMnemonic(mnemonic);
+
+                        if (jsonData.version === 2 && jsonData.encrypted) {
+                            // Encrypted keyfile (v2) - prompt for password
+                            const filePassword = prompt("This backup is encrypted. Enter the backup password:");
+                            if (!filePassword) return;
+
+                            try {
+                                const rounds = jsonData.pbkdf2_rounds || PBKDF2_ROUNDS;
+                                const hashed = my_bundle.pbkdf2.pbkdf2Sync(
+                                    filePassword.trim(), "{{ $SALT }}", rounds, 16, 'sha512'
+                                ).toString('hex');
+                                const decrypted = my_bundle.decrypt(jsonData.data, hashed, iv).trim();
+                                processMnemonic(decrypted);
+                            } catch (decErr) {
+                                alert("Failed to decrypt backup. Wrong password or corrupted file.");
+                                console.error('Decryption error:', decErr);
+                            }
+                        } else {
+                            // Unencrypted keyfile (v1/legacy)
+                            var mnemonic = jsonData.key;
+                            if (!mnemonic) {
+                                alert("Invalid keyfile format. No key found.");
+                                return;
+                            }
+                            processMnemonic(mnemonic);
+                        }
                     } catch (error) {
-                        alert('Error reading or parsing the file.');
+                        alert('Error reading or parsing the file. Please check the file format.');
                         console.error('Error:', error);
                     }
                 };
@@ -1269,35 +1342,27 @@ h5 {
             });
 
             function processMnemonic(mnemonic) {
-                // Clean up the mnemonic string if necessary
                 mnemonic = mnemonic.trim();
-
-                // Now, you can use your existing function to generate the seed and handle the rest
                 const response = genSeed(mnemonic);
 
                 if (response && response.address) {
-                    // Redirect or do further processing as needed
-
                     var postData = {
                         password: '',
                         public_addr: response.address,
-                        wallet_name: 'Imported' // Set the wallet name to 'Imported'
+                        wallet_name: 'Imported'
                     };
 
                     $.post('/wallet/createwallet', postData)
                     .done(function(data) {
-                        console.log('Mnemonic processed and key stored in localStorage.');
-                        localStorage.setItem("key", response.decrypted);
-                        location.href="/wallet/dashboard/hd-open";
+                        localStorage.setItem("key", response.mnemonic);
+                        location.href = "/wallet/dashboard/hd-open";
                     })
                     .fail(function(error) {
                         console.error("Error occurred: ", error);
                         alert("Failed to connect wallet. The server returned an error. Please try again.");
                     });
-
                 } else {
                     alert("Invalid seed phrase. Could not derive a valid wallet address. Please check your words and try again.");
-                    console.error('Failed to process mnemonic.');
                 }
             }
 
@@ -1307,33 +1372,42 @@ h5 {
                 // compile mnemonic
 
                 var wallet_password = $("#wallet-password").val().replace(/\s+/g, '');
-                // console.log(wallet_password)
-
-                const hashed = hashPassword(wallet_password);
-                //console.log("hashed:", hashed)
-
                 const encrypted_mnem = "{{ $encrypted_seed }}".replace(/\s+/g, '');
-                //const encrypted = my_bundle.encrypt("face they lemon ignore link crop above thing buffalo tide category soup", hashed)
-                //console.log("Encrypted: ", encrypted)
+                let decrypted = null;
+                let usedLegacy = false;
 
-                const decrypted = my_bundle.decrypt(encrypted_mnem, hashed, iv).trim()
+                // Try new hash (100k rounds) first
+                try {
+                    const hashed = hashPassword(wallet_password);
+                    decrypted = my_bundle.decrypt(encrypted_mnem, hashed, iv).trim();
+                    const testResp = genSeed(decrypted);
+                    if (testResp.address !== "{{ $public_addr }}") decrypted = null;
+                } catch (e) { decrypted = null; }
 
-                // console.log("Encrypted SEED: {{ $encrypted_seed }}")
-                // console.log("MNEM:", decrypted)
-
-
-                const response = genSeed(decrypted)
-
-                // console.log("response:", response)
-                if (response.address == "{{ $public_addr }}") {
-                    // Logging in was successful... Opening wallet...
-                    localStorage.setItem("key", decrypted)
-                    //      console.error("Item Succesfully locally stored")
-                } else {
-                    $(".wallet-getter").attr("action", "/wallet/failwallet")
-
+                // Fall back to legacy (1 round)
+                if (!decrypted) {
+                    try {
+                        const hashedLegacy = hashPasswordLegacy(wallet_password);
+                        decrypted = my_bundle.decrypt(encrypted_mnem, hashedLegacy, iv).trim();
+                        const testResp = genSeed(decrypted);
+                        if (testResp.address !== "{{ $public_addr }}") {
+                            decrypted = null;
+                        } else {
+                            usedLegacy = true;
+                        }
+                    } catch (e) { decrypted = null; }
                 }
-                // Logging in was NOT-successful... Prompting user to retry login.
+
+                if (decrypted) {
+                    localStorage.setItem("key", decrypted);
+                    if (usedLegacy) {
+                        // Re-encrypt with stronger hash on next createwallet call
+                        console.log("Legacy wallet detected - will upgrade encryption on next save");
+                    }
+                } else {
+                    alert("Incorrect password. Please try again.");
+                    $(".wallet-getter").attr("action", "/wallet/failwallet");
+                }
 
             })
 
@@ -1399,22 +1473,44 @@ h5 {
                 console.log("unlocking...")
 
                 var wallet_password = $("#unlock-password").val().replace(/\s+/g, '');
-                // console.log(wallet_password)
-
-                const hashed = hashPassword(wallet_password);
-
-
-                const user_wallet = selected_wallet
-                //console.log("hashed:", hashed)
-
+                const user_wallet = selected_wallet;
                 const encrypted_mnem = user_wallet.encrypted_seed.replace(/\s+/g, '');
 
-                let decrypted;
+                // Try new PBKDF2 (100k rounds) first, then fall back to legacy (1 round)
+                let decrypted = null;
+                let usedLegacy = false;
+
+                // Try new hash
                 try {
+                    const hashed = hashPassword(wallet_password);
                     decrypted = my_bundle.decrypt(encrypted_mnem, hashed, iv).trim();
+                    const testResponse = genSeed(decrypted);
+                    if (testResponse.address !== user_wallet.public_addr) {
+                        decrypted = null; // Address mismatch, try legacy
+                    }
                 } catch (err) {
-                    console.error("Decryption failed:", err);
-                    alert("Incorrect password. Could not decrypt wallet. Please try again.");
+                    decrypted = null; // Decryption failed, try legacy
+                }
+
+                // Fall back to legacy hash (1 round) for wallets created before security upgrade
+                if (!decrypted) {
+                    try {
+                        const hashedLegacy = hashPasswordLegacy(wallet_password);
+                        decrypted = my_bundle.decrypt(encrypted_mnem, hashedLegacy, iv).trim();
+                        const testResponse = genSeed(decrypted);
+                        if (testResponse.address !== user_wallet.public_addr) {
+                            decrypted = null;
+                        } else {
+                            usedLegacy = true;
+                            console.log("Unlocked with legacy hash - will re-encrypt with stronger hash");
+                        }
+                    } catch (err) {
+                        decrypted = null;
+                    }
+                }
+
+                if (!decrypted) {
+                    alert("Incorrect password. Could not decrypt wallet. Please check your password and try again.");
                     e.preventDefault();
                     return false;
                 }
@@ -1423,23 +1519,35 @@ h5 {
                 try {
                     response = genSeed(decrypted);
                 } catch (err) {
-                    console.error("Seed generation failed:", err);
                     alert("Failed to derive wallet from decrypted seed. The wallet data may be corrupted.");
                     e.preventDefault();
                     return false;
                 }
 
                 if (response.address == user_wallet.public_addr) {
-                    // Logging in was successful... Opening wallet...
                     flushLocalStorage()
-                    console.log("success...")
                     localStorage.setItem("key", decrypted)
                     $("#selected_wallet").val(JSON.stringify(selected_wallet))
+
+                    // If unlocked with legacy hash, re-encrypt with stronger hash
+                    if (usedLegacy) {
+                        try {
+                            const newHashed = hashPassword(wallet_password);
+                            const reEncrypted = my_bundle.encrypt(decrypted, newHashed, iv);
+                            $.post('/wallet/createwallet', {
+                                password: reEncrypted,
+                                public_addr: user_wallet.public_addr,
+                                wallet_name: user_wallet.wallet_type || 'Upgraded'
+                            });
+                            console.log("Wallet re-encrypted with 100k PBKDF2 rounds");
+                        } catch (upgradeErr) {
+                            console.warn("Failed to upgrade encryption, continuing with legacy:", upgradeErr);
+                        }
+                    }
+
                     return true;
                 } else {
-                    console.log("failure - address mismatch:", response.address, "!=", user_wallet.public_addr)
                     alert("Wallet unlock failed. The derived address does not match. Please check your password and try again.");
-                    validated = false
                     e.preventDefault();
                     return false;
                 }

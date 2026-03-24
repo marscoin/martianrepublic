@@ -1134,13 +1134,59 @@
 
 
         function onDownloadWallet() {
-            download(localStorage.getItem("key").trim(), "marswallet-key.json", "text/plain")
+            const mnemonic = localStorage.getItem("key");
+            if (!mnemonic) {
+                alert("No wallet key found. Please unlock your wallet first.");
+                return;
+            }
+
+            // Prompt for an export password
+            const exportPassword = prompt(
+                "Enter a password to encrypt your backup file.\n\n" +
+                "This password will be required to restore from this backup.\n" +
+                "Leave empty for an unencrypted backup (not recommended)."
+            );
+
+            if (exportPassword === null) return; // User cancelled
+
+            if (exportPassword.trim() !== '') {
+                // Encrypted export
+                try {
+                    const hashed = hashPassword(exportPassword.trim());
+                    const encrypted = my_bundle.encrypt(mnemonic.trim(), hashed, iv);
+                    const json = {
+                        version: 2,
+                        encrypted: true,
+                        pbkdf2_rounds: PBKDF2_ROUNDS,
+                        data: encrypted,
+                        address: "{{ $public_addr ?? '' }}"
+                    };
+                    downloadFile(JSON.stringify(json, null, 2), "marswallet-encrypted.json", "application/json");
+                    alert("Encrypted backup saved. Keep your backup password safe - you'll need it to restore.");
+                } catch (e) {
+                    alert("Failed to encrypt backup: " + e.message);
+                }
+            } else {
+                // Unencrypted export (legacy, with warning)
+                if (!confirm("WARNING: This will save your seed phrase in plain text. Anyone with access to this file can steal your funds. Continue?")) {
+                    return;
+                }
+                const json = {
+                    version: 1,
+                    encrypted: false,
+                    key: mnemonic.trim()
+                };
+                downloadFile(JSON.stringify(json, null, 2), "marswallet-key.json", "text/plain");
+            }
         }
 
-        function constructJSONKey() {
-            let json = {}
-
-
+        function downloadFile(content, fileName, contentType) {
+            const a = document.createElement("a");
+            const file = new Blob([content], { type: contentType });
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(a.href);
         }
 
         // grab user input password. unlock wallet...
@@ -1199,12 +1245,20 @@
 
 
 
-        const hashPassword = (passcode) => {
+        const PBKDF2_ROUNDS = 100000;
+        const PBKDF2_LEGACY_ROUNDS = 1;
 
+        const hashPassword = (passcode) => {
             const ret = my_bundle.pbkdf2.pbkdf2Sync(
                 passcode,
-                "{{ $SALT }}", 1, 16, 'sha512').toString('hex')
+                "{{ $SALT }}", PBKDF2_ROUNDS, 16, 'sha512').toString('hex')
+            return ret
+        }
 
+        const hashPasswordLegacy = (passcode) => {
+            const ret = my_bundle.pbkdf2.pbkdf2Sync(
+                passcode,
+                "{{ $SALT }}", PBKDF2_LEGACY_ROUNDS, 16, 'sha512').toString('hex')
             return ret
         }
 
