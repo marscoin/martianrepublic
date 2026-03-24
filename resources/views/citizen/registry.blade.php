@@ -637,78 +637,64 @@ const sendMARS = async (mars_amount, receiver_address) => {
     return null
 }
 
+// Find the signing key for an address using the genSeed-style derivation
+// genSeed uses TWO different bip32 libs: bitcoin.bip32 for root, my_bundle.bip32 for xpub parsing
+function findSigningKeyForAddress(mnemonic, targetAddress) {
+    const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
+    const paths = ["m/44'/2'/0'", "m/44'/107'/0'"];
+
+    for (const basePath of paths) {
+        try {
+            // Step 1: root with my_bundle.bitcoin.bip32 (genSeed line 1020)
+            const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
+            const accountPriv = root.derivePath(basePath);
+            const xpub = accountPriv.neutered().toBase58();
+
+            // Step 2: parse xpub with my_bundle.bip32 (genSeed line 1023)
+            const hdNode = my_bundle.bip32.fromBase58(xpub, Marscoin.mainnet);
+
+            for (let chain = 0; chain <= 1; chain++) {
+                const chainNode = hdNode.derive(chain);
+                for (let index = 0; index < 20; index++) {
+                    const addr = my_bundle.bitcoin.payments.p2pkh({
+                        pubkey: chainNode.derive(index).publicKey,
+                        network: Marscoin.mainnet
+                    }).address;
+
+                    if (index === 0 && chain === 0) console.log(`Trying ${basePath}/0/0 = ${addr}`);
+
+                    if (addr === targetAddress) {
+                        // Get private key from the original private account node
+                        const privChild = accountPriv.derive(chain).derive(index);
+                        const key = my_bundle.bitcoin.ECPair.fromWIF(privChild.toWIF(), Marscoin.mainnet);
+                        console.log(`Found key at ${basePath}/${chain}/${index}`);
+                        return key;
+                    }
+                }
+            }
+        } catch(e) { console.warn(`Path ${basePath}:`, e.message); }
+    }
+    return null;
+}
+
 const signMARS = async (message, mars_amount, tx_i_o) => {
 
     if(!WalletKey.get())
     {
-        alert("Unencrypt first");
+        alert("Please unlock your wallet first.");
         return;
     }
 
     const mnemonic = WalletKey.get();
     const sender_address = "<?=$public_address?>".trim()
-    const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-    // Use bitcoin.bip32 from bundle.js (matches wallet creation), fallback to my_bundle
-    const bip32Lib = (typeof bitcoin !== 'undefined' && bitcoin.bip32) ? bitcoin.bip32 : my_bundle.bitcoin.bip32;
-    const root = bip32Lib.fromSeed(seed, Marscoin.mainnet)
 
-    // Find the correct derivation path for the sender address
-    // Try both Litecoin-legacy (coin 2) and official Marscoin (coin 107) BIP44 paths
-    // Also try the neutered xpub approach (how genSeed/pebas does it)
-    let signingKey = null;
-    const derivationBases = ["m/44'/2'/0'", "m/44'/107'/0'"];
-
-    // Method 1: Direct derivation (how signing usually works)
-    for (const basePath of derivationBases) {
-        if (signingKey) break;
-        try {
-            const account = root.derivePath(basePath);
-            for (let chain = 0; chain <= 1 && !signingKey; chain++) {
-                for (let index = 0; index < 20 && !signingKey; index++) {
-                    const child = account.derive(chain).derive(index);
-                    const addr = my_bundle.bitcoin.payments.p2pkh({pubkey: child.publicKey, network: Marscoin.mainnet}).address;
-                    if (index === 0 && chain === 0) console.log(`Direct ${basePath}/0/0 = ${addr}`);
-                    if (addr === sender_address) {
-                        signingKey = my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
-                        console.log(`Found signing key at ${basePath}/${chain}/${index} for ${addr}`);
-                    }
-                }
-            }
-        } catch(e) { console.warn(`Path ${basePath} failed:`, e.message); }
-    }
-
-    // Method 2: Neutered xpub approach (how genSeed/pebas discovers addresses)
-    if (!signingKey) {
-        console.log("Direct derivation failed, trying neutered xpub approach...");
-        for (const basePath of derivationBases) {
-            if (signingKey) break;
-            try {
-                const accountPriv = root.derivePath(basePath);
-                const xpub = accountPriv.neutered().toBase58();
-                const hdNode = my_bundle.bitcoin.bip32.fromBase58(xpub, Marscoin.mainnet);
-                for (let chain = 0; chain <= 1 && !signingKey; chain++) {
-                    for (let index = 0; index < 20 && !signingKey; index++) {
-                        const node = hdNode.derive(chain);
-                        const addr = my_bundle.bitcoin.payments.p2pkh({pubkey: node.derive(index).publicKey, network: Marscoin.mainnet}).address;
-                        if (index === 0 && chain === 0) console.log(`Xpub ${basePath}/0/0 = ${addr}`);
-                        if (addr === sender_address) {
-                            // Found it via xpub - now get the private key from the non-neutered path
-                            const privChild = accountPriv.derive(chain).derive(index);
-                            signingKey = my_bundle.bitcoin.ECPair.fromWIF(privChild.toWIF(), Marscoin.mainnet);
-                            console.log(`Found via xpub at ${basePath}/${chain}/${index} for ${addr}`);
-                        }
-                    }
-                }
-            } catch(e) { console.warn(`Xpub path ${basePath} failed:`, e.message); }
-        }
-    }
-
-    if (!signingKey) {
-        alert("Could not find the signing key for address " + sender_address + " in your wallet's derivation tree. Your seed phrase may not match this wallet.");
+    // Use findSigningKeyForAddress helper (replicates genSeed two-library derivation)
+    var key = findSigningKeyForAddress(mnemonic, sender_address);
+    if (!key) {
+        alert("Could not find the signing key for address " + sender_address + ". Your seed phrase may not match this wallet.");
         return;
     }
 
-    var key = signingKey;
     const zubs = zubrinConvert(mars_amount)
     var psbt = new my_bundle.bitcoin.Psbt({
         network: Marscoin.mainnet,
@@ -781,38 +767,18 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
 
 const signMARSRegular = async (mars_amount, tx_i_o) => {
 
-if(!WalletKey.get())
-{
-    alert("Unencrypt first");
+if(!WalletKey.get()) {
+    alert("Please unlock your wallet first.");
     return;
 }
 const mnemonic = WalletKey.get();
 const sender_address = "<?=$public_address?>".trim()
-const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
 
-// Find the correct derivation path - try both coin type 2 (legacy) and 107 (official)
-let signingKey = null;
-const derivPaths = ["m/44'/2'/0'", "m/44'/107'/0'"];
-for (const basePath of derivPaths) {
-    if (signingKey) break;
-    const acct = root.derivePath(basePath);
-    for (let chain = 0; chain <= 1 && !signingKey; chain++) {
-        for (let idx = 0; idx < 20 && !signingKey; idx++) {
-            const ch = acct.derive(chain).derive(idx);
-            const a = my_bundle.bitcoin.payments.p2pkh({pubkey: ch.publicKey, network: Marscoin.mainnet}).address;
-            if (a === sender_address) {
-                signingKey = my_bundle.bitcoin.ECPair.fromWIF(ch.toWIF(), Marscoin.mainnet);
-                console.log(`Found signing key at ${basePath}/${chain}/${idx} for ${a}`);
-            }
-        }
-    }
-}
-if (!signingKey) {
-    alert("Could not find signing key for " + sender_address + " in your wallet.");
+var key = findSigningKeyForAddress(mnemonic, sender_address);
+if (!key) {
+    alert("Could not find signing key for " + sender_address + ". Your seed phrase may not match this wallet.");
     return;
 }
-var key = signingKey;
 const zubs = zubrinConvert(mars_amount)
 var psbt = new my_bundle.bitcoin.Psbt({
     network: Marscoin.mainnet,
