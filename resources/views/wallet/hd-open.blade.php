@@ -525,23 +525,44 @@
         // Scans BIP44 derivation paths to find all addresses with balance
         // ============================================================
         async function discoverHDAddresses(mnemonic) {
+            const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
+            const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
+            const xpub = root.derivePath("m/44'/2'/0'").neutered().toBase58();
+
+            // Use pebas server-side HD discovery (single API call)
+            try {
+                const resp = await fetch(`https://pebas.marscoin.org/api/mars/discover?xpub=${xpub}&gap_limit=20`);
+                const data = await resp.json();
+
+                if (data.error) throw new Error(data.error);
+
+                return {
+                    discovered: data.addresses || [],
+                    totalBalance: data.totalBalance || 0,
+                    xpub: xpub,
+                };
+            } catch (serverErr) {
+                console.warn("Server-side HD discovery failed, falling back to client-side:", serverErr.message);
+                // Fallback: client-side scan (slower but works without pebas discover endpoint)
+                return await discoverHDAddressesClientSide(mnemonic);
+            }
+        }
+
+        // Fallback client-side discovery (40+ API calls)
+        async function discoverHDAddressesClientSide(mnemonic) {
             const GAP_LIMIT = 20;
             const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
             const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
             const account = root.derivePath("m/44'/2'/0'").neutered();
-            const accountPriv = root.derivePath("m/44'/2'/0'");
 
             const discovered = [];
             let totalBalance = 0;
 
-            // Scan both chains: 0 = receiving, 1 = change
             for (let chain = 0; chain <= 1; chain++) {
                 const chainNode = account.derive(chain);
                 let consecutiveEmpty = 0;
 
-                for (let index = 0; index < GAP_LIMIT + 20; index++) {
-                    if (consecutiveEmpty >= GAP_LIMIT) break;
-
+                for (let index = 0; consecutiveEmpty < GAP_LIMIT; index++) {
                     const childNode = chainNode.derive(index);
                     const address = my_bundle.bitcoin.payments.p2pkh({
                         pubkey: childNode.publicKey,
@@ -554,39 +575,14 @@
                         const balance = parseFloat(data.balance) || 0;
 
                         if (balance > 0) {
-                            discovered.push({
-                                address,
-                                balance,
-                                chain: chain === 0 ? 'receiving' : 'change',
-                                index,
-                                path: `m/44'/2'/0'/${chain}/${index}`
-                            });
+                            discovered.push({ address, balance, chain: chain === 0 ? 'receiving' : 'change', index, path: `m/44'/2'/0'/${chain}/${index}` });
                             totalBalance += balance;
                             consecutiveEmpty = 0;
-
-                            // Update display as we find balances
                             $('#hd-total-balance').text(totalBalance.toFixed(8) + ' MARS');
                         } else {
-                            // Check if address has any transaction history
-                            const histResp = await fetch(`https://explore.marscoin.org/api/addr/${address}`);
-                            const histData = await histResp.json();
-                            if (histData.txApperances > 0 || histData.unconfirmedTxApperances > 0) {
-                                // Used address with zero balance - don't count toward gap
-                                discovered.push({
-                                    address,
-                                    balance: 0,
-                                    chain: chain === 0 ? 'receiving' : 'change',
-                                    index,
-                                    path: `m/44'/2'/0'/${chain}/${index}`,
-                                    used: true
-                                });
-                                consecutiveEmpty = 0;
-                            } else {
-                                consecutiveEmpty++;
-                            }
+                            consecutiveEmpty++;
                         }
                     } catch (err) {
-                        console.warn(`Failed to check address ${address}:`, err.message);
                         consecutiveEmpty++;
                     }
                 }
