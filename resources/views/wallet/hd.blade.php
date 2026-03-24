@@ -1402,7 +1402,13 @@ h5 {
                     localStorage.setItem("key", decrypted);
                     if (usedLegacy) {
                         // Re-encrypt with stronger hash on next createwallet call
-                        console.log("Legacy wallet detected - will upgrade encryption on next save");
+                        console.log("Legacy wallet detected - upgrading encryption");
+                        // Notify user about the security upgrade
+                        setTimeout(() => {
+                            if (typeof toastr !== 'undefined') {
+                                toastr.info('Your wallet encryption has been automatically upgraded to a stronger standard.', 'Security Upgrade', {timeOut: 8000});
+                            }
+                        }, 2000);
                     }
                 } else {
                     alert("Incorrect password. Please try again.");
@@ -1540,6 +1546,11 @@ h5 {
                                 wallet_name: user_wallet.wallet_type || 'Upgraded'
                             });
                             console.log("Wallet re-encrypted with 100k PBKDF2 rounds");
+                            setTimeout(() => {
+                                if (typeof toastr !== 'undefined') {
+                                    toastr.info('Your wallet encryption has been automatically upgraded to a stronger standard.', 'Security Upgrade', {timeOut: 8000});
+                                }
+                            }, 2000);
                         } catch (upgradeErr) {
                             console.warn("Failed to upgrade encryption, continuing with legacy:", upgradeErr);
                         }
