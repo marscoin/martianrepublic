@@ -175,6 +175,7 @@
     <footer class="footer">
         @include('footer')
     </footer>
+    <script src="/assets/wallet/js/dist/bundle.js"></script>
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
@@ -647,7 +648,9 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     const mnemonic = WalletKey.get();
     const sender_address = "<?=$public_address?>".trim()
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-    const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
+    // Use bitcoin.bip32 from bundle.js (matches wallet creation), fallback to my_bundle
+    const bip32Lib = (typeof bitcoin !== 'undefined' && bitcoin.bip32) ? bitcoin.bip32 : my_bundle.bitcoin.bip32;
+    const root = bip32Lib.fromSeed(seed, Marscoin.mainnet)
 
     // Find the correct derivation path for the sender address
     // Try both Litecoin-legacy (coin 2) and official Marscoin (coin 107) BIP44 paths
