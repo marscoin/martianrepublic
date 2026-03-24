@@ -26,7 +26,7 @@ class SecurityHeaders
             "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com data:",
             "img-src 'self' data: blob: https://ipfs.marscoin.org https://*.tile.openstreetmap.org",
             "media-src 'self' blob: https://ipfs.marscoin.org",
-            "connect-src 'self' https://ipfs.marscoin.org https://explore1.marscoin.org https://price.marscoin.org wss:",
+            "connect-src 'self' https://ipfs.marscoin.org https://explore1.marscoin.org https://explore.marscoin.org https://pebas.marscoin.org https://price.marscoin.org wss:",
             "frame-ancestors 'self'",
             "base-uri 'self'",
             "form-action 'self'",
