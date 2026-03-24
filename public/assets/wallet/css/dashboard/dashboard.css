@@ -83,18 +83,32 @@ a:hover, a:focus { color: var(--mr-amber); text-decoration: none; }
   border-bottom: 1px solid var(--mr-border) !important;
   box-shadow: none !important;
 }
+.mainnav-menu > li {
+  background: transparent !important;
+}
 .mainnav-menu > li > a {
   color: var(--mr-text-dim) !important;
   font-weight: 500;
   letter-spacing: 0.3px;
   transition: all 0.25s ease;
+  background: transparent !important;
 }
-.mainnav-menu > li > a:hover {
+.mainnav-menu > li > a:hover,
+.mainnav-menu > li > a:focus {
   color: #fff !important;
   background: rgba(255,255,255,0.05) !important;
 }
-.mainnav-menu > li.active > a {
+.mainnav-menu > li.open > a,
+.mainnav-menu > li.open > a:hover,
+.mainnav-menu > li.open > a:focus {
   color: #fff !important;
+  background: rgba(255,255,255,0.05) !important;
+}
+.mainnav-menu > li.active > a,
+.mainnav-menu > li.active > a:hover,
+.mainnav-menu > li.active > a:focus {
+  color: #fff !important;
+  background: transparent !important;
   border-bottom-color: var(--mr-mars) !important;
 }
 .mainnav-toggle {

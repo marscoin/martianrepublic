@@ -98,9 +98,24 @@
 }
 
 .seed-input{
-    width: 90px; 
-    height: 40px; 
-    margin: 5px
+    width: 90px;
+    height: 40px;
+    margin: 5px;
+    background: var(--mr-surface-raised, #1a1a2a);
+    color: #fff;
+    border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.12));
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 14px;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+.seed-input:focus {
+    outline: none;
+    border-color: var(--mr-cyan, #00e4ff);
+    box-shadow: 0 0 0 2px rgba(0, 228, 255, 0.15);
+}
+.seed-input::placeholder {
+    color: var(--mr-text-faint, #5a5968);
 }
 
 .connect-wallet:hover{
@@ -108,8 +123,8 @@
 }
 
 .wallet-card:hover{
-    box-shadow: 8px 10px 20px  #00000020;
-    background-color: rgba(233, 235, 243, 0.493);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    background-color: var(--mr-surface-raised, #1a1a2a);
     cursor:pointer
 }
 

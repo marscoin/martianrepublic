@@ -25,3 +25,31 @@
     filter: none !important;
     height: 0 !important;
 }
+
+/* Override white backgrounds from mvpready-admin-extended.css for dark theme */
+.mainnav-menu > li > a {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: var(--mr-text-dim, #8a8998) !important;
+}
+.mainnav-menu > li > a:hover,
+.mainnav-menu > li > a:focus {
+    background: rgba(255,255,255,0.05) !important;
+    background-color: rgba(255,255,255,0.05) !important;
+    color: #fff !important;
+}
+.mainnav-menu > li.active > a,
+.mainnav-menu > li.active > a:hover,
+.mainnav-menu > li.active > a:focus {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #fff !important;
+    border-bottom-color: var(--mr-mars, #c84125) !important;
+}
+.mainnav-menu > li.open > a,
+.mainnav-menu > li.open > a:hover,
+.mainnav-menu > li.open > a:focus {
+    background: rgba(255,255,255,0.05) !important;
+    background-color: rgba(255,255,255,0.05) !important;
+    color: #fff !important;
+}

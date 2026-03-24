@@ -1275,13 +1275,13 @@ h5 {
 
                 if (response && response.address) {
                     // Redirect or do further processing as needed
-                    
+
                     var postData = {
                         password: '',
                         public_addr: response.address,
                         wallet_name: 'Imported' // Set the wallet name to 'Imported'
                     };
-                    
+
                     $.post('/wallet/createwallet', postData)
                     .done(function(data) {
                         console.log('Mnemonic processed and key stored in localStorage.');
@@ -1289,12 +1289,12 @@ h5 {
                         location.href="/wallet/dashboard/hd-open";
                     })
                     .fail(function(error) {
-                        // Handle errors here
                         console.error("Error occurred: ", error);
+                        alert("Failed to connect wallet. The server returned an error. Please try again.");
                     });
 
                 } else {
-                    // Handle error
+                    alert("Invalid seed phrase. Could not derive a valid wallet address. Please check your words and try again.");
                     console.error('Failed to process mnemonic.');
                 }
             }
@@ -1406,45 +1406,40 @@ h5 {
                 //console.log("hashed:", hashed)
 
                 const encrypted_mnem = user_wallet.encrypted_seed.replace(/\s+/g, '');
-                //const encrypted = my_bundle.encrypt("face they lemon ignore link crop above thing buffalo tide category soup", hashed)
-                //console.log("Encrypted: ", encrypted)
 
-                const decrypted = my_bundle.decrypt(encrypted_mnem, hashed, iv).trim()
+                let decrypted;
+                try {
+                    decrypted = my_bundle.decrypt(encrypted_mnem, hashed, iv).trim();
+                } catch (err) {
+                    console.error("Decryption failed:", err);
+                    alert("Incorrect password. Could not decrypt wallet. Please try again.");
+                    e.preventDefault();
+                    return false;
+                }
 
-                // console.log("Encrypted SEED: {{ $encrypted_seed }}")
-                // console.log("MNEM:", decrypted)
+                let response;
+                try {
+                    response = genSeed(decrypted);
+                } catch (err) {
+                    console.error("Seed generation failed:", err);
+                    alert("Failed to derive wallet from decrypted seed. The wallet data may be corrupted.");
+                    e.preventDefault();
+                    return false;
+                }
 
-
-                const response = genSeed(decrypted)
-
-
-
-
-                // console.log("response:", response)
                 if (response.address == user_wallet.public_addr) {
                     // Logging in was successful... Opening wallet...
-
                     flushLocalStorage()
                     console.log("success...")
-                    // console.table(selected_wallet)
-                    //localStorage.setItem("key", encrypted_mnem)
                     localStorage.setItem("key", decrypted)
-
                     $("#selected_wallet").val(JSON.stringify(selected_wallet))
-
-
                     return true;
-                    //      console.error("Item Succesfully locally stored")
                 } else {
-
-                    console.log("failure...")
-
+                    console.log("failure - address mismatch:", response.address, "!=", user_wallet.public_addr)
+                    alert("Wallet unlock failed. The derived address does not match. Please check your password and try again.");
                     validated = false
                     e.preventDefault();
-                    window.location.reload()
-
                     return false;
-                    // $(".wallet-getter").attr("action", "/wallet/failwallet")
                 }
 
                 // if (!validation) {
