@@ -601,7 +601,7 @@ h5 {
                                     style="display: flex; align-items: center; justify-content: center">
                                     <div class="col-sm-12"
                                         style="display: flex; align-items: center; justify-content: center">
-                                        <button id="login-wallet-mnemonic" type="submit" class="btn btn-primary"
+                                        <button id="login-wallet-mnemonic" type="button" class="btn btn-primary"
                                             style="width: 20%; margin: 30px">Unlock</button>
 
                                     </div>
@@ -1246,27 +1246,33 @@ h5 {
 
 
              // LOGIN USING MNEMONIC INPUT
-            $('#login-wallet-mnemonic').click(() => {
+            $('#login-wallet-mnemonic').click((e) => {
+                e.preventDefault();
+
                 // compile mnemonic
                 var input_mnemonic = "";
                 for (var i = 1; i < 13; i++) {
-
                     var mnem = $(`#wallet-login-${i}`).val();
-
                     input_mnemonic += `${mnem} `
-
                 }
-                //console.log(input_mnemonic)
-                const response = genSeed(input_mnemonic)
 
-                //console.log("response:", response)
+                let response;
+                try {
+                    response = genSeed(input_mnemonic);
+                } catch (err) {
+                    alert("Invalid seed phrase. Could not derive wallet address.");
+                    console.error("genSeed failed:", err);
+                    return false;
+                }
 
-
+                if (!response || !response.address) {
+                    alert("Invalid seed phrase. Could not derive a valid wallet address. Please check your words and try again.");
+                    return false;
+                }
 
                 if ("{{ $wallets }}") {
                     if (response.address == "{{ $public_addr }}") {
                         // Existing wallet - store mnemonic as key, then navigate
-                        e.preventDefault();
                         WalletKey.set(response.mnemonic)
                         console.log("Key stored for address:", response.address)
                         window.location.href = "/wallet/getwallet";
@@ -1274,7 +1280,6 @@ h5 {
                     }
                     else if (response.address != "") {
                         // New/imported wallet - create via API, then redirect
-                        e.preventDefault();
                         var postData = {
                             password: '',
                             public_addr: response.address,
