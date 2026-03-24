@@ -647,7 +647,7 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     const mnemonic = WalletKey.get();
     const sender_address = "<?=$public_address?>".trim()
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-    const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
+    const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
 
     // Find the correct derivation path for the sender address
     // Try both Litecoin-legacy (coin 2) and official Marscoin (coin 107) BIP44 paths
@@ -682,7 +682,7 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
             try {
                 const accountPriv = root.derivePath(basePath);
                 const xpub = accountPriv.neutered().toBase58();
-                const hdNode = my_bundle.bip32.fromBase58(xpub, Marscoin.mainnet);
+                const hdNode = my_bundle.bitcoin.bip32.fromBase58(xpub, Marscoin.mainnet);
                 for (let chain = 0; chain <= 1 && !signingKey; chain++) {
                     for (let index = 0; index < 20 && !signingKey; index++) {
                         const node = hdNode.derive(chain);
@@ -786,7 +786,7 @@ if(!WalletKey.get())
 const mnemonic = WalletKey.get();
 const sender_address = "<?=$public_address?>".trim()
 const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
+const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
 
 // Find the correct derivation path - try both coin type 2 (legacy) and 107 (official)
 let signingKey = null;
