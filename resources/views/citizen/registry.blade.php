@@ -651,20 +651,52 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
 
     // Find the correct derivation path for the sender address
     // Try both Litecoin-legacy (coin 2) and official Marscoin (coin 107) BIP44 paths
+    // Also try the neutered xpub approach (how genSeed/pebas does it)
     let signingKey = null;
     const derivationBases = ["m/44'/2'/0'", "m/44'/107'/0'"];
+
+    // Method 1: Direct derivation (how signing usually works)
     for (const basePath of derivationBases) {
         if (signingKey) break;
-        const account = root.derivePath(basePath);
-        for (let chain = 0; chain <= 1 && !signingKey; chain++) {
-            for (let index = 0; index < 20 && !signingKey; index++) {
-                const child = account.derive(chain).derive(index);
-                const addr = my_bundle.bitcoin.payments.p2pkh({pubkey: child.publicKey, network: Marscoin.mainnet}).address;
-                if (addr === sender_address) {
-                    signingKey = my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
-                    console.log(`Found signing key at ${basePath}/${chain}/${index} for ${addr}`);
+        try {
+            const account = root.derivePath(basePath);
+            for (let chain = 0; chain <= 1 && !signingKey; chain++) {
+                for (let index = 0; index < 20 && !signingKey; index++) {
+                    const child = account.derive(chain).derive(index);
+                    const addr = my_bundle.bitcoin.payments.p2pkh({pubkey: child.publicKey, network: Marscoin.mainnet}).address;
+                    if (index === 0 && chain === 0) console.log(`Direct ${basePath}/0/0 = ${addr}`);
+                    if (addr === sender_address) {
+                        signingKey = my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
+                        console.log(`Found signing key at ${basePath}/${chain}/${index} for ${addr}`);
+                    }
                 }
             }
+        } catch(e) { console.warn(`Path ${basePath} failed:`, e.message); }
+    }
+
+    // Method 2: Neutered xpub approach (how genSeed/pebas discovers addresses)
+    if (!signingKey) {
+        console.log("Direct derivation failed, trying neutered xpub approach...");
+        for (const basePath of derivationBases) {
+            if (signingKey) break;
+            try {
+                const accountPriv = root.derivePath(basePath);
+                const xpub = accountPriv.neutered().toBase58();
+                const hdNode = my_bundle.bip32.fromBase58(xpub, Marscoin.mainnet);
+                for (let chain = 0; chain <= 1 && !signingKey; chain++) {
+                    for (let index = 0; index < 20 && !signingKey; index++) {
+                        const node = hdNode.derive(chain);
+                        const addr = my_bundle.bitcoin.payments.p2pkh({pubkey: node.derive(index).publicKey, network: Marscoin.mainnet}).address;
+                        if (index === 0 && chain === 0) console.log(`Xpub ${basePath}/0/0 = ${addr}`);
+                        if (addr === sender_address) {
+                            // Found it via xpub - now get the private key from the non-neutered path
+                            const privChild = accountPriv.derive(chain).derive(index);
+                            signingKey = my_bundle.bitcoin.ECPair.fromWIF(privChild.toWIF(), Marscoin.mainnet);
+                            console.log(`Found via xpub at ${basePath}/${chain}/${index} for ${addr}`);
+                        }
+                    }
+                }
+            } catch(e) { console.warn(`Xpub path ${basePath} failed:`, e.message); }
         }
     }
 
