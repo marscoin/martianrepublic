@@ -12,6 +12,11 @@ paths = [
     '''public/assets/congress/M.*''',
     '''\.ralph/logs/''',
     '''storage/''',
+    '''tests/visual/''',
+]
+# Allow dummy test keys (not real secrets)
+regexes = [
+    '''TESTKEY\d+''',
 ]
 
 [[rules]]

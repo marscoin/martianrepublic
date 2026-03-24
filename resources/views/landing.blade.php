@@ -96,11 +96,12 @@ img { max-width: 100%; height: auto; }
   background: rgba(6,6,12,0.6);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--mr-border);
+  border-bottom: none;
   transition: background 0.4s ease;
 }
 .mr-nav.scrolled {
   background: rgba(6,6,12,0.92);
+  border-bottom: 1px solid var(--mr-border);
 }
 .mr-nav .container {
   display: flex;

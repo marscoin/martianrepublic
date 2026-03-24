@@ -20,6 +20,10 @@ class WalletStatus extends Component
     public function loadWalletData()
     {
         $user = Auth::user();
+        if (!$user) {
+            $this->loading = false;
+            return;
+        }
         $profile = Profile::where('userid', '=', $user->id)->first();
 
         if ($profile && $profile->wallet_open > 0) {

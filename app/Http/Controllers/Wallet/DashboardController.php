@@ -21,6 +21,7 @@ use App\Models\Voucher;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
 use App\Models\CivicWallet;
+use App\Models\Citizen;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
@@ -351,8 +352,8 @@ class DashboardController extends Controller
 			{
 				$view->civic_balance = AppHelper::getMarscoinBalance($civic_wallet->public_addr);
 				$view->network = AppHelper::getMarscoinNetworkInfo();
-			$view->user = $user;
-			$view->citizen = $citizen;
+			$view->user = Auth::user();
+			$view->citizen = Citizen::where('userid', '=', $uid)->first();
 			$view->profile = $profile;
 				$view->public_addr = null;
 

@@ -17,46 +17,50 @@ class InventoryController extends Controller
 	{
 	}
 
-	protected function showAll()
+	public function showAll()
 	{
-		if (!Auth::check()) {
-			return redirect('/login');
-		}
-
-		$uid = Auth::user()->id;
-		$profile = Profile::where('userid', '=', $uid)->first();
-		$wallet = CivicWallet::where('user_id', '=', $uid)->first();
-
-		if (!$profile) {
-			return redirect('/twofa');
-		}
-		if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-			return redirect('/twofachallenge');
-		}
-
 		$view = View::make('inventory.dashboard');
-		$view->wallet_open = $profile->civic_wallet_open;
-		$view->isCitizen = $profile->citizen;
-		$view->isGP = $profile->general_public;
-		$view->balance = 0;
-		$view->public_address = "";
+		$view->allItems = InventoryItem::orderBy('created_at', 'desc')->get();
+		$view->categories = InventoryItem::CATEGORIES;
+		$view->conditions = InventoryItem::CONDITIONS;
 
-		if ($wallet) {
-			$view->balance = AppHelper::getMarscoinBalance($wallet['public_addr']);
-			$view->public_address = $wallet['public_addr'];
-		}
+		if (Auth::check()) {
+			$uid = Auth::user()->id;
+			$profile = Profile::where('userid', '=', $uid)->first();
+			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
-		if ($profile->civic_wallet_open) {
+			if (!$profile) {
+				return redirect('/twofa');
+			}
+			if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
+				return redirect('/twofachallenge');
+			}
+
+			$view->wallet_open = $profile->civic_wallet_open;
+			$view->isCitizen = $profile->citizen;
+			$view->isGP = $profile->general_public;
+			$view->balance = 0;
+			$view->public_address = "";
+
+			if ($wallet) {
+				$view->balance = AppHelper::getMarscoinBalance($wallet['public_addr']);
+				$view->public_address = $wallet['public_addr'];
+			}
+
 			$view->myItems = InventoryItem::where('userid', '=', $uid)->orderBy('created_at', 'desc')->get();
-			$view->allItems = InventoryItem::orderBy('created_at', 'desc')->get();
-			$view->categories = InventoryItem::CATEGORIES;
-			$view->conditions = InventoryItem::CONDITIONS;
+		} else {
+			$view->wallet_open = false;
+			$view->isCitizen = false;
+			$view->isGP = false;
+			$view->balance = 0;
+			$view->public_address = "";
+			$view->myItems = collect();
 		}
 
 		return $view;
 	}
 
-	protected function store(Request $request)
+	public function store(Request $request)
 	{
 		if (!Auth::check()) {
 			return redirect('/login');
@@ -93,7 +97,7 @@ class InventoryController extends Controller
 		return redirect('/inventory/all')->with('success', 'Item added to inventory.');
 	}
 
-	protected function update(Request $request, $id)
+	public function update(Request $request, $id)
 	{
 		if (!Auth::check()) {
 			return redirect('/login');
@@ -121,7 +125,7 @@ class InventoryController extends Controller
 		return redirect('/inventory/all')->with('success', 'Item updated.');
 	}
 
-	protected function destroy($id)
+	public function destroy($id)
 	{
 		if (!Auth::check()) {
 			return redirect('/login');

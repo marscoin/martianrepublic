@@ -37,8 +37,23 @@ class IdentityController extends Controller
 
 	//Get all public registrations and display table
 	//
-    protected function showAll()
+    public function showAll()
 	{
+		$view = View::make('citizen.registry');
+
+		// Shared public data - cached registry lists
+		$view->everyPublic = Cache::remember('registry_every_public', 300, function () {
+			return DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = ?) AND u.id NOT IN (?, ?) ORDER BY mined DESC', ['GP', 'GP', 'GP', 6462, 7601]);
+		});
+
+		$view->everyCitizen = Cache::remember('registry_every_citizen', 300, function () {
+			return DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1 ) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1 ) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = ? ) AND u.id NOT IN (?) ORDER BY mined DESC', ['CT', 'CT', 'CT', 6462]);
+		});
+
+		$view->everyApplicant = Cache::remember('registry_every_applicant', 300, function () {
+			return DB::select('SELECT profile.userid, users.fullname, citizen.*, civic_wallet.public_addr AS address FROM users, profile, civic_wallet, citizen WHERE profile.userid = users.id AND users.id = civic_wallet.user_id AND citizen.userid = users.id AND profile.has_application = ? AND users.id NOT IN (?) ORDER BY citizen.created_at DESC', [1, 6462]);
+		});
+
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
@@ -51,7 +66,6 @@ class IdentityController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			$view = View::make('citizen.registry');
 			$view->wallet_open = $profile->civic_wallet_open;
 			$view->isCitizen = $profile->citizen;
 			$view->citcache = $citcache;
@@ -60,20 +74,6 @@ class IdentityController extends Controller
 			$view->meCitizen = Feed::where('userid', '=', $uid)->where('tag', '=', "CT")->first();
 			$view->feed = Feed::where('userid', '=', $uid)->whereNotNull('mined')->whereNotIn('tag', ['GP','CT'])->orderBy('created_at', 'desc')->get();
 			$view->endorsed = array();
-			
-			// Cache registry lists for 5 minutes - these are expensive queries that change infrequently
-			$view->everyPublic = Cache::remember('registry_every_public', 300, function () {
-				return DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = ?) AND u.id NOT IN (?, ?) ORDER BY mined DESC', ['GP', 'GP', 'GP', 6462, 7601]);
-			});
-
-			$view->everyCitizen = Cache::remember('registry_every_citizen', 300, function () {
-				return DB::select('SELECT u.*, p.*, c.*, ( SELECT f.txid FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1 ) AS txid, ( SELECT f.mined FROM feed f WHERE f.userid = u.id AND f.tag = ? ORDER BY f.id DESC LIMIT 1 ) AS mined FROM users u JOIN profile p ON u.id = p.userid JOIN citizen c ON u.id = c.userid WHERE EXISTS ( SELECT 1 FROM feed f WHERE f.userid = u.id AND f.tag = ? ) AND u.id NOT IN (?) ORDER BY mined DESC', ['CT', 'CT', 'CT', 6462]);
-			});
-
-			$view->everyApplicant = Cache::remember('registry_every_applicant', 300, function () {
-				return DB::select('SELECT profile.userid, users.fullname, citizen.*, civic_wallet.public_addr AS address FROM users, profile, civic_wallet, citizen WHERE profile.userid = users.id AND users.id = civic_wallet.user_id AND citizen.userid = users.id AND profile.has_application = ? AND users.id NOT IN (?)', [1, 6462]);
-			});
-			
 			$view->recentActivityCount = Feed::where('userid', $uid)->where('mined', '>=', Carbon::now()->subDay())->count();
 
 			if ($wallet) {
@@ -84,20 +84,29 @@ class IdentityController extends Controller
 				$view->balance = 0;
 				$view->public_address = "";
 			}
+		} else {
+			// Public read-only defaults
+			$view->wallet_open = false;
+			$view->isCitizen = false;
+			$view->citcache = null;
+			$view->isGP = false;
+			$view->mePublic = null;
+			$view->meCitizen = null;
+			$view->feed = collect();
+			$view->endorsed = array();
+			$view->recentActivityCount = 0;
+			$view->balance = 0;
+			$view->public_address = "";
+		}
 
-			return $view;
-
-
-		}else{
-            return redirect('/login');
-        }
+		return $view;
 
 		
 	}
 
 
 
-	protected function printout()
+	public function printout()
 	{
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
@@ -120,7 +129,7 @@ class IdentityController extends Controller
 	}
 
 
-	protected function printout2()
+	public function printout2()
 	{
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
@@ -144,7 +153,7 @@ class IdentityController extends Controller
 
 
 
-	protected function printout3()
+	public function printout3()
 	{
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
@@ -171,7 +180,7 @@ class IdentityController extends Controller
 
 	//Get profile view of another Martian Citizen
 	//
-    protected function showId($address)
+    public function showId($address)
 	{
 		
 		if (Auth::check()) {

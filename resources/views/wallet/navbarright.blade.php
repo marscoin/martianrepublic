@@ -38,6 +38,7 @@
                 </li>
 
 
+  @auth
   <li class="dropdown navbar-profile">
     <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:;">
       @php
@@ -62,6 +63,14 @@
       </li>
     </ul>
   </li>
+  @else
+  <li>
+    <a href="/login">Sign In</a>
+  </li>
+  <li>
+    <a href="/signup" style="color: #e74c3c;">Become a Citizen</a>
+  </li>
+  @endauth
 
 </ul>
 

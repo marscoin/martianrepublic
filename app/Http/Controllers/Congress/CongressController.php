@@ -35,13 +35,13 @@ class CongressController extends Controller
 
 	//Get all inventory data and display table
 	//
-    protected function showAll()
+    public function showAll()
 	{
-		
+		$view = View::make('congress.dashboard');
+
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
 			if (!$profile) {
 				return redirect('/twofa');
@@ -50,22 +50,22 @@ class CongressController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			$view = View::make('congress.dashboard');
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->wallet_open = $profile->civic_wallet_open;
-			return $view;
+		} else {
+			$view->isCitizen = false;
+			$view->isGP = false;
+			$view->wallet_open = false;
+		}
 
-
-		}else{
-            return redirect('/login');
-        }
+		return $view;
 
 		
 	}
 
 	// Show Voting Page
-	protected function showVoting()
+	public function showVoting()
 	{
 		if (Auth::check()) {
 			$startTime = microtime(true);
@@ -197,7 +197,7 @@ class CongressController extends Controller
         }
 	}
 
-	protected function newProposal()
+	public function newProposal()
 	{
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
@@ -239,7 +239,7 @@ class CongressController extends Controller
 
 
 
-	protected function proposal($id)
+	public function proposal($id)
 	{
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
@@ -331,7 +331,7 @@ class CongressController extends Controller
 
 
 
-	protected function acquireBallot($propid)
+	public function acquireBallot($propid)
 	{
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
@@ -358,7 +358,7 @@ class CongressController extends Controller
 	}
 
 
-	protected function breakdown(Request $request)
+	public function breakdown(Request $request)
     {
 		$propid = $request->input('proposalId');
 		Log::info("Proposal: " . $propid);

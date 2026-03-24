@@ -30,14 +30,16 @@ class LogbookController extends Controller
 
 	//Get all inventory data and display table
 	//
-    protected function showAll()
+    public function showAll()
 	{
-		
+		$view = View::make('logbook.dashboard');
+		$view->allPublications = Publication::orderBy('id', 'desc')->get();
+
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
 			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
-			
+
 			if (!$profile) {
 				return Redirect::to('/twofa');
 			} else {
@@ -45,15 +47,13 @@ class LogbookController extends Controller
 					return Redirect::to('/twofachallenge');
 				}
 			}
-			
-			$view = View::make('logbook.dashboard');
+
 			$view->wallet_open = $profile->civic_wallet_open;
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->myPublications = Publication::where('userid', '=', $uid)->orderBy('created_at', 'desc')->get();
-			$view->allPublications = Publication::orderBy('id', 'desc')->get();
-			$view->balance = 0; //for now, could move to stats helper function as well
-			
+			$view->balance = 0;
+
 			if ($wallet) {
 				$view->balance = AppHelper::getMarscoinBalance($wallet['public_addr']);
 				$view->public_address = $wallet['public_addr'];
@@ -61,12 +61,16 @@ class LogbookController extends Controller
 				$view->balance = 0;
 				$view->public_address = "";
 			}
+		} else {
+			$view->wallet_open = false;
+			$view->isCitizen = false;
+			$view->isGP = false;
+			$view->myPublications = collect();
+			$view->balance = 0;
+			$view->public_address = "";
+		}
 
-			return $view;
-
-		}else{
-            return redirect('/login');
-        }
+		return $view;
 
 		
 	}

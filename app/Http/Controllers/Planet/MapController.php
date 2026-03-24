@@ -33,12 +33,13 @@ class MapController extends Controller
 
 	//Get all inventory data and display table
 	//
-    protected function showAll()
+    public function showAll()
 	{
-        if (Auth::check()) {
+		$view = View::make('planet.map');
+
+		if (Auth::check()) {
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = CivicWallet::where('user_id', '=', $uid)->first();
 
 			if (!$profile) {
 				return redirect('/twofa');
@@ -47,20 +48,20 @@ class MapController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			$view = View::make('planet.map');
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->wallet_open = $profile->civic_wallet_open;
-			return $view;
+		} else {
+			$view->isCitizen = false;
+			$view->isGP = false;
+			$view->wallet_open = false;
+		}
 
-
-		}else{
-            return redirect('/login');
-        }
+		return $view;
 
     }
 
-	protected function embed()
+	public function embed()
 	{
 		$view = View::make('planet.embed');
 		return $view;

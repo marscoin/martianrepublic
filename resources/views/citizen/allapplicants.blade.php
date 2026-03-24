@@ -30,9 +30,12 @@ use App\Includes\AppHelper;
                     $apps->missing_fields_count = $missing_fields_count;
                 }
                 
-                // Sort the array based on the missing_fields_count property
+                // Sort: complete applications first, then by most recent
                 usort($everyApplicant, function($a, $b) {
-                    return $a->missing_fields_count <=> $b->missing_fields_count;
+                    if ($a->missing_fields_count !== $b->missing_fields_count) {
+                        return $a->missing_fields_count <=> $b->missing_fields_count;
+                    }
+                    return strtotime($b->created_at ?? '0') <=> strtotime($a->created_at ?? '0');
                 });
                 
                 

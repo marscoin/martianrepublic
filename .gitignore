@@ -74,3 +74,16 @@ service-account.json
 
 # Webhook handler (contains secrets)
 public/webhook-bland.php
+
+# Claude Code project config (may contain operational details)
+CLAUDE.md
+
+# Test artifacts and operational test configs (contain credentials)
+tests/visual/screenshots/
+tests/visual/visual-smoke-test.mjs
+tests/visual/integration-test.mjs
+.phpunit.cache/
+
+# Node modules (puppeteer)
+node_modules/
+package-lock.json
