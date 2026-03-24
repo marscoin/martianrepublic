@@ -172,7 +172,20 @@
                     <div class="col-md-5 col-sm-5">
 
 
-                        @livewire('marscoin-balance', ['address' => $public_addr])
+                        {{-- HD Wallet Balance with address discovery --}}
+                        <div class="portlet" id="hd-balance-portlet">
+                            <h3 class="portlet-title"><u>Marscoin Balance</u></h3>
+                            <div class="portlet-body">
+                                <h2 id="hd-total-balance" style="font-size: 28px; margin: 0;">
+                                    <i class="fa fa-spinner fa-spin"></i> Scanning...
+                                </h2>
+                                <div id="hd-address-list" style="margin-top: 12px; font-size: 12px; max-height: 200px; overflow-y: auto; display: none;">
+                                </div>
+                                <a href="javascript:;" id="hd-toggle-addresses" style="font-size: 11px; color: var(--mr-cyan, #00e4ff); display: none;">
+                                    Show all addresses
+                                </a>
+                            </div>
+                        </div>
 
                         <div class="portlet">
 
@@ -207,10 +220,21 @@
                                 <u>Security</u>
                             </h3>
 
-                            <div class="portlet-body" >
-                                <a data-toggle="modal" type="button" class="btn btn-primary " class="download-wallet" onclick="onDownloadWallet()"><i class="fa fa-download"></i> Download Wallet</a>
-                                <a class="btn btn-secondary" class="download-wallet" href="/wallet/dashboard/hd-close"><i class="fa fa-lock"></i> Lock Wallet</a>
-                                
+                            <div class="portlet-body">
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+                                    <a class="btn btn-secondary" href="/wallet/dashboard/hd-close"><i class="fa fa-lock"></i> Lock</a>
+                                    <a type="button" class="btn btn-primary" onclick="onDownloadWallet()"><i class="fa fa-download"></i> Backup</a>
+                                </div>
+                                <div style="font-size: 12px; color: var(--mr-text-faint, #5a5968); line-height: 1.6;">
+                                    <div style="margin-bottom: 4px;">
+                                        <i class="fa fa-check-circle" style="color: var(--mr-green, #34d399);"></i>
+                                        Encrypted backup stored on server
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-info-circle" style="color: var(--mr-text-faint, #5a5968);"></i>
+                                        Download a local backup for additional safety
+                                    </div>
+                                </div>
                             </div>
                         </div>
                   
@@ -496,6 +520,113 @@
         });
     }
 
+        // ============================================================
+        // HD WALLET ADDRESS DISCOVERY
+        // Scans BIP44 derivation paths to find all addresses with balance
+        // ============================================================
+        async function discoverHDAddresses(mnemonic) {
+            const GAP_LIMIT = 20;
+            const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
+            const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
+            const account = root.derivePath("m/44'/2'/0'").neutered();
+            const accountPriv = root.derivePath("m/44'/2'/0'");
+
+            const discovered = [];
+            let totalBalance = 0;
+
+            // Scan both chains: 0 = receiving, 1 = change
+            for (let chain = 0; chain <= 1; chain++) {
+                const chainNode = account.derive(chain);
+                let consecutiveEmpty = 0;
+
+                for (let index = 0; index < GAP_LIMIT + 20; index++) {
+                    if (consecutiveEmpty >= GAP_LIMIT) break;
+
+                    const childNode = chainNode.derive(index);
+                    const address = my_bundle.bitcoin.payments.p2pkh({
+                        pubkey: childNode.publicKey,
+                        network: Marscoin.mainnet,
+                    }).address;
+
+                    try {
+                        const resp = await fetch(`https://pebas.marscoin.org/api/mars/balance?address=${address}`);
+                        const data = await resp.json();
+                        const balance = parseFloat(data.balance) || 0;
+
+                        if (balance > 0) {
+                            discovered.push({
+                                address,
+                                balance,
+                                chain: chain === 0 ? 'receiving' : 'change',
+                                index,
+                                path: `m/44'/2'/0'/${chain}/${index}`
+                            });
+                            totalBalance += balance;
+                            consecutiveEmpty = 0;
+
+                            // Update display as we find balances
+                            $('#hd-total-balance').text(totalBalance.toFixed(8) + ' MARS');
+                        } else {
+                            // Check if address has any transaction history
+                            const histResp = await fetch(`https://explore.marscoin.org/api/addr/${address}`);
+                            const histData = await histResp.json();
+                            if (histData.txApperances > 0 || histData.unconfirmedTxApperances > 0) {
+                                // Used address with zero balance - don't count toward gap
+                                discovered.push({
+                                    address,
+                                    balance: 0,
+                                    chain: chain === 0 ? 'receiving' : 'change',
+                                    index,
+                                    path: `m/44'/2'/0'/${chain}/${index}`,
+                                    used: true
+                                });
+                                consecutiveEmpty = 0;
+                            } else {
+                                consecutiveEmpty++;
+                            }
+                        }
+                    } catch (err) {
+                        console.warn(`Failed to check address ${address}:`, err.message);
+                        consecutiveEmpty++;
+                    }
+                }
+            }
+
+            return { discovered, totalBalance };
+        }
+
+        function renderAddressDiscovery(result) {
+            const { discovered, totalBalance } = result;
+
+            $('#hd-total-balance').text(totalBalance.toFixed(8) + ' MARS');
+
+            if (discovered.length > 0) {
+                const withBalance = discovered.filter(a => a.balance > 0);
+                const html = withBalance.map(a => `
+                    <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.06));">
+                        <span>
+                            <span style="color: var(--mr-text-faint); font-size: 10px;">${a.chain === 'change' ? '↳' : '→'}</span>
+                            <a href="https://explore.marscoin.org/address/${a.address}" target="_blank"
+                               style="color: var(--mr-cyan, #00e4ff); font-family: monospace;">${a.address.substring(0, 12)}...${a.address.substring(a.address.length - 6)}</a>
+                        </span>
+                        <span style="color: var(--mr-text); font-weight: 500;">${a.balance.toFixed(4)} MARS</span>
+                    </div>
+                `).join('');
+
+                $('#hd-address-list').html(html);
+                if (withBalance.length > 1) {
+                    $('#hd-toggle-addresses').show().click(function() {
+                        $('#hd-address-list').toggle();
+                        $(this).text($('#hd-address-list').is(':visible') ? 'Hide addresses' : 'Show all addresses');
+                    });
+                }
+
+                console.log(`HD Discovery: found ${discovered.length} addresses, ${withBalance.length} with balance, total: ${totalBalance}`);
+            } else {
+                $('#hd-total-balance').text('0.0000 MARS');
+            }
+        }
+
         $(document).ready(function() {
             const unlockedWallet = WalletKey.get()
 
@@ -504,8 +635,16 @@
                 console.log("No Wallet Found.")
                 window.location.replace("hd?key=none");
             }
-            else
-                console.log("Wallet found.")
+            else {
+                console.log("Wallet found. Starting HD address discovery...");
+                // Kick off HD address scan in background
+                discoverHDAddresses(unlockedWallet).then(result => {
+                    renderAddressDiscovery(result);
+                }).catch(err => {
+                    console.error("HD discovery failed:", err);
+                    $('#hd-total-balance').text('{{ $balance ?? "0" }} MARS');
+                });
+            }
 
 
             let cur_currency = "MARS";
