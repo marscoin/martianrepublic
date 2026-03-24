@@ -801,35 +801,316 @@ label {
   }
 }
 
-/* ---- FORUM DARK THEME ---- */
-.forum-category a,
-.forum-category h5,
-.forum-category h5 a,
-.card-body h5 a,
-.list-group-item h5 a,
-.forum-thread a {
+/* ============================================
+   FORUM — MISSION CONTROL DARK THEME
+   Complete override for laravel-forum classic
+   ============================================ */
+
+/* ---- Base card system ---- */
+.card {
+  background: var(--mr-surface, #12121e) !important;
+  border: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+  border-radius: 8px !important;
+  color: var(--mr-text, #e0dfe6) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  border-color: var(--mr-border-bright, rgba(255,255,255,0.12)) !important;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+}
+.card-header {
+  background: rgba(255,255,255,0.02) !important;
+  border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+  color: var(--mr-text-dim, #8a8998) !important;
+  font-size: 13px;
+  padding: 10px 20px !important;
+}
+.card-body {
+  background: transparent !important;
+  color: var(--mr-text, #e0dfe6) !important;
+  padding: 16px 20px !important;
+  line-height: 1.7;
+}
+.card-body p {
   color: var(--mr-text, #e0dfe6) !important;
 }
-.forum-category p,
-.forum-category .text-muted,
+
+/* ---- Category index page ---- */
+.card-body h5,
+.card-body h5 a {
+  color: #fff !important;
+  font-weight: 600;
+  font-size: 18px;
+  text-decoration: none;
+}
+.card-body h5 a:hover {
+  color: var(--mr-cyan, #00e4ff) !important;
+}
 .card-body .text-muted,
-.list-group-item .text-muted,
-.forum-thread .text-muted {
+.card-body small {
+  color: var(--mr-text-dim, #8a8998) !important;
+  font-size: 13px;
+}
+
+/* ---- Thread list ---- */
+.v-thread .card {
+  margin-bottom: 8px !important;
+}
+.v-thread .card-body {
+  padding: 14px 20px !important;
+}
+.v-thread h5 a,
+.v-thread .card-body > a:first-child {
+  color: var(--mr-text, #e0dfe6) !important;
+  font-weight: 500;
+  font-size: 16px;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.v-thread h5 a:hover,
+.v-thread .card-body > a:first-child:hover {
+  color: var(--mr-cyan, #00e4ff) !important;
+}
+.thread-badges .badge {
+  background: var(--mr-surface-raised, #1a1a2a) !important;
+  color: var(--mr-text, #e0dfe6) !important;
+  border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.12));
+  font-weight: 500;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* ---- Post cards ---- */
+.post.card {
+  border-left: 3px solid var(--mr-border-bright, rgba(255,255,255,0.12)) !important;
+  border-radius: 0 8px 8px 0 !important;
+}
+.post.card:first-child {
+  border-left-color: var(--mr-mars, #c84125) !important;
+}
+.post .card-header {
+  font-size: 13px;
   color: var(--mr-text-dim, #8a8998) !important;
 }
-.card, .list-group-item {
-  background: var(--mr-surface, #12121e) !important;
-  border-color: var(--mr-border, rgba(255,255,255,0.06)) !important;
+.post .card-header a {
+  color: var(--mr-text, #e0dfe6) !important;
+  font-weight: 600;
 }
-.card:hover, .list-group-item:hover {
-  background: var(--mr-surface-raised, #1a1a2a) !important;
+.post .card-header a:hover {
+  color: var(--mr-cyan, #00e4ff) !important;
 }
+.post .card-body {
+  color: var(--mr-text, #e0dfe6) !important;
+  font-size: 14.5px;
+  line-height: 1.75;
+}
+
+/* ---- Blockquotes in posts ---- */
+.post blockquote,
+.card-body blockquote {
+  background: var(--mr-dark, #0c0c16) !important;
+  border-left: 3px solid var(--mr-mars, #c84125) !important;
+  border-radius: 0 6px 6px 0;
+  padding: 12px 16px !important;
+  margin: 12px 0;
+  color: var(--mr-text-dim, #8a8998) !important;
+  font-style: italic;
+  font-size: 13.5px;
+}
+.post blockquote a,
+.card-body blockquote a {
+  color: var(--mr-text-dim, #8a8998) !important;
+}
+
+/* ---- Reply/action links ---- */
+.card-link,
+a.card-link {
+  color: var(--mr-mars, #c84125) !important;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.card-link:hover,
+a.card-link:hover {
+  color: var(--mr-mars-glow, #e05535) !important;
+}
+
+/* ---- Timestamps ---- */
+.timestamp,
+time.timestamp {
+  color: var(--mr-text-faint, #5a5968) !important;
+  font-size: 12px;
+}
+
+/* ---- Breadcrumbs ---- */
 .breadcrumb {
   background: var(--mr-surface, #12121e) !important;
+  border: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+  border-radius: 6px !important;
+  padding: 10px 16px !important;
 }
-.breadcrumb a, .breadcrumb .active {
+.breadcrumb a {
+  color: var(--mr-cyan, #00e4ff) !important;
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  color: #fff !important;
+}
+.breadcrumb-item.active,
+.breadcrumb .active {
   color: var(--mr-text-dim, #8a8998) !important;
 }
+.breadcrumb-item + .breadcrumb-item::before {
+  color: var(--mr-text-faint, #5a5968) !important;
+}
+
+/* ---- Text utilities ---- */
+.text-muted {
+  color: var(--mr-text-dim, #8a8998) !important;
+}
+.text-end {
+  color: var(--mr-text-dim, #8a8998);
+}
+a.text-muted:hover {
+  color: var(--mr-text, #e0dfe6) !important;
+}
+
+/* ---- Buttons ---- */
+.btn-primary {
+  background: var(--mr-mars, #c84125) !important;
+  border-color: var(--mr-mars, #c84125) !important;
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 6px !important;
+  transition: all 0.2s ease;
+}
+.btn-primary:hover {
+  background: var(--mr-mars-glow, #e05535) !important;
+  border-color: var(--mr-mars-glow, #e05535) !important;
+  box-shadow: 0 0 12px rgba(200,65,37,0.3);
+}
+
+/* ---- Forms (reply, new thread) ---- */
+.form-control {
+  background: var(--mr-surface-raised, #1a1a2a) !important;
+  border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.12)) !important;
+  color: var(--mr-text, #e0dfe6) !important;
+  border-radius: 6px !important;
+}
+.form-control:focus {
+  border-color: var(--mr-cyan, #00e4ff) !important;
+  box-shadow: 0 0 0 2px rgba(0,228,255,0.15) !important;
+  outline: none;
+}
+.form-control::placeholder {
+  color: var(--mr-text-faint, #5a5968) !important;
+}
+label {
+  color: var(--mr-text-dim, #8a8998) !important;
+}
+textarea.form-control {
+  min-height: 120px;
+}
+
+/* ---- Pagination ---- */
+.pagination .page-link {
+  background: var(--mr-surface, #12121e) !important;
+  border-color: var(--mr-border, rgba(255,255,255,0.06)) !important;
+  color: var(--mr-text-dim, #8a8998) !important;
+}
+.pagination .page-link:hover {
+  background: var(--mr-surface-raised, #1a1a2a) !important;
+  color: #fff !important;
+}
+.pagination .active .page-link {
+  background: var(--mr-mars, #c84125) !important;
+  border-color: var(--mr-mars, #c84125) !important;
+  color: #fff !important;
+}
+
+/* ---- Category page header ---- */
+h2, h3 {
+  color: #fff !important;
+}
+h2 small, h3 small {
+  color: var(--mr-text-dim, #8a8998) !important;
+}
+
+/* ---- Thread title on post page ---- */
+h1 {
+  color: #fff !important;
+  font-weight: 700;
+}
+
+/* ---- Horizontal rules ---- */
+hr {
+  border-color: var(--mr-border, rgba(255,255,255,0.06)) !important;
+}
+
+/* ---- List groups (used in some forum views) ---- */
+.list-group-item {
+  background: var(--mr-surface, #12121e) !important;
+  border-color: var(--mr-border, rgba(255,255,255,0.06)) !important;
+  color: var(--mr-text, #e0dfe6) !important;
+}
+.list-group-item:hover {
+  background: var(--mr-surface-raised, #1a1a2a) !important;
+}
+.list-group-item a {
+  color: var(--mr-text, #e0dfe6) !important;
+}
+.list-group-item a:hover {
+  color: var(--mr-cyan, #00e4ff) !important;
+}
+
+/* ---- Badges ---- */
 .badge {
   color: var(--mr-text, #e0dfe6) !important;
+}
+.badge-primary, .bg-primary {
+  background: var(--mr-mars, #c84125) !important;
+}
+.badge-secondary, .bg-secondary {
+  background: var(--mr-surface-raised, #1a1a2a) !important;
+}
+
+/* ---- View post link ---- */
+.float-end a,
+.text-end a {
+  color: var(--mr-cyan, #00e4ff) !important;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.float-end a:hover,
+.text-end a:hover {
+  color: #fff !important;
+}
+
+/* ---- Generic link color overrides ---- */
+.content a:not(.btn):not(.nav-link):not(.mainnav-menu a):not(.navbar a) {
+  color: var(--mr-cyan, #00e4ff);
+}
+.content a:not(.btn):not(.nav-link):not(.mainnav-menu a):not(.navbar a):hover {
+  color: #fff;
+}
+
+/* ---- Alert / flash messages ---- */
+.alert {
+  background: var(--mr-surface-raised, #1a1a2a) !important;
+  border-color: var(--mr-border, rgba(255,255,255,0.06)) !important;
+  color: var(--mr-text, #e0dfe6) !important;
+}
+.alert-success { border-left: 3px solid var(--mr-green, #34d399) !important; }
+.alert-danger { border-left: 3px solid var(--mr-red, #ef4444) !important; }
+.alert-info { border-left: 3px solid var(--mr-cyan, #00e4ff) !important; }
+.alert-warning { border-left: 3px solid var(--mr-amber, #d4a44a) !important; }
+
+/* ---- Mask overlay on pinned threads ---- */
+.mask {
+  background: linear-gradient(135deg, rgba(200,65,37,0.08), transparent) !important;
 }
