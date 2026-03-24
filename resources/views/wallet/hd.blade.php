@@ -14,7 +14,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.css">
-    <link rel="stylesheet" href="/assets/wallet/css/hd/hd.css">
+    <link rel="stylesheet" href="/assets/wallet/css/hd/hd.css?v=2.1">
     <link rel="stylesheet" href="/assets/wallet/js/plugins/magnific/magnific-popup.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin-extended.css">
@@ -1208,31 +1208,33 @@ h5 {
 
                 if ("{{ $wallets }}") {
                     if (response.address == "{{ $public_addr }}") {
-                        // Logging in was successful... Opening wallet...
-                        $(".wallet-getter-mnem").attr("action", "/wallet/getwallet")
-
-                        localStorage.setItem("key", response.decrypted)
-                        //console.error("Item Succesfully locally stored")
+                        // Existing wallet - store mnemonic as key, then navigate
+                        e.preventDefault();
+                        localStorage.setItem("key", response.mnemonic)
+                        console.log("Key stored for address:", response.address)
+                        window.location.href = "/wallet/getwallet";
+                        return false;
                     }
-                    if (response.address != "")
-                    {
+                    else if (response.address != "") {
+                        // New/imported wallet - create via API, then redirect
+                        e.preventDefault();
                         var postData = {
                             password: '',
                             public_addr: response.address,
-                            wallet_name: 'Imported' // Set the wallet name to 'Imported'
+                            wallet_name: 'Imported'
                         };
-                        
+
                         $.post('/wallet/createwallet', postData)
                         .done(function(data) {
-                            localStorage.setItem("key", response.decrypted);
-                            location.href="/wallet/dashboard/hd-open";
+                            localStorage.setItem("key", response.mnemonic);
+                            location.href = "/wallet/dashboard/hd-open";
                         })
                         .fail(function(error) {
-                            // Handle errors here
                             console.error("Error occurred: ", error);
+                            alert("Failed to connect wallet. The server returned an error. Please try again.");
                         });
-
-                    } 
+                        return false;
+                    }
                     else {
                         $(".wallet-getter-mnem").attr("action", "/wallet/failwallet")
                     }

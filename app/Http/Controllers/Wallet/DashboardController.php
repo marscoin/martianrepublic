@@ -355,7 +355,7 @@ class DashboardController extends Controller
 			$view->user = Auth::user();
 			$view->citizen = Citizen::where('userid', '=', $uid)->first();
 			$view->profile = $profile;
-				$view->public_addr = null;
+				$view->public_addr = $civic_wallet->public_addr;
 
 				$view->general_public = $profile->general_public;
 				$view->citizen = $profile->citizen;
@@ -607,8 +607,16 @@ class DashboardController extends Controller
 
 			$uid = Auth::user()->id;
 			$profile = Profile::where('userid', '=', $uid)->first();
-			$hd_wallet = HDWallet::where('user_id', '=', $uid)->get();
-			$profile->wallet_open = $hd_wallet->id;
+
+			// Try HD wallet first, then civic wallet
+			$hd_wallet = HDWallet::where('user_id', '=', $uid)->first();
+			$civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
+
+			if ($hd_wallet) {
+				$profile->wallet_open = $hd_wallet->id;
+			} elseif ($civic_wallet) {
+				$profile->civic_wallet_open = $civic_wallet->id;
+			}
 			$profile->save();
 
 			return redirect('wallet/dashboard/hd-open')->with('message', 'Wallet Successfully Open!');
