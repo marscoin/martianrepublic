@@ -274,9 +274,12 @@ h5 {
                             <label for="name">Wallet Password</label>
                             <input type="password" id="unlock-password" name="unlock-password" class="form-control"
                                 data-required="true" style="width: 100%">
-                            <div class="row d-flex justify-content-center text-center" style="padding-top: 5rem;">
-                                <button id="unlock-wallet" type="submit" class="btn btn-primary"
-                                    style="">Unlock</button>
+                            <div id="unlock-error" style="display: none; margin-top: 12px; padding: 10px 14px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 6px; color: #ef4444; font-size: 14px;">
+                                <i class="fa fa-exclamation-circle"></i> <span id="unlock-error-text"></span>
+                            </div>
+                            <div class="row d-flex justify-content-center text-center" style="padding-top: 3rem;">
+                                <button id="unlock-wallet" type="submit" class="btn btn-primary">Unlock</button>
+                                <img src="/assets/citizen/loading.gif" alt="Processing..." style="display: none; height: 30px; margin-left: 10px;" id="unlock-loading">
                             </div>
                         </div>
                     </div>
@@ -726,9 +729,9 @@ h5 {
     });
 
     $('#unlockWalletModal').on('show.bs.modal', function (event) {
-        var card = $(event.relatedTarget);  
-        var walletId = card.data('wallet-id'); 
-        $('#selected_wallet').val(walletId); 
+        var card = $(event.relatedTarget);
+        var walletId = card.data('wallet-id');
+        $('#selected_wallet').val(walletId);
 
         var data = JSON.parse(card.attr('data-wallet'))
 
@@ -736,6 +739,11 @@ h5 {
 
         $("#unlockWalletModal .unlock-name").text(data.wallet_type)
         $("#unlockWalletModal .unlock-addy").text(data.public_addr)
+
+        // Reset error state
+        $("#unlock-error").hide();
+        $("#unlock-loading").hide();
+        $("#unlock-password").val('').css('border-color', '');
     });
 
     $(document).ready(function() {
@@ -1477,6 +1485,9 @@ h5 {
 
 
                 console.log("unlocking...")
+                $("#unlock-error").hide();
+                $("#unlock-loading").show();
+                $("#unlock-password").css('border-color', '');
 
                 var wallet_password = $("#unlock-password").val().replace(/\s+/g, '');
                 const user_wallet = selected_wallet;
@@ -1516,7 +1527,10 @@ h5 {
                 }
 
                 if (!decrypted) {
-                    alert("Incorrect password. Could not decrypt wallet. Please check your password and try again.");
+                    $("#unlock-error-text").text("Incorrect password. Please check your password and try again.");
+                    $("#unlock-error").show();
+                    $("#unlock-loading").hide();
+                    $("#unlock-password").css('border-color', '#ef4444').focus();
                     e.preventDefault();
                     return false;
                 }
@@ -1525,7 +1539,9 @@ h5 {
                 try {
                     response = genSeed(decrypted);
                 } catch (err) {
-                    alert("Failed to derive wallet from decrypted seed. The wallet data may be corrupted.");
+                    $("#unlock-error-text").text("Failed to derive wallet. The wallet data may be corrupted.");
+                    $("#unlock-error").show();
+                    $("#unlock-loading").hide();
                     e.preventDefault();
                     return false;
                 }

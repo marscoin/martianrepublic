@@ -800,3 +800,36 @@ label {
     background: var(--mr-dark) !important;
   }
 }
+
+/* ---- FORUM DARK THEME ---- */
+.forum-category a,
+.forum-category h5,
+.forum-category h5 a,
+.card-body h5 a,
+.list-group-item h5 a,
+.forum-thread a {
+  color: var(--mr-text, #e0dfe6) !important;
+}
+.forum-category p,
+.forum-category .text-muted,
+.card-body .text-muted,
+.list-group-item .text-muted,
+.forum-thread .text-muted {
+  color: var(--mr-text-dim, #8a8998) !important;
+}
+.card, .list-group-item {
+  background: var(--mr-surface, #12121e) !important;
+  border-color: var(--mr-border, rgba(255,255,255,0.06)) !important;
+}
+.card:hover, .list-group-item:hover {
+  background: var(--mr-surface-raised, #1a1a2a) !important;
+}
+.breadcrumb {
+  background: var(--mr-surface, #12121e) !important;
+}
+.breadcrumb a, .breadcrumb .active {
+  color: var(--mr-text-dim, #8a8998) !important;
+}
+.badge {
+  color: var(--mr-text, #e0dfe6) !important;
+}
