@@ -77,7 +77,7 @@ class IdentityController extends Controller
 			$view->recentActivityCount = Feed::where('userid', $uid)->where('mined', '>=', Carbon::now()->subDay())->count();
 
 			if ($wallet) {
-				$view->balance = 0;
+				$view->balance = AppHelper::getMarscoinBalance($wallet['public_addr']);
 				$view->public_address = $wallet['public_addr'];
 				$view->endorsed = Feed::where('message', '=', $wallet['public_addr'])->where('tag', '=', "ED")->get();
 			} else {
