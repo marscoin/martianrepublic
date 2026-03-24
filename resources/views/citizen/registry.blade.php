@@ -650,16 +650,20 @@ const signMARS = async (message, mars_amount, tx_i_o) => {
     const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
 
     // Find the correct derivation path for the sender address
-    // Scan receiving (chain 0) and change (chain 1) addresses
+    // Try both Litecoin-legacy (coin 2) and official Marscoin (coin 107) BIP44 paths
     let signingKey = null;
-    const account = root.derivePath("m/44'/2'/0'");
-    for (let chain = 0; chain <= 1 && !signingKey; chain++) {
-        for (let index = 0; index < 20 && !signingKey; index++) {
-            const child = account.derive(chain).derive(index);
-            const addr = my_bundle.bitcoin.payments.p2pkh({pubkey: child.publicKey, network: Marscoin.mainnet}).address;
-            if (addr === sender_address) {
-                signingKey = my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
-                console.log(`Found signing key at m/44'/2'/0'/${chain}/${index} for ${addr}`);
+    const derivationBases = ["m/44'/2'/0'", "m/44'/107'/0'"];
+    for (const basePath of derivationBases) {
+        if (signingKey) break;
+        const account = root.derivePath(basePath);
+        for (let chain = 0; chain <= 1 && !signingKey; chain++) {
+            for (let index = 0; index < 20 && !signingKey; index++) {
+                const child = account.derive(chain).derive(index);
+                const addr = my_bundle.bitcoin.payments.p2pkh({pubkey: child.publicKey, network: Marscoin.mainnet}).address;
+                if (addr === sender_address) {
+                    signingKey = my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
+                    console.log(`Found signing key at ${basePath}/${chain}/${index} for ${addr}`);
+                }
             }
         }
     }
@@ -752,16 +756,20 @@ const sender_address = "<?=$public_address?>".trim()
 const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
 const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
 
-// Find the correct derivation path for the sender address
+// Find the correct derivation path - try both coin type 2 (legacy) and 107 (official)
 let signingKey = null;
-const account = root.derivePath("m/44'/2'/0'");
-for (let chain = 0; chain <= 1 && !signingKey; chain++) {
-    for (let index = 0; index < 20 && !signingKey; index++) {
-        const child = account.derive(chain).derive(index);
-        const addr = my_bundle.bitcoin.payments.p2pkh({pubkey: child.publicKey, network: Marscoin.mainnet}).address;
-        if (addr === sender_address) {
-            signingKey = my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
-            console.log(`Found signing key at m/44'/2'/0'/${chain}/${index} for ${addr}`);
+const derivPaths = ["m/44'/2'/0'", "m/44'/107'/0'"];
+for (const basePath of derivPaths) {
+    if (signingKey) break;
+    const acct = root.derivePath(basePath);
+    for (let chain = 0; chain <= 1 && !signingKey; chain++) {
+        for (let idx = 0; idx < 20 && !signingKey; idx++) {
+            const ch = acct.derive(chain).derive(idx);
+            const a = my_bundle.bitcoin.payments.p2pkh({pubkey: ch.publicKey, network: Marscoin.mainnet}).address;
+            if (a === sender_address) {
+                signingKey = my_bundle.bitcoin.ECPair.fromWIF(ch.toWIF(), Marscoin.mainnet);
+                console.log(`Found signing key at ${basePath}/${chain}/${idx} for ${a}`);
+            }
         }
     }
 }
