@@ -186,7 +186,7 @@
     <script src="/assets/wallet/js/mvpready-core.js"></script>
     <script src="/assets/wallet/js/mvpready-admin.js"></script>
     <script src="/assets/wallet/js/md5.min.js"></script>
-    <script src="/assets/wallet/js/sha256.js"></script>
+    <!-- <script src="/assets/wallet/js/sha256.js"></script> temporarily removed for signing test -->
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
 
 <script>
