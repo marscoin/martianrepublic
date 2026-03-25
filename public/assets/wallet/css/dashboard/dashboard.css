@@ -40,18 +40,21 @@ a:hover, a:focus { color: var(--mr-amber); text-decoration: none; }
   min-height: 52px !important;
   margin-bottom: 0 !important;
 }
-.navbar-inverse .navbar-collapse {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-}
-.navbar-inverse .navbar-nav {
-  display: flex !important;
-  align-items: center !important;
-  float: none !important;
-}
+/* Use float-based layout (Bootstrap 3 compatible) instead of flexbox
+   to keep dropdown toggle working */
 .navbar-inverse .navbar-nav.navbar-right {
   margin-right: 0 !important;
+}
+.navbar-inverse .navbar-nav.navbar-right > li {
+  vertical-align: middle;
+}
+.navbar-inverse .navbar-nav.navbar-right > li > a {
+  display: inline-flex;
+  align-items: center;
+  height: 52px;
+}
+.navbar-inverse .dropdown-menu {
+  z-index: 1050 !important;
 }
 .navbar-inverse .navbar-brand {
   color: #fff !important;
@@ -109,7 +112,10 @@ a:hover, a:focus { color: var(--mr-amber); text-decoration: none; }
   display: none !important;  /* Hide email in nav — too cluttered for console aesthetic */
 }
 .navbar-profile .dropdown-toggle {
-  padding: 10px 8px !important;
+  padding: 6px 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px;
 }
 .navbar-profile .dropdown-toggle .fa-caret-down {
   color: var(--mr-text-faint, #5a5968) !important;

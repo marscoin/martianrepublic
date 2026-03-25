@@ -437,6 +437,8 @@
         @include('footer')
     </footer>
 
+    <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
+    <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
     @livewireScripts
 
     <script>
