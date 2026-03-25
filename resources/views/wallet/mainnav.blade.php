@@ -142,21 +142,11 @@
 
         return {
             set: function(mnemonic) {
-                // Store encrypted version
-                localStorage.setItem(STORAGE_KEY_ENC, xorEncrypt(mnemonic, SESSION_TOKEN));
-                // Keep plaintext for backward compat during transition
                 localStorage.setItem(STORAGE_KEY, mnemonic);
             },
             get: function() {
-                // Try encrypted first
-                const enc = localStorage.getItem(STORAGE_KEY_ENC);
-                if (enc) {
-                    const decrypted = xorDecrypt(enc, SESSION_TOKEN);
-                    if (decrypted && decrypted.split(' ').length >= 12) {
-                        return decrypted;
-                    }
-                }
-                // Fall back to plaintext (legacy)
+                // Use plaintext storage (encrypted storage disabled due to
+                // CSRF token rotation causing decryption failures)
                 return localStorage.getItem(STORAGE_KEY);
             },
             clear: function() {
