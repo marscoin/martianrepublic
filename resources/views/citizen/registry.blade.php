@@ -639,6 +639,8 @@ const sendMARS = async (mars_amount, receiver_address) => {
 // Find the signing key for an address
 // Tries BOTH bip32 implementations since they derive different keys from same seed
 async function findSigningKeyForAddress(mnemonic, targetAddress) {
+    const words = mnemonic.trim().split(/\s+/);
+    console.log(`Signing with ${words.length} words, first="${words[0]}", last="${words[words.length-1]}", seed-preview=${my_bundle.bip39.mnemonicToSeedSync(mnemonic).toString('hex').substring(0,16)}`);
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
     const paths = ["m/44'/2'/0'", "m/44'/107'/0'"];
 
