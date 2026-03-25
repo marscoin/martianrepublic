@@ -187,28 +187,7 @@
     <script src="/assets/wallet/js/mvpready-admin.js"></script>
     <script src="/assets/wallet/js/md5.min.js"></script>
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
-    <script>
-    // Test: capture seed BEFORE sha256.js loads
-    window._seedBeforeSha = (function() {
-        try {
-            var s = my_bundle.bip39.mnemonicToSeedSync("test test test test test test test test test test test about");
-            return s.toString('hex').substring(0,16);
-        } catch(e) { return 'error'; }
-    })();
-    </script>
     <script src="/assets/wallet/js/sha256.js"></script>
-    <script>
-    // Test: capture seed AFTER sha256.js loads
-    window._seedAfterSha = (function() {
-        try {
-            var s = my_bundle.bip39.mnemonicToSeedSync("test test test test test test test test test test test about");
-            return s.toString('hex').substring(0,16);
-        } catch(e) { return 'error'; }
-    })();
-    console.log("Seed BEFORE sha256.js:", window._seedBeforeSha);
-    console.log("Seed AFTER sha256.js:", window._seedAfterSha);
-    console.log("SHA256 CHANGED SEED:", window._seedBeforeSha !== window._seedAfterSha);
-    </script>
 
 <script>
 
@@ -660,13 +639,9 @@ const sendMARS = async (mars_amount, receiver_address) => {
 // Find the signing key for an address
 // Tries BOTH bip32 implementations since they derive different keys from same seed
 async function findSigningKeyForAddress(mnemonic, targetAddress) {
-    const words = mnemonic.trim().split(/\s+/);
-    // Log hex of first few chars to detect hidden characters
-    const hexChars = Array.from(mnemonic.substring(0, 20)).map(c => c.charCodeAt(0).toString(16)).join(' ');
-    console.log(`Mnemonic: ${words.length} words, first="${words[0]}", last="${words[words.length-1]}"`);
-    console.log(`Hex chars: ${hexChars}`);
-    console.log(`Length: ${mnemonic.length}, trimmed: ${mnemonic.trim().length}`);
-    console.log(`Seed: ${my_bundle.bip39.mnemonicToSeedSync(mnemonic).toString('hex').substring(0,16)}`);
+    // CRITICAL: trim the mnemonic - the wallet unlock stores it with a trailing space
+    // which produces a completely different PBKDF2 seed
+    mnemonic = mnemonic.trim();
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
     const paths = ["m/44'/2'/0'", "m/44'/107'/0'"];
 
