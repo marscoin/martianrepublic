@@ -18,41 +18,37 @@ class BlockDisplay extends Component
 
     public function fetchBlockNumber()
     {
-        try 
-        {
-            $lastBlockHashResponse = Http::retry(3, 100)->timeout(60)->get('https://explore1.marscoin.org/api/status?q=getLastBlockHash');
-            // Process the successful response
-
-            if ($lastBlockHashResponse->successful()) {
-                $lastBlockHash = $lastBlockHashResponse->json()['lastblockhash'];
-
-                try {
-                    $blockDetailsResponse = Http::retry(3, 100)->timeout(60)->get('https://explore1.marscoin.org/api/block/$lastBlockHash');
-                    // Process the successful response
-    
-                    if ($blockDetailsResponse->successful()) {
-                        $this->blockNumber = $blockDetailsResponse->json()['height'];
-                        $this->lastBlockMinedAt = Carbon::createFromTimestamp($blockDetailsResponse->json()['time']);
+        // Primary: use marscoin-cli directly (fastest, most reliable)
+        try {
+            $output = shell_exec('/usr/local/bin/marscoin-cli -datadir=/root/.marscoin getblockcount 2>/dev/null');
+            if ($output && is_numeric(trim($output))) {
+                $height = (int) trim($output);
+                $hash = trim(shell_exec("/usr/local/bin/marscoin-cli -datadir=/root/.marscoin getblockhash {$height} 2>/dev/null"));
+                if ($hash) {
+                    $blockJson = shell_exec("/usr/local/bin/marscoin-cli -datadir=/root/.marscoin getblock {$hash} 2>/dev/null");
+                    $block = json_decode($blockJson, true);
+                    if ($block && isset($block['time'])) {
+                        $this->blockNumber = $height;
+                        $this->lastBlockMinedAt = Carbon::createFromTimestamp($block['time']);
                         $this->updateTimeSinceLastBlock();
                         $this->dispatch('block-update');
-        
-                    } else {
-                        $this->blockNumber = 'Error fetching block details';
+                        return;
                     }
-    
-                } catch (\Exception $e) {
-                    // Log the error and proceed with a fallback value or message
-                    $this->blockNumber = 'Error fetching block details';
                 }
-
-            } else {
-                $this->blockNumber = 'Error fetching last block hash';
             }
-
-
         } catch (\Exception $e) {
-            // Log the error and proceed with a fallback value or message
-            $this->blockNumber = 'Maintenance...';
+            // Fall through to explorer
+        }
+
+        // Fallback: explorer API
+        try {
+            $response = Http::timeout(10)->get('https://explore1.marscoin.org/api/status?q=getInfo');
+            if ($response->successful()) {
+                $this->blockNumber = $response->json()['info']['blocks'] ?? '---';
+                $this->dispatch('block-update');
+            }
+        } catch (\Exception $e) {
+            $this->blockNumber = '---';
         }
     }
 
