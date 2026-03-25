@@ -175,7 +175,6 @@
     <footer class="footer">
         @include('footer')
     </footer>
-    <script src="/assets/wallet/js/dist/bundle.js"></script>
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
