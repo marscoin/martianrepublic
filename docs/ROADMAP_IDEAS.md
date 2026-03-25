@@ -163,4 +163,39 @@ Citizens can register land claims on Mars via blockchain. Claims are enforced by
 
 ---
 
+---
+
+## Self-Governing Software (The Ultimate Vision)
+
+### Proposals as Real Governance
+The proposal system shouldn't just be for abstract policy. It should govern REAL things:
+
+1. **Land registry rules** - Propose and vote on pricing, claim limits, renewal terms
+2. **Marscoin protocol changes** - Propose features like seed phrase support in the wallet software, then vote on implementation
+3. **Martian Republic code changes** - Propose UI/UX improvements, new features, bug fixes as formal proposals
+4. **Auto-deploying governance** - The system restarts every 24 hours implementing changes that were voted upon
+
+### The Self-Modifying Republic
+Imagine: a citizen proposes "Add dark mode to the voting page." It goes through the standard proposal flow (discussion, voting period, threshold). If passed, the corresponding PR gets auto-merged and deployed. The software literally evolves based on the will of its citizens.
+
+This is:
+- **Direct democracy applied to software** - not just policy
+- **A DAO that governs its own infrastructure** - not just a treasury
+- **Dogfooding at its finest** - the governance tool governs itself
+
+### Implementation Path
+1. First: proposals are discussion-only (current state)
+2. Next: proposals can reference GitHub PRs
+3. Then: passed proposals trigger webhook to merge PR
+4. Finally: CI/CD auto-deploys after successful vote + merge
+5. Safety: 24-hour cool-down period, rollback vote mechanism
+
+### Near-term Proposal Ideas for Testing
+- "Add BIP39 seed phrase import to Marscoin Core wallet"
+- "Set land claim pricing at $99/year per pixel"
+- "Require 3 endorsements for citizenship (currently 5)"
+- "Add Olympus Mons as a named landmark on the Mars globe"
+
+---
+
 *This is a living document. Ideas captured here should be turned into GitHub issues when ready for implementation.*
