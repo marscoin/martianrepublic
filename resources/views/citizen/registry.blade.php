@@ -186,8 +186,29 @@
     <script src="/assets/wallet/js/mvpready-core.js"></script>
     <script src="/assets/wallet/js/mvpready-admin.js"></script>
     <script src="/assets/wallet/js/md5.min.js"></script>
-    <!-- <script src="/assets/wallet/js/sha256.js"></script> temporarily removed for signing test -->
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
+    <script>
+    // Test: capture seed BEFORE sha256.js loads
+    window._seedBeforeSha = (function() {
+        try {
+            var s = my_bundle.bip39.mnemonicToSeedSync("test test test test test test test test test test test about");
+            return s.toString('hex').substring(0,16);
+        } catch(e) { return 'error'; }
+    })();
+    </script>
+    <script src="/assets/wallet/js/sha256.js"></script>
+    <script>
+    // Test: capture seed AFTER sha256.js loads
+    window._seedAfterSha = (function() {
+        try {
+            var s = my_bundle.bip39.mnemonicToSeedSync("test test test test test test test test test test test about");
+            return s.toString('hex').substring(0,16);
+        } catch(e) { return 'error'; }
+    })();
+    console.log("Seed BEFORE sha256.js:", window._seedBeforeSha);
+    console.log("Seed AFTER sha256.js:", window._seedAfterSha);
+    console.log("SHA256 CHANGED SEED:", window._seedBeforeSha !== window._seedAfterSha);
+    </script>
 
 <script>
 
