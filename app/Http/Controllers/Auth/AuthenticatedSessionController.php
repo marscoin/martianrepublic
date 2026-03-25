@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Providers\RouteServiceProvider;
+use App\Models\Profile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -43,6 +44,21 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request)
     {
+        // Lock wallet on logout
+        try {
+            $user = Auth::user();
+            if ($user) {
+                $profile = Profile::where('userid', $user->id)->first();
+                if ($profile) {
+                    $profile->wallet_open = 0;
+                    $profile->civic_wallet_open = 0;
+                    $profile->save();
+                }
+            }
+        } catch (\Exception $e) {
+            // Don't block logout if profile table isn't available
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

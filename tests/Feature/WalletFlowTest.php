@@ -348,13 +348,12 @@ test('Citizen model import exists in DashboardController', function () {
 // Fix: Added public read-only defaults for unauthenticated users
 // ============================================================
 
-test('IdentityController showAll provides defaults for unauthenticated users', function () {
-    // Test the controller directly
+test('IdentityController showAll redirects unauthenticated users to login', function () {
     $controller = app()->make(\App\Http\Controllers\Citizen\IdentityController::class);
     $response = $controller->showAll();
 
-    // Should return a view, not a redirect
-    expect($response)->toBeInstanceOf(\Illuminate\View\View::class);
+    // Should redirect to login (PII protection)
+    expect($response)->toBeInstanceOf(\Illuminate\Http\RedirectResponse::class);
 });
 
 test('IdentityController showAll works for authenticated users with wallet', function () {

@@ -637,55 +637,54 @@ const sendMARS = async (mars_amount, receiver_address) => {
     return null
 }
 
-// Find the signing key for an address by asking pebas which derivation path it's at
+// Find the signing key for an address
+// Tries BOTH bip32 implementations since they derive different keys from same seed
 async function findSigningKeyForAddress(mnemonic, targetAddress) {
     const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-    const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
-    const xpub = root.derivePath("m/44'/2'/0'").neutered().toBase58();
-
-    // Ask pebas to discover addresses and find the target's path
-    try {
-        const discoverResult = await $.ajax({
-            url: '/api/discover',
-            type: 'POST',
-            data: { xpub: xpub, gap_limit: 20 },
-        });
-
-        if (discoverResult && discoverResult.addresses) {
-            const match = discoverResult.addresses.find(a => a.address === targetAddress);
-            if (match) {
-                // Found it! Derive the private key at this exact path
-                const fullPath = match.path; // e.g. "m/44'/2'/0'/0/0"
-                console.log(`Pebas found ${targetAddress} at ${fullPath}`);
-                const child = root.derivePath(fullPath);
-                const key = my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
-                return key;
-            }
-        }
-    } catch(e) {
-        console.warn("Pebas discovery failed:", e);
-    }
-
-    // Fallback: try direct derivation with all known paths
     const paths = ["m/44'/2'/0'", "m/44'/107'/0'"];
+
+    // Try my_bundle.bip32 first (this is what pebas and genSeed's xpub step use)
     for (const basePath of paths) {
         try {
+            const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet);
+            const account = root.derivePath(basePath);
             for (let chain = 0; chain <= 1; chain++) {
                 for (let index = 0; index < 20; index++) {
-                    const child = root.derivePath(`${basePath}/${chain}/${index}`);
+                    const child = account.derive(chain).derive(index);
                     const addr = my_bundle.bitcoin.payments.p2pkh({
-                        pubkey: child.publicKey,
-                        network: Marscoin.mainnet
+                        pubkey: child.publicKey, network: Marscoin.mainnet
                     }).address;
-                    if (index === 0 && chain === 0) console.log(`Trying ${basePath}/0/0 = ${addr}`);
+                    if (index === 0 && chain === 0) console.log(`bip32 ${basePath}/0/0 = ${addr}`);
                     if (addr === targetAddress) {
-                        console.log(`Found key at ${basePath}/${chain}/${index}`);
+                        console.log(`Found via my_bundle.bip32 at ${basePath}/${chain}/${index}`);
                         return my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
                     }
                 }
             }
-        } catch(e) { console.warn(`Path ${basePath}:`, e.message); }
+        } catch(e) { console.warn(`bip32 ${basePath}:`, e.message); }
     }
+
+    // Try my_bundle.bitcoin.bip32 (different derivation)
+    for (const basePath of paths) {
+        try {
+            const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
+            const account = root.derivePath(basePath);
+            for (let chain = 0; chain <= 1; chain++) {
+                for (let index = 0; index < 20; index++) {
+                    const child = account.derive(chain).derive(index);
+                    const addr = my_bundle.bitcoin.payments.p2pkh({
+                        pubkey: child.publicKey, network: Marscoin.mainnet
+                    }).address;
+                    if (index === 0 && chain === 0) console.log(`bitcoin.bip32 ${basePath}/0/0 = ${addr}`);
+                    if (addr === targetAddress) {
+                        console.log(`Found via bitcoin.bip32 at ${basePath}/${chain}/${index}`);
+                        return my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
+                    }
+                }
+            }
+        } catch(e) { console.warn(`bitcoin.bip32 ${basePath}:`, e.message); }
+    }
+
     return null;
 }
 
