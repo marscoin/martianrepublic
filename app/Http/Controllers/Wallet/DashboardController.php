@@ -235,39 +235,33 @@ class DashboardController extends Controller
 			$view = View::make('wallet.dashboard');
 			$view->public_addr = "";
 
-			// Prefer civic wallet (primary identity) over HD wallets
-			if($profile->civic_wallet_open > 0 && $civic_wallet)
-			{
-				$view->public_addr = $civic_wallet->public_addr;
-				$view->received = AppHelper::getMarscoinTotalReceived($civic_wallet->public_addr);
-				$view->sent = AppHelper::getMarscoinTotalSent($civic_wallet->public_addr);
-				$view->has_civic_wallet = true;
-				$view->has_wallet = true;
-				$view->wallet_open = true;
+			// Collect ALL wallet addresses for this user
+			$allAddresses = [];
+			if ($civic_wallet) {
+				$allAddresses[] = $civic_wallet->public_addr;
 			}
-			else if($profile->wallet_open > 0)
-			{
-				$openhdwallet = HDWallet::where('id', '=', $profile->wallet_open)->first();
-				if ($openhdwallet) {
-					$view->public_addr = $openhdwallet->public_addr;
-					$view->received = AppHelper::getMarscoinTotalReceived($openhdwallet->public_addr);
-					$view->sent = AppHelper::getMarscoinTotalSent($openhdwallet->public_addr);
-					$view->has_civic_wallet = ($civic_wallet !== null);
-					$view->has_wallet = true;
-					$view->wallet_open = true;
-				} else {
-					$profile->wallet_open = 0;
-					$profile->save();
-					$view->wallet_open = false;
+			$hdWallets = HDWallet::where('user_id', '=', $uid)->get();
+			foreach ($hdWallets as $hw) {
+				if (!in_array($hw->public_addr, $allAddresses)) {
+					$allAddresses[] = $hw->public_addr;
 				}
 			}
-			else
-			{
-				$view->balance = 0;
-				$view->received = 0;
-				$view->sent = 0;
+
+			$isWalletOpen = ($profile->civic_wallet_open > 0 || $profile->wallet_open > 0);
+
+			if ($isWalletOpen && count($allAddresses) > 0) {
+				// Primary address for transaction display (civic first)
+				$view->public_addr = $civic_wallet ? $civic_wallet->public_addr : $allAddresses[0];
+				// Pass all addresses for aggregated transaction view
+				$view->all_addresses = $allAddresses;
 				$view->has_civic_wallet = ($civic_wallet !== null);
-				$view->has_wallet = false;
+				$view->has_wallet = true;
+				$view->wallet_open = true;
+			} else {
+				$view->public_addr = "";
+				$view->all_addresses = [];
+				$view->has_civic_wallet = ($civic_wallet !== null);
+				$view->has_wallet = count($allAddresses) > 0;
 				$view->wallet_open = false;
 			}
 

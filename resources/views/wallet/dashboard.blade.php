@@ -465,6 +465,8 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
                     $('.connectivity').hide();
 
 
+                    // Fetch transactions for primary address (civic wallet)
+                    // TODO: aggregate from all addresses for full wallet view
                     $.post("/api/getTransactions", {
                 "address": '<?= $public_addr ?>'
             }, function(data) {
