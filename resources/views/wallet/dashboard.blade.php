@@ -329,6 +329,9 @@
                 <div class="row fade-in-4">
                     <div class="col-md-3">
                         <div class="section-label">Network</div>
+                        <div class="dash-card" style="margin-bottom: 16px;">
+                            @livewire('block-display')
+                        </div>
                         <div class="dash-card">
                             @livewire('hodler-stats')
                         </div>
