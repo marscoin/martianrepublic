@@ -14,9 +14,9 @@ class CivicStatusFeed extends Component
     {
         $activities = DB::table('feed')
             ->leftJoin('citizen', 'feed.userid', '=', 'citizen.userid')
-            ->whereIn('tag', ['GP', 'ED', 'CT'])
+            ->whereIn('tag', ['GP', 'ED', 'CT', 'PR'])
             ->orderByDesc('mined')
-            ->take(3)
+            ->take(8)
             ->get([
                 'feed.*', 
                 DB::raw("CONCAT(citizen.firstname, ' ', citizen.lastname) as citizenName")
@@ -41,6 +41,10 @@ class CivicStatusFeed extends Component
                     break;
                 case 'GP':
                     $actionWord = "<a href='{$activity->embedded_link}'>joined the Republic</a>";
+                    $activity->displayMessage = "{$citizenName} {$actionWord}";
+                    break;
+                case 'PR':
+                    $actionWord = "<a href='{$activity->embedded_link}'>submitted a proposal</a>";
                     $activity->displayMessage = "{$citizenName} {$actionWord}";
                     break;
             }

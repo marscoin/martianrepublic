@@ -334,34 +334,12 @@
                         </div>
                     </div>
                     <div class="col-md-5">
-                        <div class="section-label">Comms Feed</div>
+                        <div class="section-label">Republic Activity</div>
                         <div class="dash-card">
-                            <h4 class="portlet-title">
-                                News
-                            </h4>
-                            <div class="portlet-body">
-
-                                <a class="twitter-timeline" height="250" href="https://twitter.com/marscoinorg"
-                                    data-chrome="nofooter transparent noscrollbar"
-                                    data-widget-id="492843006043516928">Tweets by @marscoinorg</a>
-                                <script>
-                                    ! function(d, s, id) {
-                                        var js, fjs = d.getElementsByTagName(s)[0],
-                                            p = /^http:/.test(d.location) ? 'http' : 'https';
-                                        if (!d.getElementById(id)) {
-                                            js = d.createElement(s);
-                                            js.id = id;
-                                            js.src = p + "://platform.twitter.com/widgets.js";
-                                            fjs.parentNode.insertBefore(js, fjs);
-                                        }
-                                    }(document, "script", "twitter-wjs");
-                                </script>
-
-
-
-                            </div> <!-- /.portlet-body -->
-                        </div> <!-- /.portlet -->
-                    </div> <!-- /.col -->
+                            <h4 class="portlet-title">Live Feed</h4>
+                            @livewire('civic-status-feed')
+                        </div>
+                    </div>
                     <div class="col-md-4">
                         <div class="section-label">Market Data</div>
                         <div class="dash-card">
