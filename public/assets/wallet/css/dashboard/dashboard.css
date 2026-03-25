@@ -32,71 +32,117 @@ body {
 a { color: var(--mr-cyan); }
 a:hover, a:focus { color: var(--mr-amber); text-decoration: none; }
 
-/* ---- TOP NAVBAR ---- */
+/* ---- TOP NAVBAR — Mission Control Header ---- */
 .navbar-inverse {
-  background: rgba(6,6,12,0.92) !important;
-  border-bottom: 1px solid var(--mr-border) !important;
+  background: var(--mr-void, #06060c) !important;
+  border-bottom: none !important;
   box-shadow: none !important;
+  min-height: 52px !important;
+  margin-bottom: 0 !important;
 }
-.navbar-inverse .navbar-brand,
+.navbar-inverse .container {
+  display: flex;
+  align-items: center;
+}
+.navbar-inverse .navbar-brand {
+  color: #fff !important;
+  font-family: 'Orbitron', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase;
+  padding: 12px 15px !important;
+  height: auto !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .navbar-inverse .navbar-brand:hover {
   color: #fff !important;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+}
+.navbar-inverse .navbar-brand img {
+  width: 32px !important;
+  height: auto;
+  border-radius: 50%;
 }
 .navbar-inverse .navbar-nav > li > a {
-  color: var(--mr-text-dim) !important;
-  font-size: 13px;
-  transition: color 0.25s ease;
+  color: var(--mr-text-faint, #5a5968) !important;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 11px !important;
+  letter-spacing: 0.5px;
+  padding: 16px 12px !important;
+  transition: color 0.2s ease;
 }
 .navbar-inverse .navbar-nav > li > a:hover,
 .navbar-inverse .navbar-nav > li > a:focus {
-  color: #fff !important;
-  background: rgba(255,255,255,0.05) !important;
+  color: var(--mr-text-dim, #8a8998) !important;
+  background: transparent !important;
 }
 .navbar-inverse .navbar-nav > .open > a,
 .navbar-inverse .navbar-nav > .open > a:hover,
 .navbar-inverse .navbar-nav > .open > a:focus {
-  background: rgba(255,255,255,0.08) !important;
+  background: var(--mr-surface, #12121e) !important;
   color: #fff !important;
 }
+/* Profile avatar in top nav */
+.navbar-profile-avatar {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  border: 2px solid var(--mr-border-bright, rgba(255,255,255,0.12)) !important;
+  object-fit: cover;
+}
+.navbar-profile-label {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+  color: var(--mr-text-dim) !important;
+}
 .dropdown-menu {
-  background: var(--mr-surface) !important;
-  border: 1px solid var(--mr-border-bright) !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
-  border-radius: 8px !important;
+  background: var(--mr-surface, #12121e) !important;
+  border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.12)) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+  border-radius: 6px !important;
+  margin-top: 2px !important;
 }
 .dropdown-menu > li > a {
   color: var(--mr-text-dim) !important;
-  padding: 8px 20px !important;
-  transition: all 0.2s ease !important;
+  font-size: 12px !important;
+  padding: 8px 16px !important;
+  transition: all 0.15s ease !important;
 }
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
-  background: rgba(255,255,255,0.06) !important;
+  background: rgba(255,255,255,0.04) !important;
   color: #fff !important;
 }
 
-/* ---- MAIN NAV (secondary nav bar) ---- */
+/* ---- MAIN NAV — Console Tab Bar ---- */
 .mainnav {
-  background: var(--mr-dark) !important;
-  border-bottom: 1px solid var(--mr-border) !important;
+  background: var(--mr-dark, #0c0c16) !important;
+  border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
   box-shadow: none !important;
+  padding: 0 !important;
 }
 .mainnav-menu > li {
   background: transparent !important;
 }
 .mainnav-menu > li > a {
-  color: var(--mr-text-dim) !important;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  transition: all 0.25s ease;
+  color: var(--mr-text-dim, #8a8998) !important;
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+  padding: 18px 16px !important;
+  transition: all 0.2s ease;
   background: transparent !important;
+  border-bottom: 2px solid transparent !important;
 }
 .mainnav-menu > li > a:hover,
 .mainnav-menu > li > a:focus {
   color: #fff !important;
-  background: rgba(255,255,255,0.05) !important;
+  background: transparent !important;
+  border-bottom-color: var(--mr-border-bright, rgba(255,255,255,0.12)) !important;
 }
 .mainnav-menu > li.open > a,
 .mainnav-menu > li.open > a:hover,
@@ -113,6 +159,31 @@ a:hover, a:focus { color: var(--mr-amber); text-decoration: none; }
 }
 .mainnav-toggle {
   color: var(--mr-text) !important;
+}
+
+/* Wallet balance badge in nav */
+.nav-wallet-balance {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  background: var(--mr-surface, #12121e) !important;
+  border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.12)) !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  letter-spacing: 0.5px;
+}
+.nav-wallet-balance img {
+  width: 16px !important;
+  height: 16px !important;
+  vertical-align: -2px;
+}
+.nav-wallet-connect {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+  background: var(--mr-surface, #12121e) !important;
+  border: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
 }
 
 /* ---- CONTENT AREA ---- */
