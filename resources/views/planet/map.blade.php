@@ -187,6 +187,11 @@
             Double-click to reset
         </div>
 
+        <div id="loading-indicator" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+            <div style="font-family:'Orbitron',sans-serif; font-size:14px; color:var(--mr-mars,#c84125); letter-spacing:3px; text-transform:uppercase;">Loading Mars Surface</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--mr-text-dim,#8a8998); margin-top:8px;">Streaming NASA imagery...</div>
+        </div>
+
         <div class="hud-coords">
             <div class="coord-row">Latitude: <span class="coord-value" id="lat">18.65°N</span></div>
             <div class="coord-row">Longitude: <span class="coord-value" id="lon">226.20°E</span></div>
@@ -221,42 +226,65 @@
         const geometry = new THREE.SphereGeometry(1, 128, 128);
         const textureLoader = new THREE.TextureLoader();
 
-        // Use NASA Mars texture (public domain)
-        const marsTexture = textureLoader.load(
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/1024px-OSIRIS_Mars_true_color.jpg',
-            () => { console.log('Mars texture loaded'); },
-            undefined,
-            () => {
-                // Fallback: generate a procedural Mars-like texture
-                console.log('Using procedural Mars texture');
-                const c = document.createElement('canvas');
-                c.width = 1024; c.height = 512;
-                const ctx = c.getContext('2d');
-                const grad = ctx.createLinearGradient(0, 0, 1024, 512);
-                grad.addColorStop(0, '#b5603b');
-                grad.addColorStop(0.3, '#c47a52');
-                grad.addColorStop(0.5, '#a04e2d');
-                grad.addColorStop(0.7, '#d49464');
-                grad.addColorStop(1, '#8b3a1f');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, 1024, 512);
-                // Add some noise
-                for (let i = 0; i < 5000; i++) {
-                    ctx.fillStyle = `rgba(${Math.random() > 0.5 ? 180 : 100}, ${60 + Math.random()*40}, ${30 + Math.random()*20}, ${Math.random()*0.3})`;
-                    ctx.fillRect(Math.random()*1024, Math.random()*512, 2+Math.random()*4, 2+Math.random()*4);
-                }
-                // Polar caps
-                ctx.fillStyle = 'rgba(220,220,230,0.4)';
-                ctx.fillRect(0, 0, 1024, 30);
-                ctx.fillRect(0, 482, 1024, 30);
-                marsTexture.image = c;
-                marsTexture.needsUpdate = true;
+        // Load progressively: low-res first, then high-res
+        // NASA/USGS Mars Viking MDIM21 color mosaic (public domain)
+        const marsTexture = new THREE.Texture();
+        const bumpTexture = new THREE.Texture();
+
+        // Start with procedural texture while NASA textures load
+        (function generateProceduralMars() {
+            const c = document.createElement('canvas');
+            c.width = 1024; c.height = 512;
+            const ctx = c.getContext('2d');
+            const grad = ctx.createLinearGradient(0, 0, 1024, 512);
+            grad.addColorStop(0, '#b5603b');
+            grad.addColorStop(0.3, '#c47a52');
+            grad.addColorStop(0.5, '#a04e2d');
+            grad.addColorStop(0.7, '#d49464');
+            grad.addColorStop(1, '#8b3a1f');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 1024, 512);
+            for (let i = 0; i < 8000; i++) {
+                ctx.fillStyle = `rgba(${Math.random() > 0.5 ? 180 : 100}, ${60 + Math.random()*40}, ${30 + Math.random()*20}, ${Math.random()*0.3})`;
+                ctx.fillRect(Math.random()*1024, Math.random()*512, 2+Math.random()*6, 2+Math.random()*6);
             }
+            ctx.fillStyle = 'rgba(220,220,230,0.35)';
+            ctx.fillRect(0, 0, 1024, 25);
+            ctx.fillRect(0, 487, 1024, 25);
+            marsTexture.image = c;
+            marsTexture.needsUpdate = true;
+        })();
+
+        // Load high-res NASA texture (2K Viking color mosaic)
+        const hiResLoader = new THREE.TextureLoader();
+        // Load local NASA textures (downloaded from trek.nasa.gov)
+        hiResLoader.load(
+            '/assets/mars/mars_color.jpg',
+            (tex) => {
+                marsTexture.image = tex.image;
+                marsTexture.needsUpdate = true;
+                console.log('Mars color texture loaded');
+                document.getElementById('loading-indicator')?.remove();
+
+                // Progressive: load higher res texture
+                hiResLoader.load(
+                    '/assets/mars/mars_hires.jpg',
+                    (tex2) => {
+                        marsTexture.image = tex2.image;
+                        marsTexture.needsUpdate = true;
+                        console.log('High-res Mars texture loaded');
+                    }
+                );
+            },
+            undefined,
+            () => console.log('Mars texture unavailable, using procedural')
         );
 
         const material = new THREE.MeshPhongMaterial({
             map: marsTexture,
             bumpScale: 0.02,
+            specular: new THREE.Color(0x111111),
+            shininess: 5,
         });
         const mars = new THREE.Mesh(geometry, material);
         scene.add(mars);
