@@ -146,6 +146,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/api/rename', 'Wallet\ApiController@renameWallet');
     Route::post('/api/link-civic', 'Wallet\ApiController@linkCivicWallet');
     Route::post('/api/discover', 'Wallet\ApiController@discoverAddresses');
+    Route::get('/api/mars-price', 'Wallet\ApiController@marsPrice');
 });
 
 //

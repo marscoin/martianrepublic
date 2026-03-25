@@ -742,7 +742,7 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
     </script>
     <script>
     // Fetch MARS price from our own API
-    fetch('https://price.marscoin.org/json/')
+    fetch('/api/mars-price')
         .then(r => r.json())
         .then(d => {
             const mars = d.data['154'];

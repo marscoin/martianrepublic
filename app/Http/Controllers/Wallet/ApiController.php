@@ -590,6 +590,20 @@ class ApiController extends Controller {
 	 *
 	 * @hideFromAPIDocumentation
 	 */
+	/**
+	 * Proxy for price.marscoin.org - avoids Cloudflare CSP
+	 */
+	public function marsPrice()
+	{
+		try {
+			$response = @file_get_contents('https://price.marscoin.org/json/');
+			if ($response) {
+				return response($response)->header('Content-Type', 'application/json');
+			}
+		} catch (\Exception $e) {}
+		return response()->json(['error' => 'Price unavailable'], 500);
+	}
+
 	public function closewallet(Request $request)
 	{
 		$uid = Auth::user()->id;
