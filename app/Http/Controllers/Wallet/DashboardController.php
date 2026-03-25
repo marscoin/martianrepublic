@@ -235,27 +235,8 @@ class DashboardController extends Controller
 			$view = View::make('wallet.dashboard');
 			$view->public_addr = "";
 
-			if($profile->wallet_open > 0){
-				$openhdwallet = HDWallet::where('id', '=', $profile->wallet_open)->first();
-				if ($openhdwallet) {
-					$view->public_addr = $openhdwallet->public_addr;
-					$view->received = AppHelper::getMarscoinTotalReceived($openhdwallet->public_addr);
-					$view->sent = AppHelper::getMarscoinTotalSent($openhdwallet->public_addr);
-					$view->has_civic_wallet = true;
-					$view->has_wallet = true;
-					$view->wallet_open = true;
-				} else {
-					$profile->wallet_open = 0;
-					$profile->save();
-					$view->balance = 0;
-					$view->received = 0;
-					$view->sent = 0;
-					$view->has_civic_wallet = false;
-					$view->has_wallet = false;
-					$view->wallet_open = false;
-				}
-			}
-			else if($profile->civic_wallet_open > 0 && $civic_wallet)
+			// Prefer civic wallet (primary identity) over HD wallets
+			if($profile->civic_wallet_open > 0 && $civic_wallet)
 			{
 				$view->public_addr = $civic_wallet->public_addr;
 				$view->received = AppHelper::getMarscoinTotalReceived($civic_wallet->public_addr);
@@ -264,12 +245,28 @@ class DashboardController extends Controller
 				$view->has_wallet = true;
 				$view->wallet_open = true;
 			}
+			else if($profile->wallet_open > 0)
+			{
+				$openhdwallet = HDWallet::where('id', '=', $profile->wallet_open)->first();
+				if ($openhdwallet) {
+					$view->public_addr = $openhdwallet->public_addr;
+					$view->received = AppHelper::getMarscoinTotalReceived($openhdwallet->public_addr);
+					$view->sent = AppHelper::getMarscoinTotalSent($openhdwallet->public_addr);
+					$view->has_civic_wallet = ($civic_wallet !== null);
+					$view->has_wallet = true;
+					$view->wallet_open = true;
+				} else {
+					$profile->wallet_open = 0;
+					$profile->save();
+					$view->wallet_open = false;
+				}
+			}
 			else
 			{
 				$view->balance = 0;
 				$view->received = 0;
 				$view->sent = 0;
-				$view->has_civic_wallet = false;
+				$view->has_civic_wallet = ($civic_wallet !== null);
 				$view->has_wallet = false;
 				$view->wallet_open = false;
 			}
