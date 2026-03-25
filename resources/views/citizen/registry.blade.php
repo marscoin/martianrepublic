@@ -175,7 +175,6 @@
     <footer class="footer">
         @include('footer')
     </footer>
-    <script src="/assets/wallet/js/dist/my_bundle.js"></script>
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
     <script src="/assets/wallet/js/plugins/flot/jquery.flot.js"></script>
@@ -188,6 +187,7 @@
     <script src="/assets/wallet/js/mvpready-admin.js"></script>
     <script src="/assets/wallet/js/md5.min.js"></script>
     <script src="/assets/wallet/js/sha256.js"></script>
+    <script src="/assets/wallet/js/dist/my_bundle.js"></script>
 
 <script>
 
