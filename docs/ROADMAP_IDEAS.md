@@ -26,12 +26,50 @@ Citizens can register land claims on Mars via blockchain. Claims are enforced by
 - For 1-acre parcels: would need ~36 billion entries (database, not texture)
 - Practical approach: hierarchical subdivision, render only visible zoom level
 
-### Renewal & Economics
-- Annual fee in MARS to maintain claim
-- Fee goes to Republic treasury (community-governed)
-- Lapsed claims return to unclaimed pool
-- Transfer of ownership via blockchain transaction
-- Community voting on disputed claims
+### Economics: The Citizen Dividend Model
+
+**The flywheel:**
+1. Anyone can claim 1 pixel (~2km x 2km, ~1000 acres) of Mars for $99/year
+2. That $99 (paid in MARS) gets distributed equally to ALL current citizens
+3. Claim is recorded on-chain, valid for 1 year
+4. Before the year expires, claimant must renew ($99 again) or lose the claim
+5. Lapsed claims return to the unclaimed pool
+
+**Why this creates a flywheel:**
+- Citizens earn passive income from land claims → more people want to become citizens
+- More citizens = larger community that cares about enforcement → claims feel more "real"
+- More claims = more revenue distributed = more incentive to be a citizen
+- The community grows because there's an actual economic reason to participate
+- Eventually, when Mars colonization happens, this community IS the governance body
+
+**The math (hypothetical):**
+- 33.5 million pixels on Mars (8K texture)
+- If 1% is claimed (335,000 parcels): $33.2M/year in renewal fees
+- Split among 1,000 citizens: $33,150/citizen/year
+- Split among 10,000 citizens: $3,315/citizen/year
+- Split among 100,000 citizens: $331/citizen/year
+- The equilibrium finds itself: more citizens dilute the dividend, but also increase the value/legitimacy
+
+**Pricing thoughts:**
+- $99/year = accessible, impulse purchase level
+- Could be tiered: $99 for 1 pixel, $499 for a 3x3 block (named territory)
+- First claim is discounted or free to bootstrap adoption
+- Premium locations (Olympus Mons summit, Valles Marineris rim) could auction
+- Transfer fee: 10% of last renewal price goes to citizens on resale
+
+**On-chain implementation:**
+- Claim tx: OP_RETURN with `LC_lat_lon_pixelid_ipfs_metadata`
+- Renewal tx: OP_RETURN with `LR_pixelid_year`
+- The scanner processes these like GP/CT/ED entries
+- Smart distribution: MARS sent to a treasury address, then distributed pro-rata
+- Or: use Marscoin's built-in multisig or a distribution smart contract
+
+**What makes this different from every "buy a star" scam:**
+- It's backed by a real governance community with skin in the game
+- The blockchain makes it transparent and verifiable
+- The annual renewal prevents dead speculation
+- The citizen dividend creates aligned incentives
+- When humans DO go to Mars, this community has already self-organized
 
 ---
 
