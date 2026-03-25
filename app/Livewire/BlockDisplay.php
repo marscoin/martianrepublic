@@ -54,7 +54,9 @@ class BlockDisplay extends Component
 
     public function updateTimeSinceLastBlock()
     {
-        $this->timeSinceLastBlock = Carbon::createFromTimestamp($this->lastBlockMinedAt)->diffForHumans(null, true);
+        if ($this->lastBlockMinedAt instanceof Carbon) {
+            $this->timeSinceLastBlock = $this->lastBlockMinedAt->diffForHumans(null, true);
+        }
     }
 
     public function render()
