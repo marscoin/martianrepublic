@@ -199,3 +199,16 @@ This is:
 ---
 
 *This is a living document. Ideas captured here should be turned into GitHub issues when ready for implementation.*
+
+---
+
+## Dashboard Telemetry Ideas (captured during session)
+
+- [ ] System telemetry component: node connections, mempool size, difficulty as animated sparklines
+- [ ] Block time chart: rolling graph of last 20 block intervals
+- [ ] Network hashrate gauge
+- [ ] Citizen growth chart over time
+- [ ] Proposal activity timeline
+- [ ] Live transaction stream (scrolling ticker)
+- [ ] Balance inconsistency fix: dashboard stats, nav widget, and wallet page should all show same aggregated balance
+- [ ] Move all blockchain queries to pebas (local) instead of explorer APIs
