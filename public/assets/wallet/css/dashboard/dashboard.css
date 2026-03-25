@@ -84,18 +84,28 @@ a:hover, a:focus { color: var(--mr-amber); text-decoration: none; }
   background: var(--mr-surface, #12121e) !important;
   color: #fff !important;
 }
-/* Profile avatar in top nav */
+/* Profile avatar — hide email, show compact avatar aligned right */
 .navbar-profile-avatar {
-  width: 28px !important;
-  height: 28px !important;
+  width: 30px !important;
+  height: 30px !important;
   border-radius: 50% !important;
   border: 2px solid var(--mr-border-bright, rgba(255,255,255,0.12)) !important;
   object-fit: cover;
+  transition: border-color 0.2s ease;
+}
+.navbar-profile-avatar:hover {
+  border-color: var(--mr-mars, #c84125) !important;
 }
 .navbar-profile-label {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 11px !important;
-  color: var(--mr-text-dim) !important;
+  display: none !important;  /* Hide email in nav — too cluttered for console aesthetic */
+}
+.navbar-profile .dropdown-toggle {
+  padding: 10px 8px !important;
+}
+.navbar-profile .dropdown-toggle .fa-caret-down {
+  color: var(--mr-text-faint, #5a5968) !important;
+  font-size: 10px !important;
+  margin-left: 4px;
 }
 .dropdown-menu {
   background: var(--mr-surface, #12121e) !important;
