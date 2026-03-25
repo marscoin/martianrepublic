@@ -1,79 +1,400 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
-    <title>Martian Republic - Logbook</title>
+    <title>Mars Map - Martian Republic</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="The Marscoin Foundation">
+    <meta name="description" content="Interactive Mars Globe - Martian Republic Territory">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,800">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
-    <link rel="stylesheet" href="/assets/wallet/css/simplemde.min.css">
-    <link rel="stylesheet" href="/assets/wallet/css/upload.css">
-    <link rel="stylesheet" href="/assets/wallet/css/dropify.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
-    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
-    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
-    <style>
-      html,
-      body,
-      #viewDiv {
-        padding: 0;
-        margin: 0;
-        height: 100%;
-        width: 100%;
-      }
-    </style>
     @livewireStyles
 
+    <style>
+    body { margin: 0; overflow: hidden; background: #000; }
+    .map-page { min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Globe container */
+    #mars-globe {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 0;
+    }
+
+    /* HUD overlay */
+    .mars-hud {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 10;
+        pointer-events: none;
+    }
+    .mars-hud > * {
+        pointer-events: auto;
+    }
+
+    /* Top info bar */
+    .hud-top {
+        position: absolute;
+        top: 140px; left: 40px;
+        animation: fadeSlideDown 0.8s ease-out 0.5s both;
+    }
+    .hud-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 32px;
+        font-weight: 800;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+    }
+    .hud-subtitle {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--mr-mars, #c84125);
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin-top: 6px;
+        text-shadow: 0 1px 10px rgba(0,0,0,0.8);
+    }
+
+    /* Coordinate display */
+    .hud-coords {
+        position: absolute;
+        bottom: 40px; left: 40px;
+        background: rgba(6,6,12,0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 8px;
+        padding: 16px 24px;
+        animation: fadeSlideUp 0.6s ease-out 0.8s both;
+    }
+    .coord-row {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--mr-text-dim, #8a8998);
+        margin-bottom: 4px;
+    }
+    .coord-row:last-child { margin-bottom: 0; }
+    .coord-value {
+        color: #fff;
+        font-weight: 500;
+    }
+
+    /* Info panel */
+    .hud-info {
+        position: absolute;
+        bottom: 40px; right: 40px;
+        background: rgba(6,6,12,0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 8px;
+        padding: 20px 28px;
+        max-width: 320px;
+        animation: fadeSlideUp 0.6s ease-out 1s both;
+    }
+    .hud-info h3 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #fff;
+        margin: 0 0 8px;
+    }
+    .hud-info p {
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--mr-text-dim, #8a8998);
+        margin: 0;
+    }
+
+    /* Controls hint */
+    .hud-controls {
+        position: absolute;
+        top: 140px; right: 40px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: rgba(255,255,255,0.3);
+        text-align: right;
+        animation: fadeSlideDown 0.6s ease-out 1.2s both;
+    }
+
+    /* Vignette */
+    .vignette {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        pointer-events: none;
+        z-index: 5;
+        background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+    }
+
+    @keyframes fadeSlideDown {
+        from { opacity: 0; transform: translateY(-16px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .hud-title { font-size: 22px; }
+        .hud-top { top: 120px; left: 20px; }
+        .hud-coords { left: 20px; bottom: 20px; }
+        .hud-info { right: 20px; bottom: 20px; display: none; }
+    }
+    </style>
 </head>
-<body class=" ">
+
+<body class="map-page">
     <div id="wrapper">
-        <header class="navbar navbar-inverse" role="banner">
+        <header class="navbar navbar-inverse" role="banner" style="position: relative; z-index: 20;">
             <div class="container">
                 <div class="navbar-header">
                     @include('wallet.header')
-                </div> <!-- /.navbar-header -->
+                </div>
                 <nav class="collapse navbar-collapse" role="navigation">
                     @include('wallet.navbarleft')
                     @include('wallet.navbarright')
                 </nav>
-            </div> 
+            </div>
         </header>
         @include('wallet.mainnav', array('active'=>'map'))
-        <div class="content">
+    </div>
 
-            <iframe width="100%" height="900" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
-src="/map/embed"></iframe>
+    {{-- Three.js Mars Globe --}}
+    <canvas id="mars-globe"></canvas>
+    <div class="vignette"></div>
 
-        </div> <!-- .content -->
-    </div> <!-- /#wrapper -->
-    <footer class="footer">
-        @include('footer')
-    </footer>
-    <script src="/assets/wallet/js/mvpready-core.js"></script>
-    <script src="/assets/wallet/js/mvpready-admin.js"></script>
-    <script src="/assets/wallet/js/simplemde.min.js"></script>
-    <script src="/assets/wallet/js/md5.min.js"></script>
-    <script src="/assets/wallet/js/sha256.js"></script>
- 
-<script>
-$(document).ready(function() {
+    {{-- HUD Overlay --}}
+    <div class="mars-hud">
+        <div class="hud-top">
+            <div class="hud-subtitle"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#34d399;margin-right:8px;animation:pulse 2s infinite;vertical-align:middle;"></span>Planetary Surface — Real Terrain Data</div>
+            <div class="hud-title">Mars</div>
+        </div>
 
-$.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        <div class="hud-controls">
+            Drag to rotate<br>
+            Scroll to zoom<br>
+            Double-click to reset
+        </div>
+
+        <div class="hud-coords">
+            <div class="coord-row">Latitude: <span class="coord-value" id="lat">18.65°N</span></div>
+            <div class="coord-row">Longitude: <span class="coord-value" id="lon">226.20°E</span></div>
+            <div class="coord-row">Altitude: <span class="coord-value" id="alt">3,200 km</span></div>
+        </div>
+
+        <div class="hud-info">
+            <h3>Martian Republic Territory</h3>
+            <p>
+                The entire surface of Mars — 144.8 million km² — is governed by the Martian Republic.
+                Citizens may register land claims via blockchain, verified and enforced by the community.
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
+    <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
+
+    <script>
+    (function() {
+        const canvas = document.getElementById('mars-globe');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 3.2;
+
+        // Mars sphere
+        const geometry = new THREE.SphereGeometry(1, 128, 128);
+        const textureLoader = new THREE.TextureLoader();
+
+        // Use NASA Mars texture (public domain)
+        const marsTexture = textureLoader.load(
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/1024px-OSIRIS_Mars_true_color.jpg',
+            () => { console.log('Mars texture loaded'); },
+            undefined,
+            () => {
+                // Fallback: generate a procedural Mars-like texture
+                console.log('Using procedural Mars texture');
+                const c = document.createElement('canvas');
+                c.width = 1024; c.height = 512;
+                const ctx = c.getContext('2d');
+                const grad = ctx.createLinearGradient(0, 0, 1024, 512);
+                grad.addColorStop(0, '#b5603b');
+                grad.addColorStop(0.3, '#c47a52');
+                grad.addColorStop(0.5, '#a04e2d');
+                grad.addColorStop(0.7, '#d49464');
+                grad.addColorStop(1, '#8b3a1f');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 1024, 512);
+                // Add some noise
+                for (let i = 0; i < 5000; i++) {
+                    ctx.fillStyle = `rgba(${Math.random() > 0.5 ? 180 : 100}, ${60 + Math.random()*40}, ${30 + Math.random()*20}, ${Math.random()*0.3})`;
+                    ctx.fillRect(Math.random()*1024, Math.random()*512, 2+Math.random()*4, 2+Math.random()*4);
+                }
+                // Polar caps
+                ctx.fillStyle = 'rgba(220,220,230,0.4)';
+                ctx.fillRect(0, 0, 1024, 30);
+                ctx.fillRect(0, 482, 1024, 30);
+                marsTexture.image = c;
+                marsTexture.needsUpdate = true;
+            }
+        );
+
+        const material = new THREE.MeshPhongMaterial({
+            map: marsTexture,
+            bumpScale: 0.02,
+        });
+        const mars = new THREE.Mesh(geometry, material);
+        scene.add(mars);
+
+        // Atmosphere glow
+        const atmosGeometry = new THREE.SphereGeometry(1.02, 64, 64);
+        const atmosMaterial = new THREE.ShaderMaterial({
+            vertexShader: `
+                varying vec3 vNormal;
+                void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                varying vec3 vNormal;
+                void main() {
+                    float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.0);
+                    gl_FragColor = vec4(0.8, 0.4, 0.2, 1.0) * intensity;
+                }
+            `,
+            blending: THREE.AdditiveBlending,
+            side: THREE.BackSide,
+            transparent: true,
+        });
+        const atmosphere = new THREE.Mesh(atmosGeometry, atmosMaterial);
+        scene.add(atmosphere);
+
+        // Lighting
+        const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        sunLight.position.set(5, 3, 5);
+        scene.add(sunLight);
+        scene.add(new THREE.AmbientLight(0x333333));
+
+        // Stars background
+        const starGeometry = new THREE.BufferGeometry();
+        const starPositions = [];
+        for (let i = 0; i < 3000; i++) {
+            starPositions.push((Math.random() - 0.5) * 200);
+            starPositions.push((Math.random() - 0.5) * 200);
+            starPositions.push((Math.random() - 0.5) * 200);
+        }
+        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
+        const stars = new THREE.Points(starGeometry, new THREE.PointsMaterial({ color: 0xffffff, size: 0.15 }));
+        scene.add(stars);
+
+        // Mouse interaction
+        let isDragging = false;
+        let previousMouse = { x: 0, y: 0 };
+        let rotationVelocity = { x: 0, y: 0 };
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousMouse = { x: e.clientX, y: e.clientY };
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const dx = e.clientX - previousMouse.x;
+                const dy = e.clientY - previousMouse.y;
+                rotationVelocity.x = dy * 0.002;
+                rotationVelocity.y = dx * 0.002;
+                previousMouse = { x: e.clientX, y: e.clientY };
+            }
+            // Update HUD coordinates based on mouse position
+            const nx = ((e.clientX / window.innerWidth) * 360 - 180).toFixed(2);
+            const ny = ((0.5 - e.clientY / window.innerHeight) * 180).toFixed(2);
+            document.getElementById('lon').textContent = Math.abs(nx) + '°' + (nx >= 0 ? 'E' : 'W');
+            document.getElementById('lat').textContent = Math.abs(ny) + '°' + (ny >= 0 ? 'N' : 'S');
+        });
+        canvas.addEventListener('mouseup', () => isDragging = false);
+        canvas.addEventListener('mouseleave', () => isDragging = false);
+
+        canvas.addEventListener('wheel', (e) => {
+            camera.position.z = Math.max(1.5, Math.min(8, camera.position.z + e.deltaY * 0.003));
+            const alt = ((camera.position.z - 1) * 2000).toFixed(0);
+            document.getElementById('alt').textContent = Number(alt).toLocaleString() + ' km';
+            e.preventDefault();
+        }, { passive: false });
+
+        canvas.addEventListener('dblclick', () => {
+            camera.position.z = 3.2;
+            mars.rotation.x = 0.1;
+            mars.rotation.y = 0;
+        });
+
+        // Touch support
+        canvas.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            previousMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        });
+        canvas.addEventListener('touchmove', (e) => {
+            if (isDragging && e.touches.length === 1) {
+                const dx = e.touches[0].clientX - previousMouse.x;
+                const dy = e.touches[0].clientY - previousMouse.y;
+                rotationVelocity.x = dy * 0.002;
+                rotationVelocity.y = dx * 0.002;
+                previousMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+        });
+        canvas.addEventListener('touchend', () => isDragging = false);
+
+        // Animate
+        mars.rotation.x = 0.1; // Axial tilt
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Auto-rotate slowly
+            if (!isDragging) {
+                mars.rotation.y += 0.001;
+            }
+
+            // Apply drag rotation
+            mars.rotation.x += rotationVelocity.x;
+            mars.rotation.y += rotationVelocity.y;
+            rotationVelocity.x *= 0.95;
+            rotationVelocity.y *= 0.95;
+
+            atmosphere.rotation.copy(mars.rotation);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    })();
+    </script>
+
+    @livewireScripts
+
+    <style>
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
     }
-});  
-});  
-</script>
-@livewireScripts
+    </style>
 </body>
 </html>
