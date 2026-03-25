@@ -346,15 +346,13 @@
                     <div class="col-md-4">
                         <div class="section-label">Market Data</div>
                         <div class="dash-card">
-                            <h4 class="portlet-title">
-                                Price Chart
-                            </h4>
-                            <div class="portlet-body">
-                                <script src="https://widgets.coingecko.com/coingecko-coin-price-chart-widget.js"></script>
-                                <coingecko-coin-price-chart-widget coin-id="marscoin" currency="usd" height="300"
-                                    locale="en"></coingecko-coin-price-chart-widget>
-                            </div> <!-- /.portlet-body -->
-                        </div> <!-- /.portlet -->
+                            <h4 class="portlet-title">MARS / USD</h4>
+                            <div id="price-display">
+                                <div style="text-align: center; padding: 20px; color: var(--mr-text-dim);">
+                                    <i class="fa fa-spinner fa-spin"></i> Loading market data...
+                                </div>
+                            </div>
+                        </div>
                     </div> <!-- /.col -->
                 </div> <!-- /.row -->
             </div> <!-- /.container -->
@@ -740,6 +738,52 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
 
 
 
+        });
+    </script>
+    <script>
+    // Fetch MARS price from our own API
+    fetch('https://price.marscoin.org/json/')
+        .then(r => r.json())
+        .then(d => {
+            const mars = d.data['154'];
+            const q = mars.quote.USD;
+            const price = q.price;
+            const change24h = q.percent_change_24h;
+            const change7d = q.percent_change_7d;
+            const volume = q.volume_24h;
+            const maxSupply = mars.max_supply;
+
+            const changeColor24 = change24h >= 0 ? 'var(--mr-green, #34d399)' : 'var(--mr-mars, #c84125)';
+            const changeColor7d = change7d >= 0 ? 'var(--mr-green, #34d399)' : 'var(--mr-mars, #c84125)';
+            const arrow24 = change24h >= 0 ? '&#9650;' : '&#9660;';
+            const arrow7d = change7d >= 0 ? '&#9650;' : '&#9660;';
+
+            document.getElementById('price-display').innerHTML = `
+                <div style="margin-bottom: 16px;">
+                    <div style="font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 700; color: #fff;">
+                        $${price.toFixed(6)}
+                    </div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; margin-top: 4px;">
+                        <span style="color: ${changeColor24};">${arrow24} ${Math.abs(change24h).toFixed(2)}%</span>
+                        <span style="color: var(--mr-text-faint); margin: 0 8px;">24h</span>
+                        <span style="color: ${changeColor7d};">${arrow7d} ${Math.abs(change7d).toFixed(2)}%</span>
+                        <span style="color: var(--mr-text-faint);">7d</span>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--mr-border); border-radius: 6px; overflow: hidden;">
+                    <div style="background: var(--mr-dark, #0c0c16); padding: 12px;">
+                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-text-dim); margin-bottom: 4px;">24h Volume</div>
+                        <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 600; color: #fff;">$${volume.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                    </div>
+                    <div style="background: var(--mr-dark, #0c0c16); padding: 12px;">
+                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-text-dim); margin-bottom: 4px;">Max Supply</div>
+                        <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 600; color: #fff;">${(maxSupply/1e6).toFixed(1)}M</div>
+                    </div>
+                </div>
+            `;
+        })
+        .catch(() => {
+            document.getElementById('price-display').innerHTML = '<div style="text-align:center;padding:20px;color:var(--mr-text-faint);">Price data unavailable</div>';
         });
     </script>
     @livewireScripts
