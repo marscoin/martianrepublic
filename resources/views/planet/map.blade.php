@@ -22,10 +22,10 @@
     body { margin: 0; overflow: hidden; background: #000; }
     .map-page { min-height: 100vh; display: flex; flex-direction: column; }
 
-    /* Globe container */
+    /* Globe container - offset below nav */
     #mars-globe {
         position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
+        top: 120px; left: 0; right: 0; bottom: 0;
         z-index: 0;
     }
 
@@ -43,7 +43,7 @@
     /* Top info bar */
     .hud-top {
         position: absolute;
-        top: 140px; left: 40px;
+        top: 160px; left: 40px;
         animation: fadeSlideDown 0.8s ease-out 0.5s both;
     }
     .hud-title {
@@ -184,7 +184,8 @@
         <div class="hud-controls">
             Drag to rotate<br>
             Scroll to zoom<br>
-            Double-click to reset
+            Double-click to reset<br>
+            <span style="color:var(--mr-cyan,#00e4ff);">Click globe for NASA data</span>
         </div>
 
         <div id="loading-indicator" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
@@ -196,6 +197,17 @@
             <div class="coord-row">Latitude: <span class="coord-value" id="lat">18.65°N</span></div>
             <div class="coord-row">Longitude: <span class="coord-value" id="lon">226.20°E</span></div>
             <div class="coord-row">Altitude: <span class="coord-value" id="alt">3,200 km</span></div>
+            <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">
+                <a id="nasa-link" href="https://trek.nasa.gov/mars/" target="_blank"
+                   style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--mr-cyan,#00e4ff); text-decoration:none;">
+                    <i class="fa fa-external-link"></i> Open in NASA Mars Trek
+                </a>
+            </div>
+            <div style="margin-top:8px;">
+                <input id="coord-jump" type="text" placeholder="lat, lon (e.g. 18.4, -77.5)"
+                    style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:4px 8px; font-family:'JetBrains Mono',monospace; font-size:10px; color:#fff; width:100%; outline:none;"
+                    onkeydown="if(event.key==='Enter'){jumpToCoord(this.value)}">
+            </div>
         </div>
 
         <div class="hud-info">
@@ -214,12 +226,13 @@
     <script>
     (function() {
         const canvas = document.getElementById('mars-globe');
+        const NAV_HEIGHT = 120;
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(window.innerWidth, window.innerHeight - NAV_HEIGHT);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / (window.innerHeight - NAV_HEIGHT), 0.1, 1000);
         camera.position.z = 3.2;
 
         // Mars sphere
@@ -266,15 +279,19 @@
                 console.log('Mars color texture loaded');
                 document.getElementById('loading-indicator')?.remove();
 
-                // Progressive: load higher res texture
-                hiResLoader.load(
-                    '/assets/mars/mars_hires.jpg',
-                    (tex2) => {
-                        marsTexture.image = tex2.image;
+                // Progressive: load higher res textures
+                hiResLoader.load('/assets/mars/mars_hires.jpg', (tex2) => {
+                    marsTexture.image = tex2.image;
+                    marsTexture.needsUpdate = true;
+                    console.log('Hi-res Mars texture loaded (1.2MB)');
+
+                    // Final: load 8K texture for maximum detail on zoom
+                    hiResLoader.load('/assets/mars/mars_8k.jpg', (tex3) => {
+                        marsTexture.image = tex3.image;
                         marsTexture.needsUpdate = true;
-                        console.log('High-res Mars texture loaded');
-                    }
-                );
+                        console.log('8K Mars texture loaded (8.4MB)');
+                    });
+                });
             },
             undefined,
             () => console.log('Mars texture unavailable, using procedural')
@@ -370,6 +387,34 @@
             mars.rotation.y = 0;
         });
 
+        // Click on globe → open NASA Mars Trek at that location
+        canvas.addEventListener('click', (e) => {
+            if (Math.abs(rotationVelocity.x) > 0.005 || Math.abs(rotationVelocity.y) > 0.005) return;
+            // Raycast to find clicked point on sphere
+            const rect = canvas.getBoundingClientRect();
+            const mouse = new THREE.Vector2(
+                ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                -((e.clientY - rect.top) / rect.height) * 2 + 1
+            );
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(mars);
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                // Convert 3D point to lat/lon
+                const spherical = new THREE.Spherical();
+                const localPoint = mars.worldToLocal(point.clone());
+                spherical.setFromVector3(localPoint);
+                const lat = (90 - THREE.MathUtils.radToDeg(spherical.phi)).toFixed(2);
+                const lon = (THREE.MathUtils.radToDeg(spherical.theta)).toFixed(2);
+                // Update NASA link
+                const nasaUrl = `https://trek.nasa.gov/mars/#v=0.1&x=${lon}&y=${lat}&z=5`;
+                document.getElementById('nasa-link').href = nasaUrl;
+                document.getElementById('lat').textContent = Math.abs(lat) + '°' + (lat >= 0 ? 'N' : 'S');
+                document.getElementById('lon').textContent = Math.abs(lon) + '°' + (lon >= 0 ? 'E' : 'W');
+            }
+        });
+
         // Touch support
         canvas.addEventListener('touchstart', (e) => {
             isDragging = true;
@@ -409,11 +454,26 @@
 
         // Resize
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.aspect = window.innerWidth / (window.innerHeight - NAV_HEIGHT);
             camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setSize(window.innerWidth, window.innerHeight - NAV_HEIGHT);
         });
     })();
+
+    // Jump to coordinate from input
+    function jumpToCoord(value) {
+        const parts = value.split(',').map(s => parseFloat(s.trim()));
+        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+            const lat = parts[0], lon = parts[1];
+            document.getElementById('lat').textContent = Math.abs(lat).toFixed(2) + '°' + (lat >= 0 ? 'N' : 'S');
+            document.getElementById('lon').textContent = Math.abs(lon).toFixed(2) + '°' + (lon >= 0 ? 'E' : 'W');
+            document.getElementById('nasa-link').href = `https://trek.nasa.gov/mars/#v=0.1&x=${lon}&y=${lat}&z=5`;
+            // Flash the coordinate display
+            const coords = document.querySelector('.hud-coords');
+            coords.style.borderColor = 'var(--mr-cyan, #00e4ff)';
+            setTimeout(() => { coords.style.borderColor = 'rgba(255,255,255,0.08)'; }, 1000);
+        }
+    }
     </script>
 
     @livewireScripts
