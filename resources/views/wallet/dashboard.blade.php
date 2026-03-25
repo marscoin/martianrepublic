@@ -1,88 +1,190 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Martian Republic</title>
+    <title>Dashboard - Martian Republic</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="Martian Republic Command Center">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,800">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/wallet/js/plugins/dataTables/dataTables.bootstrap.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     @livewireStyles
     <style>
-    /* Mobile responsiveness for wallet dashboard */
-    @media (max-width: 767px) {
-        .table-responsive, .dataTables_wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .dataTable th, .dataTable td {
-            white-space: nowrap;
-            font-size: 12px;
-        }
-        .portlet {
-            margin-bottom: 15px;
-        }
-        .portlet-title {
-            font-size: 16px;
-        }
-        .content .container {
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-        #chart {
-            min-height: 200px;
-        }
-        coingecko-coin-price-chart-widget {
-            max-width: 100%;
-            overflow: hidden;
-        }
+    /* ---- THE CHAMBER: Dashboard Command Center ---- */
+    .dash-hero {
+        padding: 32px 0 20px;
+        position: relative;
     }
-    @media (max-width: 480px) {
-        .navbar-brand {
-            font-size: 14px !important;
-        }
-        .navbar-brand img {
-            width: 40px !important;
-        }
+    .dash-hero::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--mr-border-bright, rgba(255,255,255,0.12)) 30%, var(--mr-mars, #c84125) 50%, var(--mr-border-bright, rgba(255,255,255,0.12)) 70%, transparent);
+    }
+    .dash-greeting {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--mr-mars, #c84125);
+        margin-bottom: 6px;
+    }
+    .dash-greeting .status-dot {
+        display: inline-block;
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--mr-green, #34d399);
+        margin-right: 8px;
+        animation: pulse 2s infinite;
+        vertical-align: middle;
+    }
+    .dash-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    /* Stats section heading */
+    .section-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim, #8a8998);
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+    }
+
+    /* Override portlet for dashboard */
+    .dash-card {
+        background: var(--mr-surface, #12121e) !important;
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+        border-radius: 8px !important;
+        padding: 24px !important;
+        margin-bottom: 20px;
+    }
+    .dash-card .portlet-title {
+        font-family: 'Orbitron', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        color: #fff !important;
+        text-decoration: none !important;
+        border: none !important;
+    }
+    .dash-card .portlet-title u {
+        text-decoration: none !important;
+    }
+
+    /* Transaction table styling */
+    .dataTable {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 12px !important;
+    }
+    .dataTable thead th {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 10px !important;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim) !important;
+        border-bottom: 1px solid var(--mr-border) !important;
+        background: transparent !important;
+    }
+    .dataTable tbody td {
+        border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.04)) !important;
+        color: var(--mr-text) !important;
+        background: transparent !important;
+    }
+    .dataTables_wrapper .dataTables_filter input,
+    .dataTables_wrapper .dataTables_length select {
+        background: var(--mr-surface-raised) !important;
+        border: 1px solid var(--mr-border-bright) !important;
+        color: var(--mr-text) !important;
+        border-radius: 4px !important;
+        padding: 4px 8px !important;
+    }
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        color: var(--mr-text-dim) !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 11px !important;
+    }
+
+    /* Footer fix */
+    .dash-page { min-height: 100vh; display: flex; flex-direction: column; }
+    .dash-page .content { flex: 1; }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-1 { animation: fadeIn 0.5s ease-out 0.2s both; }
+    .fade-in-2 { animation: fadeIn 0.5s ease-out 0.4s both; }
+    .fade-in-3 { animation: fadeIn 0.5s ease-out 0.6s both; }
+    .fade-in-4 { animation: fadeIn 0.5s ease-out 0.8s both; }
+
+    @media (max-width: 767px) {
+        .dash-title { font-size: 20px; }
+        .table-responsive, .dataTables_wrapper { overflow-x: auto; }
+        .dataTable th, .dataTable td { white-space: nowrap; }
     }
     </style>
 </head>
 
-<body class=" ">
+<body class="dash-page">
     <div id="wrapper">
         <header class="navbar navbar-inverse" role="banner">
             <div class="container">
                 <div class="navbar-header">
                     @include('wallet.header')
-                </div> <!-- /.navbar-header -->
+                </div>
                 <nav class="collapse navbar-collapse" role="navigation">
                     @include('wallet.navbarleft')
                     @include('wallet.navbarright')
                 </nav>
-            </div> <!-- /.container -->
+            </div>
         </header>
         @include('wallet.mainnav', ['active' => 'dashboard'])
         <div class="content">
             <div class="container">
-                <div class="row">
-                    <div class="col-md-4 col-sm-5">
-                        <div class="portlet">
+
+                {{-- HERO --}}
+                <div class="dash-hero">
+                    <div class="dash-greeting"><span class="status-dot"></span>Command Center — Online</div>
+                    <h1 class="dash-title">Dashboard</h1>
+                </div>
+
+                <div class="row" style="margin-top: 24px;">
+                    <div class="col-md-4 col-sm-5 fade-in-1">
+                        <div class="section-label">Account Overview</div>
+                        <div class="dash-card">
                             @livewire('dashboard-stats')
-                        </div> 
-                    </div> 
-                    <div class="col-md-8 col-sm-7">
-                        <div class="portlet">
+                        </div>
+                    </div>
+                    <div class="col-md-8 col-sm-7 fade-in-2">
+                        <div class="section-label">Activity</div>
+                        <div class="dash-card">
 
                             @if ($wallet_open)
 
@@ -157,18 +259,19 @@
                             @endif
 
 
-                        </div> <!-- /.portlet -->
-                    </div> <!-- /.col -->
-                </div> <!-- /.row -->
+                        </div> <!-- /.dash-card -->
+                    </div>
+                </div>
 
-                <div class="row">
+                <div class="row fade-in-3">
 
                     @if ($wallet_open)
                         <div class="col-md-12">
-                            <div class="portlet">
+                            <div class="section-label">Transaction Ledger</div>
+                            <div class="dash-card">
                                 <div class="wallet-is-open">
                                     <h4 class="portlet-title">
-                                        <u>Wallet Transactions</u>
+                                        Wallet Transactions
                                     </h4>
                                     <div class="table-responsive">
                                     <table class="table table-striped table-bordered dataTable" id="table-2"
@@ -223,19 +326,18 @@
 
                 </div>
 
-                <div class="row">
+                <div class="row fade-in-4">
                     <div class="col-md-3">
-                        <div class="portlet">
-
+                        <div class="section-label">Network</div>
+                        <div class="dash-card">
                             @livewire('hodler-stats')
-
-                            
-                        </div> <!-- /.portlet -->
-                    </div> <!-- /.col -->
+                        </div>
+                    </div>
                     <div class="col-md-5">
-                        <div class="portlet">
+                        <div class="section-label">Comms Feed</div>
+                        <div class="dash-card">
                             <h4 class="portlet-title">
-                                <u>Crypto News</u>
+                                News
                             </h4>
                             <div class="portlet-body">
 
@@ -261,9 +363,10 @@
                         </div> <!-- /.portlet -->
                     </div> <!-- /.col -->
                     <div class="col-md-4">
-                        <div class="portlet">
+                        <div class="section-label">Market Data</div>
+                        <div class="dash-card">
                             <h4 class="portlet-title">
-                                <u>Price Chart</u>
+                                Price Chart
                             </h4>
                             <div class="portlet-body">
                                 <script src="https://widgets.coingecko.com/coingecko-coin-price-chart-widget.js"></script>
@@ -276,7 +379,7 @@
             </div> <!-- /.container -->
         </div> <!-- .content -->
     </div> <!-- /#wrapper -->
-    <footer class="footer">
+    <footer class="footer" style="border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)); padding: 20px 0; background: var(--mr-void, #06060c);">
         @include('footer')
     </footer>
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
