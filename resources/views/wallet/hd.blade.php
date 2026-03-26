@@ -479,9 +479,14 @@
         color: var(--mr-text-faint, #5a5968) !important;
     }
 
-    /* Modal body padding */
+    /* Modal body padding + overflow */
     .modal-styled .modal-body, #styledModal .modal-body, #modalLogin .modal-body {
-        padding-bottom: 32px !important;
+        padding-bottom: 40px !important;
+        overflow-y: auto !important;
+        max-height: 75vh !important;
+    }
+    #styledModal .tab-content, #modalLogin .tab-content {
+        padding-bottom: 24px !important;
     }
 
     /* -- Tab pills in modals -- */
