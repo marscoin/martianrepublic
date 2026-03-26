@@ -280,41 +280,67 @@
                                         </div>
                                     </div>
                                 @else
-                                    <div class="wallet-is-not-open" style="padding: 30px 20px;">
-                                        <h4 class="portlet-title"><u>Welcome to the Martian Republic</u></h4>
-                                        <p style="color: var(--mr-text-secondary, #8a8998); margin-bottom: 24px;">Complete these steps to get started as a Martian citizen.</p>
+                                    <div class="wallet-is-not-open" style="padding: 32px 24px;">
+                                        <div style="text-align: center; margin-bottom: 28px;">
+                                            <div style="font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; color: #fff; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;">Welcome to Mars</div>
+                                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mr-text-dim, #8a8998);">Complete these steps to begin your journey as a Martian citizen</div>
+                                        </div>
 
-                                        <div style="display: flex; flex-direction: column; gap: 16px; max-width: 480px;">
-                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px;">
-                                                <i class="fa fa-check-circle" style="color: #34d399; font-size: 22px;"></i>
+                                        <div style="display: flex; flex-direction: column; gap: 12px; max-width: 440px; margin: 0 auto;">
+                                            {{-- Step 1: Account --}}
+                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2); border-radius: 10px;">
+                                                <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(52,211,153,0.12); border: 2px solid var(--mr-green, #34d399); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                    <i class="fa fa-check" style="color: var(--mr-green); font-size: 14px;"></i>
+                                                </div>
                                                 <div>
-                                                    <strong style="color: #34d399;">Account Created</strong>
-                                                    <div style="color: var(--mr-text-secondary, #8a8998); font-size: 13px;">Your Martian Republic account is active</div>
+                                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: var(--mr-green, #34d399);">Account Created</div>
+                                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968);">Your Martian Republic account is active</div>
                                                 </div>
                                             </div>
 
-                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px;">
-                                                <i class="fa fa-check-circle" style="color: #34d399; font-size: 22px;"></i>
+                                            {{-- Step 2: 2FA --}}
+                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2); border-radius: 10px;">
+                                                <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(52,211,153,0.12); border: 2px solid var(--mr-green, #34d399); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                    <i class="fa fa-check" style="color: var(--mr-green); font-size: 14px;"></i>
+                                                </div>
                                                 <div>
-                                                    <strong style="color: #34d399;">2FA Secured</strong>
-                                                    <div style="color: var(--mr-text-secondary, #8a8998); font-size: 13px;">Two-factor authentication is protecting your account</div>
+                                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: var(--mr-green, #34d399);">2FA Secured</div>
+                                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968);">Two-factor authentication is protecting your account</div>
                                                 </div>
                                             </div>
 
-                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(0,228,255,0.08); border: 1px solid rgba(0,228,255,0.25); border-radius: 8px;">
-                                                <i class="fa fa-arrow-circle-right" style="color: var(--mr-cyan, #00e4ff); font-size: 22px;"></i>
+                                            {{-- Step 3: Wallet (CURRENT) --}}
+                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(0,228,255,0.06); border: 1px solid rgba(0,228,255,0.25); border-radius: 10px; position: relative; overflow: hidden;">
+                                                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--mr-cyan, #00e4ff); animation: pulse 2s infinite;"></div>
+                                                <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(0,228,255,0.12); border: 2px solid var(--mr-cyan, #00e4ff); display: flex; align-items: center; justify-content: center; flex-shrink: 0; animation: pulse 2s infinite;">
+                                                    <i class="fa fa-arrow-right" style="color: var(--mr-cyan); font-size: 14px;"></i>
+                                                </div>
                                                 <div style="flex: 1;">
-                                                    <strong style="color: var(--mr-cyan, #00e4ff);">Create Your Wallet</strong>
-                                                    <div style="color: var(--mr-text-secondary, #8a8998); font-size: 13px;">Set up your Marscoin wallet to participate in the Republic</div>
+                                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: var(--mr-cyan, #00e4ff);">Create Your Wallet</div>
+                                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968);">Set up your Marscoin wallet to participate in the Republic</div>
                                                 </div>
-                                                <a href="/wallet/dashboard/hd" class="btn btn-primary" style="white-space: nowrap;">Create Wallet</a>
+                                                <a href="/wallet/dashboard/hd" class="onboard-cta" style="padding: 8px 16px; background: var(--mr-mars, #c84125); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #fff; text-decoration: none; white-space: nowrap;">
+                                                    Create Wallet <i class="fa fa-arrow-right" style="margin-left: 4px;"></i>
+                                                </a>
+                                                <style>
+                                                    .onboard-cta {
+                                                        animation: ctaPulse 2s ease-in-out infinite;
+                                                    }
+                                                    @keyframes ctaPulse {
+                                                        0%, 100% { box-shadow: 0 0 0 0 rgba(200,65,37,0.4); }
+                                                        50% { box-shadow: 0 0 16px 4px rgba(200,65,37,0.2); }
+                                                    }
+                                                </style>
                                             </div>
 
-                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(255,255,255,0.03); border: 1px solid var(--mr-border, rgba(255,255,255,0.08)); border-radius: 8px; opacity: 0.5;">
-                                                <i class="fa fa-circle-o" style="color: var(--mr-text-secondary, #8a8998); font-size: 22px;"></i>
+                                            {{-- Step 4: Citizen (LOCKED) --}}
+                                            <div style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: rgba(255,255,255,0.02); border: 1px solid var(--mr-border, rgba(255,255,255,0.06)); border-radius: 10px; opacity: 0.4;">
+                                                <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.04); border: 2px solid var(--mr-border-bright, rgba(255,255,255,0.12)); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--mr-text-faint);">4</span>
+                                                </div>
                                                 <div>
-                                                    <strong>Register as Citizen</strong>
-                                                    <div style="color: var(--mr-text-secondary, #8a8998); font-size: 13px;">Submit your identity to join the Martian citizenry</div>
+                                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: var(--mr-text-dim, #8a8998);">Register as Citizen</div>
+                                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968);">Submit your identity to join the Martian citizenry</div>
                                                 </div>
                                             </div>
                                         </div>
