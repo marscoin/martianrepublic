@@ -779,58 +779,106 @@
                                 $('#wallet-recent-txs').html('<div style="text-align:center;padding:16px;color:var(--mr-text-faint);">No addresses found</div>');
                                 return;
                             }
-                            // Fetch from first address with balance (most likely to have transactions)
-                            var addr = addresses[0];
-                            $.get('/api/mars-txhistory?address=' + encodeURIComponent(addr), function(data) {
-                                if (!data || !data.txs || data.txs.length === 0) {
-                                    $('#wallet-recent-txs').html('<div style="text-align:center;padding:16px;color:var(--mr-text-faint);">No transactions yet</div>');
-                                    return;
-                                }
-                                var txs = data.txs.sort(function(a,b){ return (b.time||0) - (a.time||0); }).slice(0, 6);
-                                renderRecentTxs(txs, addresses);
-                            }).fail(function() {
-                                // Fallback: try explorer
-                                $.post('/api/getTransactions', {address: '{{ $public_addr }}'}, function(data) {
-                                    if (!data || !data.txs || data.txs.length === 0) {
-                                        $('#wallet-recent-txs').html('<div style="text-align:center;padding:16px;color:var(--mr-text-faint);">No transactions yet</div>');
-                                        return;
+                            // Fetch transactions from ALL addresses and merge
+                            var allTxs = [];
+                            var fetched = 0;
+                            var total = addresses.length;
+
+                            addresses.forEach(function(addr) {
+                                $.get('/api/mars-txhistory?address=' + encodeURIComponent(addr), function(data) {
+                                    if (data && data.txs) {
+                                        allTxs = allTxs.concat(data.txs);
                                     }
-                                    renderRecentTxs(data.txs.sort(function(a,b){ return (b.time||0) - (a.time||0); }).slice(0, 6), addresses);
-                                }).fail(function() {
-                                    $('#wallet-recent-txs').html('<div style="text-align:center;padding:20px 16px;color:var(--mr-text-faint);"><i class="fa fa-clock-rotate-left" style="font-size:18px;display:block;margin-bottom:8px;opacity:0.4;"></i><span style="font-size:10px;">Transaction history loading after discovery...</span></div>');
+                                }).always(function() {
+                                    fetched++;
+                                    if (fetched >= total) {
+                                        // All addresses checked - dedupe by txid and show
+                                        var seen = {};
+                                        var unique = [];
+                                        allTxs.forEach(function(tx) {
+                                            if (!seen[tx.txid]) { seen[tx.txid] = true; unique.push(tx); }
+                                        });
+                                        if (unique.length === 0) {
+                                            $('#wallet-recent-txs').html('<div style="text-align:center;padding:16px;color:var(--mr-text-faint);">No transactions yet</div>');
+                                            return;
+                                        }
+                                        var sorted = unique.sort(function(a,b){ return (b.time||0) - (a.time||0); }).slice(0, 8);
+                                        renderRecentTxs(sorted, addresses);
+                                    }
                                 });
                             });
+
+                            // Fallback timeout - if nothing loads in 10s, show message
+                            setTimeout(function() {
+                                if (fetched < total && allTxs.length === 0) {
+                                    // Also try explorer as last resort
+                                    $.post('/api/getTransactions', {address: '{{ $public_addr }}'}, function(data) {
+                                        if (!data || !data.txs || data.txs.length === 0) {
+                                            $('#wallet-recent-txs').html('<div style="text-align:center;padding:20px 16px;color:var(--mr-text-faint);"><i class="fa fa-clock-rotate-left" style="font-size:18px;display:block;margin-bottom:8px;opacity:0.4;"></i><span style="font-size:10px;">Transaction history unavailable</span></div>');
+                                            return;
+                                        }
+                                        renderRecentTxs(data.txs.sort(function(a,b){ return (b.time||0) - (a.time||0); }).slice(0, 6), addresses);
+                                    }).fail(function() {
+                                        $('#wallet-recent-txs').html('<div style="text-align:center;padding:20px 16px;color:var(--mr-text-faint);"><i class="fa fa-clock-rotate-left" style="font-size:18px;display:block;margin-bottom:8px;opacity:0.4;"></i><span style="font-size:10px;">Transaction history unavailable</span></div>');
+                                    });
+                                }
+                            }, 10000);
                         }
 
                         function renderRecentTxs(txs, myAddresses) {
                             var html = '';
                             txs.forEach(function(tx) {
-                                var isSender = false, valueReceived = 0, totalTxValue = 0, isAnchor = false;
-                                (tx.vin || []).forEach(function(vin) {
-                                    if (vin.addr && myAddresses.indexOf(vin.addr) !== -1) { isSender = true; totalTxValue -= (vin.value || 0); }
-                                });
+                                var valueToUs = 0, valueToOthers = 0, isAnchor = false;
+
+                                // Check all outputs - how much goes to us vs others
                                 (tx.vout || []).forEach(function(vout) {
                                     var sp = vout.scriptPubKey || {};
                                     var va = sp.addresses || (sp.address ? [sp.address] : []);
+                                    var toUs = false;
                                     for (var i = 0; i < va.length; i++) {
-                                        if (myAddresses.indexOf(va[i]) !== -1) { valueReceived += parseFloat(vout.value || 0); break; }
+                                        if (myAddresses.indexOf(va[i]) !== -1) { toUs = true; break; }
                                     }
-                                    if (sp.type === 'nulldata') { isAnchor = true; }
+                                    if (toUs) {
+                                        valueToUs += parseFloat(vout.value || 0);
+                                    } else if (sp.type === 'nulldata') {
+                                        isAnchor = true;
+                                    } else {
+                                        valueToOthers += parseFloat(vout.value || 0);
+                                    }
                                 });
-                                if (isSender) { totalTxValue -= (tx.fees || 0); }
-                                totalTxValue += valueReceived;
 
-                                var color = totalTxValue >= 0 ? 'var(--mr-green,#34d399)' : 'var(--mr-mars,#c84125)';
-                                var icon = isAnchor ? 'fa-anchor' : (totalTxValue >= 0 ? 'fa-arrow-down' : 'fa-arrow-up');
-                                var iconBg = isAnchor ? 'rgba(0,228,255,0.1)' : (totalTxValue >= 0 ? 'rgba(52,211,153,0.1)' : 'rgba(200,65,37,0.1)');
-                                var iconColor = isAnchor ? 'var(--mr-cyan)' : color;
+                                // Determine direction: if outputs go to others, we're sending
+                                // Electrum txs don't have vin.addr, so we infer from outputs
+                                var isSend = valueToOthers > 0 && valueToUs > 0; // Has both: change to us + payment to others = send
+                                var isPureReceive = valueToOthers === 0 && valueToUs > 0; // Only outputs to us = receive
+                                var displayAmount, label, color, icon, iconBg;
+
+                                if (isAnchor) {
+                                    displayAmount = -(tx.fees || 0.001);
+                                    label = 'On-Chain Data';
+                                    color = 'var(--mr-cyan,#00e4ff)';
+                                    icon = 'fa-anchor';
+                                    iconBg = 'rgba(0,228,255,0.1)';
+                                } else if (isSend) {
+                                    displayAmount = -valueToOthers;
+                                    label = 'Sent';
+                                    color = 'var(--mr-mars,#c84125)';
+                                    icon = 'fa-arrow-up';
+                                    iconBg = 'rgba(200,65,37,0.1)';
+                                } else {
+                                    displayAmount = valueToUs;
+                                    label = 'Received';
+                                    color = 'var(--mr-green,#34d399)';
+                                    icon = 'fa-arrow-down';
+                                    iconBg = 'rgba(52,211,153,0.1)';
+                                }
+
                                 var timeStr = tx.time ? new Date(tx.time * 1000).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'pending';
-                                var label = isAnchor ? 'On-Chain Data' : (totalTxValue >= 0 ? 'Received' : 'Sent');
 
                                 html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--mr-border,rgba(255,255,255,0.04));">' +
-                                    '<div style="width:28px;height:28px;border-radius:6px;background:' + iconBg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa ' + icon + '" style="font-size:10px;color:' + iconColor + ';"></i></div>' +
+                                    '<div style="width:28px;height:28px;border-radius:6px;background:' + iconBg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa ' + icon + '" style="font-size:10px;color:' + color + ';"></i></div>' +
                                     '<div style="flex:1;min-width:0;"><div style="color:var(--mr-text-dim);font-size:10px;">' + label + '</div><div style="color:var(--mr-text-faint);font-size:9px;">' + timeStr + '</div></div>' +
-                                    '<div style="color:' + color + ';font-weight:500;font-size:11px;">' + (totalTxValue >= 0 ? '+' : '') + totalTxValue.toFixed(4) + '</div></div>';
+                                    '<div style="color:' + color + ';font-weight:500;font-size:11px;">' + (displayAmount >= 0 ? '+' : '') + displayAmount.toFixed(4) + '</div></div>';
                             });
                             $('#wallet-recent-txs').html(html);
                         }
