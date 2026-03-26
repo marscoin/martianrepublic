@@ -21,19 +21,369 @@
     <link rel="stylesheet" href="/assets/wallet/js/plugins/fileupload/bootstrap-fileupload.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/wallet/js/plugins/magnific/magnific-popup.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/assets/wallet/css/dashboard/dashboard.css?v=4.4">
     <style>
-        .orbitron {
-            font-family: "Orbitron", sans-serif;
-            font-optical-sizing: auto;
-            font-weight:800;
-            font-style: bold;
-        }
+    /* ============================================ */
+    /* THE CIVIC HALL: Citizen Registry Redesign    */
+    /* ============================================ */
+    body { background: var(--mr-void, #06060c) !important; color: var(--mr-text, #e0dfe6) !important; }
+    .civic-page { min-height: 100vh; display: flex; flex-direction: column; }
+    .civic-page .content { flex: 1; }
+    .orbitron { font-family: 'Orbitron', sans-serif; font-weight: 800; }
+
+    /* -- Hero -- */
+    .civic-hero {
+        padding: 28px 0 20px;
+        position: relative;
+    }
+    .civic-hero::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08) 20%, var(--mr-cyan, #00e4ff) 50%, rgba(255,255,255,0.08) 80%, transparent);
+    }
+    .civic-status {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--mr-cyan, #00e4ff);
+        margin-bottom: 4px;
+    }
+    .civic-status .dot {
+        display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+        background: var(--mr-green, #34d399);
+        margin-right: 8px; vertical-align: middle;
+        animation: civicPulse 2s infinite;
+    }
+    .civic-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 28px; font-weight: 800;
+        color: #fff; letter-spacing: 2px;
+        text-transform: uppercase; margin: 0;
+    }
+
+    /* -- Progress Tracker -- */
+    .civic-progress {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        padding: 20px 0;
+        margin: 20px 0;
+        background: var(--mr-surface, #12121e);
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+        border-radius: 12px;
+        flex-wrap: wrap;
+    }
+    .civic-step {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 16px;
+    }
+    .civic-step-icon {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px;
+        border: 2px solid;
+        transition: all 0.3s;
+    }
+    .civic-step-icon.done { background: rgba(52,211,153,0.12); border-color: var(--mr-green, #34d399); color: var(--mr-green); }
+    .civic-step-icon.current { background: rgba(0,228,255,0.12); border-color: var(--mr-cyan, #00e4ff); color: var(--mr-cyan); animation: civicPulse 2s infinite; }
+    .civic-step-icon.locked { background: rgba(138,137,152,0.08); border-color: var(--mr-border-bright, rgba(255,255,255,0.12)); color: var(--mr-text-faint, #5a5968); }
+    .civic-step-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px; letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    .civic-step-label.done { color: var(--mr-green, #34d399); }
+    .civic-step-label.current { color: var(--mr-cyan, #00e4ff); }
+    .civic-step-label.locked { color: var(--mr-text-faint, #5a5968); }
+    .civic-step-sub {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 8px; color: var(--mr-text-faint, #5a5968);
+    }
+    .civic-step-connector {
+        width: 32px; height: 2px;
+        background: var(--mr-border-bright, rgba(255,255,255,0.12));
+    }
+    .civic-step-connector.done { background: var(--mr-green, #34d399); }
+
+    /* -- Tab Navigation -- */
+    .civic-tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+        padding-bottom: 0;
+        overflow-x: auto;
+    }
+    .civic-tabs .nav-pills { display: flex; gap: 4px; margin: 0; padding: 0; border: none; }
+    .civic-tabs .nav-pills > li { float: none; }
+    .civic-tabs .nav-pills > li > a {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 10px !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        color: var(--mr-text-dim, #8a8998) !important;
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 2px solid transparent !important;
+        border-radius: 0 !important;
+        padding: 10px 16px !important;
+        transition: all 0.2s !important;
+        white-space: nowrap;
+    }
+    .civic-tabs .nav-pills > li > a:hover {
+        color: #fff !important;
+        border-bottom-color: rgba(255,255,255,0.2) !important;
+    }
+    .civic-tabs .nav-pills > li.active > a,
+    .civic-tabs .nav-pills > li.active > a:hover {
+        color: #fff !important;
+        background: transparent !important;
+        border-bottom-color: var(--mr-cyan, #00e4ff) !important;
+    }
+    .civic-tabs .badge {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 9px !important;
+        background: var(--mr-mars, #c84125) !important;
+        color: #fff !important;
+        border-radius: 3px !important;
+        padding: 2px 6px !important;
+        margin-left: 6px;
+    }
+
+    /* -- Cards / Portlets -- */
+    .civic-card {
+        background: var(--mr-surface, #12121e);
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+        border-radius: 10px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+    .civic-card-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 12px; font-weight: 700;
+        letter-spacing: 1.5px; text-transform: uppercase;
+        color: #fff; margin-bottom: 16px;
+    }
+    .portlet {
+        background: var(--mr-surface, #12121e) !important;
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+        border-radius: 10px !important;
+        padding: 24px !important;
+        margin-bottom: 20px !important;
+        box-shadow: none !important;
+    }
+    .portlet-title {
+        font-family: 'Orbitron', sans-serif !important;
+        font-size: 12px !important; font-weight: 700 !important;
+        letter-spacing: 1.5px !important; text-transform: uppercase !important;
+        color: #fff !important; border: none !important;
+        text-decoration: none !important; margin-bottom: 16px !important;
+    }
+    .portlet-title u { text-decoration: none !important; }
+
+    /* -- Section label -- */
+    .civic-section {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px; letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim, #8a8998);
+        margin-bottom: 14px; padding-bottom: 8px;
+        border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+    }
+
+    /* -- Citizen Table -- */
+    .civic-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .civic-table thead th {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 9px !important; letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim) !important;
+        border-bottom: 1px solid var(--mr-border) !important;
+        background: transparent !important;
+        padding: 8px 12px !important;
+    }
+    .civic-table tbody td {
+        border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.04)) !important;
+        color: var(--mr-text) !important;
+        background: transparent !important;
+        padding: 10px 12px !important;
+        vertical-align: middle !important;
+    }
+    .civic-table tbody tr:hover td {
+        background: rgba(255,255,255,0.02) !important;
+    }
+    .table { color: var(--mr-text) !important; }
+    .table > thead > tr > th { border-bottom-color: var(--mr-border) !important; color: var(--mr-text-dim) !important; }
+    .table > tbody > tr > td { border-top-color: var(--mr-border, rgba(255,255,255,0.04)) !important; }
+    .table-striped > tbody > tr:nth-child(odd) > td { background: rgba(255,255,255,0.015) !important; }
+
+    /* -- Citizen Avatar -- */
+    .civic-avatar {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--mr-border-bright, rgba(255,255,255,0.1));
+    }
+
+    /* -- Citizen Status Badge -- */
+    .civic-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 8px; letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 3px 8px; border-radius: 3px;
+        display: inline-block;
+    }
+    .civic-badge.citizen { background: rgba(52,211,153,0.12); color: var(--mr-green); border: 1px solid rgba(52,211,153,0.25); }
+    .civic-badge.public { background: rgba(0,228,255,0.1); color: var(--mr-cyan); border: 1px solid rgba(0,228,255,0.2); }
+    .civic-badge.applicant { background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); }
+    .label-success { background: rgba(52,211,153,0.15) !important; color: var(--mr-green) !important; font-family: 'JetBrains Mono', monospace !important; font-size: 9px !important; }
+    .label-info { background: rgba(0,228,255,0.12) !important; color: var(--mr-cyan) !important; }
+    .label-warning { background: rgba(245,158,11,0.12) !important; color: #f59e0b !important; }
+
+    /* -- Buttons -- */
+    .btn-primary {
+        background: var(--mr-mars, #c84125) !important;
+        border-color: var(--mr-mars) !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 11px !important; letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        border-radius: 6px !important;
+        transition: all 0.2s !important;
+    }
+    .btn-primary:hover { background: #d94e30 !important; box-shadow: 0 4px 16px rgba(200,65,37,0.3) !important; }
+    .btn-default, .btn-secondary {
+        background: var(--mr-dark, #0c0c16) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.12)) !important;
+        color: var(--mr-text-dim) !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 11px !important;
+        border-radius: 6px !important;
+    }
+    .btn-success { background: rgba(52,211,153,0.15) !important; border-color: rgba(52,211,153,0.3) !important; color: var(--mr-green) !important; }
+    .btn-danger { background: rgba(239,68,68,0.12) !important; border-color: rgba(239,68,68,0.25) !important; color: #ef4444 !important; }
+
+    /* -- Forms -- */
+    .form-control {
+        background: var(--mr-dark, #0c0c16) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)) !important;
+        color: #fff !important;
+        border-radius: 6px !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 13px !important;
+        transition: border-color 0.2s !important;
+    }
+    .form-control:focus {
+        border-color: var(--mr-cyan, #00e4ff) !important;
+        box-shadow: 0 0 0 2px rgba(0,228,255,0.1) !important;
+    }
+    label { color: var(--mr-text-dim) !important; }
+    textarea.form-control { min-height: 80px; }
+
+    /* -- Modals -- */
+    .modal-content {
+        background: var(--mr-surface, #12121e) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)) !important;
+        border-radius: 12px !important;
+        color: var(--mr-text) !important;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.6) !important;
+    }
+    .modal-header {
+        background: var(--mr-dark, #0c0c16) !important;
+        border-bottom: 1px solid var(--mr-border) !important;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 16px 24px !important;
+    }
+    .modal-title {
+        font-family: 'Orbitron', sans-serif !important;
+        font-size: 13px !important; font-weight: 600 !important;
+        letter-spacing: 1.5px !important; text-transform: uppercase !important;
+        color: #fff !important;
+    }
+    .modal-body { background: var(--mr-surface, #12121e) !important; }
+    .modal-footer { background: var(--mr-surface, #12121e) !important; border-top: 1px solid var(--mr-border) !important; }
+    .modal-header .close { color: var(--mr-text-dim) !important; text-shadow: none !important; }
+
+    /* -- Alerts -- */
+    .alert { border-radius: 8px !important; }
+    .alert-info { background: rgba(0,228,255,0.08) !important; border-color: rgba(0,228,255,0.2) !important; color: var(--mr-cyan) !important; }
+    .alert-danger { background: rgba(200,65,37,0.1) !important; border-color: rgba(200,65,37,0.25) !important; color: var(--mr-mars) !important; }
+    .alert-success { background: rgba(52,211,153,0.1) !important; border-color: rgba(52,211,153,0.25) !important; color: var(--mr-green) !important; }
+
+    /* -- Sidebar/List Group -- */
+    .list-group-item {
+        background: var(--mr-surface, #12121e) !important;
+        border-color: var(--mr-border) !important;
+        color: var(--mr-text-dim) !important;
+    }
+    .list-group-item.active, .list-group-item:hover {
+        background: var(--mr-surface-raised, #1a1a2a) !important;
+        border-color: var(--mr-border-bright) !important;
+        color: #fff !important;
+    }
+
+    /* -- Tab Content -- */
+    .tab-content { color: var(--mr-text) !important; }
+    .tab-pane { color: var(--mr-text) !important; }
+    .nav-tabs { border-bottom-color: var(--mr-border) !important; }
+    .nav-tabs > li > a { color: var(--mr-text-dim) !important; border: none !important; }
+    .nav-tabs > li.active > a { color: #fff !important; background: transparent !important; border-bottom: 2px solid var(--mr-cyan) !important; }
+
+    /* -- Thumbnail/Images -- */
+    .thumbnail { background: var(--mr-dark) !important; border-color: var(--mr-border) !important; border-radius: 8px !important; }
+    img.thumbnail, .thumbnail img { border-radius: 6px; }
+
+    /* -- Profile specific -- */
+    .profile-header { color: #fff !important; }
+    .profile-header h2, .profile-header h3, .profile-header h4 { color: #fff !important; }
+
+    /* -- Wallet Lock Message -- */
+    .wallet-lock-msg {
+        text-align: center; padding: 60px 20px;
+        border: 1px dashed var(--mr-border-bright, rgba(255,255,255,0.1));
+        border-radius: 12px; background: var(--mr-surface);
+    }
+
+    /* -- Footer -- */
+    .footer { border-top: 1px solid var(--mr-border) !important; padding: 20px 0 !important; background: var(--mr-void) !important; }
+
+    /* -- Animations -- */
+    @keyframes civicPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @keyframes civicFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .civic-fade-1 { animation: civicFadeIn 0.5s ease-out 0.1s both; }
+    .civic-fade-2 { animation: civicFadeIn 0.5s ease-out 0.25s both; }
+    .civic-fade-3 { animation: civicFadeIn 0.5s ease-out 0.4s both; }
+
+    /* -- Misc -- */
+    h1, h2, h3, h4, h5, h6 { color: #fff !important; }
+    p { color: var(--mr-text) !important; }
+    a { color: var(--mr-cyan, #00e4ff) !important; }
+    a:hover { color: #fff !important; }
+    hr { border-color: var(--mr-border) !important; }
+    .well { background: var(--mr-dark) !important; border-color: var(--mr-border) !important; border-radius: 8px !important; }
+    .panel { background: var(--mr-surface) !important; border-color: var(--mr-border) !important; }
+    .panel-heading { background: var(--mr-dark) !important; border-color: var(--mr-border) !important; color: #fff !important; }
+
+    @media (max-width: 767px) {
+        .civic-title { font-size: 20px; }
+        .civic-progress { flex-direction: column; gap: 8px; }
+        .civic-step-connector { width: 2px; height: 16px; }
+        .civic-tabs .nav-pills > li > a { padding: 8px 10px !important; font-size: 9px !important; }
+    }
     </style>
     <script>var current_blob = null;</script>
     @livewireStyles
 </head>
 
-<body class=" ">
+<body class="civic-page">
     <div id="wrapper">
         <header class="navbar navbar-inverse" role="banner">
             <div class="container">
@@ -50,6 +400,12 @@
         <div class="content">
 
             <div class="container">
+
+                {{-- CIVIC HALL HERO --}}
+                <div class="civic-hero civic-fade-1">
+                    <div class="civic-status"><span class="dot"></span>Civic Registry — Active</div>
+                    <h1 class="civic-title">Citizen</h1>
+                </div>
 
                 <?php if($wallet_open){ ?>
 
@@ -112,10 +468,11 @@
                     </div>
                 </div>
 
-                <div class="portlet">
-                    <div class="portlet-body">
+                <div class="portlet civic-fade-2" style="padding: 0 !important; border: none !important; background: transparent !important;">
+                    <div class="portlet-body" style="padding: 0;">
 
-                        <ul id="myTab1" class="nav nav-tabs">
+                        <div class="civic-tabs">
+                        <ul id="myTab1" class="nav nav-pills">
                             <li class="active">
                                 <?php if(!$isCitizen && !$isGP){?>
                                     <a href="#new" data-toggle="tab">Join Mars!</a>
@@ -134,7 +491,8 @@
                                 <a href="#applicants" data-toggle="tab">Applicants</a>
                             </li>
                         </ul>
-                        <div id="myTab1Content" class="tab-content" style="margin-top: 50px;">
+                        </div>{{-- /.civic-tabs --}}
+                        <div id="myTab1Content" class="tab-content civic-fade-3" style="margin-top: 24px;">
 
                             <div class="tab-pane fade active in" id="new">
                                 <?php if(!$isCitizen && !$isGP){?>
@@ -172,7 +530,7 @@
             </div> <!-- /.container -->
         </div> <!-- .content -->
     </div> <!-- /#wrapper -->
-    <footer class="footer">
+    <footer class="footer" style="border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)); padding: 20px 0; background: var(--mr-void, #06060c);">
         @include('footer')
     </footer>
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
