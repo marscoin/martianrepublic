@@ -792,7 +792,9 @@ class ApiController extends Controller {
 		$targetProfile->save();
 
 		// Check if target now meets the threshold for auto-upgrade to citizen
-		$endorsementThreshold = min(5, max(1, (int) ceil($citizenCount * 0.1)));
+		// Bootstrap: with 0 citizens, threshold is 0 (first pioneer auto-qualifies)
+		// Then: 1 per 10 citizens (rounded up), capped at 5
+		$endorsementThreshold = $citizenCount === 0 ? 0 : min(5, max(1, (int) ceil($citizenCount * 0.1)));
 		if ($targetProfile->endorse_cnt >= $endorsementThreshold) {
 			$targetProfile->citizen = 1;
 			$targetProfile->save();

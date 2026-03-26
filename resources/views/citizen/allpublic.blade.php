@@ -5,7 +5,9 @@
     <div class="col-md-8">
         @php
             $citizenCount = count($everyCitizen ?? []);
-            $endorsementThreshold = min(5, max(1, (int) ceil($citizenCount * 0.1)));
+            // Bootstrap: 0 citizens → 0 endorsements needed (first pioneer auto-qualifies)
+            // Then: 1 per 10 citizens (rounded up), capped at 5
+            $endorsementThreshold = $citizenCount === 0 ? 0 : min(5, max(1, (int) ceil($citizenCount * 0.1)));
         @endphp
         <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #fff; margin-bottom: 6px;">
             <i class="fa fa-users" style="color: var(--mr-cyan, #00e4ff); margin-right: 8px;"></i> General Public
