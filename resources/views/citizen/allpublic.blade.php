@@ -5,9 +5,10 @@
     <div class="col-md-8">
         @php
             $citizenCount = count($everyCitizen ?? []);
-            // Bootstrap: 0 citizens → 0 endorsements needed (first pioneer auto-qualifies)
-            // Then: 1 per 10 citizens (rounded up), capped at 5
             $endorsementThreshold = $citizenCount === 0 ? 0 : min(5, max(1, (int) ceil($citizenCount * 0.1)));
+            $everyPublicArr = is_array($everyPublic) ? $everyPublic : (array) $everyPublic;
+            $stillGP = array_filter($everyPublicArr, fn($gp) => !$gp->citizen);
+            $graduated = array_filter($everyPublicArr, fn($gp) => (bool) $gp->citizen);
         @endphp
         <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #fff; margin-bottom: 6px;">
             <i class="fa fa-users" style="color: var(--mr-cyan, #00e4ff); margin-right: 8px;"></i> General Public
@@ -34,10 +35,6 @@
                 if ($aCount !== $bCount) return $bCount - $aCount; // most endorsements first
                 return strtotime($b->mined ?? '0') - strtotime($a->mined ?? '0'); // newest first
             });
-
-            // Separate: still-GP vs graduated-to-citizen
-            $stillGP = array_filter($everyPublic, fn($gp) => !$gp->citizen);
-            $graduated = array_filter($everyPublic, fn($gp) => $gp->citizen);
 
             foreach($stillGP as $gp){
 
