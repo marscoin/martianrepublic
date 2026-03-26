@@ -3,6 +3,8 @@
 <head>
   <title>Martian Republic - 2FA Setup</title>
   @include('partials.public-head')
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     .mr-2fa-input {
       width: 100%;
@@ -110,25 +112,32 @@
             <i class="fa fa-shield-halved"></i>
           </div>
 
-          <h2>Setup 2FA</h2>
-          <p class="mr-form-sub">Secure your account with two-factor authentication</p>
+          <h2 style="font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Setup 2FA</h2>
+          <p class="mr-form-sub" style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">Secure your account with two-factor authentication</p>
 
           <div class="mr-2fa-step">
             <span class="mr-2fa-step-num">1</span>
-            <span>Open Google Authenticator or Authy on your phone</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">Open Google Authenticator or Authy on your phone</span>
           </div>
           <div class="mr-2fa-step">
             <span class="mr-2fa-step-num">2</span>
-            <span>Scan the QR code below</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">Scan the QR code below</span>
           </div>
 
           <div class="mr-qr-display">
-            <img src="data:image/png;base64, {{ $qrcode_image }}" alt="2FA QR Code">
+            <div style="position: relative; display: inline-block; padding: 16px; background: var(--mr-void, #06060c); border: 1px solid rgba(0,228,255,0.2); border-radius: 10px;">
+              <div style="position: absolute; top: 6px; left: 6px; width: 16px; height: 16px; border-top: 2px solid var(--mr-cyan, #00e4ff); border-left: 2px solid var(--mr-cyan, #00e4ff); border-top-left-radius: 4px;"></div>
+              <div style="position: absolute; top: 6px; right: 6px; width: 16px; height: 16px; border-top: 2px solid var(--mr-cyan, #00e4ff); border-right: 2px solid var(--mr-cyan, #00e4ff); border-top-right-radius: 4px;"></div>
+              <div style="position: absolute; bottom: 26px; left: 6px; width: 16px; height: 16px; border-bottom: 2px solid var(--mr-cyan, #00e4ff); border-left: 2px solid var(--mr-cyan, #00e4ff); border-bottom-left-radius: 4px;"></div>
+              <div style="position: absolute; bottom: 26px; right: 6px; width: 16px; height: 16px; border-bottom: 2px solid var(--mr-cyan, #00e4ff); border-right: 2px solid var(--mr-cyan, #00e4ff); border-bottom-right-radius: 4px;"></div>
+              <img src="data:image/png;base64, {{ $qrcode_image }}" alt="2FA QR Code">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 7px; letter-spacing: 3px; text-transform: uppercase; color: var(--mr-text-faint, #5a5968); text-align: center; margin-top: 10px;">Scan with Authenticator</div>
+            </div>
           </div>
 
           <div class="mr-2fa-step">
             <span class="mr-2fa-step-num">3</span>
-            <span>Enter the 6-digit code from the app</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">Enter the 6-digit code from the app</span>
           </div>
 
           <form method="POST" action="/twofa">
@@ -140,7 +149,7 @@
             </div>
 
             <div class="mr-form-group">
-              <button type="submit" class="mr-btn mr-btn-primary" tabindex="2">
+              <button type="submit" class="mr-btn mr-btn-primary" tabindex="2" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;">
                 Verify &amp; Enable 2FA <i class="fa fa-check"></i>
               </button>
             </div>
