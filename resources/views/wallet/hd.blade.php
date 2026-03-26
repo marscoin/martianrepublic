@@ -1022,10 +1022,10 @@
                                         <div class="form-group password-encrypt-cont">
                                             <div class="password-encrypt">
                                                 <label for="name">Password</label>
-                                                <input type="password" id="password" name="password"
+                                                <input type="password" id="password"
                                                     class="form-control parsley-validated" data-required="true" autocomplete="new-password">
                                                 <label for="name">Re-Type Password</label>
-                                                <input type="password" id="re-password" name="re-password"
+                                                <input type="password" id="re-password"
                                                     class="form-control parsley-validated" data-required="true"  autocomplete="new-password">
                                             </div>
                                         </div>
@@ -1039,6 +1039,8 @@
                             <div class="tab-pane fade" id="done">
                                 <h2>Open Wallet</h2>
                                 <input class="addr" id="public_addr" name="public_addr" style="display: none" />
+                                <input type="hidden" id="enc-password" name="password" value="" />
+                                <input type="hidden" id="enc-repassword" name="re-password" value="" />
                                 <p>Public Address</p>
                                 <div class="pub-addr">
                                     <h3 class="addr" name="public_addr" id="publicAddr"></h3>
@@ -1403,8 +1405,9 @@
                         var hashed_password = hashPassword(password);
                         var encrypted_mnem = my_bundle.encrypt(mnem, hashed_password, iv);
                         var hashed_re_password = hashPassword(rePassword);
-                        $("#password").val(encrypted_mnem);
-                        $("#re-password").val(hashed_re_password);
+                        // Save to hidden fields in "done" tab (mnemonic tab gets replaced by verification)
+                        $("#enc-password").val(encrypted_mnem);
+                        $("#enc-repassword").val(hashed_re_password);
                         // Now show the verification step
                         showMnemonicVerification();
                     }, 80);
