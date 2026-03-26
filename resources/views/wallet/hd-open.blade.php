@@ -585,6 +585,87 @@
                     </div>
                 </div>
 
+                {{-- CIVIC WALLET STATUS BAR --}}
+                @if(!empty($civic_addr))
+                <div class="bridge-fade-2" style="
+                    display: flex; align-items: center; gap: 16px; padding: 14px 20px;
+                    background: linear-gradient(135deg, rgba(200,65,37,0.06) 0%, rgba(200,65,37,0.02) 100%);
+                    border: 1px solid rgba(200,65,37,0.15); border-radius: 10px;
+                    margin-bottom: 20px;
+                ">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(200,65,37,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="fa fa-id-card" style="font-size: 14px; color: var(--mr-mars, #c84125);"></i>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+                            <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-mars, #c84125);">Civic Wallet</span>
+                            <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968);">{{ $civic_addr }}</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 6px;">
+                            <span id="civic-balance-display" style="font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 700; color: #fff;">
+                                <i class="fa fa-spinner fa-spin" style="font-size: 11px; color: var(--mr-text-dim);"></i>
+                            </span>
+                            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-dim);">MARS</span>
+                        </div>
+                    </div>
+                    <button onclick="fundCivicWallet()" style="
+                        display: flex; align-items: center; gap: 6px;
+                        padding: 8px 16px; border-radius: 6px;
+                        background: var(--mr-mars, #c84125); border: none;
+                        font-family: 'JetBrains Mono', monospace; font-size: 10px;
+                        font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
+                        color: #fff; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+                    " onmouseover="this.style.background='#d94e30';this.style.boxShadow='0 4px 16px rgba(200,65,37,0.3)'" onmouseout="this.style.background='var(--mr-mars, #c84125)';this.style.boxShadow='none'">
+                        <i class="fa fa-arrow-up"></i> Fund
+                    </button>
+                </div>
+                <script>
+                // Fetch civic wallet balance
+                (function() {
+                    var civicAddr = '{{ $civic_addr ?? "" }}';
+                    if (!civicAddr) return;
+                    fetch('/api/balance/' + encodeURIComponent(civicAddr))
+                        .then(function(r) { return r.json(); })
+                        .then(function(d) {
+                            var bal = parseFloat(d.balance || 0);
+                            document.getElementById('civic-balance-display').textContent = bal.toFixed(4);
+                        })
+                        .catch(function() {
+                            document.getElementById('civic-balance-display').textContent = '—';
+                        });
+                })();
+
+                function fundCivicWallet() {
+                    var civicAddr = '{{ $civic_addr ?? "" }}';
+                    if (!civicAddr) { alert('No civic wallet found.'); return; }
+
+                    // Pre-fill recipient with civic address
+                    var recipientEl = document.getElementById('recipient');
+                    recipientEl.value = civicAddr;
+                    recipientEl.dispatchEvent(new Event('input', { bubbles: true }));
+                    $(recipientEl).trigger('change').trigger('input');
+
+                    // Visual feedback: flash the recipient field
+                    recipientEl.style.borderColor = 'var(--mr-mars, #c84125)';
+                    recipientEl.style.boxShadow = '0 0 0 3px rgba(200,65,37,0.15)';
+                    setTimeout(function() {
+                        recipientEl.style.borderColor = '';
+                        recipientEl.style.boxShadow = '';
+                    }, 2000);
+
+                    // Scroll to send form
+                    document.getElementById('send-section').scrollIntoView({ behavior: 'smooth' });
+
+                    // Focus amount field after scroll
+                    setTimeout(function() {
+                        var amountEl = document.querySelector('.input-placeholder');
+                        amountEl.focus();
+                        amountEl.placeholder = 'Amount to fund civic wallet';
+                    }, 500);
+                }
+                </script>
+                @endif
+
                 {{-- QUICK ACTIONS --}}
                 <div class="bridge-actions bridge-fade-2">
                     <a href="#send-section" class="bridge-action" onclick="document.getElementById('recipient').focus()">
@@ -1184,31 +1265,11 @@
         // Scans BIP44 derivation paths to find all addresses with balance
         // ============================================================
         async function discoverHDAddresses(mnemonic) {
-            const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
-            const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
-            const xpub = root.derivePath("m/44'/2'/0'").neutered().toBase58();
-
-            // Use same-origin proxy to pebas HD discovery (avoids Cloudflare CSP)
-            try {
-                const resp = await $.ajax({
-                    url: '/api/discover',
-                    type: 'POST',
-                    data: { xpub: xpub, gap_limit: 20 },
-                });
-                const data = resp;
-
-                if (data.error) throw new Error(data.error);
-
-                return {
-                    discovered: data.addresses || [],
-                    totalBalance: data.totalBalance || 0,
-                    xpub: xpub,
-                };
-            } catch (serverErr) {
-                console.warn("Server-side HD discovery failed, falling back to client-side:", serverErr.message);
-                // Fallback: client-side scan (slower but works without pebas discover endpoint)
-                return await discoverHDAddressesClientSide(mnemonic);
-            }
+            // IMPORTANT: Always use client-side derivation (my_bundle.bitcoin.bip32)
+            // to ensure addresses match genSeed. The pebas server-side discovery uses
+            // a different BIP32 library that derives DIFFERENT addresses from the same seed.
+            console.log("HD Discovery: using client-side derivation (matches genSeed)");
+            return await discoverHDAddressesClientSide(mnemonic);
         }
 
         // Fallback client-side discovery (40+ API calls)
@@ -1233,7 +1294,7 @@
                     }).address;
 
                     try {
-                        const resp = await fetch(`https://pebas.marscoin.org/api/mars/balance?address=${address}`);
+                        const resp = await fetch(`/api/balance/${address}`);
                         const data = await resp.json();
                         const balance = parseFloat(data.balance) || 0;
 
@@ -1256,12 +1317,21 @@
 
         function renderAddressDiscovery(result) {
             const { discovered, totalBalance } = result;
+            const totalUnconfirmed = result.totalUnconfirmed || 0;
             const civicAddr = '{{ $civic_addr ?? "" }}';
 
-            $('#hd-total-balance').text(totalBalance.toFixed(8) + ' MARS');
+            // Show balance with pending indicator
+            var balanceHtml = totalBalance.toFixed(8) + ' MARS';
+            if (totalUnconfirmed > 0) {
+                balanceHtml += '<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--mr-text-dim,#8a8998);margin-top:4px;">' +
+                    '<i class="fa fa-clock" style="color:#f59e0b;margin-right:4px;"></i>' +
+                    '<span style="color:#f59e0b;">' + totalUnconfirmed.toFixed(4) + ' MARS pending</span></div>';
+            }
+            $('#hd-total-balance').html(balanceHtml);
 
             if (discovered.length > 0) {
-                const withBalance = discovered.filter(a => a.balance > 0);
+                // Include addresses with balance OR unconfirmed amounts
+                const withBalance = discovered.filter(a => a.balance > 0 || (a.unconfirmed && a.unconfirmed > 0));
                 // Sort: civic address first, then by balance descending
                 withBalance.sort((a, b) => {
                     if (a.address === civicAddr) return -1;
@@ -1285,7 +1355,10 @@
                                style="color:var(--mr-cyan,#00e4ff);font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;">${a.address.substring(0, 12)}...${a.address.substring(a.address.length - 6)}</a>
                             ${badge}
                         </span>
-                        <span style="color:var(--mr-text);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;white-space:nowrap;margin-left:8px;">${a.balance.toFixed(4)} MARS</span>
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;white-space:nowrap;margin-left:8px;">
+                            <span style="color:var(--mr-text);">${a.balance.toFixed(4)} MARS</span>
+                            ${a.unconfirmed && a.unconfirmed > 0 ? '<span style="color:#f59e0b;font-size:9px;margin-left:4px;" title="Pending confirmation"><i class="fa fa-clock"></i> +' + a.unconfirmed.toFixed(4) + '</span>' : ''}
+                        </span>
                     </div>`;
                 }).join('');
 
@@ -1673,37 +1746,31 @@
 
             const sendMARS = async (mars_amount, receiver_address) => {
 
-                // Use discovered HD addresses for multi-address UTXO selection
+                // Use client-side discovered addresses (derived with same BIP32 as genSeed)
                 const allAddresses = window._walletDiscoveredAddresses || [];
                 const sender_address = "{{ $public_addr }}".trim();
 
+                // Try each discovered address until we find one with enough funds
                 if (allAddresses.length > 0) {
-                    // Try multi-address UTXO via xpub (local pebas proxied through Laravel)
-                    try {
-                        const mnemonic = WalletKey.get();
-                        if (mnemonic) {
-                            const xpub = getXpub(mnemonic);
-                            const url = `/api/mars-utxo-multi?xpub=${encodeURIComponent(xpub)}&receiver_address=${encodeURIComponent(receiver_address)}&amount=${mars_amount}`;
-                            const response = await fetch(url);
-                            if (response.ok) {
-                                const io = await response.json();
-                                if (io && io.inputs && io.inputs.length > 0) {
-                                    console.log("Multi-UTXO: got", io.inputs.length, "inputs from HD scan");
-                                    return io;
-                                }
+                    for (const addr of allAddresses) {
+                        try {
+                            const io = await getTxInputsOutputs(addr, receiver_address, mars_amount);
+                            if (io && io.inputs && io.inputs.length > 0) {
+                                console.log("UTXO found on address:", addr, "inputs:", io.inputs.length);
+                                return io;
                             }
+                        } catch (e) {
+                            console.log("No sufficient UTXOs on", addr, "- trying next...");
                         }
-                    } catch (e) {
-                        console.log("Multi-UTXO failed, falling back to single address:", e);
                     }
                 }
 
-                // Fallback: single address UTXO
+                // Fallback: try the stored wallet address directly
                 try {
                     const io = await getTxInputsOutputs(sender_address, receiver_address, mars_amount);
                     return io;
                 } catch (e) {
-                    handleError("get input outputs");
+                    handleError("get input outputs - insufficient funds across all addresses");
                     throw e;
                 }
             }
