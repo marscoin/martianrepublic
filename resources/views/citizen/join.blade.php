@@ -16,7 +16,7 @@
     body, .mr-theme { background: var(--mr-void, #06060c) !important; }
     .gateway-wizard { max-width: 620px; margin: 0 auto; padding: 16px 20px 60px; }
     main.mr-auth-page { padding: 0 !important; margin: 0 !important; min-height: auto !important; background: var(--mr-void, #06060c) !important; }
-    #wrapper { min-height: 100vh; display: flex; flex-direction: column; margin-bottom: 0 !important; padding-bottom: 0 !important; }
+    #wrapper { min-height: 100vh; margin: 0 !important; padding: 0 !important; }
     #wrapper > main { flex: 1; }
     .gateway-step { display: none; animation: gateIn 0.4s ease-out; }
     .gateway-step.active { display: block; }
@@ -77,8 +77,8 @@
     <script>var current_blob = null;</script>
     @livewireStyles
 </head>
-<body style="background: #06060c !important; margin: 0; padding: 0;">
-<style>html { background: #06060c !important; }</style>
+<body style="background: #06060c !important; margin: 0; padding: 0; overflow-x: hidden;">
+<style>html { background: #06060c !important; margin: 0; padding: 0; height: 100%; } body { min-height: 100%; }</style>
     <div id="wrapper">
         <header class="navbar navbar-inverse" role="banner">
             <div class="container">
