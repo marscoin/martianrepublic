@@ -90,9 +90,8 @@
             </div>
         </header>
         @include('wallet.mainnav', ['active' => 'citizen'])
-    </div>
 
-    <main class="mr-auth-page">
+    <main class="mr-auth-page" style="padding: 0 !important;">
         <div class="gateway-wizard">
 
             {{-- Progress --}}
@@ -350,6 +349,7 @@
     <footer class="footer" style="border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)); padding: 20px 0; background: var(--mr-void, #06060c);">
         @include('footer')
     </footer>
+    </div> {{-- /#wrapper --}}
 
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
