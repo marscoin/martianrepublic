@@ -1480,59 +1480,23 @@
             // ===================================================================
 
             function handleMakeWallet() {
-                var mnem;
-                var password;
-                var re_password;
-                var hashed_password;
-                var hashed_re_password;
-
-                var encrypted_mnem;
-
-                // ensure marswallet.json conf is retreived
-                //var salt = "{{ $SALT }}"
-
-
-                $('#password').on('input', function() {
-
-                    mnem = $('.mnemonic-text').html();
-                    password = $('#password').val().replace(/\s+/g, '');
-
-                    // hashed_password = my_bundle.pbkdf2.pbkdf2Sync(
-                    //     password,
-                    //     "{{ $SALT }}", 1, 16, 'sha512').toString('hex')
-
-                    hashed_password = hashPassword(password)
-
-                    // console.log("hashed-pass: ", hashed_password)
-
-                    encrypted_mnem = my_bundle.encrypt(mnem, hashed_password, iv)
-
-                    // console.log("enc:", encrypted_mnem)
-
-
-                });
-
-
-                $('#re-password').on('input', function() {
-
-                    mnem = $('.mnemonic-text').html();
-                    re_password = $("#re-password").val().replace(/\s+/g, '');
-
-                    hashed_re_password = hashPassword(re_password)
-
-                    //   console.log("HASHED RE-pass:", hashed_re_password)
-                    //   console.log("enc-mnem:", encrypted_mnem)
-                    //   console.log("dec-mnem:", my_bundle.decrypt(encrypted_mnem, hashed_re_password, iv))
-                });
-
-
-                // set the input as the encryption.
+                // Hash and encrypt on Next click, NOT on every keystroke
+                // (PBKDF2 100k rounds takes ~2s - can't run on input events)
                 $("#next-mnemonic").click(() => {
-                    $("#password").val(encrypted_mnem);
-                    $("#re-password").val(hashed_re_password);
+                    var mnem = $('.mnemonic-text').html();
+                    var password = $('#password').val().replace(/\s+/g, '');
+                    var re_password = $("#re-password").val().replace(/\s+/g, '');
 
+                    if (password && re_password) {
+                        var hashed_password = hashPassword(password);
+                        var encrypted_mnem = my_bundle.encrypt(mnem, hashed_password, iv);
+                        var hashed_re_password = hashPassword(re_password);
+
+                        // Set the hidden form fields with encrypted values
+                        $("#password").val(encrypted_mnem);
+                        $("#re-password").val(hashed_re_password);
+                    }
                 })
-
             }
             handleMakeWallet()
 
