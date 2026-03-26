@@ -78,8 +78,13 @@
                             @endforeach
                         </div>
                         @else
-                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint);">
-                            <?=$apps->address ? substr($apps->address, 0, 16) . '...' : ''?> · <?=$apps->created_at ? date('M j, Y', strtotime($apps->created_at)) : ''?>
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint);">
+                                <?=$apps->address ? substr($apps->address, 0, 16) . '...' : ''?> · <?=$apps->created_at ? date('M j, Y', strtotime($apps->created_at)) : ''?>
+                            </span>
+                            <span style="font-family: 'JetBrains Mono', monospace; font-size: 8px; padding: 2px 8px; border-radius: 3px; background: rgba(0,228,255,0.08); color: var(--mr-cyan, #00e4ff); border: 1px solid rgba(0,228,255,0.15); animation: civicPulse 2s infinite;">
+                                <i class="fa fa-pen-to-square" style="margin-right: 3px;"></i> Awaiting on-chain notarization
+                            </span>
                         </div>
                         @endif
                     </div>
