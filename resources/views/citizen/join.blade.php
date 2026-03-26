@@ -13,10 +13,11 @@
     /* ============================================ */
     /* THE GATEWAY: Citizen Onboarding Wizard       */
     /* ============================================ */
+    body, .mr-theme { background: var(--mr-void, #06060c) !important; }
     .gateway-wizard { max-width: 620px; margin: 0 auto; padding: 16px 20px 60px; }
-    .mr-auth-page { padding-top: 0 !important; min-height: auto !important; margin-top: 0 !important; }
-    .mr-auth-page > .container { padding-top: 0 !important; }
-    main.mr-auth-page { padding: 0 !important; }
+    main.mr-auth-page { padding: 0 !important; margin: 0 !important; min-height: auto !important; background: var(--mr-void, #06060c) !important; }
+    #wrapper { min-height: 100vh; display: flex; flex-direction: column; }
+    #wrapper > main { flex: 1; }
     .gateway-step { display: none; animation: gateIn 0.4s ease-out; }
     .gateway-step.active { display: block; }
     @keyframes gateIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
