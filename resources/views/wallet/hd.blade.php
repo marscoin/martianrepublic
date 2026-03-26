@@ -1351,32 +1351,38 @@
                 indices.sort((a, b) => a - b);
 
                 const confirmHtml = `
-                    <div style="text-align: center; padding: 20px;">
-                        <h4 style="color: var(--mr-mars, #c84125); margin-bottom: 16px;">Verify Your Seed Phrase</h4>
-                        <p style="color: var(--mr-text-dim, #8a8998); margin-bottom: 24px;">
-                            Please enter the following words from your seed phrase to confirm you've saved it.
+                    <div style="text-align: center; padding: 10px 0;">
+                        <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-mars, #c84125); margin-bottom: 10px;">
+                            <i class="fa fa-shield-halved" style="margin-right: 6px;"></i> Verify Seed Phrase
+                        </div>
+                        <p style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-dim, #8a8998); margin-bottom: 16px;">
+                            Enter these words from your seed phrase to confirm you saved it.
                         </p>
-                        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px;">
                             ${indices.map(idx => `
                                 <div style="text-align: center;">
-                                    <label style="color: var(--mr-text-dim); font-size: 12px;">Word #${idx + 1}</label>
+                                    <label style="color: var(--mr-text-faint); font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase;">Word #${idx + 1}</label>
                                     <input type="text" class="seed-input mnemonic-verify-input" data-word-index="${idx}"
-                                        style="display: block; text-align: center;" placeholder="Word ${idx + 1}" autocomplete="off">
+                                        style="display: block; text-align: center; width: 110px;" placeholder="Word ${idx + 1}" autocomplete="off">
                                 </div>
                             `).join('')}
                         </div>
-                        <div style="margin-top: 24px;">
-                            <button class="btn btn-primary" id="confirm-mnemonic-btn">Confirm & Continue</button>
-                            <button class="btn btn-secondary" id="cancel-mnemonic-btn" style="margin-left: 10px;">Go Back</button>
+                        <div style="display: flex; gap: 8px; justify-content: center;">
+                            <button class="btn btn-primary" id="confirm-mnemonic-btn" style="padding: 8px 20px !important;">
+                                <i class="fa fa-check" style="margin-right: 4px;"></i> Confirm
+                            </button>
+                            <button class="btn btn-secondary" id="cancel-mnemonic-btn" style="padding: 8px 20px !important;">Go Back</button>
                         </div>
-                        <p id="mnemonic-verify-error" style="color: var(--mr-red, #ef4444); margin-top: 12px; display: none;">
-                            Incorrect words. Please check your seed phrase and try again.
+                        <p id="mnemonic-verify-error" style="color: var(--mr-mars, #ef4444); font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-top: 10px; display: none;">
+                            Incorrect words. Please check and try again.
                         </p>
                     </div>`;
 
-                // Show verification in the mnemonic tab area
-                const origContent = $('#mnemonic .next-btn').html();
-                $('#mnemonic .next-btn').html(confirmHtml);
+                // Replace the entire mnemonic tab content with verification
+                const origContent = $('#mnemonic > div').first().html();
+                const origNextBtn = $('#mnemonic .next-btn').html();
+                $('#mnemonic > div').first().html(confirmHtml);
+                $('#mnemonic .next-btn').hide();
                 $('#next-mnemonic').hide();
 
                 $('#confirm-mnemonic-btn').click(() => {
@@ -1406,7 +1412,8 @@
                 });
 
                 $('#cancel-mnemonic-btn').click(() => {
-                    $('#mnemonic .next-btn').html(origContent);
+                    $('#mnemonic > div').first().html(origContent);
+                    $('#mnemonic .next-btn').show().html(origNextBtn);
                     $('#next-mnemonic').show();
                 });
 
