@@ -21,6 +21,7 @@ use App\Models\Voucher;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
 use App\Models\CivicWallet;
+use App\Models\Feed;
 use App\Models\Citizen;
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -489,13 +490,32 @@ class DashboardController extends Controller
 	{
 		if (Auth::check()) {
 			$uid = Auth::user()->id;
-			
 			$walletid = $request->input('hdwallet_id');
-			
+
+			// Civic wallet reset (only if no on-chain activity)
+			if ($request->input('civic_reset')) {
+				$hasActivity = Feed::where('userid', $uid)->whereIn('tag', ['GP', 'CT', 'ED'])->exists();
+				if ($hasActivity) {
+					return response()->json(['error' => 'Cannot reset: on-chain civic activity exists'], 403);
+				}
+				$civic = CivicWallet::where('id', $walletid)->where('user_id', $uid)->first();
+				if ($civic) {
+					$profile = Profile::where('userid', $uid)->first();
+					if ($profile) {
+						$profile->civic_wallet_open = 0;
+						$profile->has_application = 0;
+						$profile->save();
+					}
+					Citizen::where('userid', $uid)->delete();
+					$civic->delete();
+					return response()->json(['success' => 'Civic wallet reset successfully']);
+				}
+			}
+
+			// Regular HD wallet delete
 			$wallet = HDWallet::where('id', $walletid)->where('user_id', $uid)->firstOrFail();
-			
 			$wallet->delete();
-			
+
 			return response()->json(['success' => 'Wallet deleted successfully']);
 		}
 		return response()->json(['error' => 'Unauthorized'], 403);

@@ -742,6 +742,14 @@
                                     <button type="button" class="vault-btn-sm unlock unlock-wallet-button" data-wallet-id="{{ $civic_wallet->id }}" data-toggle="modal" href="#unlockWalletModal" data-keyboard="false" data-wallet='{{ json_encode($civic_wallet, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES) }}' id={{ $civic_wallet->public_addr }}>
                                         <i class="fa fa-lock-open"></i> Unlock
                                     </button>
+                                    @php
+                                        $hasOnChainActivity = \App\Models\Feed::where('userid', Auth::id())->whereIn('tag', ['GP', 'CT', 'ED'])->exists();
+                                    @endphp
+                                    @if(!$hasOnChainActivity)
+                                    <button type="button" class="vault-btn-sm danger" onclick="resetCivicWallet({{ $civic_wallet->id }})">
+                                        <i class="fa fa-rotate"></i> Reset
+                                    </button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -1289,6 +1297,22 @@
             console.error("Failed to copy text", err);
         }
         document.body.removeChild(textArea);
+    }
+
+    function resetCivicWallet(walletId) {
+        if (!confirm('Are you sure you want to reset your civic wallet? This will delete the wallet so you can create a new one.\n\nThis is only possible because you have no on-chain civic activity yet.')) {
+            return;
+        }
+        if (!confirm('FINAL WARNING: This cannot be undone. Any funds at this address will only be recoverable with the original seed phrase. Continue?')) {
+            return;
+        }
+        $.ajax({
+            url: '/wallet/forget',
+            type: 'POST',
+            data: { _token: $('meta[name="csrf-token"]').attr('content'), hdwallet_id: walletId, civic_reset: true },
+            success: function() { location.reload(); },
+            error: function() { alert('Error: Could not reset wallet.'); }
+        });
     }
 
     function renameWallet() {
