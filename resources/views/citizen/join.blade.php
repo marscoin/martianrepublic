@@ -390,7 +390,7 @@
 
         // Save to IPFS
         document.getElementById('gate-photo-saving').style.display = 'block';
-        $.post('/api/permapinpic', { imageData: dataUrl, address: publicAddress }, function(data) {
+        $.post('/api/permapinpic', { picture: dataUrl, address: publicAddress }, function(data) {
             photoIPFS = 'https://ipfs.marscoin.org/ipfs/' + data.Hash;
             document.getElementById('gate-photo-saving').style.display = 'none';
             document.getElementById('gate-photo-next').disabled = false;
