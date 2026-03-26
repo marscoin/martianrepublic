@@ -1669,10 +1669,10 @@
                     // Create and append dot
                     var dot = document.createElement('div');
                     dot.className = 'dot';
-                    dot.style.left = `${e.clientX}px`;
-                    dot.style.top = `${e.clientY}px`;
-                    dot.style.zIndex = 1100;
-                    document.body.appendChild(dot);
+                    var box = $('.mouse-box')[0].getBoundingClientRect();
+                    dot.style.left = `${e.clientX - box.left}px`;
+                    dot.style.top = `${e.clientY - box.top}px`;
+                    $('.mouse-box')[0].appendChild(dot);
                     document.getElementById('progress-counter').innerText = `${increase.toFixed(1)}%`;
                 }else{
                     document.getElementById('progress-counter').innerText = "100%";
