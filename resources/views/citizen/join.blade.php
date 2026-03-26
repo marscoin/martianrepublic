@@ -310,6 +310,7 @@
                         <div class="gate-why-title" style="color: var(--mr-mars);"><i class="fa fa-cube" style="margin-right: 4px;"></i> What happens next</div>
                         <div class="gate-why-text">
                             Your data will be uploaded to IPFS and anchored to the Marscoin blockchain. This creates a permanent, verifiable record of your identity. Citizens can then endorse you for full citizenship.
+                            <br><br><em style="color: var(--mr-mars, #c84125);">We intend to take these records to Mars. Ad Astra, Martian.</em>
                         </div>
                     </div>
 
