@@ -1043,13 +1043,7 @@
                                     &nbsp;&nbsp;Unlock with Mnemonic
                                 </a>
                             </li>
-                            @if (empty($encrypted_seed))
-                                <li>
-                                    <a href="#passwordLogin" data-toggle="tab"><i class="fa fa-key"></i>
-                                        &nbsp;&nbsp;Unlock with Password
-                                    </a>
-                                </li>
-                            @endif
+                            {{-- Password unlock disabled - content was removed, mnemonic/keyfile are the supported methods --}}
                             <li>
                                 <a href="#importWallet" data-toggle="tab"><i class="fa fa-upload"></i>
                                     &nbsp;&nbsp;Unlock with Keyfile
@@ -1158,16 +1152,32 @@
 
 
                         <div class="tab-pane fade in" id="importWallet">
-                            <div>
-                            <h2>Upload Marswallet JSON Key</h2>
-                                <div class="form-group">
-
-                                <input class="form-control" type="file" id="jsonFile" accept=".json" />
-                                <button style="margin-top:10px;" class="btn" id="uploadButton"><i class="fa fa-upload"> </i> Upload</button>
+                            <div style="padding: 20px 0;">
+                                <h2 style="font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #fff; margin-bottom: 20px;">
+                                    <i class="fa fa-file-import" style="color: var(--mr-cyan); margin-right: 8px;"></i> Import Keyfile
+                                </h2>
+                                <div style="border: 2px dashed var(--mr-border-bright, rgba(255,255,255,0.12)); border-radius: 10px; padding: 32px 24px; text-align: center; margin-bottom: 16px; transition: border-color 0.2s;" id="dropzone-area">
+                                    <i class="fa fa-cloud-arrow-up" style="font-size: 32px; color: var(--mr-text-faint, #5a5968); display: block; margin-bottom: 12px;"></i>
+                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mr-text-dim, #8a8998); margin-bottom: 12px;">
+                                        Select your <strong style="color: #fff;">marswallet.json</strong> backup file
+                                    </div>
+                                    <label for="jsonFile" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 20px; background: var(--mr-surface-raised, #1a1a2a); border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.12)); border-radius: 6px; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--mr-text-dim); transition: all 0.2s;" onmouseover="this.style.borderColor='var(--mr-cyan)';this.style.color='var(--mr-cyan)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='var(--mr-text-dim)'">
+                                        <i class="fa fa-folder-open"></i> Choose File
+                                    </label>
+                                    <input type="file" id="jsonFile" accept=".json" style="display: none;" />
+                                    <div id="selected-file-name" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-faint); margin-top: 8px;"></div>
                                 </div>
-                                
+                                <button class="btn btn-primary" id="uploadButton" style="width: 100%; padding: 12px !important;">
+                                    <i class="fa fa-upload" style="margin-right: 6px;"></i> Import & Unlock
+                                </button>
                             </div>
-
+                            <script>
+                                document.getElementById('jsonFile').addEventListener('change', function() {
+                                    var name = this.files[0] ? this.files[0].name : '';
+                                    document.getElementById('selected-file-name').textContent = name;
+                                    if (name) document.getElementById('dropzone-area').style.borderColor = 'var(--mr-cyan)';
+                                });
+                            </script>
                         </div>
 
 
