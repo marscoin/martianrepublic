@@ -508,7 +508,24 @@
 
                             <div class="tab-pane fade active in" id="new">
                                 <?php if(!$isCitizen && !$isGP){?>
-                                    @include('citizen.joinpublic')
+                                    <div style="text-align: center; padding: 48px 24px;">
+                                        <div style="width: 80px; height: 80px; border-radius: 20px; background: rgba(0,228,255,0.08); border: 1px solid rgba(0,228,255,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+                                            <i class="fa fa-rocket" style="font-size: 32px; color: var(--mr-cyan, #00e4ff);"></i>
+                                        </div>
+                                        <div style="font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 700; color: #fff; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;">
+                                            Join the Martian Republic
+                                        </div>
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--mr-text-dim, #8a8998); max-width: 440px; margin: 0 auto 28px; line-height: 1.7;">
+                                            Register as a member of the General Martian Public. Take a photo, record a liveness video, and publish your identity to the blockchain.
+                                        </div>
+                                        <a href="/citizen/join" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 36px; background: var(--mr-mars, #c84125); border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: #fff; text-decoration: none; transition: all 0.2s; animation: ctaPulse 2s ease-in-out infinite;" onmouseover="this.style.background='#d94e30'" onmouseout="this.style.background='var(--mr-mars)'">
+                                            <i class="fa fa-rocket"></i> Begin Registration
+                                        </a>
+                                        <style>@keyframes ctaPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(200,65,37,0.4); } 50% { box-shadow: 0 0 20px 6px rgba(200,65,37,0.15); } }</style>
+                                        <div style="margin-top: 24px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968);">
+                                            <i class="fa fa-clock" style="margin-right: 4px;"></i> Takes about 5 minutes · Requires camera access · ~0.02 MARS fee
+                                        </div>
+                                    </div>
                                 <?php }else{ ?>
                                     @include('citizen.profile')
                                 <?php } ?>
