@@ -311,6 +311,13 @@
     .modal-body { background: var(--mr-surface, #12121e) !important; }
     .modal-footer { background: var(--mr-surface, #12121e) !important; border-top: 1px solid var(--mr-border) !important; }
     .modal-header .close { color: var(--mr-text-dim) !important; text-shadow: none !important; }
+    .modal-backdrop { background: #000 !important; }
+    .modal-backdrop.in { opacity: 0.85 !important; }
+    .modal-body-box { background: var(--mr-dark, #0c0c16) !important; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; }
+    .modal-body-box h5 { font-family: 'JetBrains Mono', monospace !important; font-size: 9px !important; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-text-dim) !important; margin-bottom: 6px; }
+    .modal-body-box p { font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important; color: var(--mr-cyan) !important; word-break: break-all; }
+    .modal-cost { font-family: 'Orbitron', sans-serif !important; font-size: 16px !important; font-weight: 600 !important; color: #fff !important; }
+    .modal-category { color: var(--mr-text-dim) !important; }
 
     /* -- Alerts -- */
     .alert { border-radius: 8px !important; }
