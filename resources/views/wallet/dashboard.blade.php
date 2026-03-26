@@ -177,6 +177,43 @@
                     <h1 class="dash-title">Dashboard</h1>
                 </div>
 
+                {{-- Contextual Onboarding Banner --}}
+                @if(isset($applied) && $applied && isset($general_public) && !$general_public)
+                <a href="/citizen/all" style="display: block; margin-top: 20px; padding: 16px 20px; background: linear-gradient(135deg, rgba(0,228,255,0.06), rgba(0,228,255,0.02)); border: 1px solid rgba(0,228,255,0.2); border-radius: 10px; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.borderColor='rgba(0,228,255,0.4)'" onmouseout="this.style.borderColor='rgba(0,228,255,0.2)'">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(0,228,255,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fa fa-rocket" style="font-size: 16px; color: var(--mr-cyan, #00e4ff);"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 600; color: #fff; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px;">
+                                Complete Your Application
+                            </div>
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-dim, #8a8998);">
+                                Your profile is ready — publish it to the Marscoin blockchain to join the General Public
+                            </div>
+                        </div>
+                        <i class="fa fa-arrow-right" style="color: var(--mr-cyan, #00e4ff); font-size: 14px;"></i>
+                    </div>
+                </a>
+                @elseif(isset($general_public) && $general_public && isset($citizen_status) && $citizen_status !== 'CT')
+                <a href="/citizen/all" style="display: block; margin-top: 20px; padding: 16px 20px; background: linear-gradient(135deg, rgba(52,211,153,0.06), rgba(52,211,153,0.02)); border: 1px solid rgba(52,211,153,0.15); border-radius: 10px; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.borderColor='rgba(52,211,153,0.3)'" onmouseout="this.style.borderColor='rgba(52,211,153,0.15)'">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(52,211,153,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fa fa-handshake" style="font-size: 16px; color: var(--mr-green, #34d399);"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 600; color: #fff; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px;">
+                                Gather Endorsements
+                            </div>
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-dim, #8a8998);">
+                                Connect with citizens to receive endorsements and earn full citizenship
+                            </div>
+                        </div>
+                        <i class="fa fa-arrow-right" style="color: var(--mr-green, #34d399); font-size: 14px;"></i>
+                    </div>
+                </a>
+                @endif
+
                 <div class="row" style="margin-top: 24px;">
                     <div class="col-md-4 col-sm-5 fade-in-1">
                         <div class="section-label">Account Overview</div>
