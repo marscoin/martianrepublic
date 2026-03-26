@@ -21,12 +21,32 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 10px;">
-            <?php foreach($everyPublic as $gp){
-                $endorseCount = $gp->endorse_cnt ?? 0;
+            <?php
+            // Sort: eligible for citizenship first, then by endorsement count desc, then recent
+            usort($everyPublic, function($a, $b) use ($endorsementThreshold) {
+                $aEligible = ($a->endorse_cnt ?? 0) >= $endorsementThreshold ? 1 : 0;
+                $bEligible = ($b->endorse_cnt ?? 0) >= $endorsementThreshold ? 1 : 0;
+                if ($aEligible !== $bEligible) return $bEligible - $aEligible; // eligible first
+                $aCount = $a->endorse_cnt ?? 0;
+                $bCount = $b->endorse_cnt ?? 0;
+                if ($aCount !== $bCount) return $bCount - $aCount; // most endorsements first
+                return strtotime($b->mined ?? '0') - strtotime($a->mined ?? '0'); // newest first
+            });
+
+            foreach($everyPublic as $gp){
+                // Skip members who are already citizens (they shouldn't be in GP list)
+                if ($gp->citizen) continue;
+
+                // Get real endorsement count from Feed table (Profile.endorse_cnt may be stale)
+                $feedEndorsements = \App\Models\Feed::where('tag', 'ED')
+                    ->where('message', $gp->public_address)
+                    ->count();
+                $endorseCount = max($gp->endorse_cnt ?? 0, $feedEndorsements);
                 $threshold = $endorsementThreshold;
-                $progress = min(100, ($endorseCount / max($threshold, 1)) * 100);
+                $isEligible = $endorseCount >= $threshold && $threshold > 0;
+                $progress = $threshold > 0 ? min(100, ($endorseCount / $threshold) * 100) : 100;
             ?>
-            <div style="padding: 16px 18px; background: var(--mr-surface, #12121e); border: 1px solid var(--mr-border, rgba(255,255,255,0.06)); border-radius: 10px; transition: all 0.2s;" onmouseover="this.style.borderColor='rgba(0,228,255,0.2)'" onmouseout="this.style.borderColor='var(--mr-border)'">
+            <div style="padding: 16px 18px; background: <?=$isEligible ? 'linear-gradient(135deg, rgba(52,211,153,0.04), var(--mr-surface, #12121e))' : 'var(--mr-surface, #12121e)'?>; border: 1px solid <?=$isEligible ? 'rgba(52,211,153,0.25)' : 'var(--mr-border, rgba(255,255,255,0.06))'?>; border-radius: 10px; transition: all 0.2s;" onmouseover="this.style.borderColor='<?=$isEligible ? 'var(--mr-green)' : 'rgba(0,228,255,0.2)'?>'" onmouseout="this.style.borderColor='<?=$isEligible ? 'rgba(52,211,153,0.25)' : 'var(--mr-border)'?>'">
                 <div style="display: flex; align-items: center; gap: 14px;">
                     <a href="/citizen/id/<?=$gp->public_address?>">
                         <img src="{{ $gp->avatar_link }}" onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'"
@@ -37,9 +57,15 @@
                             <a href="/citizen/id/<?=$gp->public_address?>" style="font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 600; color: #fff; text-decoration: none;">
                                 <?=$gp->fullname ?: $gp->firstname . ' ' . $gp->lastname?>
                             </a>
+                            @if($isEligible)
+                            <span style="font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; background: rgba(52,211,153,0.15); color: var(--mr-green, #34d399); border: 1px solid rgba(52,211,153,0.3); flex-shrink: 0; animation: civicPulse 2s infinite;">
+                                <i class="fa fa-star" style="margin-right: 3px;"></i> Eligible
+                            </span>
+                            @else
                             <span style="font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; background: rgba(0,228,255,0.1); color: var(--mr-cyan, #00e4ff); border: 1px solid rgba(0,228,255,0.2); flex-shrink: 0;">
                                 General Public
                             </span>
+                            @endif
                         </div>
                         <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968); margin-bottom: 8px;">
                             <a target="_blank" href="https://explore.marscoin.org/tx/<?=$gp->txid?>" style="text-decoration: none; color: var(--mr-text-faint);">
