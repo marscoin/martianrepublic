@@ -11,7 +11,9 @@
         @endphp
         <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #fff; margin-bottom: 6px;">
             <i class="fa fa-users" style="color: var(--mr-cyan, #00e4ff); margin-right: 8px;"></i> General Public
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 400; color: var(--mr-text-dim); margin-left: 8px;">{{ count($everyPublic) }} members</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 400; color: var(--mr-text-dim); margin-left: 8px;">
+                {{ count($stillGP) }} awaiting · {{ count($graduated) }} graduated
+            </span>
         </div>
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968); margin-bottom: 16px; line-height: 1.6; padding: 10px 14px; background: var(--mr-dark, #0c0c16); border-radius: 6px; border: 1px solid var(--mr-border, rgba(255,255,255,0.06));">
             <i class="fa fa-scale-balanced" style="color: var(--mr-cyan); margin-right: 4px;"></i>
@@ -33,9 +35,11 @@
                 return strtotime($b->mined ?? '0') - strtotime($a->mined ?? '0'); // newest first
             });
 
-            foreach($everyPublic as $gp){
-                // Skip members who are already citizens (they shouldn't be in GP list)
-                if ($gp->citizen) continue;
+            // Separate: still-GP vs graduated-to-citizen
+            $stillGP = array_filter($everyPublic, fn($gp) => !$gp->citizen);
+            $graduated = array_filter($everyPublic, fn($gp) => $gp->citizen);
+
+            foreach($stillGP as $gp){
 
                 // Get real endorsement count from Feed table (Profile.endorse_cnt may be stale)
                 $feedEndorsements = \App\Models\Feed::where('tag', 'ED')
@@ -99,10 +103,28 @@
             </div>
             <?php } ?>
 
-            <?php if(count($everyPublic) === 0){ ?>
-            <div style="text-align: center; padding: 40px; color: var(--mr-text-faint); font-family: 'JetBrains Mono', monospace; font-size: 11px;">
-                <i class="fa fa-users" style="font-size: 24px; display: block; margin-bottom: 12px; opacity: 0.3;"></i>
-                No General Public members registered yet.
+            <?php if(count($stillGP) === 0){ ?>
+            <div style="text-align: center; padding: 32px; color: var(--mr-text-faint); font-family: 'JetBrains Mono', monospace; font-size: 11px; background: var(--mr-surface); border-radius: 10px; border: 1px solid var(--mr-border);">
+                <i class="fa fa-check-double" style="font-size: 24px; display: block; margin-bottom: 12px; color: var(--mr-green); opacity: 0.5;"></i>
+                All registered members have been promoted to citizenship!
+            </div>
+            <?php } ?>
+
+            {{-- Graduated Members (now citizens) --}}
+            <?php if(count($graduated) > 0){ ?>
+            <div style="margin-top: 24px;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--mr-text-faint, #5a5968); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--mr-border);">
+                    <i class="fa fa-graduation-cap" style="margin-right: 4px;"></i> Graduated to Citizenship ({{ count($graduated) }})
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <?php foreach($graduated as $grad){ ?>
+                    <a href="/citizen/id/<?=$grad->public_address?>" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; background: var(--mr-dark, #0c0c16); border: 1px solid rgba(52,211,153,0.1); border-radius: 6px; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-dim); transition: border-color 0.2s;" onmouseover="this.style.borderColor='rgba(52,211,153,0.3)'" onmouseout="this.style.borderColor='rgba(52,211,153,0.1)'">
+                        <img src="{{ $grad->avatar_link }}" onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'" style="width: 18px; height: 18px; border-radius: 50%; object-fit: cover;">
+                        <?=$grad->firstname?> <?=$grad->lastname?>
+                        <i class="fa fa-check-circle" style="color: var(--mr-green, #34d399); font-size: 8px;"></i>
+                    </a>
+                    <?php } ?>
+                </div>
             </div>
             <?php } ?>
         </div>
