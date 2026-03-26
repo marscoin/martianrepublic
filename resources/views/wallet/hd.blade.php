@@ -1488,13 +1488,22 @@
                     var re_password = $("#re-password").val().replace(/\s+/g, '');
 
                     if (password && re_password) {
-                        var hashed_password = hashPassword(password);
-                        var encrypted_mnem = my_bundle.encrypt(mnem, hashed_password, iv);
-                        var hashed_re_password = hashPassword(re_password);
+                        // Show encrypting indicator
+                        var origText = $("#next-mnemonic").html();
+                        $("#next-mnemonic").html('<i class="fa fa-shield-halved fa-spin"></i> Encrypting...').prop('disabled', true);
 
-                        // Set the hidden form fields with encrypted values
-                        $("#password").val(encrypted_mnem);
-                        $("#re-password").val(hashed_re_password);
+                        // Use setTimeout to let the UI update before blocking
+                        setTimeout(function() {
+                            var hashed_password = hashPassword(password);
+                            var encrypted_mnem = my_bundle.encrypt(mnem, hashed_password, iv);
+                            var hashed_re_password = hashPassword(re_password);
+
+                            $("#password").val(encrypted_mnem);
+                            $("#re-password").val(hashed_re_password);
+
+                            // Restore button
+                            $("#next-mnemonic").html(origText).prop('disabled', false);
+                        }, 50);
                     }
                 })
             }
