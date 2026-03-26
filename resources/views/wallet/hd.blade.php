@@ -479,11 +479,18 @@
         color: var(--mr-text-faint, #5a5968) !important;
     }
 
-    /* Modal body padding + overflow */
+    /* Modal body padding + overflow with hidden scrollbar */
     .modal-styled .modal-body, #styledModal .modal-body, #modalLogin .modal-body {
         padding-bottom: 40px !important;
         overflow-y: auto !important;
         max-height: 75vh !important;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+    .modal-styled .modal-body::-webkit-scrollbar,
+    #styledModal .modal-body::-webkit-scrollbar,
+    #modalLogin .modal-body::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
     }
     #styledModal .tab-content, #modalLogin .tab-content {
         padding-bottom: 24px !important;
