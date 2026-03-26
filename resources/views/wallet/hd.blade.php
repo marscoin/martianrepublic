@@ -1397,8 +1397,7 @@
                 // Encrypt mnemonic with password (PBKDF2 100k rounds)
                 // Show spinner, then run in setTimeout so UI updates first
                 if (password && rePassword) {
-                    $(".next-btn").css('text-align', 'center');
-                    $("#next-mnemonic").html('<i class="fa fa-lock fa-spin"></i> Securing...').prop('disabled', true).css({'padding':'8px 16px'});
+                    $("#next-mnemonic").html('<i class="fa fa-lock fa-spin"></i> Encrypting...').prop('disabled', true).css({'margin-right':'70px'});
                     setTimeout(() => {
                         var mnem = $('.mnemonic-text').html();
                         var hashed_password = hashPassword(password);
