@@ -842,7 +842,7 @@
                             <input name="wallet" hidden id="selected_wallet"/>
                             <label for="name">Wallet Password</label>
                             <input type="password" id="unlock-password" name="unlock-password" class="form-control"
-                                data-required="true" style="width: 100%">
+                                data-required="true" style="width: 100%" autocomplete="current-password">
                             <div id="unlock-error" style="display: none; margin-top: 12px; padding: 10px 14px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 6px; color: #ef4444; font-size: 14px;">
                                 <i class="fa fa-exclamation-circle"></i> <span id="unlock-error-text"></span>
                             </div>
