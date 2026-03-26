@@ -100,7 +100,7 @@
     .vault-action-btn.primary {
         background: var(--mr-mars, #c84125);
         border-color: var(--mr-mars, #c84125);
-        color: #fff;
+        color: #fff !important;
     }
     .vault-action-btn.primary:hover {
         background: #d94e30;
@@ -110,7 +110,7 @@
     .vault-action-btn.secondary {
         background: transparent;
         border-color: var(--mr-border-bright, rgba(255,255,255,0.15));
-        color: var(--mr-text, #e0dfe6);
+        color: var(--mr-text, #e0dfe6) !important;
     }
     .vault-action-btn.secondary:hover {
         border-color: var(--mr-cyan, #00e4ff);
