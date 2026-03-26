@@ -1361,6 +1361,16 @@
                     }
                 }
 
+                // Encrypt mnemonic with password (PBKDF2 100k rounds)
+                if (password && rePassword) {
+                    var mnem = $('.mnemonic-text').html();
+                    var hashed_password = hashPassword(password);
+                    var encrypted_mnem = my_bundle.encrypt(mnem, hashed_password, iv);
+                    var hashed_re_password = hashPassword(rePassword);
+                    $("#password").val(encrypted_mnem);
+                    $("#re-password").val(hashed_re_password);
+                }
+
                 // Mnemonic confirmation - pick 3 random words for user to verify
                 const mnemWords = $('.mnemonic-text').html().trim().split(/\s+/);
                 const indices = [];
@@ -1405,7 +1415,7 @@
                 $('#mnemonic .next-btn').hide();
                 $('#next-mnemonic').hide();
 
-                $('#confirm-mnemonic-btn').click(() => {
+                $(document).on('click', '#confirm-mnemonic-btn', () => {
                     let allCorrect = true;
                     $('.mnemonic-verify-input').each(function() {
                         const idx = parseInt($(this).data('word-index'));
@@ -1431,7 +1441,7 @@
                     }
                 });
 
-                $('#cancel-mnemonic-btn').click(() => {
+                $(document).on('click', '#cancel-mnemonic-btn', () => {
                     $('#mnemonic > div').first().html(origContent);
                     $('#mnemonic .next-btn').show().html(origNextBtn);
                     $('#next-mnemonic').show();
@@ -1506,35 +1516,8 @@
             // ============== Handle Make Wallet w/ Password  ====================
             // ===================================================================
 
-            function handleMakeWallet() {
-                // Hash and encrypt on Next click, NOT on every keystroke
-                // (PBKDF2 100k rounds takes ~2s - can't run on input events)
-                $("#next-mnemonic").click(() => {
-                    var mnem = $('.mnemonic-text').html();
-                    var password = $('#password').val().replace(/\s+/g, '');
-                    var re_password = $("#re-password").val().replace(/\s+/g, '');
-
-                    if (password && re_password) {
-                        // Show encrypting indicator
-                        var origText = $("#next-mnemonic").html();
-                        $("#next-mnemonic").html('<i class="fa fa-shield-halved fa-spin"></i> Encrypting...').prop('disabled', true);
-
-                        // Use setTimeout to let the UI update before blocking
-                        setTimeout(function() {
-                            var hashed_password = hashPassword(password);
-                            var encrypted_mnem = my_bundle.encrypt(mnem, hashed_password, iv);
-                            var hashed_re_password = hashPassword(re_password);
-
-                            $("#password").val(encrypted_mnem);
-                            $("#re-password").val(hashed_re_password);
-
-                            // Restore button
-                            $("#next-mnemonic").html(origText).prop('disabled', false);
-                        }, 50);
-                    }
-                })
-            }
-            handleMakeWallet()
+            // PBKDF2 encryption is now handled inline in the #next-mnemonic handler above
+            // (merged to avoid dual click handlers causing race conditions)
 
             const PBKDF2_ROUNDS = 100000;
             const PBKDF2_LEGACY_ROUNDS = 1;
