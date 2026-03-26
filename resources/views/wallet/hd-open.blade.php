@@ -1265,11 +1265,31 @@
         // Scans BIP44 derivation paths to find all addresses with balance
         // ============================================================
         async function discoverHDAddresses(mnemonic) {
-            // IMPORTANT: Always use client-side derivation (my_bundle.bitcoin.bip32)
-            // to ensure addresses match genSeed. The pebas server-side discovery uses
-            // a different BIP32 library that derives DIFFERENT addresses from the same seed.
-            console.log("HD Discovery: using client-side derivation (matches genSeed)");
-            return await discoverHDAddressesClientSide(mnemonic);
+            // Server-side discovery via pebas (fast, single API call)
+            // Pebas now uses bitcoinjs-lib bip32 (same as client) - one source of truth
+            const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
+            const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
+            const xpub = root.derivePath("m/44'/2'/0'").neutered().toBase58();
+
+            try {
+                const resp = await $.ajax({
+                    url: '/api/discover',
+                    type: 'POST',
+                    data: { xpub: xpub, gap_limit: 20 },
+                });
+
+                if (resp.error) throw new Error(resp.error);
+
+                return {
+                    discovered: resp.addresses || [],
+                    totalBalance: resp.totalBalance || 0,
+                    totalUnconfirmed: resp.totalUnconfirmed || 0,
+                    xpub: xpub,
+                };
+            } catch (serverErr) {
+                console.warn("Server-side discovery failed, falling back to client-side:", serverErr);
+                return await discoverHDAddressesClientSide(mnemonic);
+            }
         }
 
         // Fallback client-side discovery (40+ API calls)
