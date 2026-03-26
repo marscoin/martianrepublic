@@ -1641,13 +1641,13 @@
             $(document).on("mousemove", ".mouse-box", function(e) {
 
                 var mnemonic;
-                const percent_increase = 5
+                const percent_increase = 2  // 50 points to reach 100%
                 var increase = percent_increase * entropy.length
 
                 // Entropy Logic
-                const MAX_LEN = 24; // size of entropy's array
+                const MAX_LEN = 64; // more entropy = more secure feel
                 const now = Date.now();
-                if (now >= 1 && (now % 10) !== 0) return;
+                if (now >= 1 && (now % 7) !== 0) return; // slightly more responsive
 
                 // mouse movement cords
                 const px = e.pageX;
