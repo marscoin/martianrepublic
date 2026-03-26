@@ -3,15 +3,25 @@
 {{-- General Public: Awaiting Citizenship --}}
 <div class="row">
     <div class="col-md-8">
-        <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #fff; margin-bottom: 16px;">
+        @php
+            $citizenCount = count($everyCitizen ?? []);
+            $endorsementThreshold = min(5, max(1, (int) ceil($citizenCount * 0.1)));
+        @endphp
+        <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #fff; margin-bottom: 6px;">
             <i class="fa fa-users" style="color: var(--mr-cyan, #00e4ff); margin-right: 8px;"></i> General Public
             <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 400; color: var(--mr-text-dim); margin-left: 8px;">{{ count($everyPublic) }} members</span>
+        </div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968); margin-bottom: 16px; line-height: 1.6; padding: 10px 14px; background: var(--mr-dark, #0c0c16); border-radius: 6px; border: 1px solid var(--mr-border, rgba(255,255,255,0.06));">
+            <i class="fa fa-scale-balanced" style="color: var(--mr-cyan); margin-right: 4px;"></i>
+            Citizenship requires <strong style="color: #fff;">{{ $endorsementThreshold }}</strong> endorsement{{ $endorsementThreshold > 1 ? 's' : '' }}
+            <span style="color: var(--mr-text-faint);">(1 per 10 citizens, cap 5)</span>
+            · <strong style="color: #fff;">{{ $citizenCount }}</strong> active citizen{{ $citizenCount !== 1 ? 's' : '' }}
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 10px;">
             <?php foreach($everyPublic as $gp){
                 $endorseCount = $gp->endorse_cnt ?? 0;
-                $threshold = 3; // TODO: dynamic based on citizen count
+                $threshold = $endorsementThreshold;
                 $progress = min(100, ($endorseCount / max($threshold, 1)) * 100);
             ?>
             <div style="padding: 16px 18px; background: var(--mr-surface, #12121e); border: 1px solid var(--mr-border, rgba(255,255,255,0.06)); border-radius: 10px; transition: all 0.2s;" onmouseover="this.style.borderColor='rgba(0,228,255,0.2)'" onmouseout="this.style.borderColor='var(--mr-border)'">
