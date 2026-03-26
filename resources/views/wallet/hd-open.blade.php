@@ -1280,9 +1280,49 @@
 
                 if (resp.error) throw new Error(resp.error);
 
+                var discovered = resp.addresses || [];
+                var totalBal = resp.totalBalance || 0;
+
+                // Check legacy/stored wallet address (may have been created by older code)
+                // This catches addresses not in the standard HD derivation tree
+                var storedAddr = '{{ $public_addr }}'.trim();
+                var civicAddr = '{{ $civic_addr ?? "" }}'.trim();
+                var knownAddrs = discovered.map(function(a) { return a.address; });
+
+                // Check stored HD wallet address
+                if (storedAddr && knownAddrs.indexOf(storedAddr) === -1) {
+                    try {
+                        var balResp = await $.ajax({ url: '/api/balance/' + storedAddr, type: 'GET' });
+                        var bal = parseFloat(balResp.balance || 0);
+                        if (bal > 0) {
+                            discovered.push({
+                                address: storedAddr, balance: bal, unconfirmed: 0,
+                                chain: 'legacy', index: 0, path: 'legacy/stored',
+                            });
+                            totalBal += bal;
+                            console.log("Added legacy stored address:", storedAddr, bal, "MARS");
+                        }
+                    } catch(e) { console.log("Could not check stored address:", e.message); }
+                }
+
+                // Check civic wallet address (if different from stored and not in HD tree)
+                if (civicAddr && civicAddr !== storedAddr && knownAddrs.indexOf(civicAddr) === -1) {
+                    try {
+                        var civicBalResp = await $.ajax({ url: '/api/balance/' + civicAddr, type: 'GET' });
+                        var civicBal = parseFloat(civicBalResp.balance || 0);
+                        if (civicBal > 0) {
+                            discovered.push({
+                                address: civicAddr, balance: civicBal, unconfirmed: 0,
+                                chain: 'civic', index: 0, path: 'civic',
+                            });
+                            // Don't add to totalBal if already shown in civic status bar
+                        }
+                    } catch(e) { /* civic addr might not be trackable */ }
+                }
+
                 return {
-                    discovered: resp.addresses || [],
-                    totalBalance: resp.totalBalance || 0,
+                    discovered: discovered,
+                    totalBalance: totalBal,
                     totalUnconfirmed: resp.totalUnconfirmed || 0,
                     xpub: xpub,
                 };
@@ -1361,12 +1401,17 @@
 
                 const html = withBalance.map(a => {
                     const isCivic = civicAddr && a.address === civicAddr;
-                    const badge = isCivic
-                        ? '<span style="font-family:JetBrains Mono,monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:2px 5px;border-radius:3px;background:rgba(200,65,37,0.15);color:var(--mr-mars,#c84125);border:1px solid rgba(200,65,37,0.25);margin-left:6px;vertical-align:middle;">Civic ID</span>'
-                        : '';
-                    const borderColor = isCivic ? 'rgba(200,65,37,0.15)' : 'var(--mr-border, rgba(255,255,255,0.04))';
-                    const bgColor = isCivic ? 'rgba(200,65,37,0.04)' : 'transparent';
-                    const chainIcon = a.chain === 'change' ? '↳' : '→';
+                    const isLegacy = a.chain === 'legacy';
+                    let badge = '';
+                    if (isCivic) {
+                        badge = '<span style="font-family:JetBrains Mono,monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:2px 5px;border-radius:3px;background:rgba(200,65,37,0.15);color:var(--mr-mars,#c84125);border:1px solid rgba(200,65,37,0.25);margin-left:6px;vertical-align:middle;">Civic ID</span>';
+                    } else if (isLegacy) {
+                        badge = '<span style="font-family:JetBrains Mono,monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:2px 5px;border-radius:3px;background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.25);margin-left:6px;vertical-align:middle;">Legacy</span>';
+                    }
+                    const highlighted = isCivic || isLegacy;
+                    const borderColor = isCivic ? 'rgba(200,65,37,0.15)' : (isLegacy ? 'rgba(245,158,11,0.12)' : 'var(--mr-border, rgba(255,255,255,0.04))');
+                    const bgColor = isCivic ? 'rgba(200,65,37,0.04)' : (isLegacy ? 'rgba(245,158,11,0.03)' : 'transparent');
+                    const chainIcon = isLegacy ? '⚡' : (a.chain === 'change' ? '↳' : '→');
 
                     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;margin-bottom:2px;border-radius:4px;border-bottom:1px solid ${borderColor};background:${bgColor};">
                         <span style="display:flex;align-items:center;gap:4px;min-width:0;">
@@ -1709,33 +1754,71 @@
                                 const tx = await signMARS(mars_amount, io, unlockedWallet)
                                 $("#loading").hide()
 
-                                // Beautiful success state
-                                $(".success-message").show().html(`
-                                    <div style="text-align: center; padding: 20px 0;">
-                                        <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(52,211,153,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                                            <i class="fa fa-check" style="font-size: 24px; color: var(--mr-green, #34d399);"></i>
+                                // Beautiful success state - replace entire modal body
+                                $("#basicModal .modal-body").html(`
+                                    <div style="text-align: center; padding: 32px 20px;">
+                                        {{-- Animated blockchain blocks --}}
+                                        <div class="tx-chain" style="display:flex;align-items:center;justify-content:center;gap:0;margin:0 auto 24px;overflow:hidden;">
+                                            <div class="tx-block" style="width:36px;height:36px;border-radius:6px;background:var(--mr-surface-raised,#1a1a2a);border:1.5px solid var(--mr-green,#34d399);display:flex;align-items:center;justify-content:center;animation:blockSlide 0.6s ease-out 0.2s both;">
+                                                <i class="fa fa-cube" style="font-size:14px;color:var(--mr-green,#34d399);"></i>
+                                            </div>
+                                            <div style="width:20px;height:2px;background:var(--mr-green,#34d399);animation:chainGrow 0.3s ease-out 0.7s both;"></div>
+                                            <div class="tx-block" style="width:36px;height:36px;border-radius:6px;background:var(--mr-surface-raised,#1a1a2a);border:1.5px solid var(--mr-cyan,#00e4ff);display:flex;align-items:center;justify-content:center;animation:blockSlide 0.6s ease-out 0.9s both;">
+                                                <i class="fa fa-cube" style="font-size:14px;color:var(--mr-cyan,#00e4ff);"></i>
+                                            </div>
+                                            <div style="width:20px;height:2px;background:var(--mr-cyan,#00e4ff);animation:chainGrow 0.3s ease-out 1.4s both;"></div>
+                                            <div class="tx-block" style="width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,rgba(200,65,37,0.2),rgba(200,65,37,0.05));border:2px solid var(--mr-mars,#c84125);display:flex;align-items:center;justify-content:center;animation:blockSlide 0.6s ease-out 1.6s both;box-shadow:0 0 16px rgba(200,65,37,0.2);">
+                                                <i class="fa fa-check" style="font-size:18px;color:var(--mr-mars,#c84125);"></i>
+                                            </div>
+                                            <div style="width:20px;height:2px;background:var(--mr-text-faint,#5a5968);animation:chainGrow 0.3s ease-out 2.1s both;opacity:0.4;"></div>
+                                            <div class="tx-block" style="width:36px;height:36px;border-radius:6px;border:1.5px dashed var(--mr-text-faint,#5a5968);display:flex;align-items:center;justify-content:center;animation:blockSlide 0.6s ease-out 2.3s both;opacity:0.3;">
+                                                <i class="fa fa-cube" style="font-size:14px;color:var(--mr-text-faint,#5a5968);"></i>
+                                            </div>
                                         </div>
-                                        <div style="font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; color: var(--mr-green, #34d399); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
+                                        <div style="font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; color: var(--mr-green, #34d399); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; animation: successPulse 0.5s ease-out 2.5s both;">
                                             Transaction Broadcast
                                         </div>
-                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mr-text-dim, #8a8998); margin-bottom: 16px;">
-                                            ${mars_amount} MARS sent successfully
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #fff; margin-bottom: 6px;">
+                                            ${mars_amount} MARS sent
+                                        </div>
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-faint, #5a5968); margin-bottom: 20px;">
+                                            Waiting for block confirmation (~2 min)
                                         </div>
                                         <a href="https://explore.marscoin.org/tx/${tx.tx_hash}" target="_blank"
-                                           style="display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-cyan, #00e4ff); background: var(--mr-dark, #0c0c16); padding: 10px 16px; border-radius: 6px; border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)); text-decoration: none; word-break: break-all;">
-                                            <i class="fa fa-arrow-up-right-from-square" style="margin-right: 6px;"></i>${tx.tx_hash}
+                                           style="display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-cyan, #00e4ff); background: var(--mr-dark, #0c0c16); padding: 12px 18px; border-radius: 8px; border: 1px solid rgba(0,228,255,0.2); text-decoration: none; word-break: break-all; max-width: 100%; transition: border-color 0.2s;">
+                                            <i class="fa fa-cube" style="margin-right: 6px;"></i>${tx.tx_hash.substring(0, 24)}...
                                         </a>
-                                        <div style="margin-top: 16px;">
-                                            <button onclick="location.reload()" class="btn btn-primary" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px;">
+                                        <div style="margin-top: 24px;">
+                                            <button onclick="location.reload()" style="
+                                                font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+                                                letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 28px;
+                                                border-radius: 8px; border: none; cursor: pointer;
+                                                background: var(--mr-mars, #c84125); color: #fff; transition: all 0.2s;
+                                            " onmouseover="this.style.background='#d94e30'" onmouseout="this.style.background='var(--mr-mars, #c84125)'">
                                                 <i class="fa fa-arrow-left" style="margin-right: 6px;"></i> Back to Wallet
                                             </button>
                                         </div>
                                     </div>
+                                    <style>
+                                        @keyframes successPulse {
+                                            0% { transform: scale(0.5); opacity: 0; }
+                                            50% { transform: scale(1.1); }
+                                            100% { transform: scale(1); opacity: 1; }
+                                        }
+                                        @keyframes blockSlide {
+                                            0% { transform: translateX(-20px) scale(0.7); opacity: 0; }
+                                            60% { transform: translateX(3px) scale(1.05); }
+                                            100% { transform: translateX(0) scale(1); opacity: 1; }
+                                        }
+                                        @keyframes chainGrow {
+                                            0% { transform: scaleX(0); opacity: 0; }
+                                            100% { transform: scaleX(1); opacity: 1; }
+                                        }
+                                    </style>
                                 `);
-
-                                // Hide the confirmation details
-                                $(".confirm-transaction, .modal-footer").hide();
-                                $(".modal-title").text("Transaction Complete");
+                                // Hide footer, update title
+                                $("#basicModal .modal-footer").hide();
+                                $("#basicModal .modal-title").text("Transaction Complete");
 
 
 
