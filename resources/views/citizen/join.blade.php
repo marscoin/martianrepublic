@@ -13,7 +13,8 @@
     /* ============================================ */
     /* THE GATEWAY: Citizen Onboarding Wizard       */
     /* ============================================ */
-    .gateway-wizard { max-width: 620px; margin: 0 auto; padding: 32px 20px 60px; }
+    .gateway-wizard { max-width: 620px; margin: 0 auto; padding: 16px 20px 60px; }
+    .mr-auth-page { padding-top: 0 !important; min-height: auto !important; }
     .gateway-step { display: none; animation: gateIn 0.4s ease-out; }
     .gateway-step.active { display: block; }
     @keyframes gateIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
