@@ -531,9 +531,12 @@
     /* -- Modal internal layout fixes -- */
     .next-btn {
         text-align: right;
-        padding: 12px 0 0;
-        margin-top: 8px;
+        padding: 8px 0;
+        margin-top: 4px;
     }
+    /* Ensure modal content doesn't overflow */
+    #styledModal .modal-body { overflow: visible !important; }
+    #styledModal .tab-pane { padding-bottom: 8px; }
     .next-btn .btn-primary {
         padding: 10px 28px !important;
         font-family: 'JetBrains Mono', monospace !important;
