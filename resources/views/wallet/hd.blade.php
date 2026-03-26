@@ -989,8 +989,13 @@
                                         log
                                         back in to your wallet. </p>
 
-                                    <div class="mnemonic">
+                                    <div class="mnemonic" style="position: relative;">
                                         <h2 class="mnemonic-text"></h2>
+                                        <button type="button" onclick="navigator.clipboard.writeText(document.querySelector('.mnemonic-text').textContent.trim()); this.innerHTML='<i class=\'fa fa-check\' style=\'color:var(--mr-green)\'></i>'; setTimeout(() => this.innerHTML='<i class=\'fa fa-copy\'></i>', 2000);"
+                                            style="position: absolute; top: 8px; right: 8px; background: var(--mr-surface-raised, #1a1a2a); border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.12)); border-radius: 4px; padding: 4px 7px; cursor: pointer; color: var(--mr-text-dim); font-size: 12px; transition: all 0.2s;"
+                                            title="Copy seed phrase">
+                                            <i class="fa fa-copy"></i>
+                                        </button>
                                     </div>
                                     <div class="title-help">
                                         <h2> Backup Wallet </h2>
@@ -1436,10 +1441,10 @@
                             `).join('')}
                         </div>
                         <div style="display: flex; gap: 8px; justify-content: center;">
-                            <button class="btn btn-primary" id="confirm-mnemonic-btn" style="padding: 8px 20px !important;">
+                            <button type="button" class="btn btn-primary" id="confirm-mnemonic-btn" style="padding: 8px 20px !important;">
                                 <i class="fa fa-check" style="margin-right: 4px;"></i> Confirm
                             </button>
-                            <button class="btn btn-secondary" id="cancel-mnemonic-btn" style="padding: 8px 20px !important;">Go Back</button>
+                            <button type="button" class="btn btn-secondary" id="cancel-mnemonic-btn" style="padding: 8px 20px !important;">Go Back</button>
                         </div>
                         <p id="mnemonic-verify-error" style="color: var(--mr-mars, #ef4444); font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-top: 10px; display: none;">
                             Incorrect words. Please check and try again.
