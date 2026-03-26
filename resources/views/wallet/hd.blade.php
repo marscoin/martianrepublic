@@ -531,12 +531,13 @@
     /* -- Modal internal layout fixes -- */
     .next-btn {
         text-align: right;
-        padding: 8px 0;
+        padding: 8px 4px 4px 0;
         margin-top: 4px;
     }
-    /* Ensure modal content doesn't overflow */
-    #styledModal .modal-body { overflow: visible !important; }
-    #styledModal .tab-pane { padding-bottom: 8px; }
+    #styledModal .modal-body { overflow: hidden !important; }
+    #styledModal .tab-pane { padding-bottom: 4px; }
+    #styledModal .modal-dialog { max-height: 90vh; }
+    #styledModal .stacked-content { padding-right: 10px; }
     .next-btn .btn-primary {
         padding: 10px 28px !important;
         font-family: 'JetBrains Mono', monospace !important;
