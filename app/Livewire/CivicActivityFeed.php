@@ -13,6 +13,9 @@ class CivicActivityFeed extends Component
     public $activities;
     public $citcache;
     public $userId;
+    public int $perPage = 8;
+    public int $page = 1;
+    public bool $hasMore = true;
 
     public function mount($userId = null)
     {
@@ -20,25 +23,34 @@ class CivicActivityFeed extends Component
         $this->loadActivities();
     }
 
+    public function loadMore()
+    {
+        $this->page++;
+        $this->loadActivities();
+    }
+
     public function loadActivities()
     {
-        // Assuming you want to load activities related to the logged-in user
         $this->citcache = Citizen::where('userid', $this->userId)->first();
         if (!$this->citcache) {
             $this->activities = collect();
+            $this->hasMore = false;
             return;
         }
         $publicAddress = $this->citcache->public_address;
-        $this->activities = Feed::where(function ($query) use ($publicAddress) {
+        $total = $this->page * $this->perPage;
+        $all = Feed::where(function ($query) use ($publicAddress) {
             $query->where('userid', $this->userId)
                   ->orWhere('message', 'like', '%' . $publicAddress . '%');
         })
         ->whereIn('tag', ['ED', 'SP', 'GP', 'CT', 'LB'])
         ->orderBy('mined', 'desc')
         ->orderBy('id', 'desc')
-        ->take(10)
+        ->take($total + 1)
         ->get();
-        
+
+        $this->hasMore = $all->count() > $total;
+        $this->activities = $all->take($total);
     }
 
     public function render()
