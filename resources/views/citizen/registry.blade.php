@@ -409,8 +409,9 @@
 
                 <?php if($wallet_open){ ?>
 
-                {{-- Citizenship Progress Tracker --}}
-                <div class="portlet" style="padding: 20px 24px;">
+                {{-- Citizenship Progress Tracker (only show if NOT yet a full citizen) --}}
+                @if(!$isCitizen)
+                <div class="portlet civic-fade-1" style="padding: 20px 24px;">
                     <div style="display: flex; align-items: center; gap: 0; justify-content: center; flex-wrap: wrap;">
                         {{-- Step 1: Account --}}
                         <div style="display: flex; align-items: center; gap: 8px;">
@@ -467,6 +468,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 <div class="portlet civic-fade-2" style="padding: 0 !important; border: none !important; background: transparent !important;">
                     <div class="portlet-body" style="padding: 0;">
