@@ -433,8 +433,8 @@
         background: var(--mr-dark, #0c0c16) !important;
         border: 2px solid var(--mr-mars, #c84125) !important;
         border-radius: 8px !important;
-        padding: 20px !important;
-        margin: 16px 0 !important;
+        padding: 14px 16px !important;
+        margin: 10px 0 !important;
         position: relative;
     }
     .mnemonic::before {
@@ -448,12 +448,13 @@
     }
     .mnemonic-text {
         font-family: 'JetBrains Mono', monospace !important;
-        font-size: 15px !important;
+        font-size: 14px !important;
         font-weight: 500 !important;
         color: #fff !important;
-        line-height: 2 !important;
-        word-spacing: 8px;
+        line-height: 1.8 !important;
+        word-spacing: 6px;
         letter-spacing: 0.5px;
+        margin: 0 !important;
     }
 
     /* -- Seed inputs -- */
@@ -479,22 +480,11 @@
         color: var(--mr-text-faint, #5a5968) !important;
     }
 
-    /* Modal body padding + overflow with hidden scrollbar */
+    /* Modal body - compact padding, scroll only if truly needed */
     .modal-styled .modal-body, #styledModal .modal-body, #modalLogin .modal-body {
-        padding-bottom: 40px !important;
-        overflow-y: auto !important;
-        max-height: 75vh !important;
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* IE/Edge */
+        padding: 16px 24px 20px !important;
     }
-    .modal-styled .modal-body::-webkit-scrollbar,
-    #styledModal .modal-body::-webkit-scrollbar,
-    #modalLogin .modal-body::-webkit-scrollbar {
-        display: none; /* Chrome/Safari */
-    }
-    #styledModal .tab-content, #modalLogin .tab-content {
-        padding-bottom: 24px !important;
-    }
+    .modal-body .tab-pane p { font-size: 11px !important; }
 
     /* -- Tab pills in modals -- */
     .nav-pills.nav-stacked > li > a {
@@ -520,13 +510,9 @@
 
     /* -- Modal internal layout fixes -- */
     .next-btn {
-        position: sticky;
-        bottom: 0;
         text-align: right;
-        padding: 16px 0 4px;
-        margin-top: 12px;
-        background: linear-gradient(to bottom, transparent, var(--mr-surface, #12121e) 30%);
-        z-index: 10;
+        padding: 12px 0 0;
+        margin-top: 8px;
     }
     .next-btn .btn-primary {
         padding: 10px 28px !important;
@@ -553,15 +539,22 @@
         border-color: var(--mr-border-bright) !important;
         color: var(--mr-text-dim) !important;
     }
-    .password-encrypt { margin-top: 12px; }
+    .password-encrypt { margin-top: 8px; }
     .password-encrypt label {
         font-family: 'JetBrains Mono', monospace !important;
         font-size: 10px !important;
         letter-spacing: 1px !important;
         text-transform: uppercase !important;
         color: var(--mr-text-dim) !important;
-        margin-top: 12px !important;
+        margin-top: 8px !important;
+        margin-bottom: 4px !important;
     }
+    .password-encrypt .form-control { padding: 8px 12px !important; }
+    /* Compact the mnemonic tab content */
+    .stacked-content .title-help { margin-bottom: 4px !important; }
+    .stacked-content p { margin-bottom: 6px !important; }
+    .stacked-content .btn-group { margin-bottom: 4px; }
+    .password-encrypt-cont { margin-top: 4px !important; }
     .password-encrypt .form-control {
         background: var(--mr-dark) !important;
         border: 1px solid var(--mr-border-bright) !important;
