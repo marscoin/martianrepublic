@@ -520,9 +520,13 @@
 
     /* -- Modal internal layout fixes -- */
     .next-btn {
+        position: sticky;
+        bottom: 0;
         text-align: right;
-        padding: 20px 0 24px;
+        padding: 16px 0 4px;
         margin-top: 12px;
+        background: linear-gradient(to bottom, transparent, var(--mr-surface, #12121e) 30%);
+        z-index: 10;
     }
     .next-btn .btn-primary {
         padding: 10px 28px !important;
