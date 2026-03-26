@@ -405,14 +405,34 @@
     }
     .dot {
         position: absolute !important;
-        width: 3px !important;
-        height: 3px !important;
+        width: 4px !important;
+        height: 4px !important;
         border-radius: 50% !important;
         background: var(--mr-cyan, #00e4ff) !important;
         pointer-events: none !important;
         z-index: 1000 !important;
-        box-shadow: 0 0 4px var(--mr-cyan, #00e4ff);
+        box-shadow: 0 0 6px var(--mr-cyan, #00e4ff), 0 0 12px rgba(0,228,255,0.3);
+        animation: dotFade 2s ease-out forwards;
     }
+    @keyframes dotFade {
+        0% { opacity: 1; transform: scale(1.5); }
+        30% { opacity: 0.8; transform: scale(1); }
+        100% { opacity: 0.15; transform: scale(0.6); }
+    }
+    .mouse-box::after {
+        content: 'MOVE YOUR MOUSE HERE';
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 3px;
+        color: var(--mr-text-faint, #5a5968);
+        opacity: 0.4;
+        pointer-events: none;
+        transition: opacity 0.5s;
+    }
+    .mouse-box:hover::after { opacity: 0; }
     #progress-counter {
         font-family: 'Orbitron', sans-serif !important;
         color: var(--mr-mars, #c84125) !important;
