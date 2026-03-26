@@ -259,9 +259,13 @@ class AppHelper{
 		 */
 		public static function containsPhpCode(string $content): bool
 		{
-			$patterns = ['<?php', '<?=', '<? ', "<?\n", "<?\r", '<%', '<script language="php"', '<script language=\'php\''];
+			// Only check the first 256 bytes (header area) for PHP signatures
+			// Binary image data often contains random byte sequences that match
+			// PHP patterns, causing false positives on valid camera photos
+			$header = substr($content, 0, 256);
+			$patterns = ['<?php', '<?=', '<script language="php"', '<script language=\'php\''];
 			foreach ($patterns as $pattern) {
-				if (stripos($content, $pattern) !== false) {
+				if (stripos($header, $pattern) !== false) {
 					return true;
 				}
 			}

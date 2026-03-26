@@ -66,10 +66,28 @@
     .gate-why-title { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-cyan); margin-bottom: 4px; }
     .gate-why-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-dim); line-height: 1.6; }
     </style>
+    <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
+    <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
+    <link rel="stylesheet" href="/assets/wallet/css/dashboard/dashboard.css?v=4.4">
     <script>var current_blob = null;</script>
+    @livewireStyles
 </head>
 <body class="mr-theme">
-    @include('partials.public-nav')
+    <div id="wrapper">
+        <header class="navbar navbar-inverse" role="banner">
+            <div class="container">
+                <div class="navbar-header">
+                    @include('wallet.header')
+                </div>
+                <nav class="collapse navbar-collapse" role="navigation">
+                    @include('wallet.navbarleft')
+                    @include('wallet.navbarright')
+                </nav>
+            </div>
+        </header>
+        @include('wallet.mainnav', ['active' => 'citizen'])
+    </div>
 
     <main class="mr-auth-page">
         <div class="gateway-wizard">
@@ -326,7 +344,9 @@
         </div>
     </main>
 
-    @include('partials.public-footer')
+    <footer class="footer" style="border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)); padding: 20px 0; background: var(--mr-void, #06060c);">
+        @include('footer')
+    </footer>
 
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
