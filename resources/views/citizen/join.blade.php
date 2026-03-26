@@ -77,7 +77,7 @@
     <script>var current_blob = null;</script>
     @livewireStyles
 </head>
-<body class="mr-theme">
+<body style="background: #06060c !important;">
     <div id="wrapper">
         <header class="navbar navbar-inverse" role="banner">
             <div class="container">
