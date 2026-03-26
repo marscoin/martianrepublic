@@ -75,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
 // Citizen Routes
 // ==================================================================================
 Route::get('/citizen/all', 'Citizen\IdentityController@showAll');
+Route::get('/citizen/join', 'Citizen\IdentityController@showJoin');
 Route::get('/citizen/printout', 'Citizen\IdentityController@printout');
 Route::get('/citizen/printout2', 'Citizen\IdentityController@printout2');
 Route::get('/citizen/printout3', 'Citizen\IdentityController@printout3');

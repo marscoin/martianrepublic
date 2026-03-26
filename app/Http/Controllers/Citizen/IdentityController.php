@@ -35,6 +35,24 @@ class IdentityController extends Controller
 	}
 
 
+	// The Gateway: citizen onboarding wizard
+	public function showJoin()
+	{
+		if (!Auth::check()) return redirect('/login');
+		$uid = Auth::user()->id;
+		$profile = Profile::where('userid', $uid)->first();
+		if (!$profile) return redirect('/twofa');
+
+		$civic_wallet = CivicWallet::where('user_id', $uid)->first();
+		if (!$civic_wallet) return redirect('/wallet/dashboard/hd');
+
+		$citcache = Citizen::where('userid', $uid)->first();
+		$view = View::make('citizen.join');
+		$view->citcache = $citcache ? $citcache->toArray() : [];
+		$view->public_address = $civic_wallet->public_addr;
+		return $view;
+	}
+
 	//Get all public registrations and display table
 	//
     public function showAll()
