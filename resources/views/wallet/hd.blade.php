@@ -1386,15 +1386,26 @@
                 }
 
                 // Encrypt mnemonic with password (PBKDF2 100k rounds)
+                // Show spinner, then run in setTimeout so UI updates first
                 if (password && rePassword) {
-                    var mnem = $('.mnemonic-text').html();
-                    var hashed_password = hashPassword(password);
-                    var encrypted_mnem = my_bundle.encrypt(mnem, hashed_password, iv);
-                    var hashed_re_password = hashPassword(rePassword);
-                    $("#password").val(encrypted_mnem);
-                    $("#re-password").val(hashed_re_password);
+                    $("#next-mnemonic").html('<i class="fa fa-shield-halved fa-spin" style="margin-right:6px;"></i> Encrypting...').prop('disabled', true);
+                    setTimeout(() => {
+                        var mnem = $('.mnemonic-text').html();
+                        var hashed_password = hashPassword(password);
+                        var encrypted_mnem = my_bundle.encrypt(mnem, hashed_password, iv);
+                        var hashed_re_password = hashPassword(rePassword);
+                        $("#password").val(encrypted_mnem);
+                        $("#re-password").val(hashed_re_password);
+                        // Now show the verification step
+                        showMnemonicVerification();
+                    }, 80);
+                    return; // Don't fall through - verification shown after encryption
                 }
 
+                showMnemonicVerification();
+            });
+
+            function showMnemonicVerification() {
                 // Mnemonic confirmation - pick 3 random words for user to verify
                 const mnemWords = $('.mnemonic-text').html().trim().split(/\s+/);
                 const indices = [];
