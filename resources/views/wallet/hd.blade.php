@@ -1043,7 +1043,13 @@
                                     &nbsp;&nbsp;Unlock with Mnemonic
                                 </a>
                             </li>
-                            {{-- Password unlock disabled - content was removed, mnemonic/keyfile are the supported methods --}}
+                            @if (!empty($encrypted_seed) && $encrypted_seed !== 'UNSET')
+                                <li>
+                                    <a href="#passwordLogin" data-toggle="tab"><i class="fa fa-key"></i>
+                                        &nbsp;&nbsp;Unlock with Password
+                                    </a>
+                                </li>
+                            @endif
                             <li>
                                 <a href="#importWallet" data-toggle="tab"><i class="fa fa-upload"></i>
                                     &nbsp;&nbsp;Unlock with Keyfile
@@ -1135,20 +1141,28 @@
                             </form>
 
                         </div>
-                        {{-- @if (empty($encrypted_seed))
+                        @if (!empty($encrypted_seed) && $encrypted_seed !== 'UNSET')
                             <div class="tab-pane fade" id="passwordLogin">
-                                <form class="form account-form wallet-getter" method="GET"
-                                    action="/wallet/getwallet">
-                                    <label for="name">Password</label>
-                                    <input type="password" id="wallet-password" name="password"
-                                        class="form-control parsley-validated" data-required="true">
-                                    <button id="login-wallet-password" type="submit"
-                                        class="btn btn-primary">Login</button>
-                                </form>
-
-
+                                <div style="padding: 20px 0;">
+                                    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #fff; margin-bottom: 8px;">
+                                        <i class="fa fa-key" style="color: var(--mr-cyan); margin-right: 8px;"></i> Unlock with Password
+                                    </h2>
+                                    <p style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mr-text-dim); margin-bottom: 20px;">
+                                        Enter the password you set when creating or backing up your wallet.
+                                    </p>
+                                    <form class="form account-form wallet-getter" method="GET" action="/wallet/getwallet">
+                                        <label style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-text-dim); margin-bottom: 6px;">Wallet Password</label>
+                                        <input type="password" id="wallet-password" name="password"
+                                            class="form-control" data-required="true" style="margin-bottom: 16px;"
+                                            placeholder="Enter your backup password">
+                                        <button id="login-wallet-password" type="submit"
+                                            class="btn btn-primary" style="width: 100%; padding: 12px !important;">
+                                            <i class="fa fa-unlock" style="margin-right: 6px;"></i> Unlock Wallet
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-                        @endif --}}
+                        @endif
 
 
                         <div class="tab-pane fade in" id="importWallet">
