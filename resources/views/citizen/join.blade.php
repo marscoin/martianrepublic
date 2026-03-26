@@ -16,7 +16,7 @@
     body, .mr-theme { background: var(--mr-void, #06060c) !important; }
     .gateway-wizard { max-width: 620px; margin: 0 auto; padding: 16px 20px 60px; }
     main.mr-auth-page { padding: 0 !important; margin: 0 !important; min-height: auto !important; background: var(--mr-void, #06060c) !important; }
-    #wrapper { min-height: 100vh; display: flex; flex-direction: column; }
+    #wrapper { min-height: 100vh; display: flex; flex-direction: column; margin-bottom: 0 !important; padding-bottom: 0 !important; }
     #wrapper > main { flex: 1; }
     .gateway-step { display: none; animation: gateIn 0.4s ease-out; }
     .gateway-step.active { display: block; }
