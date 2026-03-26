@@ -56,6 +56,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/wallet/forget', 'Wallet\DashboardController@forgetWallet');
 
     Route::any('/wallet/dashboard/hd', 'Wallet\DashboardController@listHDWallet');
+    Route::get('/wallet/create', 'Wallet\DashboardController@showCreateWallet');
     Route::any('/wallet/dashboard/hd-open', 'Wallet\DashboardController@showHDOpen');
     Route::any('/wallet/dashboard/hd-close', 'Wallet\DashboardController@showHDClose');
     Route::any('/wallet/getwallet', 'Wallet\DashboardController@getWallet');

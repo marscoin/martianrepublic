@@ -696,7 +696,7 @@
 
                 {{-- ACTION BAR --}}
                 <div class="vault-actions">
-                    <a data-toggle="modal" href="#styledModal" class="vault-action-btn primary demo-element" data-backdrop="static" data-keyboard="false">
+                    <a href="/wallet/create" class="vault-action-btn primary">
                         <i class="fa fa-plus"></i> New Wallet
                     </a>
                     <a data-backdrop="static" data-keyboard="false" data-toggle="modal" href="#modalLogin" class="vault-action-btn secondary demo-element">

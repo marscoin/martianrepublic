@@ -319,7 +319,7 @@
                                                     <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: var(--mr-cyan, #00e4ff);">Create Your Wallet</div>
                                                     <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968);">Set up your Marscoin wallet to participate in the Republic</div>
                                                 </div>
-                                                <a href="/wallet/dashboard/hd" class="onboard-cta" style="padding: 8px 16px; background: var(--mr-mars, #c84125); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #fff; text-decoration: none; white-space: nowrap;">
+                                                <a href="/wallet/create" class="onboard-cta" style="padding: 8px 16px; background: var(--mr-mars, #c84125); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #fff; text-decoration: none; white-space: nowrap;">
                                                     Create Wallet <i class="fa fa-arrow-right" style="margin-left: 4px;"></i>
                                                 </a>
                                                 <style>

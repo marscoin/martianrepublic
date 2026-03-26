@@ -287,6 +287,22 @@ class DashboardController extends Controller
 
 	// Wallet history
 
+	// Create Wallet Wizard (full-page, replaces modal)
+	public function showCreateWallet()
+	{
+		if (!Auth::check()) return redirect('/login');
+		$uid = Auth::user()->id;
+		$profile = Profile::where('userid', $uid)->first();
+		if (!$profile) return redirect('/twofa');
+		if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) return redirect('/twofachallenge');
+
+		$view = View::make('wallet.create');
+		$data = json_decode(file_get_contents("/home/mars/constitution/marswallet.json"), true);
+		$view->SALT = $data['salt'];
+		$view->iv = $data['iv'];
+		return $view;
+	}
+
 	// Show HD Wallet (Not Open)
 	// /wallet/dashboard/hd
 	protected function listHDWallet(Request $request)
