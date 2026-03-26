@@ -148,6 +148,8 @@
         .dash-title { font-size: 20px; }
         .table-responsive, .dataTables_wrapper { overflow-x: auto; }
         .dataTable th, .dataTable td { white-space: nowrap; }
+        #chart-summary { grid-template-columns: repeat(2, 1fr) !important; }
+        #chart-view-toggle { flex-wrap: wrap; }
     }
     </style>
 </head>
@@ -181,26 +183,53 @@
                         <div class="dash-card">
                             @livewire('dashboard-stats')
                         </div>
+                        <div style="margin-top: 16px;">
+                            @livewire('citizen-id-card')
+                        </div>
                     </div>
                     <div class="col-md-8 col-sm-7 fade-in-2">
                         <div class="section-label">Activity</div>
                         <div class="dash-card">
 
                             @if ($wallet_open)
+                                {{-- Financial Overview Header --}}
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                                    <h4 class="portlet-title" style="margin: 0;">Financial Overview</h4>
+                                    <div id="chart-view-toggle" style="display: flex; gap: 2px; background: var(--mr-dark, #0c0c16); border-radius: 6px; padding: 2px; border: 1px solid var(--mr-border, rgba(255,255,255,0.06));">
+                                        <button class="chart-toggle-btn active" data-view="combined" style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; transition: all 0.2s; background: var(--mr-mars, #c84125); color: #fff;">Combined</button>
+                                        <button class="chart-toggle-btn" data-view="flow" style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--mr-text-dim, #8a8998);">Flow</button>
+                                        <button class="chart-toggle-btn" data-view="balance" style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; transition: all 0.2s; background: transparent; color: var(--mr-text-dim, #8a8998);">Balance</button>
+                                    </div>
+                                </div>
 
+                                {{-- Summary Stats --}}
+                                <div id="chart-summary" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--mr-border, rgba(255,255,255,0.06)); border-radius: 6px; overflow: hidden; margin-bottom: 20px;">
+                                    <div style="background: var(--mr-dark, #0c0c16); padding: 12px 14px;">
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-text-faint, #5a5968);">Total In</div>
+                                        <div id="stat-total-in" style="font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 600; color: var(--mr-green, #34d399); margin-top: 2px;">-</div>
+                                    </div>
+                                    <div style="background: var(--mr-dark, #0c0c16); padding: 12px 14px;">
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-text-faint, #5a5968);">Total Out</div>
+                                        <div id="stat-total-out" style="font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 600; color: var(--mr-mars, #c84125); margin-top: 2px;">-</div>
+                                    </div>
+                                    <div style="background: var(--mr-dark, #0c0c16); padding: 12px 14px;">
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-text-faint, #5a5968);">Net</div>
+                                        <div id="stat-net" style="font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 600; color: #fff; margin-top: 2px;">-</div>
+                                    </div>
+                                    <div style="background: var(--mr-dark, #0c0c16); padding: 12px 14px;">
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-text-faint, #5a5968);">Transactions</div>
+                                        <div id="stat-tx-count" style="font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 600; color: var(--mr-cyan, #00e4ff); margin-top: 2px;">-</div>
+                                    </div>
+                                </div>
 
+                                {{-- Time range indicator --}}
+                                <div id="chart-timerange" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-faint, #5a5968); margin-bottom: 8px; display: none;">
+                                    <i class="fa fa-clock-o" style="margin-right: 4px;"></i>
+                                    <span id="chart-timerange-text"></span>
+                                </div>
 
-                                <h4 class="portlet-title">
-                                    <u>Transactions By Month</u>
-                                </h4>
+                                <div id="chart" style="min-height: 320px;"></div>
 
-                                <p>Quick overview over your Marscoin wallet transactions by type over time.</p>
-                                <hr>
-
-                                <div class="portlet-body">
-                                
-                                <div id="chart"></div>
-                                </div> 
                             @else
                                 @if ($has_civic_wallet || $has_wallet)
                                     <div style="padding: 30px 20px; text-align: center;">
@@ -332,9 +361,47 @@
                         <div class="dash-card" style="margin-bottom: 16px;">
                             @livewire('block-display')
                         </div>
-                        <div class="dash-card">
+                        <div class="dash-card" style="margin-bottom: 16px;">
                             @livewire('hodler-stats')
                         </div>
+                        {{-- Mars Land CTA --}}
+                        <a href="/map/all" class="mars-land-cta" style="display: block; text-decoration: none; position: relative; overflow: hidden; border-radius: 8px; border: 1px solid var(--mr-border, rgba(255,255,255,0.06)); background: var(--mr-surface, #12121e); padding: 16px 18px; transition: border-color 0.3s, transform 0.2s;">
+                            <div style="position: absolute; bottom: -8px; right: -20px; opacity: 0.08; pointer-events: none;">
+                                <svg width="120" height="60" viewBox="0 0 120 60" fill="none">
+                                    <path d="M0 60 Q60 0 120 60" fill="var(--mr-mars, #c84125)"/>
+                                </svg>
+                            </div>
+                            <svg width="100%" height="28" viewBox="0 0 200 28" preserveAspectRatio="none" style="display: block; margin-bottom: 10px;">
+                                <defs>
+                                    <linearGradient id="marsHorizon" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0%" stop-color="transparent"/>
+                                        <stop offset="30%" stop-color="var(--mr-mars, #c84125)" stop-opacity="0.7"/>
+                                        <stop offset="50%" stop-color="var(--mr-mars, #c84125)"/>
+                                        <stop offset="70%" stop-color="var(--mr-mars, #c84125)" stop-opacity="0.7"/>
+                                        <stop offset="100%" stop-color="transparent"/>
+                                    </linearGradient>
+                                    <radialGradient id="marsGlow" cx="50%" cy="100%" r="60%">
+                                        <stop offset="0%" stop-color="var(--mr-mars, #c84125)" stop-opacity="0.15"/>
+                                        <stop offset="100%" stop-color="transparent"/>
+                                    </radialGradient>
+                                </defs>
+                                <rect x="0" y="0" width="200" height="28" fill="url(#marsGlow)"/>
+                                <path d="M0 26 Q50 8 100 6 Q150 8 200 26" stroke="url(#marsHorizon)" stroke-width="2" fill="none"/>
+                                <path d="M40 26 Q100 12 160 26" fill="var(--mr-mars, #c84125)" fill-opacity="0.06"/>
+                            </svg>
+                            <div style="font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 1px; text-transform: uppercase;">
+                                Stake Mars Acreage
+                            </div>
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-dim, #8a8998); margin-top: 3px; letter-spacing: 0.5px;">
+                                Claim your plot on the Red Planet <i class="fa fa-arrow-right" style="font-size: 8px; margin-left: 4px; color: var(--mr-mars, #c84125);"></i>
+                            </div>
+                        </a>
+                        <style>
+                            .mars-land-cta:hover {
+                                border-color: rgba(200,65,37,0.4) !important;
+                                transform: translateY(-1px);
+                            }
+                        </style>
                     </div>
                     <div class="col-md-5">
                         <div class="section-label">Republic Activity</div>
@@ -345,7 +412,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="section-label">Market Data</div>
-                        <div class="dash-card">
+                        <div class="dash-card" style="margin-bottom: 16px;">
                             <h4 class="portlet-title">MARS / USD</h4>
                             <div id="price-display">
                                 <div style="text-align: center; padding: 20px; color: var(--mr-text-dim);">
@@ -353,6 +420,38 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="dash-card">
+                            @livewire('block-interval-sparkline')
+                        </div>
+                        {{-- Mobile Wallet Downloads --}}
+                        <div style="margin-top: 16px; border-radius: 8px; border: 1px solid var(--mr-border, rgba(255,255,255,0.06)); background: var(--mr-surface, #12121e); padding: 16px 18px;">
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-text-dim, #8a8998); margin-bottom: 10px;">
+                                <i class="fa fa-mobile" style="margin-right: 4px;"></i> Mobile Wallets
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <a href="https://apps.apple.com/us/app/martianrepublic/id6480416861" target="_blank" rel="noopener"
+                                   class="mobile-dl-btn" style="flex: 1; display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--mr-dark, #0c0c16); border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)); border-radius: 6px; text-decoration: none; transition: border-color 0.2s;">
+                                    <i class="fa fa-apple" style="font-size: 18px; color: #fff;"></i>
+                                    <div>
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--mr-text-faint, #5a5968); letter-spacing: 0.5px;">Download on</div>
+                                        <div style="font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 600; color: #fff;">App Store</div>
+                                    </div>
+                                </a>
+                                <a href="https://play.google.com/store/apps/details?id=io.bytewallet.bytewallet" target="_blank" rel="noopener"
+                                   class="mobile-dl-btn" style="flex: 1; display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--mr-dark, #0c0c16); border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)); border-radius: 6px; text-decoration: none; transition: border-color 0.2s;">
+                                    <i class="fa fa-android" style="font-size: 18px; color: var(--mr-green, #34d399);"></i>
+                                    <div>
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--mr-text-faint, #5a5968); letter-spacing: 0.5px;">Get it on</div>
+                                        <div style="font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 600; color: #fff;">Google Play</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <style>
+                            .mobile-dl-btn:hover {
+                                border-color: rgba(255,255,255,0.25) !important;
+                            }
+                        </style>
                     </div> <!-- /.col -->
                 </div> <!-- /.row -->
             </div> <!-- /.container -->
@@ -417,9 +516,10 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
             }
         });
 
-        // Calculate the value received (vout)
+        // Calculate the value received (vout) - handle both v28 and legacy formats
         tx.vout.forEach((vout) => {
-            if (vout.scriptPubKey.addresses && vout.scriptPubKey.addresses.includes(address)) {
+            var ra = vout.scriptPubKey.addresses || (vout.scriptPubKey.address ? [vout.scriptPubKey.address] : []);
+            if (ra.includes(address)) {
                 valueReceived += parseFloat(vout.value);
             }
         });
@@ -503,13 +603,14 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
                             }
                         });
 
-                        // Calculate the value received (vout)
-                        tx.vout.forEach((vout) => 
+                        // Calculate the value received (vout) - handle both v28 and legacy address formats
+                        tx.vout.forEach((vout) =>
                         {
-                            if (vout.scriptPubKey.addresses && vout.scriptPubKey.addresses.includes(address)) {
+                            var vAddrs = vout.scriptPubKey.addresses || (vout.scriptPubKey.address ? [vout.scriptPubKey.address] : []);
+                            if (vAddrs.includes(address)) {
                                 valueReceived += parseFloat(vout.value);
-                            }else if (vout.scriptPubKey.addresses){
-                                recipient = vout.scriptPubKey.addresses[0];
+                            }else if (vAddrs.length > 0){
+                                recipient = vAddrs[0];
                             }
 
                             if (vout.scriptPubKey.type == "nulldata") {
@@ -602,74 +703,416 @@ function calculateRunningBalanceWithoutFees(jsonData, address) {
 
                 }
 
-                    // Clean and sort the balanceData by time (x)
-                    let cleanedBalanceData = balanceData.filter(point => point.x && !isNaN(point.y)).sort((a, b) => a.x - b.x);
+                    // ================================================================
+                    // FINANCIAL OVERVIEW CHART ENGINE
+                    // ================================================================
 
-                    // Map the sorted and updated balanceData for charting
-                    let seriesData = cleanedBalanceData.map(point => {
-                        return { x: new Date(point.x), y: point.y };
-                    });
+                    // Build per-transaction flow data with PROPER inflow/outflow tracking
+                    // The existing balanceData[].z is unreliable for HD wallets because
+                    // change goes to different addresses, making z = -(full UTXO) instead
+                    // of -(actual amount sent). We re-process from raw transactions.
+                    let txFlowData = [];
+                    let totalIn = 0, totalOut = 0;
+                    var rawTxs = data.txs.slice().sort(function(a, b) { return a.time - b.time; });
+                    var flowBalance = 0;
+                    for (var ti = 0; ti < rawTxs.length; ti++) {
+                        var ftx = rawTxs[ti];
+                        var fIsSender = false;
+                        var fValueReceived = 0;
+                        var fValueSentToOthers = 0;
+                        var fVinTotal = 0;
 
-                    //console.log(seriesData);
-
-                    let maxYValue = Math.max(...cleanedBalanceData.map(point => point.y));
-
-                    // ApexCharts options
-                    var options = {
-
-                    series: [{
-                        name: 'Balance',
-                        data: seriesData,
-                        color: '#c84125',
-                    }],
-                    chart: {
-                        type: 'area',
-                        height: 350,
-                        zoom: { enabled: false },
-                        toolbar: { show: false },
-                        foreColor: '#8a8998',
-                        background: 'transparent'
-                    },
-                    dataLabels: { enabled: false },
-                    stroke: { curve: 'smooth', width: 2 },
-                    fill: {
-                        type: 'gradient',
-                        gradient: {
-                            shadeIntensity: 1,
-                            opacityFrom: 0.4,
-                            opacityTo: 0.05,
-                            stops: [0, 100]
-                        }
-                    },
-                    grid: {
-                        borderColor: 'rgba(255,255,255,0.06)',
-                        strokeDashArray: 4
-                    },
-                    xaxis: {
-                        type: 'datetime',
-                        labels: { style: { colors: '#5a5968' } },
-                        axisBorder: { color: 'rgba(255,255,255,0.06)' },
-                        axisTicks: { color: 'rgba(255,255,255,0.06)' }
-                    },
-                    tooltip: {
-                        theme: 'dark',
-                        x: { format: 'dd MMM yyyy' }
-                    },
-                    yaxis: {
-                        min: 0,
-                        max: maxYValue,
-                        labels: {
-                            style: { colors: '#5a5968' },
-                            formatter: function (value) {
-                                return value.toFixed(2);
+                        // Check vins - are we the sender?
+                        ftx.vin.forEach(function(vin) {
+                            if (vin.addr === address) {
+                                fIsSender = true;
+                                fVinTotal += vin.value;
                             }
+                        });
+
+                        // Check vouts (handle both v28 'address' and legacy 'addresses' formats)
+                        ftx.vout.forEach(function(vout) {
+                            var sp = vout.scriptPubKey || {};
+                            var addrs = sp.addresses || (sp.address ? [sp.address] : []);
+                            if (addrs.includes(address)) {
+                                fValueReceived += parseFloat(vout.value);
+                            } else if (sp.type !== 'nulldata' && addrs.length > 0) {
+                                fValueSentToOthers += parseFloat(vout.value);
+                            }
+                        });
+
+                        var fInflow = 0, fOutflow = 0;
+                        if (fIsSender) {
+                            // We spent: outflow = amount to others + fees
+                            fOutflow = fValueSentToOthers + ftx.fees;
+                            // We might also receive in same tx (rare but possible)
+                            // Only count received from others (vouts to us minus our own change)
+                            // If we're sender, vouts to us IS change, not real income
+                        } else {
+                            // Pure receive
+                            fInflow = fValueReceived;
+                        }
+
+                        flowBalance += fInflow - fOutflow;
+                        totalIn += fInflow;
+                        totalOut += fOutflow;
+                        txFlowData.push({
+                            time: Math.round(ftx.time * 1000),
+                            inflow: fInflow,
+                            outflow: fOutflow,
+                            balance: flowBalance
+                        });
+                    }
+
+                    // Update summary stats
+                    document.getElementById('stat-total-in').textContent = totalIn.toFixed(4) + ' MARS';
+                    document.getElementById('stat-total-out').textContent = totalOut.toFixed(4) + ' MARS';
+                    var net = totalIn - totalOut;
+                    var netEl = document.getElementById('stat-net');
+                    netEl.textContent = (net >= 0 ? '+' : '') + net.toFixed(4) + ' MARS';
+                    netEl.style.color = net >= 0 ? 'var(--mr-green, #34d399)' : 'var(--mr-mars, #c84125)';
+                    document.getElementById('stat-tx-count').textContent = txFlowData.length;
+
+                    // Smart time bucketing
+                    function detectBucketSize(data) {
+                        if (data.length < 2) return 'none';
+                        var spanMs = data[data.length - 1].time - data[0].time;
+                        var spanDays = spanMs / (86400000);
+                        if (spanDays <= 3) return 'hour';
+                        if (spanDays <= 14) return 'day';
+                        if (spanDays <= 90) return 'week';
+                        if (spanDays <= 730) return 'month';
+                        if (spanDays <= 2555) return 'quarter';
+                        return 'year';
+                    }
+
+                    function getBucketKey(timestamp, bucketSize) {
+                        var d = new Date(timestamp);
+                        switch (bucketSize) {
+                            case 'hour':
+                                return new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours()).getTime();
+                            case 'day':
+                                return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+                            case 'week':
+                                var day = d.getDay();
+                                var diff = d.getDate() - day + (day === 0 ? -6 : 1);
+                                return new Date(d.getFullYear(), d.getMonth(), diff).getTime();
+                            case 'month':
+                                return new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+                            case 'quarter':
+                                return new Date(d.getFullYear(), Math.floor(d.getMonth() / 3) * 3, 1).getTime();
+                            case 'year':
+                                return new Date(d.getFullYear(), 0, 1).getTime();
+                            default:
+                                return timestamp;
                         }
                     }
-                    };
 
-                    // Initialize ApexCharts
-                    var chart = new ApexCharts(document.querySelector("#chart"), options);
-                    chart.render();
+                    function formatBucketLabel(bucketSize) {
+                        var labels = {
+                            'hour': 'Hourly', 'day': 'Daily', 'week': 'Weekly',
+                            'month': 'Monthly', 'quarter': 'Quarterly', 'year': 'Yearly', 'none': 'Per Transaction'
+                        };
+                        return labels[bucketSize] || bucketSize;
+                    }
+
+                    function bucketData(flowData, bucketSize) {
+                        if (bucketSize === 'none' || flowData.length <= 20) {
+                            // Few transactions: show each one individually
+                            return flowData.map(function(d) {
+                                return { time: d.time, inflow: d.inflow, outflow: d.outflow, balance: d.balance };
+                            });
+                        }
+                        var buckets = {};
+                        var lastBalance = 0;
+                        for (var i = 0; i < flowData.length; i++) {
+                            var key = getBucketKey(flowData[i].time, bucketSize);
+                            if (!buckets[key]) {
+                                buckets[key] = { time: key, inflow: 0, outflow: 0, balance: 0 };
+                            }
+                            buckets[key].inflow += flowData[i].inflow;
+                            buckets[key].outflow += flowData[i].outflow;
+                            buckets[key].balance = flowData[i].balance; // last balance in bucket
+                            lastBalance = flowData[i].balance;
+                        }
+
+                        // Fill gaps between buckets so the chart is continuous
+                        var keys = Object.keys(buckets).map(Number).sort(function(a, b) { return a - b; });
+                        var filled = [];
+                        var prevBal = 0;
+                        for (var k = 0; k < keys.length; k++) {
+                            // If gap is > 1 bucket, insert empty buckets
+                            if (k > 0 && bucketSize !== 'none') {
+                                var prevKey = keys[k - 1];
+                                var nextExpected = getNextBucket(prevKey, bucketSize);
+                                while (nextExpected < keys[k]) {
+                                    filled.push({ time: nextExpected, inflow: 0, outflow: 0, balance: prevBal });
+                                    nextExpected = getNextBucket(nextExpected, bucketSize);
+                                }
+                            }
+                            filled.push(buckets[keys[k]]);
+                            prevBal = buckets[keys[k]].balance;
+                        }
+                        return filled;
+                    }
+
+                    function getNextBucket(timestamp, bucketSize) {
+                        var d = new Date(timestamp);
+                        switch (bucketSize) {
+                            case 'hour': return new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours() + 1).getTime();
+                            case 'day': return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime();
+                            case 'week': return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 7).getTime();
+                            case 'month': return new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime();
+                            case 'quarter': return new Date(d.getFullYear(), d.getMonth() + 3, 1).getTime();
+                            case 'year': return new Date(d.getFullYear() + 1, 0, 1).getTime();
+                            default: return timestamp + 1;
+                        }
+                    }
+
+                    var bucketSize = detectBucketSize(txFlowData);
+                    var chartBuckets = bucketData(txFlowData, bucketSize);
+
+                    // Show time range indicator
+                    if (txFlowData.length >= 2) {
+                        var rangeEl = document.getElementById('chart-timerange');
+                        var first = new Date(txFlowData[0].time);
+                        var last = new Date(txFlowData[txFlowData.length - 1].time);
+                        var rangeText = first.toLocaleDateString('en-US', {month: 'short', year: 'numeric'}) +
+                            ' \u2014 ' + last.toLocaleDateString('en-US', {month: 'short', year: 'numeric'}) +
+                            ' \u00b7 ' + formatBucketLabel(txFlowData.length <= 20 ? 'none' : bucketSize) + ' view';
+                        document.getElementById('chart-timerange-text').textContent = rangeText;
+                        rangeEl.style.display = 'block';
+                    }
+
+                    // Prepare series data
+                    var inflowSeries = chartBuckets.map(function(b) { return { x: b.time, y: parseFloat(b.inflow.toFixed(4)) }; });
+                    var outflowSeries = chartBuckets.map(function(b) { return { x: b.time, y: parseFloat((-b.outflow).toFixed(4)) }; });
+                    var balanceSeries = chartBuckets.map(function(b) { return { x: b.time, y: parseFloat(b.balance.toFixed(4)) }; });
+
+                    // Determine x-axis format based on bucket size
+                    var xaxisFormat = 'MMM yyyy';
+                    if (bucketSize === 'hour') xaxisFormat = 'HH:mm';
+                    else if (bucketSize === 'day') xaxisFormat = 'dd MMM';
+                    else if (bucketSize === 'week') xaxisFormat = 'dd MMM';
+
+                    // Chart render function
+                    var currentView = 'combined';
+                    var finChart = null;
+
+                    function renderFinChart(view) {
+                        if (finChart) { finChart.destroy(); }
+                        currentView = view;
+
+                        var series, chartType, yaxisConfig, strokeConfig, fillConfig, plotOptions;
+                        var maxBalance = Math.max.apply(null, chartBuckets.map(function(b) { return b.balance; }));
+                        var maxInflow = Math.max.apply(null, chartBuckets.map(function(b) { return b.inflow; }));
+                        var maxOutflow = Math.max.apply(null, chartBuckets.map(function(b) { return b.outflow; }));
+                        var maxFlow = Math.max(maxInflow, maxOutflow);
+
+                        if (view === 'flow') {
+                            series = [
+                                { name: 'Received', data: inflowSeries, type: 'bar' },
+                                { name: 'Sent', data: outflowSeries, type: 'bar' }
+                            ];
+                            yaxisConfig = [{
+                                labels: {
+                                    style: { colors: '#5a5968', fontFamily: "'JetBrains Mono', monospace", fontSize: '10px' },
+                                    formatter: function(v) { return Math.abs(v).toFixed(2); }
+                                },
+                                forceNiceScale: true
+                            }];
+                            strokeConfig = { width: [0, 0], curve: 'smooth' };
+                            fillConfig = { opacity: [0.85, 0.85] };
+                            plotOptions = {
+                                bar: {
+                                    columnWidth: chartBuckets.length <= 12 ? '40%' : '65%',
+                                    borderRadius: 3,
+                                    borderRadiusApplication: 'end'
+                                }
+                            };
+                        } else if (view === 'balance') {
+                            series = [
+                                { name: 'Balance', data: balanceSeries, type: 'area' }
+                            ];
+                            yaxisConfig = [{
+                                min: 0,
+                                max: maxBalance * 1.1,
+                                labels: {
+                                    style: { colors: '#5a5968', fontFamily: "'JetBrains Mono', monospace", fontSize: '10px' },
+                                    formatter: function(v) { return v.toFixed(2); }
+                                }
+                            }];
+                            strokeConfig = { width: [2.5], curve: 'smooth' };
+                            fillConfig = {
+                                type: ['gradient'],
+                                gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.02, stops: [0, 100] }
+                            };
+                            plotOptions = {};
+                        } else {
+                            // Combined: bars for flow + area for balance
+                            // Scale balance to fit the flow axis range for reliable rendering
+                            var maxFlowAbs = Math.max(maxInflow, maxOutflow, 0.01);
+                            var balScale = maxBalance > 0 ? (maxFlowAbs * 0.85) / maxBalance : 1;
+                            var scaledBalanceSeries = chartBuckets.map(function(b) {
+                                return { x: b.time, y: parseFloat((b.balance * balScale).toFixed(4)) };
+                            });
+
+                            series = [
+                                { name: 'Received', data: inflowSeries, type: 'bar' },
+                                { name: 'Sent', data: outflowSeries, type: 'bar' },
+                                { name: 'Balance', data: scaledBalanceSeries, type: 'area' }
+                            ];
+                            yaxisConfig = [
+                                {
+                                    labels: {
+                                        style: { colors: '#5a5968', fontFamily: "'JetBrains Mono', monospace", fontSize: '10px' },
+                                        formatter: function(v) { return Math.abs(v).toFixed(2); }
+                                    },
+                                    forceNiceScale: true,
+                                    title: { text: 'Flow (MARS)', style: { color: '#5a5968', fontFamily: "'JetBrains Mono', monospace", fontSize: '9px' } }
+                                },
+                                { show: false },
+                                {
+                                    opposite: true,
+                                    show: true,
+                                    min: 0,
+                                    labels: {
+                                        style: { colors: '#00e4ff', fontFamily: "'JetBrains Mono', monospace", fontSize: '10px' },
+                                        formatter: function(v) {
+                                            // Reverse the scaling to show real balance values
+                                            var real = balScale > 0 ? v / balScale : 0;
+                                            return real.toFixed(1);
+                                        }
+                                    },
+                                    title: { text: 'Balance (MARS)', style: { color: '#00e4ff', fontFamily: "'JetBrains Mono', monospace", fontSize: '9px' } }
+                                }
+                            ];
+                            strokeConfig = { width: [0, 0, 2.5], curve: ['smooth', 'smooth', 'smooth'] };
+                            fillConfig = {
+                                opacity: [0.85, 0.85, 0.12],
+                                type: ['solid', 'solid', 'gradient'],
+                                gradient: { shadeIntensity: 0, opacityFrom: 0.2, opacityTo: 0.02, stops: [0, 90] }
+                            };
+                            plotOptions = {
+                                bar: {
+                                    columnWidth: chartBuckets.length <= 12 ? '40%' : '60%',
+                                    borderRadius: 3,
+                                    borderRadiusApplication: 'end'
+                                }
+                            };
+                        }
+
+                        var options = {
+                            series: series,
+                            chart: {
+                                type: view === 'combined' ? 'line' : (view === 'balance' ? 'area' : 'bar'),
+                                height: 320,
+                                stacked: view === 'flow',
+                                toolbar: { show: false },
+                                zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
+                                foreColor: '#8a8998',
+                                background: 'transparent',
+                                fontFamily: "'JetBrains Mono', monospace",
+                                animations: {
+                                    enabled: true,
+                                    easing: 'easeinout',
+                                    speed: 600,
+                                    dynamicAnimation: { enabled: true, speed: 300 }
+                                }
+                            },
+                            colors: view === 'balance'
+                                ? ['#00e4ff']
+                                : ['#34d399', '#c84125', '#00e4ff'],
+                            plotOptions: plotOptions,
+                            dataLabels: { enabled: false },
+                            stroke: strokeConfig,
+                            fill: fillConfig,
+                            grid: {
+                                borderColor: 'rgba(255,255,255,0.04)',
+                                strokeDashArray: 3,
+                                xaxis: { lines: { show: false } },
+                                yaxis: { lines: { show: true } },
+                                padding: { left: 8, right: 8 }
+                            },
+                            xaxis: {
+                                type: 'datetime',
+                                labels: {
+                                    format: xaxisFormat,
+                                    style: { colors: '#5a5968', fontFamily: "'JetBrains Mono', monospace", fontSize: '9px' },
+                                    datetimeUTC: false,
+                                    rotate: -45,
+                                    rotateAlways: chartBuckets.length > 24
+                                },
+                                axisBorder: { show: true, color: 'rgba(255,255,255,0.06)' },
+                                axisTicks: { show: true, color: 'rgba(255,255,255,0.06)' },
+                                crosshairs: {
+                                    show: true,
+                                    stroke: { color: 'rgba(255,255,255,0.15)', width: 1, dashArray: 3 }
+                                }
+                            },
+                            yaxis: yaxisConfig,
+                            tooltip: {
+                                theme: 'dark',
+                                shared: true,
+                                intersect: false,
+                                style: { fontFamily: "'JetBrains Mono', monospace", fontSize: '11px' },
+                                x: { format: 'dd MMM yyyy' },
+                                y: {
+                                    formatter: function(value, opts) {
+                                        if (value === undefined || value === null) return '';
+                                        var name = opts.w.config.series[opts.seriesIndex].name;
+                                        var absVal = Math.abs(value).toFixed(4);
+                                        if (name === 'Sent') return absVal + ' MARS';
+                                        return absVal + ' MARS';
+                                    }
+                                }
+                            },
+                            markers: view === 'combined' ? {
+                                size: [0, 0, 4],
+                                colors: ['transparent', 'transparent', '#00e4ff'],
+                                strokeColors: '#0c0c16',
+                                strokeWidth: 2,
+                                hover: { sizeOffset: 2 }
+                            } : (view === 'balance' ? {
+                                size: [3],
+                                colors: ['#00e4ff'],
+                                strokeColors: '#0c0c16',
+                                strokeWidth: 2,
+                                hover: { sizeOffset: 2 }
+                            } : { size: 0 }),
+                            legend: {
+                                show: view === 'combined' || view === 'flow',
+                                position: 'top',
+                                horizontalAlign: 'left',
+                                fontFamily: "'JetBrains Mono', monospace",
+                                fontSize: '10px',
+                                labels: { colors: '#8a8998' },
+                                markers: { radius: 2, width: 10, height: 10 },
+                                itemMargin: { horizontal: 12 }
+                            }
+                        };
+
+                        finChart = new ApexCharts(document.querySelector("#chart"), options);
+                        finChart.render();
+                    }
+
+                    // Initial render
+                    renderFinChart('combined');
+
+                    // Toggle buttons
+                    document.querySelectorAll('.chart-toggle-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            document.querySelectorAll('.chart-toggle-btn').forEach(function(b) {
+                                b.style.background = 'transparent';
+                                b.style.color = 'var(--mr-text-dim, #8a8998)';
+                                b.classList.remove('active');
+                            });
+                            this.style.background = 'var(--mr-mars, #c84125)';
+                            this.style.color = '#fff';
+                            this.classList.add('active');
+                            renderFinChart(this.getAttribute('data-view'));
+                        });
+                    });
 
                 });
 

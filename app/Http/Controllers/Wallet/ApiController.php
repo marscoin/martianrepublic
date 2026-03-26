@@ -604,6 +604,39 @@ class ApiController extends Controller {
 		return response()->json(['error' => 'Price unavailable'], 500);
 	}
 
+	public function marsUtxoMulti(Request $request)
+	{
+		$xpub = $request->input('xpub');
+		$receiver = $request->input('receiver_address');
+		$amount = $request->input('amount');
+		if (!$xpub || !$receiver || !$amount) {
+			return response()->json(['error' => 'Missing parameters'], 400);
+		}
+		try {
+			$url = 'http://localhost:3001/api/mars/utxo-multi?xpub=' . urlencode($xpub) . '&receiver_address=' . urlencode($receiver) . '&amount=' . urlencode($amount);
+			$json = @file_get_contents($url);
+			if ($json) {
+				return response($json)->header('Content-Type', 'application/json');
+			}
+		} catch (\Exception $e) {}
+		return response()->json(['error' => 'UTXO selection failed'], 500);
+	}
+
+	public function marsTxHistory(Request $request)
+	{
+		$address = $request->input('address');
+		if (!$address || !AppHelper::isValidMarscoinAddress($address)) {
+			return response()->json(['error' => 'Invalid address'], 400);
+		}
+		try {
+			$json = @file_get_contents('http://localhost:3001/api/mars/txhistory/?address=' . urlencode($address));
+			if ($json) {
+				return response($json)->header('Content-Type', 'application/json');
+			}
+		} catch (\Exception $e) {}
+		return response()->json(['error' => 'Transaction history unavailable'], 500);
+	}
+
 	public function closewallet(Request $request)
 	{
 		$uid = Auth::user()->id;

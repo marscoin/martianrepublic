@@ -17,25 +17,548 @@
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/wallet/css/hd-open/hd-open.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
-        span.qrcodeicon span {
-            position: absolute;
-            display: block;
-            top: 7px;
-            right: 21px;
-            width: 18px;
-            height: 18px;
-            background: url('/assets/wallet/img/qrcode.png');
-            cursor: pointer;
-            z-index: 1;
-        }
+    /* ============================================ */
+    /* THE BRIDGE: Active Wallet Command Interface  */
+    /* ============================================ */
+    body { background: var(--mr-void, #06060c) !important; color: var(--mr-text, #e0dfe6); }
+    .bridge-page { min-height: 100vh; display: flex; flex-direction: column; }
+    .bridge-page .content { flex: 1; }
+
+    /* -- Hero Balance Bar -- */
+    .bridge-hero {
+        padding: 28px 0 22px;
+        position: relative;
+        margin-bottom: 24px;
+    }
+    .bridge-hero::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08) 20%, var(--mr-mars, #c84125) 50%, rgba(255,255,255,0.08) 80%, transparent);
+    }
+    .bridge-status {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--mr-green, #34d399);
+        margin-bottom: 4px;
+    }
+    .bridge-status .dot {
+        display: inline-block;
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--mr-green, #34d399);
+        margin-right: 8px;
+        animation: bridgePulse 2s infinite;
+        vertical-align: middle;
+    }
+    .bridge-balance-row {
+        display: flex;
+        align-items: baseline;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+    .bridge-balance {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 32px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 1px;
+    }
+    .bridge-balance .unit {
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--mr-text-dim, #8a8998);
+        margin-left: 6px;
+    }
+    .bridge-addr {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--mr-cyan, #00e4ff);
+        opacity: 0.7;
+    }
+
+    /* -- Quick Action Cards -- */
+    .bridge-actions {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 28px;
+    }
+    .bridge-action {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 12px;
+        background: var(--mr-surface, #12121e);
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.25s;
+        text-decoration: none !important;
+    }
+    .bridge-action:hover {
+        border-color: rgba(255,255,255,0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .bridge-action-icon {
+        width: 40px; height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
+    .bridge-action-icon.send { background: rgba(200,65,37,0.15); color: var(--mr-mars, #c84125); }
+    .bridge-action-icon.receive { background: rgba(52,211,153,0.15); color: var(--mr-green, #34d399); }
+    .bridge-action-icon.backup { background: rgba(0,228,255,0.12); color: var(--mr-cyan, #00e4ff); }
+    .bridge-action-icon.lock { background: rgba(138,137,152,0.12); color: var(--mr-text-dim, #8a8998); }
+    .bridge-action-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim, #8a8998);
+    }
+
+    /* -- Section label -- */
+    .bridge-section {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim, #8a8998);
+        margin-bottom: 14px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+    }
+
+    /* -- Card container -- */
+    .bridge-card {
+        background: var(--mr-surface, #12121e);
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+        border-radius: 10px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+    .bridge-card-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #fff;
+        margin-bottom: 18px;
+    }
+
+    /* -- Send form styling -- */
+    .bridge-card .form-control {
+        background: var(--mr-dark, #0c0c16) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)) !important;
+        color: #fff !important;
+        border-radius: 8px !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 13px !important;
+        padding: 12px 16px !important;
+        height: auto !important;
+        transition: border-color 0.2s !important;
+    }
+    .bridge-card .form-control:focus {
+        border-color: var(--mr-cyan, #00e4ff) !important;
+        box-shadow: 0 0 0 3px rgba(0,228,255,0.08) !important;
+        outline: none !important;
+    }
+    .bridge-card .form-control::placeholder {
+        color: var(--mr-text-faint, #5a5968) !important;
+    }
+    .bridge-card label, .bridge-card span[for] {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 10px !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        color: var(--mr-text-dim, #8a8998) !important;
+        margin-bottom: 6px !important;
+        display: block;
+    }
+    .bridge-card .btn-primary {
+        background: var(--mr-mars, #c84125) !important;
+        border-color: var(--mr-mars, #c84125) !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 11px !important;
+        font-weight: 500;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        padding: 12px 28px !important;
+        border-radius: 8px !important;
+        transition: all 0.2s !important;
+        width: 100%;
+        margin-top: 8px;
+    }
+    .bridge-card .btn-primary:hover {
+        background: #d94e30 !important;
+        box-shadow: 0 4px 20px rgba(200,65,37,0.35) !important;
+    }
+
+    /* -- Receive / QR styling -- */
+    .bridge-qr-wrap {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 16px;
+    }
+    .bridge-qr-wrap canvas, .bridge-qr-wrap img {
+        border-radius: 8px;
+        border: 2px solid var(--mr-border-bright, rgba(255,255,255,0.1));
+    }
+    .pub-addr {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        background: var(--mr-dark, #0c0c16) !important;
+        padding: 12px 16px !important;
+        border-radius: 8px !important;
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+        height: auto !important;
+        width: 100% !important;
+    }
+    .pub-addr-text, .pub-addr a {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 11px !important;
+        color: var(--mr-cyan, #00e4ff) !important;
+        word-break: break-all;
+        flex: 1;
+        text-decoration: none !important;
+    }
+    .copy-icon {
+        background: var(--mr-surface-raised, #1a1a2a) !important;
+        color: var(--mr-text-dim, #8a8998) !important;
+        padding: 8px 10px !important;
+        border-radius: 6px !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+        flex-shrink: 0;
+    }
+    .copy-icon:hover {
+        color: var(--mr-cyan, #00e4ff) !important;
+        border-color: var(--mr-cyan, #00e4ff) !important;
+        background: rgba(0,228,255,0.08) !important;
+    }
+
+    /* -- HD Addresses -- */
+    #hd-address-list {
+        background: var(--mr-dark, #0c0c16);
+        border-radius: 8px;
+        padding: 12px;
+        max-height: 280px;
+        overflow-y: auto;
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+    }
+    #hd-address-list a {
+        color: var(--mr-cyan, #00e4ff) !important;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+    }
+    #hd-toggle-addresses {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        color: var(--mr-text-dim, #8a8998);
+        cursor: pointer;
+    }
+
+    /* -- Security section -- */
+    .bridge-security-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    .bridge-sec-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 16px;
+        background: var(--mr-dark, #0c0c16);
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+        border-radius: 8px;
+        text-decoration: none !important;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    .bridge-sec-btn:hover {
+        border-color: rgba(255,255,255,0.15);
+        transform: translateY(-1px);
+    }
+    .bridge-sec-btn i {
+        font-size: 16px;
+        width: 20px;
+        text-align: center;
+    }
+    .bridge-sec-btn .sec-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim, #8a8998);
+    }
+    .bridge-sec-btn .sec-desc {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 8px;
+        color: var(--mr-text-faint, #5a5968);
+        margin-top: 2px;
+    }
+
+    /* -- Portlet overrides -- */
+    .portlet {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 0 20px 0 !important;
+    }
+    .bridge-card.portlet {
+        margin: 0 0 20px 0 !important;
+    }
+    .portlet-title {
+        font-family: 'Orbitron', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        color: #fff !important;
+        border: none !important;
+        text-decoration: none !important;
+        margin-bottom: 16px !important;
+    }
+    .portlet-title u { text-decoration: none !important; }
+
+    /* -- Exchange icon -- */
+    .exchange {
+        background: var(--mr-surface-raised, #1a1a2a) !important;
+        color: var(--mr-text-dim, #8a8998) !important;
+        padding: 8px 10px !important;
+        border-radius: 6px !important;
+        cursor: pointer !important;
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+        transition: all 0.2s;
+    }
+    .exchange:hover {
+        color: var(--mr-cyan, #00e4ff) !important;
+        border-color: rgba(0,228,255,0.3) !important;
+    }
+
+    /* -- Conversion display -- */
+    .conversion-rate {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 13px !important;
+        color: var(--mr-text-dim, #8a8998) !important;
+        padding: 5px 8px !important;
+        border-radius: 4px !important;
+        background: transparent !important;
+    }
+
+    /* -- Modal overrides -- */
+    .modal-content {
+        background: var(--mr-surface, #12121e) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)) !important;
+        border-radius: 12px !important;
+        color: var(--mr-text, #e0dfe6) !important;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.6) !important;
+    }
+    .modal-header {
+        background: var(--mr-dark, #0c0c16) !important;
+        border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 16px 24px !important;
+    }
+    .modal-title {
+        font-family: 'Orbitron', sans-serif !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        color: #fff !important;
+    }
+    .modal-header .close {
+        color: var(--mr-text-dim) !important;
+        opacity: 0.7 !important;
+        text-shadow: none !important;
+    }
+    .modal-body { background: var(--mr-surface, #12121e) !important; padding: 24px !important; }
+    .modal-footer { background: var(--mr-surface, #12121e) !important; border-top: 1px solid var(--mr-border) !important; }
+
+    /* Scan button inside address field */
+    .bridge-card .btn-default, .bridge-card .btn.btn-default {
+        background: var(--mr-surface-raised, #1a1a2a) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.12)) !important;
+        color: var(--mr-text-dim, #8a8998) !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 10px !important;
+        letter-spacing: 0.5px !important;
+        text-transform: uppercase !important;
+    }
+    .bridge-card .btn-default:hover {
+        border-color: var(--mr-cyan, #00e4ff) !important;
+        color: var(--mr-cyan, #00e4ff) !important;
+    }
+
+    /* Confirmation modal sections */
+    .confirm-transaction { background: transparent !important; }
+    .from, .to, .amount-modal {
+        background: var(--mr-dark, #0c0c16) !important;
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+        border-radius: 8px !important;
+        padding: 14px 16px !important;
+        margin: 8px 0 !important;
+        width: 100% !important;
+        color: var(--mr-text) !important;
+    }
+    .from strong, .to strong, .amount-modal strong {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim, #8a8998);
+    }
+    .from p, .to p, .amount-modal p {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: #fff;
+        margin: 4px 0 0;
+        word-break: break-all;
+    }
+    .modal .form-control {
+        background: var(--mr-dark, #0c0c16) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)) !important;
+        color: #fff !important;
+        border-radius: 6px !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 13px !important;
+    }
+    .modal .form-control:focus {
+        border-color: var(--mr-cyan, #00e4ff) !important;
+        box-shadow: 0 0 0 2px rgba(0,228,255,0.1) !important;
+    }
+    .modal .btn-primary {
+        background: var(--mr-mars, #c84125) !important;
+        border-color: var(--mr-mars, #c84125) !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 11px !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        border-radius: 6px !important;
+    }
+    .modal .btn-primary:hover { background: #d94e30 !important; }
+
+    /* Error messages */
+    .error-message { color: var(--mr-mars, #c84125) !important; font-family: 'JetBrains Mono', monospace !important; font-size: 11px !important; }
+    .error-unlocking, .error-unlocking-tx { color: var(--mr-mars, #c84125) !important; font-family: 'JetBrains Mono', monospace !important; }
+
+    /* Alert styling */
+    .alert-danger { background: rgba(200,65,37,0.1) !important; border-color: rgba(200,65,37,0.25) !important; color: var(--mr-mars) !important; border-radius: 8px !important; }
+    .alert-info { background: rgba(0,228,255,0.08) !important; border-color: rgba(0,228,255,0.2) !important; color: var(--mr-cyan) !important; border-radius: 8px !important; }
+
+    /* Footer */
+    .footer { border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important; padding: 20px 0 !important; background: var(--mr-void, #06060c) !important; }
+
+    /* -- QR Scanner Popup -- */
+    .scan-popup .modal-dialog {
+        max-width: 480px !important;
+        margin: 80px auto !important;
+    }
+    .scan-popup .modal-content {
+        background: var(--mr-dark, #0c0c16) !important;
+        border: 2px solid var(--mr-mars, #c84125) !important;
+        border-radius: 12px !important;
+        overflow: hidden;
+        padding: 0 !important;
+    }
+    .scan-popup #app {
+        position: relative;
+    }
+    .scan-popup .sidebar {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        z-index: 10;
+        padding: 12px 16px;
+        background: linear-gradient(to bottom, rgba(6,6,12,0.9), transparent);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--mr-mars, #c84125);
+        text-align: center;
+    }
+    .scan-popup .sidebar::before {
+        content: '\f029  SCANNING FOR QR CODE';
+        font-family: 'JetBrains Mono', monospace, 'Font Awesome 6 Free';
+    }
+    .scan-popup #qr-canvas {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 360px;
+        max-height: 480px;
+        object-fit: cover;
+        padding: 0 !important;
+        border-radius: 0 !important;
+    }
+    .scan-popup .modal-backdrop { background: rgba(0,0,0,0.85) !important; }
+
+    /* Corner scanner overlay */
+    .scan-popup #app::before,
+    .scan-popup #app::after {
+        content: '';
+        position: absolute;
+        z-index: 5;
+        pointer-events: none;
+        border-color: var(--mr-mars, #c84125);
+        border-style: solid;
+        border-width: 0;
+    }
+    .scan-popup #app::before {
+        top: 40px; left: 40px;
+        width: 40px; height: 40px;
+        border-top-width: 3px;
+        border-left-width: 3px;
+        border-top-left-radius: 6px;
+    }
+    .scan-popup #app::after {
+        bottom: 40px; right: 40px;
+        width: 40px; height: 40px;
+        border-bottom-width: 3px;
+        border-right-width: 3px;
+        border-bottom-right-radius: 6px;
+    }
+
+    /* Animations */
+    @keyframes bridgePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @keyframes bridgeFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .bridge-fade-1 { animation: bridgeFadeIn 0.5s ease-out 0.1s both; }
+    .bridge-fade-2 { animation: bridgeFadeIn 0.5s ease-out 0.25s both; }
+    .bridge-fade-3 { animation: bridgeFadeIn 0.5s ease-out 0.4s both; }
+
+    /* Mobile */
+    @media (max-width: 767px) {
+        .bridge-actions { grid-template-columns: repeat(2, 1fr); }
+        .bridge-balance { font-size: 24px; }
+        .bridge-security-grid { grid-template-columns: 1fr; }
+        .bridge-qr-wrap { flex-direction: column; align-items: flex-start; }
+    }
     </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
     @livewireStyles
 </head>
 
-<body class=" ">
+<body class="bridge-page">
     <div id="wrapper">
         <header class="navbar navbar-inverse" role="banner">
             <div class="container">
@@ -52,6 +575,36 @@
 
         <div class="content">
             <div class="container">
+
+                {{-- BRIDGE HERO: Balance + Address --}}
+                <div class="bridge-hero bridge-fade-1">
+                    <div class="bridge-status"><span class="dot"></span>Wallet Active — Connected</div>
+                    <div class="bridge-balance-row">
+                        <div class="bridge-balance"><span id="bridge-balance-display"><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: var(--mr-text-dim);"></i></span><span class="unit">MARS</span></div>
+                        <div class="bridge-addr">{{ $public_addr }}</div>
+                    </div>
+                </div>
+
+                {{-- QUICK ACTIONS --}}
+                <div class="bridge-actions bridge-fade-2">
+                    <a href="#send-section" class="bridge-action" onclick="document.getElementById('recipient').focus()">
+                        <div class="bridge-action-icon send"><i class="fa fa-arrow-up-right-from-square"></i></div>
+                        <div class="bridge-action-label">Send</div>
+                    </a>
+                    <a href="#receive-section" class="bridge-action">
+                        <div class="bridge-action-icon receive"><i class="fa fa-arrow-down"></i></div>
+                        <div class="bridge-action-label">Receive</div>
+                    </a>
+                    <a href="javascript:void(0)" class="bridge-action" onclick="onDownloadWallet()">
+                        <div class="bridge-action-icon backup"><i class="fa fa-shield-halved"></i></div>
+                        <div class="bridge-action-label">Backup</div>
+                    </a>
+                    <a href="/wallet/dashboard/hd-close" class="bridge-action">
+                        <div class="bridge-action-icon lock"><i class="fa fa-lock"></i></div>
+                        <div class="bridge-action-label">Lock</div>
+                    </a>
+                </div>
+
                 <div class="row">
                     <div class="col-md-7 col-sm-7">
 
@@ -68,101 +621,164 @@
                                 You are currently viewing your Passport Wallet used for civic functions.
                             </div>
                         @endif
-                        <div class="portlet">
+                        <div id="send-section" class="bridge-section">Send & Receive</div>
+                        <div class="bridge-card portlet">
 
-                            <h3 class="portlet-title">
-                                <u>Send Marscoin</u>
+                            <h3 class="bridge-card-title portlet-title">
+                                <i class="fa fa-paper-plane" style="margin-right: 6px; color: var(--mr-mars);"></i> Send Marscoin
                             </h3>
 
                             <div class="portlet-body">
 
                                 <div>
                                     <span for="name">Destination Address</span>
-                                    <input type="text" name="recipient" id="recipient"
-                                        class="form-control destination-address" style="width: 90%" data-required="true"
-                                        placeholder="Marscoin Address">
-
-                                    <a style="float: right; margin-top: -35px;margin-right: 67px;" href="#"
-                                        onclick="scan();" class="btn btn-primary">Scan <i class="fa fa-qrcode "></i></a>
+                                    <div style="position: relative;">
+                                        <input type="text" name="recipient" id="recipient"
+                                            class="form-control destination-address" style="width: 100%; padding-right: 80px !important;" data-required="true"
+                                            placeholder="Marscoin Address">
+                                        <a style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); padding: 6px 12px; font-size: 11px; border-radius: 5px;" href="#"
+                                            onclick="scan();" class="btn btn-default"><i class="fa fa-qrcode" style="margin-right: 4px;"></i> Scan</a>
+                                    </div>
 
                                     <span id="address-error" style="display: none;" class="error-message">Enter a valid
                                         MARS address</span>
                                     <br />
 
-                                    <span for="name">Amount To Send: <strong class="amount-to-send"> MARS
-                                        </strong></span>
-                                    <div class="row">
+                                    <span for="name">Amount To Send: <strong class="amount-to-send"> MARS</strong></span>
 
-                                        <div class="col-md-6 col-sm-5">
-
-                                            <div id="amount-cont" class="">
-                                                <input type="number" min="1" step="any" name="amount"
-                                                    class="form-control input-placeholder " data-required="true"
-                                                    placeholder="0.0 MARS">
-                                                <span id="amount-error" style="display: none;"
-                                                    class="error-message">Enter an amount</span>
-                                                <span id="insufficient-error" style="display: none;"
-                                                    class="error-message">Insufficient balance</span>
-
-                                            </div>
-
-
-
-                                            {{-- <i class="fa fa-exchange exchange" > </i> --}}
+                                    {{-- Amount + Conversion Row --}}
+                                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
+                                        <div id="amount-cont" style="flex: 1;">
+                                            <input type="number" min="1" step="any" name="amount"
+                                                class="form-control input-placeholder" data-required="true"
+                                                placeholder="0.0 MARS">
                                         </div>
-                                        <div class="col-md-2 col-sm-5">
-                                            <i class="fa fa-exchange exchange"></i>
-
-
-                                        </div>
-                                        <div class="col-md-4 col-sm-5">
-                                            <div style="display: flex; flex-direction: row" class="converted-value">
-                                                <h2 class="symbol"> $ </h2>
-                                                <h2 class="conversion-rate"> 0 </h2>
-                                                <h5 class="currency-abbr"> USD</h5>
-                                            </div>
-
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-12" style="display:flex;">
-
-                                            <button id="send-preconfirm" type="button" class="btn btn-primary "
-                                                data-toggle="modal" href=""
-                                                style="margin-top: 5px; width: 50%; ">Send</button>
-
+                                        <i class="fa fa-exchange exchange" style="flex-shrink: 0;"></i>
+                                        <div class="converted-value" style="flex: 0 0 auto; display: flex; align-items: baseline; gap: 2px; background: var(--mr-dark, #0c0c16); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--mr-border, rgba(255,255,255,0.06));">
+                                            <span class="symbol" style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--mr-text-dim);"> $ </span>
+                                            <span class="conversion-rate" style="font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 600; color: #fff; padding: 0;"> 0 </span>
+                                            <span class="currency-abbr" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-faint); margin-left: 4px;"> USD</span>
                                         </div>
                                     </div>
+                                    <div style="margin-bottom: 16px;">
+                                        <span id="amount-error" style="display: none;" class="error-message">Enter an amount</span>
+                                        <span id="insufficient-error" style="display: none;" class="error-message">Insufficient balance</span>
+                                    </div>
+
+                                    {{-- Send Button --}}
+                                    <button id="send-preconfirm" type="button" class="btn btn-primary"
+                                        data-toggle="modal" href=""
+                                        style="width: 100%; padding: 14px 0 !important; font-size: 13px !important; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                        <i class="fa fa-paper-plane"></i> Send MARS
+                                    </button>
                                 </div>
                             </div>
                         </div>
 
 
-                        <div class="portlet" style="margin-top: 160px;">
-
-                            <h3 class="portlet-title">
-                                <u>Mobile Marscoin Wallet</u>
-                            </h3>
-
-                            <div class="portlet-body" style="float:left">
-
-                                <div>
-                                    <a href="https://apps.apple.com/app/id1569062610" target="_blank" class="">
-                                        <img style="width: 200px;" src="/assets/landing/img/apple.png" alt=""
-                                            loading="lazy"></a>
-
-
-                                    <a href="https://play.google.com/store/apps/details?id=io.bytewallet.bytewallet"
-                                        target="_blank" class="">
-                                        <img style="width: 200px;" src="/assets/landing/img/google.png"
-                                            alt="" loading="lazy"></a>
-
+                        {{-- Recent Transactions --}}
+                        <div class="bridge-card" style="margin-top: 0;">
+                            <h3 class="bridge-card-title"><i class="fa fa-clock-rotate-left" style="margin-right: 6px; color: var(--mr-text-dim);"></i> Recent Activity</h3>
+                            <div id="wallet-recent-txs" style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">
+                                <div style="text-align: center; padding: 20px; color: var(--mr-text-faint);">
+                                    <i class="fa fa-spinner fa-spin"></i> Loading transactions...
                                 </div>
+                            </div>
+                            <div style="margin-top: 12px; text-align: center;">
+                                <a href="/wallet/dashboard" style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mr-text-dim); text-decoration: none;">
+                                    View All on Dashboard <i class="fa fa-arrow-right" style="font-size: 8px; margin-left: 4px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <script>
+                        // Load recent transactions using pebas (Electrum) - works with all address formats
+                        // Waits for HD discovery to provide working addresses, then fetches tx history
+                        function loadRecentTxs(addresses) {
+                            if (!addresses || addresses.length === 0) {
+                                $('#wallet-recent-txs').html('<div style="text-align:center;padding:16px;color:var(--mr-text-faint);">No addresses found</div>');
+                                return;
+                            }
+                            // Fetch from first address with balance (most likely to have transactions)
+                            var addr = addresses[0];
+                            $.get('/api/mars-txhistory?address=' + encodeURIComponent(addr), function(data) {
+                                if (!data || !data.txs || data.txs.length === 0) {
+                                    $('#wallet-recent-txs').html('<div style="text-align:center;padding:16px;color:var(--mr-text-faint);">No transactions yet</div>');
+                                    return;
+                                }
+                                var txs = data.txs.sort(function(a,b){ return (b.time||0) - (a.time||0); }).slice(0, 6);
+                                renderRecentTxs(txs, addresses);
+                            }).fail(function() {
+                                // Fallback: try explorer
+                                $.post('/api/getTransactions', {address: '{{ $public_addr }}'}, function(data) {
+                                    if (!data || !data.txs || data.txs.length === 0) {
+                                        $('#wallet-recent-txs').html('<div style="text-align:center;padding:16px;color:var(--mr-text-faint);">No transactions yet</div>');
+                                        return;
+                                    }
+                                    renderRecentTxs(data.txs.sort(function(a,b){ return (b.time||0) - (a.time||0); }).slice(0, 6), addresses);
+                                }).fail(function() {
+                                    $('#wallet-recent-txs').html('<div style="text-align:center;padding:20px 16px;color:var(--mr-text-faint);"><i class="fa fa-clock-rotate-left" style="font-size:18px;display:block;margin-bottom:8px;opacity:0.4;"></i><span style="font-size:10px;">Transaction history loading after discovery...</span></div>');
+                                });
+                            });
+                        }
 
+                        function renderRecentTxs(txs, myAddresses) {
+                            var html = '';
+                            txs.forEach(function(tx) {
+                                var isSender = false, valueReceived = 0, totalTxValue = 0, isAnchor = false;
+                                (tx.vin || []).forEach(function(vin) {
+                                    if (vin.addr && myAddresses.indexOf(vin.addr) !== -1) { isSender = true; totalTxValue -= (vin.value || 0); }
+                                });
+                                (tx.vout || []).forEach(function(vout) {
+                                    var sp = vout.scriptPubKey || {};
+                                    var va = sp.addresses || (sp.address ? [sp.address] : []);
+                                    for (var i = 0; i < va.length; i++) {
+                                        if (myAddresses.indexOf(va[i]) !== -1) { valueReceived += parseFloat(vout.value || 0); break; }
+                                    }
+                                    if (sp.type === 'nulldata') { isAnchor = true; }
+                                });
+                                if (isSender) { totalTxValue -= (tx.fees || 0); }
+                                totalTxValue += valueReceived;
 
+                                var color = totalTxValue >= 0 ? 'var(--mr-green,#34d399)' : 'var(--mr-mars,#c84125)';
+                                var icon = isAnchor ? 'fa-anchor' : (totalTxValue >= 0 ? 'fa-arrow-down' : 'fa-arrow-up');
+                                var iconBg = isAnchor ? 'rgba(0,228,255,0.1)' : (totalTxValue >= 0 ? 'rgba(52,211,153,0.1)' : 'rgba(200,65,37,0.1)');
+                                var iconColor = isAnchor ? 'var(--mr-cyan)' : color;
+                                var timeStr = tx.time ? new Date(tx.time * 1000).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'pending';
+                                var label = isAnchor ? 'On-Chain Data' : (totalTxValue >= 0 ? 'Received' : 'Sent');
+
+                                html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--mr-border,rgba(255,255,255,0.04));">' +
+                                    '<div style="width:28px;height:28px;border-radius:6px;background:' + iconBg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa ' + icon + '" style="font-size:10px;color:' + iconColor + ';"></i></div>' +
+                                    '<div style="flex:1;min-width:0;"><div style="color:var(--mr-text-dim);font-size:10px;">' + label + '</div><div style="color:var(--mr-text-faint);font-size:9px;">' + timeStr + '</div></div>' +
+                                    '<div style="color:' + color + ';font-weight:500;font-size:11px;">' + (totalTxValue >= 0 ? '+' : '') + totalTxValue.toFixed(4) + '</div></div>';
+                            });
+                            $('#wallet-recent-txs').html(html);
+                        }
+
+                        // Hook into HD discovery completion to get working addresses
+                        window._walletDiscoveredAddresses = [];
+                        </script>
+
+                        <div class="bridge-card" style="margin-top: 0; padding: 18px 20px;">
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-text-dim, #8a8998); margin-bottom: 12px;">
+                                <i class="fa fa-mobile" style="margin-right: 4px;"></i> Mobile Wallets
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <a href="https://apps.apple.com/us/app/martianrepublic/id6480416861" target="_blank" rel="noopener"
+                                   style="flex: 1; display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--mr-dark, #0c0c16); border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)); border-radius: 6px; text-decoration: none; transition: border-color 0.2s;">
+                                    <i class="fa-brands fa-apple" style="font-size: 18px; color: #fff;"></i>
+                                    <div>
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--mr-text-faint, #5a5968);">Download on</div>
+                                        <div style="font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 600; color: #fff;">App Store</div>
+                                    </div>
+                                </a>
+                                <a href="https://play.google.com/store/apps/details?id=io.bytewallet.bytewallet" target="_blank" rel="noopener"
+                                   style="flex: 1; display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--mr-dark, #0c0c16); border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)); border-radius: 6px; text-decoration: none; transition: border-color 0.2s;">
+                                    <i class="fa-brands fa-google-play" style="font-size: 16px; color: var(--mr-green, #34d399);"></i>
+                                    <div>
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--mr-text-faint, #5a5968);">Get it on</div>
+                                        <div style="font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 600; color: #fff;">Google Play</div>
+                                    </div>
+                                </a>
                             </div>
                         </div>
 
@@ -171,69 +787,111 @@
 
                     <div class="col-md-5 col-sm-5">
 
-
                         {{-- HD Wallet Balance with address discovery --}}
-                        <div class="portlet" id="hd-balance-portlet">
-                            <h3 class="portlet-title"><u>Marscoin Balance</u></h3>
+                        <div class="bridge-card portlet" id="hd-balance-portlet">
+                            <h3 class="bridge-card-title portlet-title"><i class="fa fa-layer-group" style="margin-right: 6px; color: var(--mr-cyan);"></i> HD Addresses</h3>
                             <div class="portlet-body">
-                                <h2 id="hd-total-balance" style="font-size: 28px; margin: 0;">
-                                    <i class="fa fa-spinner fa-spin"></i> Scanning...
+                                <h2 id="hd-total-balance" style="font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 700; color: #fff; margin: 0 0 12px;">
+                                    <i class="fa fa-spinner fa-spin" style="color: var(--mr-text-dim);"></i> <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--mr-text-dim);">Discovering addresses...</span>
                                 </h2>
-                                <div id="hd-address-list" style="margin-top: 12px; font-size: 12px; max-height: 200px; overflow-y: auto; display: none;">
-                                </div>
-                                <a href="javascript:;" id="hd-toggle-addresses" style="font-size: 11px; color: var(--mr-cyan, #00e4ff); display: none;">
-                                    Show all addresses
+                                <div id="hd-address-list" style="margin-top: 12px; font-size: 12px; display: none;"></div>
+                                <a href="javascript:;" id="hd-toggle-addresses" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-cyan, #00e4ff); display: none; margin-top: 8px;">
+                                    <i class="fa fa-chevron-down" style="margin-right: 4px; font-size: 8px;"></i> Show all addresses
                                 </a>
                             </div>
                         </div>
 
-                        <div class="portlet">
-
-                            <h3 class="portlet-title">
-                                <u>Receive Marscoin</u>
-                            </h3>
-
-                            <div class="portlet-body" >
-
-                                <div class="pub-addr" style="height: 50px;">
-
-                                    <h3 class="pub-addr-text" style="font-size: 21px;    margin-left: -40px;"><a
-                                            href="https://explore.marscoin.org/address/{{ $public_addr }}"
-                                            target="_blank">{{ $public_addr }}</a></h3>
-
-                                    <i id="copy-addr" class="fa fa-copy copy-icon"> </i>
+                        <div id="receive-section" class="bridge-card portlet">
+                            <h3 class="bridge-card-title portlet-title"><i class="fa fa-qrcode" style="margin-right: 6px; color: var(--mr-green);"></i> Receive Marscoin</h3>
+                            <div class="portlet-body">
+                                <div class="pub-addr">
+                                    <h3 class="pub-addr-text"><a href="https://explore.marscoin.org/address/{{ $public_addr }}" target="_blank">{{ $public_addr }}</a></h3>
+                                    <i id="copy-addr" class="fa fa-copy copy-icon"></i>
                                 </div>
-
-                                <div>
-                                    <img id="qrious" height="200" width="200" class=" float: right;">
+                                <div style="margin-top: 16px; display: flex; justify-content: center;">
+                                    <div class="mars-qr-frame">
+                                        <div class="mars-qr-corner tl"></div>
+                                        <div class="mars-qr-corner tr"></div>
+                                        <div class="mars-qr-corner bl"></div>
+                                        <div class="mars-qr-corner br"></div>
+                                        <img id="qrious" height="180" width="180">
+                                        <div class="mars-qr-label">SCAN TO RECEIVE</div>
+                                    </div>
                                 </div>
-
-                                
-
+                                <style>
+                                    .mars-qr-frame {
+                                        position: relative;
+                                        display: inline-block;
+                                        padding: 16px;
+                                        background: var(--mr-dark, #0c0c16);
+                                        border: 1px solid rgba(200,65,37,0.2);
+                                        border-radius: 10px;
+                                    }
+                                    .mars-qr-frame img {
+                                        display: block;
+                                        border-radius: 4px;
+                                    }
+                                    .mars-qr-corner {
+                                        position: absolute;
+                                        width: 16px;
+                                        height: 16px;
+                                        border-color: var(--mr-mars, #c84125);
+                                        border-style: solid;
+                                        border-width: 0;
+                                    }
+                                    .mars-qr-corner.tl { top: 6px; left: 6px; border-top-width: 2px; border-left-width: 2px; border-top-left-radius: 4px; }
+                                    .mars-qr-corner.tr { top: 6px; right: 6px; border-top-width: 2px; border-right-width: 2px; border-top-right-radius: 4px; }
+                                    .mars-qr-corner.bl { bottom: 24px; left: 6px; border-bottom-width: 2px; border-left-width: 2px; border-bottom-left-radius: 4px; }
+                                    .mars-qr-corner.br { bottom: 24px; right: 6px; border-bottom-width: 2px; border-right-width: 2px; border-bottom-right-radius: 4px; }
+                                    .mars-qr-label {
+                                        font-family: 'JetBrains Mono', monospace;
+                                        font-size: 7px;
+                                        letter-spacing: 3px;
+                                        text-transform: uppercase;
+                                        color: var(--mr-text-faint, #5a5968);
+                                        text-align: center;
+                                        margin-top: 10px;
+                                    }
+                                </style>
                             </div>
-
                         </div>
 
-                        <div class="portlet">
-
-                            <h3 class="portlet-title">
-                                <u>Security</u>
-                            </h3>
-
+                        <div class="bridge-card portlet">
+                            <h3 class="bridge-card-title portlet-title"><i class="fa fa-shield-halved" style="margin-right: 6px; color: var(--mr-cyan);"></i> Security</h3>
                             <div class="portlet-body">
-                                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-                                    <a class="btn btn-secondary" href="/wallet/dashboard/hd-close"><i class="fa fa-lock"></i> Lock</a>
-                                    <a type="button" class="btn btn-primary" onclick="onDownloadWallet()"><i class="fa fa-download"></i> Backup</a>
+                                <div class="bridge-security-grid">
+                                    <a class="bridge-sec-btn" href="/wallet/dashboard/hd-close">
+                                        <i class="fa fa-lock" style="color: var(--mr-text-dim);"></i>
+                                        <div>
+                                            <div class="sec-label">Lock Wallet</div>
+                                            <div class="sec-desc">Disconnect & clear keys</div>
+                                        </div>
+                                    </a>
+                                    <a class="bridge-sec-btn" href="javascript:void(0)" onclick="onDownloadWallet()">
+                                        <i class="fa fa-download" style="color: var(--mr-cyan);"></i>
+                                        <div>
+                                            <div class="sec-label">Export Backup</div>
+                                            <div class="sec-desc">Download encrypted keyfile</div>
+                                        </div>
+                                    </a>
+                                    <a class="bridge-sec-btn" href="javascript:void(0)" onclick="showSeedPhrase()">
+                                        <i class="fa fa-eye" style="color: var(--mr-mars);"></i>
+                                        <div>
+                                            <div class="sec-label">View Seed</div>
+                                            <div class="sec-desc">Show recovery phrase</div>
+                                        </div>
+                                    </a>
+                                    <a class="bridge-sec-btn" href="javascript:void(0)" onclick="createNewBackup()">
+                                        <i class="fa fa-key" style="color: var(--mr-green);"></i>
+                                        <div>
+                                            <div class="sec-label">New Password</div>
+                                            <div class="sec-desc">Re-encrypt with new key</div>
+                                        </div>
+                                    </a>
                                 </div>
-                                <div style="font-size: 12px; color: var(--mr-text-faint, #5a5968); line-height: 1.6;">
-                                    <div style="margin-bottom: 4px;">
-                                        <i class="fa fa-check-circle" style="color: var(--mr-green, #34d399);"></i>
-                                        Encrypted backup stored on server
-                                    </div>
-                                    <div>
-                                        <i class="fa fa-info-circle" style="color: var(--mr-text-faint, #5a5968);"></i>
-                                        Download a local backup for additional safety
-                                    </div>
+                                <div style="margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968); line-height: 1.8;">
+                                    <div><i class="fa fa-check-circle" style="color: var(--mr-green, #34d399); margin-right: 4px;"></i> Encrypted backup stored on server</div>
+                                    <div><i class="fa fa-check-circle" style="color: var(--mr-green, #34d399); margin-right: 4px;"></i> PBKDF2-SHA512 (100,000 rounds)</div>
                                 </div>
                             </div>
                         </div>
@@ -365,10 +1023,11 @@
 
                                 {{-- <input name="wallet" hidden id="selected_wallet" /> --}}
 
-                                <label for="name">Wallet Password</label>
-                                <input type="password" id="unlock-password-tx" name="unlock-password-tx"
-                                    class="form-control" data-required="true" style="width: 100%">
-
+                                {{-- Password removed - wallet is already unlocked for this session --}}
+                                <input type="hidden" id="unlock-password-tx" name="unlock-password-tx" value="session">
+                                <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-faint, #5a5968); text-align: center; padding: 8px 0;">
+                                    <i class="fa fa-shield-halved" style="color: var(--mr-green, #34d399); margin-right: 4px;"></i> Wallet unlocked — ready to sign
+                                </div>
                                 <p class="error-unlocking-tx"></p>
 
 
@@ -597,31 +1256,63 @@
 
         function renderAddressDiscovery(result) {
             const { discovered, totalBalance } = result;
+            const civicAddr = '{{ $civic_addr ?? "" }}';
 
             $('#hd-total-balance').text(totalBalance.toFixed(8) + ' MARS');
 
             if (discovered.length > 0) {
                 const withBalance = discovered.filter(a => a.balance > 0);
-                const html = withBalance.map(a => `
-                    <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.06));">
-                        <span>
-                            <span style="color: var(--mr-text-faint); font-size: 10px;">${a.chain === 'change' ? '↳' : '→'}</span>
-                            <a href="https://explore.marscoin.org/address/${a.address}" target="_blank"
-                               style="color: var(--mr-cyan, #00e4ff); font-family: monospace;">${a.address.substring(0, 12)}...${a.address.substring(a.address.length - 6)}</a>
-                        </span>
-                        <span style="color: var(--mr-text); font-weight: 500;">${a.balance.toFixed(4)} MARS</span>
-                    </div>
-                `).join('');
+                // Sort: civic address first, then by balance descending
+                withBalance.sort((a, b) => {
+                    if (a.address === civicAddr) return -1;
+                    if (b.address === civicAddr) return 1;
+                    return b.balance - a.balance;
+                });
 
-                $('#hd-address-list').html(html);
+                const html = withBalance.map(a => {
+                    const isCivic = civicAddr && a.address === civicAddr;
+                    const badge = isCivic
+                        ? '<span style="font-family:JetBrains Mono,monospace;font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:2px 5px;border-radius:3px;background:rgba(200,65,37,0.15);color:var(--mr-mars,#c84125);border:1px solid rgba(200,65,37,0.25);margin-left:6px;vertical-align:middle;">Civic ID</span>'
+                        : '';
+                    const borderColor = isCivic ? 'rgba(200,65,37,0.15)' : 'var(--mr-border, rgba(255,255,255,0.04))';
+                    const bgColor = isCivic ? 'rgba(200,65,37,0.04)' : 'transparent';
+                    const chainIcon = a.chain === 'change' ? '↳' : '→';
+
+                    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;margin-bottom:2px;border-radius:4px;border-bottom:1px solid ${borderColor};background:${bgColor};">
+                        <span style="display:flex;align-items:center;gap:4px;min-width:0;">
+                            <span style="color:var(--mr-text-faint);font-size:10px;">${chainIcon}</span>
+                            <a href="https://explore.marscoin.org/address/${a.address}" target="_blank"
+                               style="color:var(--mr-cyan,#00e4ff);font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;">${a.address.substring(0, 12)}...${a.address.substring(a.address.length - 6)}</a>
+                            ${badge}
+                        </span>
+                        <span style="color:var(--mr-text);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;white-space:nowrap;margin-left:8px;">${a.balance.toFixed(4)} MARS</span>
+                    </div>`;
+                }).join('');
+
+                $('#hd-address-list').html(html).show();
                 if (withBalance.length > 1) {
-                    $('#hd-toggle-addresses').show().click(function() {
-                        $('#hd-address-list').toggle();
-                        $(this).text($('#hd-address-list').is(':visible') ? 'Hide addresses' : 'Show all addresses');
-                    });
+                    $('#hd-toggle-addresses')
+                        .html('<i class="fa fa-chevron-up" style="margin-right:4px;font-size:8px;"></i> Hide addresses')
+                        .show()
+                        .click(function() {
+                            $('#hd-address-list').toggle();
+                            $(this).html($('#hd-address-list').is(':visible')
+                                ? '<i class="fa fa-chevron-up" style="margin-right:4px;font-size:8px;"></i> Hide addresses'
+                                : '<i class="fa fa-chevron-down" style="margin-right:4px;font-size:8px;"></i> Show all addresses');
+                        });
                 }
 
                 console.log(`HD Discovery: found ${discovered.length} addresses, ${withBalance.length} with balance, total: ${totalBalance}`);
+
+                // Trigger Recent Activity loading with discovered addresses
+                var allAddrs = withBalance.map(function(a) { return a.address; });
+                window._walletDiscoveredAddresses = allAddrs;
+                // Store address-to-path mapping for transaction signing
+                window._walletAddressMap = {};
+                discovered.forEach(function(a) {
+                    window._walletAddressMap[a.address] = { chain: a.chain === 'change' ? 1 : 0, index: a.index };
+                });
+                if (typeof loadRecentTxs === 'function') { loadRecentTxs(allAddrs); }
             } else {
                 $('#hd-total-balance').text('0.0000 MARS');
             }
@@ -679,21 +1370,21 @@
             let cur_currency = "MARS";
             var mars_price = 0;
 
-            $.ajax({
-                url: '/api/price',
-                type: 'POST',
-                data: {
-                },
-                success: function(data) {
-                    var mars_price = parseFloat(data.mars_price);
-                    console.log("Mars price: ", mars_price);
-                    $('.connectivity').hide();
-                },
-                error: function() {
+            // Fetch MARS price from price.marscoin.org (via same-origin proxy)
+            fetch('/api/mars-price')
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    var q = d.data && d.data['154'] && d.data['154'].quote && d.data['154'].quote.USD;
+                    if (q && q.price) {
+                        mars_price = parseFloat(q.price);
+                        console.log("Mars price: $" + mars_price);
+                        $('.connectivity').hide();
+                    }
+                })
+                .catch(function() {
                     console.log('Error fetching Mars price');
                     $('.connectivity').show();
-                }
-            });
+                });
 
             const decryptWallet = (seed) => {
                 //  console.log(seed)
@@ -826,8 +1517,8 @@
             function getXpub(mnemonic) {
                 //console.log("==== [MARS] GetXPub()");
 
-                const seed = getSeed(mnemonic);
-                const root = bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
+                const seed = getSeed(mnemonic.trim());
+                const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
 
                 const path = getDerivationPath();
                 const child = root.derivePath(path).neutered();
@@ -862,82 +1553,96 @@
             let tx_i_o;
 
             $("#send-preconfirm").click(async (e) => {
+                e.preventDefault();
                 $(".destination-address-modal").text($(".destination-address").val())
                 let addy = $(".destination-address-modal").text()
                 let amount = $(".input-placeholder").val()
-                let m = addy.charAt(0) === "M" ? true : false
-                let len = addy.length === 34 ? true : false
+                let m = addy.charAt(0) === "M"
+                let len = addy.length === 34
                 let pa = "{{ $public_addr }}";
 
-                // Handle Input for Tx
-                if (addy && amount && m && len && pa) {
-                    $.ajax({
-                        url: `/api/balance/${pa}`, 
-                        type: 'GET',
-                        success: function(balance) {
-                            balance = parseFloat(balance.balance);
-                            amount = parseFloat(amount);
-
-                            if (balance > amount) {
-                                $("#address-error, #amount-error, #insufficient-error").hide();
-                                $("#send-preconfirm").attr("href", "#basicModal");
-                            } else {
-                                $("#insufficient-error").show();
-                            }
-                        },
-                        error: function() {
-                            // Handle API error (e.g., balance fetch failed)
-                            console.log('Error fetching balance');
-                            // You might want to show an error message to the user here
-                        }
-                    });
-                } else {
-                    // Handle invalid input
-                    $("#send-preconfirm").attr("href", "");
-                    $("#address-error").toggle(!addy || !m || !len);
-                    $("#amount-error").toggle(!amount);
+                // Validate inputs
+                if (!addy || !m || !len) {
+                    $("#address-error").show();
+                    return;
                 }
+                if (!amount || parseFloat(amount) <= 0) {
+                    $("#amount-error").show();
+                    return;
+                }
+                $("#address-error, #amount-error, #insufficient-error").hide();
 
+                // Show loading state on button
+                var origBtnHtml = $("#send-preconfirm").html();
+                $("#send-preconfirm").html('<i class="fa fa-spinner fa-spin"></i> Preparing...').prop('disabled', true);
 
-                /// Trying to breakdown the logic of gettig fee on modal click
+                // Get fee and UTXO data
                 var mars_amount;
                 var receiver_address = $(".destination-address").val();
-
                 if (cur_currency == "MARS") {
                     mars_amount = $(".input-placeholder").val();
                 } else if (cur_currency == "USD") {
                     mars_amount = $(".conversion-rate").text();
                 }
-                //console.log("MARS AMOUNT: ", mars_amount)
 
-                const io = await sendMARS(mars_amount, receiver_address);
+                try {
+                    const io = await sendMARS(mars_amount, receiver_address);
+                    const fee = marsConvert(io.fee);
+                    console.log("THE FEE: ", fee);
 
-                const fee = marsConvert(io.fee);
-                console.log("THE FEE: ", fee);
+                    const total_amount = fee + parseFloat(mars_amount);
+                    $(".estimated-fee").text(fee.toFixed(6) + " MARS");
+                    // Don't overwrite the conversion-rate used for currency display
+                    $(".amount-modal .conversion-rate, #conversion-rate").text("$" + (total_amount * mars_price).toFixed(4) + " USD");
 
-                const total_amount = fee + parseInt(mars_amount)
-                $(".estimated-fee").text("$ " + fee)
-                $(".conversion-rate").text(total_amount)
+                    // Restore button
+                    $("#send-preconfirm").html(origBtnHtml).prop('disabled', false);
 
-                $("#send-mars").click(async () => {
+                    // Open modal programmatically (fixes double-click bug)
+                    $('#basicModal').modal('show');
 
+                    // Unbind previous click handlers to prevent stacking
+                    $("#send-mars").off('click').on('click', async () => {
 
-                    const unlockedWallet = WalletKey.get().trim();
+                        const unlockedWallet = WalletKey.get().trim();
 
-                    if (unlockedWallet) {
-                        console.log("successfully unlocked..")
+                        if (unlockedWallet) {
+                            console.log("successfully unlocked..")
 
-                        $("#send-mars").hide()
-                        $("#loading").show()
+                            $("#send-mars").hide()
+                            $("#loading").show()
 
-                        //await sendMARS(sending_mars, receiver_address);
-                        try {
-                            const tx = await signMARS(mars_amount, io, unlockedWallet)
-                            $("#loading").hide()
-                            $(".success-message").show()
-                            $(".transaction-hash-link").attr("href",
-                                "https://explore.marscoin.org/tx/" + tx.tx_hash)
-                            $(".transaction-hash").text("" + tx.tx_hash)
+                            try {
+                                const tx = await signMARS(mars_amount, io, unlockedWallet)
+                                $("#loading").hide()
+
+                                // Beautiful success state
+                                $(".success-message").show().html(`
+                                    <div style="text-align: center; padding: 20px 0;">
+                                        <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(52,211,153,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                                            <i class="fa fa-check" style="font-size: 24px; color: var(--mr-green, #34d399);"></i>
+                                        </div>
+                                        <div style="font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; color: var(--mr-green, #34d399); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
+                                            Transaction Broadcast
+                                        </div>
+                                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mr-text-dim, #8a8998); margin-bottom: 16px;">
+                                            ${mars_amount} MARS sent successfully
+                                        </div>
+                                        <a href="https://explore.marscoin.org/tx/${tx.tx_hash}" target="_blank"
+                                           style="display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-cyan, #00e4ff); background: var(--mr-dark, #0c0c16); padding: 10px 16px; border-radius: 6px; border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)); text-decoration: none; word-break: break-all;">
+                                            <i class="fa fa-arrow-up-right-from-square" style="margin-right: 6px;"></i>${tx.tx_hash}
+                                        </a>
+                                        <div style="margin-top: 16px;">
+                                            <button onclick="location.reload()" class="btn btn-primary" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px;">
+                                                <i class="fa fa-arrow-left" style="margin-right: 6px;"></i> Back to Wallet
+                                            </button>
+                                        </div>
+                                    </div>
+                                `);
+
+                                // Hide the confirmation details
+                                $(".confirm-transaction, .modal-footer").hide();
+                                $(".modal-title").text("Transaction Complete");
 
 
 
@@ -947,16 +1652,17 @@
                         }
 
                     } else {
-                        $(".error-unlocking-tx").text("Incorrect Password")
-                        $(".error-unlocking-tx").css('color', 'red')
-
+                        $(".error-unlocking-tx").text("Wallet key not found — please re-unlock your wallet")
+                        $(".error-unlocking-tx").css('color', 'var(--mr-mars, #c84125)')
                     }
 
-                })
+                    });
 
-
-
-
+                } catch (err) {
+                    console.error("Send preparation failed:", err);
+                    $("#send-preconfirm").html(origBtnHtml).prop('disabled', false);
+                    alert("Could not prepare transaction. Please check the address and try again.");
+                }
 
             })
 
@@ -967,37 +1673,86 @@
 
             const sendMARS = async (mars_amount, receiver_address) => {
 
-                // obtain utxo i/o
-                const sender_address = "{{ $public_addr }}".trim()
+                // Use discovered HD addresses for multi-address UTXO selection
+                const allAddresses = window._walletDiscoveredAddresses || [];
+                const sender_address = "{{ $public_addr }}".trim();
 
-                try {
-                    const io = await getTxInputsOutputs(sender_address, receiver_address,
-                        mars_amount)
-
-                    return io
-                } catch (e) {
-                    handleError("get input outputs")
-                    throw e;
+                if (allAddresses.length > 0) {
+                    // Try multi-address UTXO via xpub (local pebas proxied through Laravel)
+                    try {
+                        const mnemonic = WalletKey.get();
+                        if (mnemonic) {
+                            const xpub = getXpub(mnemonic);
+                            const url = `/api/mars-utxo-multi?xpub=${encodeURIComponent(xpub)}&receiver_address=${encodeURIComponent(receiver_address)}&amount=${mars_amount}`;
+                            const response = await fetch(url);
+                            if (response.ok) {
+                                const io = await response.json();
+                                if (io && io.inputs && io.inputs.length > 0) {
+                                    console.log("Multi-UTXO: got", io.inputs.length, "inputs from HD scan");
+                                    return io;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.log("Multi-UTXO failed, falling back to single address:", e);
+                    }
                 }
 
-                return null
+                // Fallback: single address UTXO
+                try {
+                    const io = await getTxInputsOutputs(sender_address, receiver_address, mars_amount);
+                    return io;
+                } catch (e) {
+                    handleError("get input outputs");
+                    throw e;
+                }
             }
 
             const signMARS = async (mars_amount, tx_i_o, mnemonic) => {
-                
+
                 const sender_address = "{{ $public_addr }}".trim()
-                const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-                const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-                const child = root.derivePath("m/44'/2'/0'/0/0");
-                const wif = child.toWIF()
-                const zubs = zubrinConvert(mars_amount)
-                var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-                
+                const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
+                // IMPORTANT: use my_bundle.bitcoin.bip32 (same as genSeed) NOT my_bundle.bip32
+                const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
+                const addressMap = window._walletAddressMap || {};
+
+                // Helper: derive key for a specific address using its HD path
+                function getKeyForAddress(address) {
+                    const pathInfo = addressMap[address];
+                    if (pathInfo) {
+                        const path = `m/44'/2'/0'/${pathInfo.chain}/${pathInfo.index}`;
+                        const child = root.derivePath(path);
+                        console.log(`Signing with path ${path} for address ${address}`);
+                        return my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
+                    }
+                    // Fallback: try first address key (same derivation as genSeed)
+                    console.log(`Signing with default path m/44'/2'/0'/0/0 for address ${address}`);
+                    const child = root.derivePath("m/44'/2'/0'/0/0");
+                    return my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
+                }
+
+                // Helper: extract the address from the UTXO's locking script
+                function getAddressFromInput(input) {
+                    try {
+                        const rawTxBuf = my_bundle.Buffer.from(input.rawTx, 'hex');
+                        const prevTx = my_bundle.bitcoin.Transaction.fromBuffer(rawTxBuf);
+                        const output = prevTx.outs[input.vout];
+                        const addr = my_bundle.bitcoin.address.fromOutputScript(output.script, Marscoin.mainnet);
+                        return addr;
+                    } catch (e) {
+                        console.log("Could not extract address from input:", e.message);
+                        return input.address || null;
+                    }
+                }
+
                 var psbt = new my_bundle.bitcoin.Psbt({
                     network: Marscoin.mainnet,
                 });
                 psbt.setVersion(1)
                 psbt.setMaximumFeeRate(100000);
+
+                // Track which key to use for each input
+                const inputKeys = [];
 
                 tx_i_o.inputs.forEach((input, i) => {
                     psbt.addInput({
@@ -1005,44 +1760,72 @@
                         index: input.vout,
                         nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex'),
                     })
+                    // Determine the correct signing key for this input
+                    const inputAddr = getAddressFromInput(input);
+                    console.log(`Input ${i}: address=${inputAddr}, path=${addressMap[inputAddr] ? "m/44'/2'/0'/" + addressMap[inputAddr].chain + "/" + addressMap[inputAddr].index : "default 0/0"}`);
+                    inputKeys.push(getKeyForAddress(inputAddr));
                 })
 
-                tx_i_o.outputs.forEach(output => {
-                    // watch out, outputs may have been added that you need to provide
-                    // an output address/script for
-                    if (!output.address) {
-                        output.address = sender_address
-                    }
+                // For change output, use an HD address the scanner can track
+                // (civic address may not be discoverable by Electrum due to v28 format)
+                const discoveredAddrs = window._walletDiscoveredAddresses || [];
+                const changeAddress = discoveredAddrs.length > 0 ? discoveredAddrs[0] : sender_address;
 
+                tx_i_o.outputs.forEach(output => {
+                    if (!output.address) {
+                        output.address = changeAddress;
+                        console.log("Change routed to HD address:", changeAddress);
+                    }
                     psbt.addOutput({
                         address: output.address,
                         value: output.value,
                     })
-
                 })
 
-                //console.log("length:",tx_i_o.inputs.length )
+                // Sign each input with its correct key
                 for (let i = 0; i < tx_i_o.inputs.length; i++) {
-                    psbt.signInput(i, key);
+                    try {
+                        psbt.signInput(i, inputKeys[i]);
+                    } catch (signErr) {
+                        // Debug: show what key we tried vs what the UTXO expects
+                        const inputAddr = getAddressFromInput(tx_i_o.inputs[i]);
+                        const keyPub = inputKeys[i].publicKey.toString('hex');
+                        const derivedAddr = my_bundle.bitcoin.payments.p2pkh({ pubkey: inputKeys[i].publicKey, network: Marscoin.mainnet }).address;
+                        console.error(`Sign failed for input ${i}:`);
+                        console.error(`  UTXO address:    ${inputAddr}`);
+                        console.error(`  Key derives to:  ${derivedAddr}`);
+                        console.error(`  Key pubkey:      ${keyPub}`);
+                        console.error(`  Match: ${inputAddr === derivedAddr}`);
+
+                        // Try brute-force: scan first 20 receiving + 20 change paths
+                        let signed = false;
+                        for (let chain = 0; chain <= 1 && !signed; chain++) {
+                            for (let idx = 0; idx < 20 && !signed; idx++) {
+                                try {
+                                    const tryChild = root.derivePath(`m/44'/2'/0'/${chain}/${idx}`);
+                                    const tryKey = my_bundle.bitcoin.ECPair.fromWIF(tryChild.toWIF(), Marscoin.mainnet);
+                                    psbt.signInput(i, tryKey);
+                                    console.log(`  ✓ Signed with brute-force path m/44'/2'/0'/${chain}/${idx}`);
+                                    signed = true;
+                                } catch (e) { /* try next */ }
+                            }
+                        }
+                        if (!signed) {
+                            handleError("unable to sign");
+                            throw signErr;
+                        }
+                    }
                 }
-
-                // psbt.signInput(0, key);
-
-                //console.log(psbt.finalizeAllInputs().extractTransaction().toHex());
 
                 const txhash = psbt.finalizeAllInputs().extractTransaction().toHex()
 
                 try {
                     const txId = await broadcastTxHash(txhash);
                     return txId;
-
-
                 } catch (e) {
                     handleError("broadcasting")
                     throw e;
                 }
-
-
             }
 
             const handleError = (str) => {
@@ -1186,7 +1969,11 @@
         var qr = new QRious({
             element: document.getElementById('qrious'),
             value: '{{ $public_addr }}',
-            size: '250'
+            size: 200,
+            foreground: '#c84125',
+            background: '#0c0c16',
+            level: 'M',
+            padding: 12
         });
 
         function scan() {
@@ -1503,9 +2290,92 @@
         };
 
 
+    // ===================================================================
+    // New Security Features: View Seed & Re-encrypt
+    // ===================================================================
+    function showSeedPhrase() {
+        var mnemonic = WalletKey.get();
+        if (!mnemonic) {
+            alert('Wallet key not found. Please unlock your wallet first.');
+            return;
+        }
+        var confirmed = confirm('WARNING: Your seed phrase gives full access to your funds. Never share it with anyone. Continue?');
+        if (!confirmed) return;
+
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;';
+        overlay.innerHTML = '<div style="background:var(--mr-surface,#12121e);border:2px solid var(--mr-mars,#c84125);border-radius:12px;padding:32px;max-width:500px;width:90%;text-align:center;">' +
+            '<div style="font-family:Orbitron,sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mr-mars,#c84125);margin-bottom:16px;"><i class="fa fa-exclamation-triangle" style="margin-right:6px;"></i> Recovery Seed Phrase</div>' +
+            '<div style="background:var(--mr-dark,#0c0c16);border:1px solid var(--mr-border-bright,rgba(255,255,255,0.1));border-radius:8px;padding:20px;margin-bottom:20px;">' +
+            '<div style="font-family:JetBrains Mono,monospace;font-size:15px;font-weight:500;color:#fff;line-height:2.2;word-spacing:8px;letter-spacing:0.5px;">' + mnemonic.trim() + '</div>' +
+            '</div>' +
+            '<div style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--mr-text-faint,#5a5968);margin-bottom:16px;">Write these words down and store them in a safe place. Anyone with these words can access your funds.</div>' +
+            '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:var(--mr-mars,#c84125);border:none;color:#fff;padding:10px 24px;border-radius:6px;font-family:JetBrains Mono,monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Close</button>' +
+            '</div>';
+        document.body.appendChild(overlay);
+    }
+
+    function createNewBackup() {
+        var mnemonic = WalletKey.get();
+        if (!mnemonic) {
+            alert('Wallet key not found. Please unlock your wallet first.');
+            return;
+        }
+        var newPassword = prompt('Enter a NEW password to re-encrypt your wallet backup.\n\nThis will update the server-stored encrypted backup with your new password.');
+        if (!newPassword || newPassword.trim() === '') return;
+        var confirmPassword = prompt('Confirm new password:');
+        if (newPassword !== confirmPassword) {
+            alert('Passwords do not match. Please try again.');
+            return;
+        }
+
+        try {
+            var iv = "{{ json_encode($iv) }}".replace("]", "").replace("[", "").split(",");
+            iv = new Uint8Array(iv);
+            var hashed = my_bundle.pbkdf2.pbkdf2Sync(newPassword.trim(), "{{ $SALT }}", 100000, 16, 'sha512').toString('hex');
+            var encrypted = my_bundle.encrypt(mnemonic.trim(), hashed, iv);
+
+            $.post('/wallet/createwallet', {
+                password: encrypted,
+                public_addr: '{{ $public_addr }}',
+                wallet_name: 'Re-encrypted'
+            }).done(function() {
+                if (typeof toastr !== 'undefined') {
+                    toastr.success('Wallet backup re-encrypted with your new password.', 'Backup Updated');
+                } else {
+                    alert('Wallet backup has been re-encrypted with your new password.');
+                }
+            }).fail(function() {
+                alert('Failed to update backup. Please try again.');
+            });
+        } catch (err) {
+            alert('Encryption failed: ' + err.message);
+            console.error('Re-encryption error:', err);
+        }
+    }
+
+    // Update bridge hero balance when HD discovery completes
+    (function() {
+        var balEl = document.getElementById('hd-total-balance');
+        var heroEl = document.getElementById('bridge-balance-display');
+        if (!balEl || !heroEl) return;
+        var observer = new MutationObserver(function() {
+            var txt = balEl.textContent.trim();
+            if (txt && txt.indexOf('Scanning') === -1 && txt.indexOf('Discovering') === -1) {
+                var num = parseFloat(txt.replace(/[^0-9.]/g, ''));
+                if (!isNaN(num) && num > 0) {
+                    heroEl.textContent = num.toFixed(4);
+                } else if (txt.indexOf('MARS') === -1) {
+                    heroEl.textContent = txt;
+                }
+            }
+        });
+        observer.observe(balEl, { childList: true, subtree: true, characterData: true });
+    })();
+
     </script>
 
-@livewireScripts    
+@livewireScripts
 </body>
 
 </html>

@@ -25,39 +25,542 @@
     <link rel="shortcut icon" href="/favicon.ico">
 
     <script src="/assets/wallet/js/dist/bundle.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* span.qrcodeicon span {
-            position: absolute;
-            display: block;
-            top: 7px;
-            right: 21px;
-            width: 18px;
-            height: 18px;
-            background: url('/assets/wallet/img/qrcode.png');
-            cursor: pointer;
-            z-index: 1;
-        } */
+    /* ============================================ */
+    /* THE VAULT: Wallet Hub Redesign               */
+    /* ============================================ */
+    body { background: var(--mr-void, #06060c) !important; color: var(--mr-text, #e0dfe6); }
 
-        .mouse-box {
-    width: 400px; /* Example width */
-    height: 200px; /* Example height */
-    position: relative; /* Ensures that the canvas can be absolutely positioned within */
+    /* -- Page structure -- */
+    .vault-page { min-height: 100vh; display: flex; flex-direction: column; }
+    .vault-page .content { flex: 1; }
 
-}
+    .vault-hero {
+        padding: 32px 0 20px;
+        position: relative;
+    }
+    .vault-hero::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--mr-border-bright, rgba(255,255,255,0.12)) 30%, var(--mr-mars, #c84125) 50%, var(--mr-border-bright, rgba(255,255,255,0.12)) 70%, transparent);
+    }
+    .vault-status {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--mr-mars, #c84125);
+        margin-bottom: 6px;
+    }
+    .vault-status .status-dot {
+        display: inline-block;
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--mr-green, #34d399);
+        margin-right: 8px;
+        animation: vaultPulse 2s infinite;
+        vertical-align: middle;
+    }
+    .vault-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin: 0;
+    }
 
-h5 {
-    font-size: 14px;
-}
-.dot {
-    /* ... your existing styles ... */
-    z-index: 1000; /* high value to bring to front */
-}
+    /* -- Action bar -- */
+    .vault-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        margin-bottom: 28px;
+    }
+    .vault-action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        text-decoration: none !important;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        border: 1px solid;
+    }
+    .vault-action-btn.primary {
+        background: var(--mr-mars, #c84125);
+        border-color: var(--mr-mars, #c84125);
+        color: #fff;
+    }
+    .vault-action-btn.primary:hover {
+        background: #d94e30;
+        box-shadow: 0 0 20px rgba(200,65,37,0.3);
+        transform: translateY(-1px);
+    }
+    .vault-action-btn.secondary {
+        background: transparent;
+        border-color: var(--mr-border-bright, rgba(255,255,255,0.15));
+        color: var(--mr-text, #e0dfe6);
+    }
+    .vault-action-btn.secondary:hover {
+        border-color: var(--mr-cyan, #00e4ff);
+        color: var(--mr-cyan, #00e4ff);
+        box-shadow: 0 0 20px rgba(0,228,255,0.1);
+    }
+
+    /* -- Section labels -- */
+    .vault-section-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim, #8a8998);
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+    }
+
+    /* -- Wallet Cards: Credit Card Style -- */
+    .vault-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+    .vault-card {
+        position: relative;
+        background: linear-gradient(135deg, var(--mr-surface, #12121e) 0%, var(--mr-surface-raised, #1a1a2a) 100%);
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+        border-radius: 12px;
+        padding: 24px;
+        overflow: hidden;
+        transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+        cursor: default;
+    }
+    .vault-card:hover {
+        border-color: rgba(255,255,255,0.12);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        transform: translateY(-2px);
+    }
+    .vault-card.unlocked { border-color: rgba(52,211,153,0.25); }
+    .vault-card.unlocked:hover { border-color: rgba(52,211,153,0.4); box-shadow: 0 8px 32px rgba(52,211,153,0.08); }
+    .vault-card::before {
+        content: '';
+        position: absolute;
+        top: 0; right: 0;
+        width: 120px; height: 120px;
+        background: radial-gradient(circle at top right, rgba(200,65,37,0.06), transparent 70%);
+        pointer-events: none;
+    }
+    .vault-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+    .vault-card-chip {
+        width: 36px; height: 26px;
+        background: linear-gradient(135deg, #c8a84e 0%, #d4b85a 40%, #a08030 100%);
+        border-radius: 4px;
+        position: relative;
+        overflow: hidden;
+    }
+    .vault-card-chip::after {
+        content: '';
+        position: absolute;
+        top: 4px; left: 6px;
+        width: 24px; height: 18px;
+        border: 1px solid rgba(0,0,0,0.15);
+        border-radius: 2px;
+    }
+    .vault-card-chip::before {
+        content: '';
+        position: absolute;
+        top: 50%; left: 0; right: 0;
+        height: 1px;
+        background: rgba(0,0,0,0.12);
+    }
+    .vault-card-status {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 3px;
+    }
+    .vault-card-status.locked {
+        background: rgba(200,65,37,0.12);
+        color: var(--mr-mars, #c84125);
+        border: 1px solid rgba(200,65,37,0.25);
+    }
+    .vault-card-status.active-status {
+        background: rgba(52,211,153,0.12);
+        color: var(--mr-green, #34d399);
+        border: 1px solid rgba(52,211,153,0.25);
+    }
+    .vault-card-type {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+    .vault-card-addr {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--mr-cyan, #00e4ff);
+        letter-spacing: 0.5px;
+        margin-bottom: 16px;
+        word-break: break-all;
+        opacity: 0.8;
+    }
+    .vault-card-balance {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
+    }
+    .vault-card-balance .unit {
+        font-size: 11px;
+        font-weight: 400;
+        color: var(--mr-text-dim, #8a8998);
+        margin-left: 4px;
+    }
+    .vault-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+    }
+    .vault-card-meta {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        color: var(--mr-text-faint, #5a5968);
+        letter-spacing: 0.5px;
+    }
+    .vault-card-actions {
+        display: flex;
+        gap: 6px;
+    }
+    .vault-btn-sm {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        letter-spacing: 0.5px;
+        padding: 5px 10px;
+        border-radius: 4px;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.12));
+        background: var(--mr-dark, #0c0c16);
+        color: var(--mr-text-dim, #8a8998);
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none !important;
+    }
+    .vault-btn-sm:hover { border-color: var(--mr-cyan, #00e4ff); color: var(--mr-cyan, #00e4ff); }
+    .vault-btn-sm.unlock { border-color: rgba(52,211,153,0.3); color: var(--mr-green, #34d399); }
+    .vault-btn-sm.unlock:hover { background: rgba(52,211,153,0.1); border-color: var(--mr-green, #34d399); }
+    .vault-btn-sm.danger { border-color: rgba(239,68,68,0.25); color: #ef4444; }
+    .vault-btn-sm.danger:hover { background: rgba(239,68,68,0.1); border-color: #ef4444; }
+
+    /* -- Empty State -- */
+    .vault-empty {
+        text-align: center;
+        padding: 60px 20px;
+        border: 1px dashed var(--mr-border-bright, rgba(255,255,255,0.1));
+        border-radius: 12px;
+        background: var(--mr-surface, #12121e);
+    }
+    .vault-empty-icon {
+        font-size: 48px;
+        color: var(--mr-text-faint, #5a5968);
+        margin-bottom: 20px;
+    }
+    .vault-empty h3 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+    .vault-empty p {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--mr-text-dim, #8a8998);
+        margin-bottom: 24px;
+    }
+
+    /* -- Modal Overrides -- */
+    .modal-styled .modal-content {
+        background: var(--mr-surface, #12121e) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)) !important;
+        border-radius: 12px !important;
+        color: var(--mr-text, #e0dfe6) !important;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.6) !important;
+    }
+    .modal-styled .modal-header {
+        background: var(--mr-dark, #0c0c16) !important;
+        border-bottom: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 16px 24px !important;
+    }
+    .modal-styled .modal-title {
+        font-family: 'Orbitron', sans-serif !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        color: #fff !important;
+    }
+    .modal-styled .modal-header .close {
+        color: var(--mr-text-dim) !important;
+        opacity: 0.7 !important;
+        text-shadow: none !important;
+    }
+    .modal-styled .modal-body {
+        background: var(--mr-surface, #12121e) !important;
+        padding: 24px !important;
+    }
+    .modal-styled .form-control {
+        background: var(--mr-dark, #0c0c16) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)) !important;
+        color: #fff !important;
+        border-radius: 6px !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 13px !important;
+        padding: 10px 14px !important;
+        transition: border-color 0.2s !important;
+    }
+    .modal-styled .form-control:focus {
+        border-color: var(--mr-cyan, #00e4ff) !important;
+        box-shadow: 0 0 0 2px rgba(0,228,255,0.1) !important;
+        outline: none !important;
+    }
+    .modal-styled label {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 10px !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        color: var(--mr-text-dim, #8a8998) !important;
+        margin-bottom: 6px !important;
+    }
+    .modal-styled .btn-primary {
+        background: var(--mr-mars, #c84125) !important;
+        border-color: var(--mr-mars, #c84125) !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 11px !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        padding: 10px 24px !important;
+        border-radius: 6px !important;
+        transition: all 0.2s !important;
+    }
+    .modal-styled .btn-primary:hover {
+        background: #d94e30 !important;
+        box-shadow: 0 0 16px rgba(200,65,37,0.3) !important;
+    }
+    .modal-styled .btn-secondary, .modal-styled .btn-default {
+        background: var(--mr-dark, #0c0c16) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.12)) !important;
+        color: var(--mr-text-dim, #8a8998) !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 11px !important;
+        border-radius: 6px !important;
+    }
+
+    /* -- Entropy box -- */
+    .mouse-box {
+        width: 100% !important;
+        height: 200px !important;
+        position: relative !important;
+        background: var(--mr-dark, #0c0c16) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)) !important;
+        border-radius: 8px !important;
+        overflow: hidden;
+        cursor: crosshair;
+        margin-bottom: 16px;
+    }
+    .mouse-box::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(255,255,255,0.02) 19px, rgba(255,255,255,0.02) 20px),
+            repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(255,255,255,0.02) 19px, rgba(255,255,255,0.02) 20px);
+        pointer-events: none;
+    }
+    .dot {
+        position: absolute !important;
+        width: 3px !important;
+        height: 3px !important;
+        border-radius: 50% !important;
+        background: var(--mr-cyan, #00e4ff) !important;
+        pointer-events: none !important;
+        z-index: 1000 !important;
+        box-shadow: 0 0 4px var(--mr-cyan, #00e4ff);
+    }
+    #progress-counter {
+        font-family: 'Orbitron', sans-serif !important;
+        color: var(--mr-mars, #c84125) !important;
+    }
+    .progress {
+        background: var(--mr-dark, #0c0c16) !important;
+        border-radius: 4px !important;
+        height: 6px !important;
+        overflow: hidden;
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+    }
+    .progress-bar-primary {
+        background: var(--mr-mars, #c84125) !important;
+    }
+
+    /* -- Mnemonic display -- */
+    .mnemonic {
+        background: var(--mr-dark, #0c0c16) !important;
+        border: 2px solid var(--mr-mars, #c84125) !important;
+        border-radius: 8px !important;
+        padding: 20px !important;
+        margin: 16px 0 !important;
+        position: relative;
+    }
+    .mnemonic::before {
+        content: '\f023';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        top: 8px; right: 12px;
+        color: rgba(200,65,37,0.3);
+        font-size: 14px;
+    }
+    .mnemonic-text {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        color: #fff !important;
+        line-height: 2 !important;
+        word-spacing: 8px;
+        letter-spacing: 0.5px;
+    }
+
+    /* -- Seed inputs -- */
+    .seed-input {
+        background: var(--mr-dark, #0c0c16) !important;
+        border: 1px solid var(--mr-border-bright, rgba(255,255,255,0.1)) !important;
+        color: #fff !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 13px !important;
+        padding: 10px 12px !important;
+        border-radius: 6px !important;
+        width: 120px !important;
+        margin: 4px !important;
+        text-align: center !important;
+        transition: border-color 0.2s !important;
+    }
+    .seed-input:focus {
+        border-color: var(--mr-cyan, #00e4ff) !important;
+        box-shadow: 0 0 0 2px rgba(0,228,255,0.1) !important;
+        outline: none !important;
+    }
+    .seed-input::placeholder {
+        color: var(--mr-text-faint, #5a5968) !important;
+    }
+
+    /* -- Tab pills in modals -- */
+    .nav-pills.nav-stacked > li > a {
+        background: var(--mr-dark, #0c0c16) !important;
+        color: var(--mr-text-dim, #8a8998) !important;
+        border: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 11px !important;
+        border-radius: 6px !important;
+        margin-bottom: 4px !important;
+        transition: all 0.2s !important;
+    }
+    .nav-pills.nav-stacked > li.active > a,
+    .nav-pills.nav-stacked > li.active > a:hover {
+        background: var(--mr-surface-raised, #1a1a2a) !important;
+        border-color: var(--mr-mars, #c84125) !important;
+        color: #fff !important;
+    }
+    .nav-pills.nav-stacked > li.disabled > a {
+        opacity: 0.4 !important;
+        cursor: not-allowed !important;
+    }
+
+    /* -- Portlet overrides -- */
+    .portlet { background: transparent !important; border: none !important; box-shadow: none !important; }
+    .portlet-title { display: none !important; } /* Hidden - replaced by vault-hero */
+    .icon-stat, .icon-stat-footer, .icon-stat-label, .icon-stat-value { all: unset; display: block; }
+
+    /* -- Wallet card override (the old .wallet-card class) -- */
+    .wallet-card { all: unset; display: block; }
+
+    /* -- Footer -- */
+    .footer {
+        border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)) !important;
+        padding: 20px 0 !important;
+        background: var(--mr-void, #06060c) !important;
+    }
+
+    /* -- Misc -- */
+    h5 { font-size: 14px; }
+    .pub-addr { display: flex; align-items: center; gap: 8px; }
+    .copy-icon { color: var(--mr-text-dim) !important; cursor: pointer; transition: color 0.2s; }
+    .copy-icon:hover { color: var(--mr-cyan, #00e4ff) !important; }
+    .title-help { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .title-help h2 {
+        font-family: 'Orbitron', sans-serif !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        color: #fff !important;
+        margin: 0 !important;
+    }
+    .password-encrypt label {
+        display: block;
+        margin-top: 12px;
+    }
+    .btn-group .btn { font-family: 'JetBrains Mono', monospace !important; font-size: 11px !important; }
+
+    @keyframes vaultPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+    }
+    @keyframes vaultFadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .vault-fade-1 { animation: vaultFadeIn 0.5s ease-out 0.15s both; }
+    .vault-fade-2 { animation: vaultFadeIn 0.5s ease-out 0.3s both; }
+    .vault-fade-3 { animation: vaultFadeIn 0.5s ease-out 0.45s both; }
+
+    @media (max-width: 767px) {
+        .vault-title { font-size: 20px; }
+        .vault-cards { grid-template-columns: 1fr; }
+        .vault-actions { flex-wrap: wrap; }
+        .seed-input { width: 90px !important; }
+    }
     </style>
     <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
     @livewireStyles
 </head>
 
-<body class=" ">
+<body class="vault-page">
     <div id="wrapper">
         <header class="navbar navbar-inverse" role="banner">
             <div class="container">
@@ -76,176 +579,129 @@ h5 {
 
             <div class="container">
 
-                <div class="portlet">
+                {{-- VAULT HERO --}}
+                <div class="vault-hero">
+                    <div class="vault-status"><span class="status-dot"></span>Secure Vault — Active</div>
+                    <h1 class="vault-title">Wallet</h1>
+                </div>
 
+                {{-- ACTION BAR --}}
+                <div class="vault-actions">
+                    <a data-toggle="modal" href="#styledModal" class="vault-action-btn primary demo-element" data-backdrop="static" data-keyboard="false">
+                        <i class="fa fa-plus"></i> New Wallet
+                    </a>
+                    <a data-backdrop="static" data-keyboard="false" data-toggle="modal" href="#modalLogin" class="vault-action-btn secondary demo-element">
+                        <i class="fa fa-link"></i> Connect Wallet
+                    </a>
+                </div>
+
+                <div class="portlet" style="display:none;">
                     <h3 class="portlet-title">
                         <u>Select Wallet</u>
-                         <a style="float:right;" data-toggle="modal" href="#styledModal" class="btn-lg btn-primary demo-element" data-backdrop="static" data-keyboard="false">New Wallet</a>
-                        <a style="float:right;" data-backdrop="static" data-keyboard="false" data-toggle="modal" href="#modalLogin" class="btn-lg btn-primary demo-element">Connect Wallet</a>
                     </h3>
-
+                </div>
 
                     {{-- Render Civic Wallet --}}
+                    @if ($wallets || $civic_wallet)
+                    <div class="vault-section-label">Your Wallets</div>
+                    <div class="vault-cards">
+                    @endif
+
                     @if ($civic_wallet)
-                        <div class="row">
-
-                            <div class="col-md-5 col-sm-7 ">
-                                <a  data-aos="fade-right" data-aos-duration="1000">
-                                    <div class="icon-stat wallet-card">
-
-                                        <div class="row">
-                                            <div class="col-xs-8 text-left">
-                                                @if(!$general_public && !@$citizen)
-                                                    <h4><i class="fa fa-drivers-license"></i> Civic Wallet - Applicant</h4>
-                                                @elseif($general_public && !$citizen)
-                                                    <h4><i class="fa fa-drivers-license"></i> Civic Wallet - Public</h4>
-                                                @elseif($citizen)
-                                                    <h4><i class="fa fa-drivers-license"></i> Civic Wallet - Citizen</h4>
-                                                @endif
-                                                <span class="icon-stat-label">{{ $civic_wallet->public_addr }}</span>
-                                                <!-- /.icon-stat-label -->
-                                                <span class="icon-stat-value">{{$civic_balance}}</span> <!-- /.icon-stat-value -->
-
-                                            
-
-
-                                            </div><!-- /.col-xs-8 -->
-
-                                            <div class="col-xs-4 text-center">
-                                                    @if($civic_wallet->id == $wallet_open)
-                                                        <i style="float: right; margin-top: 5px;" class="fa-solid fa-unlock fa-xl "></i>
-                                                    @else
-                                                        <i style="float: right; margin-top: 5px;" class="fa-solid fa-lock fa-xl "></i>
-                                                    @endif
-                                                        
-                                            </div><!-- /.col-xs-4 -->
-                                        </div><!-- /.row -->
-
-                                        <div class="icon-stat-footer" style="border-top: 1px dotted #CCC;">
-                                            @if(isset($civic_wallet->opened_at))
-                                                    <i class="fa fa-clock-o"></i> Last Opened: {{ \Carbon\Carbon::parse($civic_wallet->opened_at)->toFormattedDateString() }} ({{ \Carbon\Carbon::parse($civic_wallet->opened_at)->diffForHumans() }})
-                                            @elseif(isset($civic_wallet->created_at))
-                                                    <i class="fa fa-clock-o"></i> Created: {{ \Carbon\Carbon::parse($civic_wallet->created_at)->toFormattedDateString() }} ({{ \Carbon\Carbon::parse($civic_wallet->created_at)->diffForHumans() }})
-                                            @endif
-                                            <button style="float: right; position: relative; margin-right: 5px;" type="button" class="btn btn-secondary btn-xs unlock-wallet-button" data-wallet-id="{{ $civic_wallet->id }}"  style="margin-top: 5px;"data-toggle="modal" href="#unlockWalletModal" data-keyboard="false" data-wallet='{{ json_encode($civic_wallet, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES) }}' id={{ $civic_wallet->public_addr }}>
-                                                    <i class="fa fa-lock-open"></i> Unlock
-                                                    </button>
-                                        </div>
-
-
-
-                                    </div> <!-- /.icon-stat -->
-                                </a>
-
+                        <div class="vault-card vault-fade-1 {{ $civic_wallet->id == $wallet_open ? 'unlocked' : '' }}">
+                            <div class="vault-card-header">
+                                <div class="vault-card-chip"></div>
+                                <span class="vault-card-status {{ $civic_wallet->id == $wallet_open ? 'active-status' : 'locked' }}">
+                                    <i class="fa-solid {{ $civic_wallet->id == $wallet_open ? 'fa-unlock' : 'fa-lock' }}" style="margin-right: 4px;"></i>
+                                    {{ $civic_wallet->id == $wallet_open ? 'Unlocked' : 'Locked' }}
+                                </span>
                             </div>
-
+                            <div class="vault-card-type">
+                                <i class="fa fa-id-card" style="margin-right: 6px; color: var(--mr-mars);"></i>
+                                @if(!$general_public && !@$citizen) Civic — Applicant
+                                @elseif($general_public && !$citizen) Civic — Public
+                                @elseif($citizen) Civic — Citizen
+                                @endif
+                            </div>
+                            <div class="vault-card-addr">{{ $civic_wallet->public_addr }}</div>
+                            <div class="vault-card-balance">{{ number_format($civic_balance, 4) }}<span class="unit">MARS</span></div>
+                            <div class="vault-card-footer">
+                                <div class="vault-card-meta">
+                                    @if(isset($civic_wallet->opened_at))
+                                        Opened {{ \Carbon\Carbon::parse($civic_wallet->opened_at)->diffForHumans() }}
+                                    @elseif(isset($civic_wallet->created_at))
+                                        Created {{ \Carbon\Carbon::parse($civic_wallet->created_at)->diffForHumans() }}
+                                    @endif
+                                </div>
+                                <div class="vault-card-actions">
+                                    <button type="button" class="vault-btn-sm unlock unlock-wallet-button" data-wallet-id="{{ $civic_wallet->id }}" data-toggle="modal" href="#unlockWalletModal" data-keyboard="false" data-wallet='{{ json_encode($civic_wallet, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES) }}' id={{ $civic_wallet->public_addr }}>
+                                        <i class="fa fa-lock-open"></i> Unlock
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     @endif
 
-
-
-
                     {{-- Render all existing wallets --}}
-
-
                     @if ($wallets)
                         @foreach ($wallets as $wallet)
-                            <div class="row">
-                                <div class="col-md-5 col-sm-7">
-                                <a data-aos="fade-right" data-aos-duration="1000" >
-                                        <div class="icon-stat wallet-card">
-                                            <div class="row">
-                                               
-                                            <div class="col-xs-8 text-left">
-                                                    <h4><i class="fa fa-wallet"></i> <span class="wallet-name">{{ $wallet->wallet_type }}</span></h4>
-                                                    <span class="icon-stat-label">{{ $wallet->public_addr }}</span>
-                                                    <!-- /.icon-stat-label -->
-                                                    <span class="icon-stat-value">{{$wallet->balance}}</span>
-                                                    <!-- /.icon-stat-value -->
-                                                </div><!-- /.col-xs-8 -->
-
-                                                <div class="col-xs-4 text-center">
-                                                    @if($wallet->id == $wallet_open)
-                                                        <i style="float: right; margin-top: 5px;" class="fa-solid fa-unlock fa-xl "></i>
-                                                    @else
-                                                        <i style="float: right; margin-top: 5px;" class="fa-solid fa-lock fa-xl "></i>
-                                                    @endif
-                                                </div><!-- /.col-xs-4 -->
-                                            </div><!-- /.row -->
-
-                                            <div class="icon-stat-footer" style="border-top: 1px dotted #CCC;">
-                                                @if(isset($wallet->opened_at))
-                                                    <i class="fa fa-clock-o"></i> Last Opened: {{ $wallet->opened_at->diffForHumans() }}
-                                                @elseif(isset($wallet->created_at))
-                                                    <i class="fa fa-clock-o"></i> Created: {{ $wallet->created_at->diffForHumans() }}
-                                                @endif
-
-                                                <button style="float: right; position: relative; margin-right: 5px;" type="button" class="btn btn-danger btn-xs delete-wallet-button" data-wallet-id="{{ $wallet->id }}" style="margin-top: 5px;">
-                                                <i class="fa fa-times"></i> Forget
-                                                </button>
-
-                                                <button style="float: right; position: relative; margin-right: 5px;" type="button" class="btn btn-info btn-xs rename-wallet-button" data-wallet-name="{{$wallet->wallet_type}}"  data-wallet-id="{{ $wallet->id }}" data-toggle="modal" href="#renameWalletModal" style="margin-top: 5px;">
-                                                <i class="fa fa-edit"></i> Rename
-                                                </button>
-
-                                                <button style="float: right; position: relative; margin-right: 5px;" type="button" class="btn btn-secondary btn-xs unlock-wallet-button" data-wallet-id="{{ $wallet->id }}"  style="margin-top: 5px;" data-toggle="modal" @if($wallet->wallet_type == "Imported") href="#modalLogin" @else href="#unlockWalletModal" @endif data-keyboard="false" data-wallet='{{ json_encode($wallet, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES) }}' id={{ $wallet->public_addr }}>
-                                                <i class="fa fa-lock-open"></i> Unlock
-                                                </button>
-                                            </div>
-
-                                        </div> <!-- /.icon-stat -->
-
-                                    </a>
+                            <div class="vault-card vault-fade-2 {{ $wallet->id == $wallet_open ? 'unlocked' : '' }}">
+                                <div class="vault-card-header">
+                                    <div class="vault-card-chip"></div>
+                                    <span class="vault-card-status {{ $wallet->id == $wallet_open ? 'active-status' : 'locked' }}">
+                                        <i class="fa-solid {{ $wallet->id == $wallet_open ? 'fa-unlock' : 'fa-lock' }}" style="margin-right: 4px;"></i>
+                                        {{ $wallet->id == $wallet_open ? 'Unlocked' : 'Locked' }}
+                                    </span>
                                 </div>
-
+                                <div class="vault-card-type">
+                                    <i class="fa fa-wallet" style="margin-right: 6px; color: var(--mr-cyan);"></i>
+                                    <span class="wallet-name">{{ $wallet->wallet_type }}</span>
+                                </div>
+                                <div class="vault-card-addr">{{ $wallet->public_addr }}</div>
+                                <div class="vault-card-balance">{{ number_format($wallet->balance, 4) }}<span class="unit">MARS</span></div>
+                                <div class="vault-card-footer">
+                                    <div class="vault-card-meta">
+                                        @if(isset($wallet->opened_at))
+                                            Opened {{ $wallet->opened_at->diffForHumans() }}
+                                        @elseif(isset($wallet->created_at))
+                                            Created {{ $wallet->created_at->diffForHumans() }}
+                                        @endif
+                                    </div>
+                                    <div class="vault-card-actions">
+                                        <button type="button" class="vault-btn-sm unlock unlock-wallet-button" data-wallet-id="{{ $wallet->id }}" data-toggle="modal" @if($wallet->wallet_type == "Imported") href="#modalLogin" @else href="#unlockWalletModal" @endif data-keyboard="false" data-wallet='{{ json_encode($wallet, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES) }}' id={{ $wallet->public_addr }}>
+                                            <i class="fa fa-lock-open"></i> Unlock
+                                        </button>
+                                        <button type="button" class="vault-btn-sm rename-wallet-button" data-wallet-name="{{$wallet->wallet_type}}" data-wallet-id="{{ $wallet->id }}" data-toggle="modal" href="#renameWalletModal">
+                                            <i class="fa fa-edit"></i> Rename
+                                        </button>
+                                        <button type="button" class="vault-btn-sm danger delete-wallet-button" data-wallet-id="{{ $wallet->id }}">
+                                            <i class="fa fa-times"></i> Forget
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         @endforeach
-
                     @endif
 
-
-                    {{-- Render First time wallet banner OR exisiting card banner --}}
                     @if ($wallets || $civic_wallet)
-
+                    </div>{{-- /.vault-cards --}}
                     @else
-                        <div class="portlet-body"
-                            style="display: flex; justify-content: center; align-items: center; flex-direction: column; background: transparent">
-
-
-
-
-                            <div style="display: flex; justify-content: space-around; align-items: center">
-                                <h2>Create new Marscoin wallet or Login to existing wallet</h2>
-
+                        {{-- Empty state --}}
+                        <div class="vault-empty vault-fade-1">
+                            <div class="vault-empty-icon"><i class="fa fa-shield-halved"></i></div>
+                            <h3>No Wallets Found</h3>
+                            <p>Create a new Marscoin wallet or connect an existing one to get started.</p>
+                            <div style="display: flex; gap: 12px; justify-content: center;">
+                                <a data-toggle="modal" href="#styledModal" class="vault-action-btn primary demo-element" data-backdrop="static" data-keyboard="false">
+                                    <i class="fa fa-plus"></i> New Wallet
+                                </a>
+                                <a data-backdrop="static" data-keyboard="false" data-toggle="modal" href="#modalLogin" class="vault-action-btn secondary demo-element">
+                                    <i class="fa fa-link"></i> Connect Wallet
+                                </a>
                             </div>
-
-                            <div class="panel-group accordion-panel" id="accordion-paneled"
-                                style="display: flex; justify-content: space-evenly; align-items: center; width: 40%; margin: 40px">
-
-
-                                <a data-toggle="modal" href="#styledModal" class="btn-lg btn-primary demo-element"
-                                    data-backdrop="static" data-keyboard="false">New Wallet</a>
-                                <h4>OR</h4>
-                                <a data-backdrop="static" data-keyboard="false" data-toggle="modal"
-                                    href="#modalLogin" class="btn-lg btn-primary demo-element">Connect Wallet</a>
-
-
-
-
-                            </div> <!-- /.accordion -->
-
-
-
-
-                        </div> <!-- /.portlet-body -->
+                        </div>
                     @endif
 
-                    {{-- render this if !civic_wallet && !hd_wallet --}}
-
-
-
-
-                </div> <!-- /.portlet -->
 
 
             </div> <!-- /.container -->
@@ -664,7 +1120,7 @@ h5 {
 
     <!------- Footer Start ------->
 
-    <footer class="footer">
+    <footer class="footer" style="border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)); padding: 20px 0; background: var(--mr-void, #06060c);">
         @include('footer')
     </footer>
 

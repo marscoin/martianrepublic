@@ -754,20 +754,34 @@ class AppHelper{
 
 		public static function getMarscoinTotalAmount()
 		{
-			$url = "https://explore.marscoin.org/api/status?q=getTxOutSetInfo";
 			$cacheKey = 'marscoin_total_amount';
 
-			$totalAmount = Cache::remember($cacheKey, 180, function () use ($url) {
+			$totalAmount = Cache::remember($cacheKey, 180, function () {
+				// Primary: marscoin-cli (fastest, most reliable)
 				try {
+					$output = shell_exec('/usr/local/bin/marscoin-cli -datadir=/root/.marscoin gettxoutsetinfo 2>/dev/null');
+					if ($output) {
+						$data = json_decode($output, true);
+						if ($data && isset($data['total_amount'])) {
+							return round($data['total_amount'], 2);
+						}
+					}
+				} catch (\Exception $e) {
+					// Fall through to explorer
+				}
+
+				// Fallback: explorer API
+				try {
+					$url = "https://explore.marscoin.org/api/status?q=getTxOutSetInfo";
 					$response = file_get_contents($url);
 					$data = json_decode($response, true);
-					if ($data && count($data) > 0) {
+					if ($data && isset($data['txoutsetinfo']['total_amount'])) {
 						return round($data['txoutsetinfo']['total_amount'], 2);
 					}
 				} catch (\Exception $e) {
-					return 39000000; // Default value in case of an error
+					return 39000000;
 				}
-				return 39000000; // Default value if the API does not return a valid response
+				return 39000000;
 			});
 
 			return $totalAmount;
