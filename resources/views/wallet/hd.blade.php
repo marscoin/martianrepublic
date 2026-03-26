@@ -501,6 +501,76 @@
         cursor: not-allowed !important;
     }
 
+    /* -- Modal internal layout fixes -- */
+    .next-btn {
+        text-align: right;
+        padding: 16px 0 8px;
+    }
+    .next-btn .btn-primary {
+        padding: 10px 28px !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 12px !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        background: var(--mr-mars, #c84125) !important;
+        border-color: var(--mr-mars) !important;
+        color: #fff !important;
+        border-radius: 6px !important;
+    }
+    .title-help h2 {
+        font-family: 'Orbitron', sans-serif !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        color: #fff !important;
+        margin: 0 !important;
+    }
+    .title-help .btn {
+        background: var(--mr-surface-raised) !important;
+        border-color: var(--mr-border-bright) !important;
+        color: var(--mr-text-dim) !important;
+    }
+    .password-encrypt { margin-top: 12px; }
+    .password-encrypt label {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 10px !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        color: var(--mr-text-dim) !important;
+        margin-top: 12px !important;
+    }
+    .password-encrypt .form-control {
+        background: var(--mr-dark) !important;
+        border: 1px solid var(--mr-border-bright) !important;
+        color: #fff !important;
+        border-radius: 6px !important;
+        font-family: 'JetBrains Mono', monospace !important;
+    }
+    .password-encrypt .form-control:focus {
+        border-color: var(--mr-cyan) !important;
+        box-shadow: 0 0 0 2px rgba(0,228,255,0.1) !important;
+    }
+    .btn-group .btn.active {
+        background: var(--mr-mars) !important;
+        border-color: var(--mr-mars) !important;
+        color: #fff !important;
+    }
+    /* Tooltip/popover styling */
+    .popover { background: var(--mr-surface, #12121e) !important; border-color: var(--mr-border-bright) !important; }
+    .popover-title { background: var(--mr-dark) !important; color: #fff !important; border-color: var(--mr-border) !important; font-family: 'Orbitron', sans-serif !important; font-size: 11px !important; }
+    .popover-content { color: var(--mr-text-dim) !important; font-family: 'JetBrains Mono', monospace !important; font-size: 11px !important; }
+    .popover .arrow:after { border-right-color: var(--mr-surface) !important; }
+    .tooltip-inner { background: var(--mr-surface) !important; color: var(--mr-text) !important; font-family: 'JetBrains Mono', monospace !important; font-size: 11px !important; border: 1px solid var(--mr-border-bright) !important; }
+    /* Tab content in modals */
+    .stacked-content { color: var(--mr-text) !important; }
+    .stacked-content h2 { font-family: 'Orbitron', sans-serif !important; font-size: 14px !important; font-weight: 600 !important; color: #fff !important; letter-spacing: 1px; text-transform: uppercase; }
+    .stacked-content p { color: var(--mr-text-dim) !important; font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important; }
+    .success h4 { color: var(--mr-green) !important; font-family: 'JetBrains Mono', monospace !important; }
+    /* Pub addr in wallet generation step */
+    .stacked-content .pub-addr { display: flex; align-items: center; gap: 8px; }
+    .stacked-content .pub-addr h3 { font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important; color: var(--mr-cyan) !important; word-break: break-all; }
+
     /* -- Portlet overrides -- */
     .portlet { background: transparent !important; border: none !important; box-shadow: none !important; }
     .portlet-title { display: none !important; } /* Hidden - replaced by vault-hero */
