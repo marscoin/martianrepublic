@@ -479,6 +479,11 @@
         color: var(--mr-text-faint, #5a5968) !important;
     }
 
+    /* Modal body padding */
+    .modal-styled .modal-body, #styledModal .modal-body, #modalLogin .modal-body {
+        padding-bottom: 32px !important;
+    }
+
     /* -- Tab pills in modals -- */
     .nav-pills.nav-stacked > li > a {
         background: var(--mr-dark, #0c0c16) !important;
@@ -504,7 +509,8 @@
     /* -- Modal internal layout fixes -- */
     .next-btn {
         text-align: right;
-        padding: 16px 0 8px;
+        padding: 20px 0 24px;
+        margin-top: 12px;
     }
     .next-btn .btn-primary {
         padding: 10px 28px !important;
