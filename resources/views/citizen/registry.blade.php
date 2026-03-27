@@ -28,8 +28,7 @@
     /* ============================================ */
     /* THE CIVIC HALL: Citizen Registry Redesign    */
     /* ============================================ */
-    html, body { background: #06060c !important; color: var(--mr-text, #e0dfe6) !important; margin: 0 !important; padding: 0 !important; height: 100%; }
-    #wrapper { margin: 0 !important; padding: 0 !important; min-height: calc(100vh - 60px); }
+    html, body { background: #06060c !important; color: var(--mr-text, #e0dfe6) !important; }
     .civic-page { min-height: 100vh; display: flex; flex-direction: column; }
     .civic-page .content { flex: 1; }
     .orbitron { font-family: 'Orbitron', sans-serif; font-weight: 800; }
@@ -364,8 +363,7 @@
     }
 
     /* -- Footer -- */
-    .footer { border-top: 1px solid var(--mr-border) !important; padding: 0 !important; height: 60px !important; background: var(--mr-void) !important; }
-    .content { padding-bottom: 40px !important; }
+    .footer { border-top: 1px solid var(--mr-border) !important; background: #06060c !important; }
 
     /* -- Animations -- */
     @keyframes civicPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
