@@ -312,11 +312,11 @@
     .modal-body { background: var(--mr-surface, #12121e) !important; }
     .modal-footer { background: var(--mr-surface, #12121e) !important; border-top: 1px solid var(--mr-border) !important; }
     .modal-header .close { color: var(--mr-text-dim) !important; text-shadow: none !important; }
-    .modal-backdrop { background: #000 !important; opacity: 0.5 !important; }
-    .modal-backdrop.in { opacity: 0.5 !important; }
-    .modal.fade.in { background: none; }
-    .modal { z-index: 10500 !important; }
-    .modal-dialog { z-index: 10501; position: relative; }
+    .modal-backdrop { background: rgba(6,6,12,0.6) !important; opacity: 1 !important; z-index: 1040 !important; }
+    .modal-backdrop.in { opacity: 1 !important; }
+    .modal { z-index: 1050 !important; overflow-y: auto; }
+    .modal-dialog { z-index: 1051; position: relative; pointer-events: auto; }
+    .modal-content { pointer-events: auto !important; position: relative; z-index: 1052; }
     .modal-body-box { background: var(--mr-dark, #0c0c16) !important; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; }
     .modal-body-box h5 { font-family: 'JetBrains Mono', monospace !important; font-size: 9px !important; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mr-text-dim) !important; margin-bottom: 6px; }
     .modal-body-box p { font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important; color: var(--mr-cyan) !important; word-break: break-all; }
