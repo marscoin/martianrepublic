@@ -16,8 +16,7 @@
     body, .mr-theme { background: var(--mr-void, #06060c) !important; }
     .gateway-wizard { max-width: 620px; margin: 0 auto; padding: 16px 20px 60px; }
     main.mr-auth-page { padding: 0 !important; margin: 0 !important; min-height: auto !important; background: var(--mr-void, #06060c) !important; }
-    #wrapper { min-height: 100vh; margin: 0 !important; padding: 0 !important; position: relative; padding-bottom: 80px !important; }
-    #wrapper > .footer { position: absolute; bottom: 0; left: 0; right: 0; }
+    #wrapper { min-height: 100%; height: auto; margin: 0 auto -60px; padding: 0 0 60px; }
     #wrapper > main { flex: 1; }
     .gateway-step { display: none; animation: gateIn 0.4s ease-out; }
     .gateway-step.active { display: block; }
@@ -350,10 +349,10 @@
         </div>
     </main>
 
-    <footer class="footer" style="border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)); padding: 20px 0; background: var(--mr-void, #06060c);">
+    </div> {{-- /#wrapper --}}
+    <footer class="footer" style="border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)); padding: 20px 0; background: #06060c; height: 60px;">
         @include('footer')
     </footer>
-    </div> {{-- /#wrapper --}}
 
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
