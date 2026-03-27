@@ -474,7 +474,7 @@
                         <div class="draft-section">
                             <div class="draft-section-title">Proposal Type</div>
 
-                            <div class="preset-grid" style="grid-template-columns: repeat(4, 1fr);">
+                            <div class="preset-grid" style="grid-template-columns: repeat(2, 1fr);">
                                 <div class="preset-btn active" data-preset="signal" style="border-top:2px solid var(--mr-green);">
                                     <div class="preset-name" style="color:var(--mr-green);">Signal</div>
                                     <div class="preset-desc">Temperature check</div>
