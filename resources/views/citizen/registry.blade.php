@@ -559,7 +559,7 @@
             </div> <!-- /.container -->
         </div> <!-- .content -->
     </div> <!-- /#wrapper -->
-    <footer class="footer" style="border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)); padding: 20px 0; background: var(--mr-void, #06060c);">
+    <footer class="footer" style="border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)); padding: 0; height: 60px; background: var(--mr-void, #06060c);">
         @include('footer')
     </footer>
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
