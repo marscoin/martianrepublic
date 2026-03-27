@@ -456,4 +456,165 @@ class CongressController extends Controller
 	}
 
 
+	/**
+	 * Withdraw a proposal during screening (proposer only)
+	 */
+	public function withdrawProposal(Request $request)
+	{
+		$proposalId = $request->input('proposalId');
+		$uid = Auth::user()->id;
+
+		$proposal = Proposals::find($proposalId);
+		if (!$proposal) {
+			return response()->json(['success' => false, 'error' => 'Proposal not found'], 404);
+		}
+
+		// Must be the proposer
+		if ($proposal->user_id !== $uid) {
+			return response()->json(['success' => false, 'error' => 'Only the proposer can withdraw'], 403);
+		}
+
+		// Must be in screening phase
+		$phase = \App\Includes\GovernanceTiers::currentPhase($proposal);
+		if ($phase !== 'screening') {
+			return response()->json(['success' => false, 'error' => 'Can only withdraw during screening period'], 400);
+		}
+
+		$proposal->status = 'withdrawn';
+		$proposal->active = 0;
+		$proposal->save();
+
+		Log::info("Proposal MR-{$proposalId} withdrawn by user {$uid}");
+		return response()->json(['success' => true, 'message' => 'Proposal withdrawn']);
+	}
+
+
+	/**
+	 * Amend a proposal during screening (proposer only, max 1 amendment)
+	 */
+	public function amendProposal(Request $request)
+	{
+		$proposalId = $request->input('proposalId');
+		$newDescription = $request->input('description');
+		$newTitle = $request->input('title');
+		$uid = Auth::user()->id;
+
+		$proposal = Proposals::find($proposalId);
+		if (!$proposal) {
+			return response()->json(['success' => false, 'error' => 'Proposal not found'], 404);
+		}
+
+		if ($proposal->user_id !== $uid) {
+			return response()->json(['success' => false, 'error' => 'Only the proposer can amend'], 403);
+		}
+
+		$phase = \App\Includes\GovernanceTiers::currentPhase($proposal);
+		if ($phase !== 'screening') {
+			return response()->json(['success' => false, 'error' => 'Can only amend during screening'], 400);
+		}
+
+		if ($proposal->amended_at) {
+			return response()->json(['success' => false, 'error' => 'Already amended once (maximum 1 amendment allowed)'], 400);
+		}
+
+		// Store original
+		$proposal->original_description = $proposal->description;
+		$proposal->original_ipfs_hash = $proposal->ipfs_hash;
+
+		// Update
+		$proposal->title = $newTitle ?: $proposal->title;
+		$proposal->description = $newDescription ?: $proposal->description;
+		$proposal->amended_at = now();
+
+		// Reset screening period (new 3-sol window)
+		$timestamps = \App\Includes\GovernanceTiers::calculateTimestamps($proposal->tier);
+		$proposal->screening_ends_at = $timestamps['screening_ends_at'];
+		$proposal->voting_ends_at = $timestamps['voting_ends_at'];
+		$proposal->timelock_ends_at = $timestamps['timelock_ends_at'];
+		$proposal->sunset_at = $timestamps['sunset_at'];
+
+		$proposal->save();
+
+		// Commit amendment to LegislationRepo
+		try {
+			$repo = new \App\Includes\LegislationRepo();
+			$gitHash = $repo->amendProposal(
+				$proposal->id,
+				$proposal->title,
+				$proposal->description,
+				$proposal->author,
+				$proposal->tier,
+				[],
+				$request->input('note', 'Amended during screening')
+			);
+			$proposal->git_hash = $gitHash;
+			$proposal->save();
+		} catch (\Exception $e) {
+			Log::warning('LegislationRepo amend failed: ' . $e->getMessage());
+		}
+
+		Log::info("Proposal MR-{$proposalId} amended by user {$uid}");
+		return response()->json(['success' => true, 'message' => 'Proposal amended. Screening period reset.']);
+	}
+
+
+	/**
+	 * Challenge a proposal's tier classification during screening
+	 */
+	public function challengeTier(Request $request)
+	{
+		$proposalId = $request->input('proposalId');
+		$proposedTier = $request->input('proposedTier');
+		$reason = $request->input('reason', '');
+		$uid = Auth::user()->id;
+
+		$proposal = Proposals::find($proposalId);
+		if (!$proposal) {
+			return response()->json(['success' => false, 'error' => 'Proposal not found'], 404);
+		}
+
+		// Can't challenge your own proposal
+		if ($proposal->user_id === $uid) {
+			return response()->json(['success' => false, 'error' => 'Cannot challenge your own proposal'], 400);
+		}
+
+		$phase = \App\Includes\GovernanceTiers::currentPhase($proposal);
+		if ($phase !== 'screening') {
+			return response()->json(['success' => false, 'error' => 'Can only challenge during screening'], 400);
+		}
+
+		// Validate reclassification (upward only)
+		if (!\App\Includes\GovernanceTiers::isValidReclassification($proposal->tier, $proposedTier)) {
+			return response()->json(['success' => false, 'error' => 'Reclassification must be to a higher tier'], 400);
+		}
+
+		// Check no existing open challenge
+		$existing = DB::table('proposal_challenges')
+			->where('proposal_id', $proposalId)
+			->where('status', 'open')
+			->first();
+		if ($existing) {
+			return response()->json(['success' => false, 'error' => 'An open challenge already exists'], 400);
+		}
+
+		DB::table('proposal_challenges')->insert([
+			'proposal_id' => $proposalId,
+			'challenger_user_id' => $uid,
+			'current_tier' => $proposal->tier,
+			'proposed_tier' => $proposedTier,
+			'reason' => $reason,
+			'status' => 'open',
+			'expires_at' => now()->addHours(48),
+			'created_at' => now(),
+			'updated_at' => now(),
+		]);
+
+		$proposal->status = 'challenged';
+		$proposal->save();
+
+		Log::info("Proposal MR-{$proposalId} tier challenged: {$proposal->tier} -> {$proposedTier}");
+		return response()->json(['success' => true, 'message' => "Challenge submitted: reclassify to {$proposedTier}"]);
+	}
+
+
 }

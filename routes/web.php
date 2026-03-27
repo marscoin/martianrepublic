@@ -103,6 +103,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/congress/ballot/{propid?}', 'Congress\CongressController@acquireBallot');
     Route::post('/congress/vote/breakdown', 'Congress\CongressController@breakdown');
     Route::post('/congress/proposal/diff', 'Congress\CongressController@proposalDiff');
+    Route::post('/congress/proposal/withdraw', 'Congress\CongressController@withdrawProposal');
+    Route::post('/congress/proposal/amend', 'Congress\CongressController@amendProposal');
+    Route::post('/congress/proposal/challenge', 'Congress\CongressController@challengeTier');
 });
 
 

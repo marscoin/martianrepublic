@@ -621,21 +621,67 @@
                     <div class="col-md-4 col-lg-3">
                         <div class="docket-sidebar">
 
-                            {{-- BALLOT CTA (active proposals only) --}}
-                            @if($proposal->mined && $proposal->active && $isCitizen && $proposal->txid)
-                                <a href="/congress/ballot/{{ $proposal->id }}" class="ballot-cta">
-                                    <i class="fa-solid fa-check-to-slot"></i> Request Ballot
-                                </a>
-                            @elseif($proposal->mined && $proposal->active && !$isCitizen)
-                                <div class="sidebar-panel" style="text-align:center;">
-                                    <p style="color:var(--mr-text-dim); font-size:13px; margin:0;">
-                                        <a href="/citizen/all" style="color:var(--mr-cyan); text-decoration:none;">Become a citizen</a> to cast your vote.
+                            {{-- ========== SCREENING PHASE ========== --}}
+                            @if(($lifecyclePhase ?? '') === 'screening')
+                                <div class="sidebar-panel" style="border:1px solid rgba(245,158,11,0.3);">
+                                    <div class="sidebar-panel-title" style="color:var(--mr-amber);">
+                                        <i class="fa-solid fa-hourglass-half" style="margin-right:4px;"></i> Screening Period
+                                    </div>
+                                    <p style="font-size:13px; color:var(--mr-text-dim); margin-bottom:16px; line-height:1.6;">
+                                        This proposal is under community review. Voting opens after the screening period ends.
                                     </p>
-                                </div>
-                            @endif
+                                    @if($proposal->screening_ends_at)
+                                        <div style="text-align:center; padding:16px; background:var(--mr-dark); border-radius:8px; margin-bottom:16px;">
+                                            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--mr-text-dim); margin-bottom:6px;">Voting Opens In</div>
+                                            <div style="font-family:'Orbitron',sans-serif; font-size:20px; font-weight:700; color:var(--mr-amber);" id="screening-countdown">
+                                                {{ now()->diff(\Carbon\Carbon::parse($proposal->screening_ends_at))->format('%dd %hh %im') }}
+                                            </div>
+                                        </div>
+                                    @endif
 
-                            {{-- VOTE BREAKDOWN --}}
-                            @if($proposal->status === 'passed' || $proposal->status === 'rejected' || ($proposal->mined && $proposal->active))
+                                    {{-- Challenge Tier (any citizen except proposer) --}}
+                                    @if($isCitizen && !($isProposer ?? false))
+                                        <a href="#" id="challenge-tier-btn" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:12px; border:1px solid var(--mr-border); border-radius:8px; color:var(--mr-text-dim); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; text-transform:uppercase; text-decoration:none; transition:all 0.3s ease; margin-bottom:8px;">
+                                            <i class="fa-solid fa-scale-balanced"></i> Challenge Tier Classification
+                                        </a>
+                                    @endif
+
+                                    {{-- Proposer Actions --}}
+                                    @if($isProposer ?? false)
+                                        <div style="display:flex; gap:8px;">
+                                            @if(!$proposal->amended_at)
+                                                <a href="#" id="amend-btn" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px; background:rgba(0,228,255,0.08); border:1px solid rgba(0,228,255,0.2); border-radius:6px; color:var(--mr-cyan); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase; text-decoration:none;">
+                                                    <i class="fa-solid fa-pen"></i> Amend
+                                                </a>
+                                            @else
+                                                <span style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px; background:var(--mr-dark); border:1px solid var(--mr-border); border-radius:6px; color:var(--mr-text-dim); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase;">
+                                                    <i class="fa-solid fa-check"></i> Amended
+                                                </span>
+                                            @endif
+                                            <a href="#" id="withdraw-btn" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:6px; color:var(--mr-red); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase; text-decoration:none;">
+                                                <i class="fa-solid fa-xmark"></i> Withdraw
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
+
+                            {{-- ========== VOTING PHASE ========== --}}
+                            @elseif(($lifecyclePhase ?? '') === 'voting' || ($proposal->mined && $proposal->active && !$proposal->screening_ends_at))
+
+                                {{-- Ballot CTA --}}
+                                @if($isCitizen && $proposal->txid)
+                                    <a href="/congress/ballot/{{ $proposal->id }}" class="ballot-cta">
+                                        <i class="fa-solid fa-check-to-slot"></i> Request Ballot
+                                    </a>
+                                @elseif(!$isCitizen)
+                                    <div class="sidebar-panel" style="text-align:center;">
+                                        <p style="color:var(--mr-text-dim); font-size:13px; margin:0;">
+                                            <a href="/citizen/all" style="color:var(--mr-cyan); text-decoration:none;">Become a citizen</a> to cast your vote.
+                                        </p>
+                                    </div>
+                                @endif
+
+                                {{-- Vote Breakdown --}}
                                 <div class="sidebar-panel">
                                     <div class="sidebar-panel-title">Vote Breakdown</div>
                                     <div class="vote-display" id="vote-display">
@@ -651,10 +697,78 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                {{-- Voting Countdown --}}
+                                @php
+                                    $votingEnd = $proposal->voting_ends_at
+                                        ? $proposal->voting_ends_at
+                                        : \Carbon\Carbon::parse($proposal->mined)->addDays($proposal->duration)->format('Y-m-d H:i:s');
+                                @endphp
+                                <div class="sidebar-panel">
+                                    <div class="sidebar-panel-title">Time Remaining</div>
+                                    <x-countdown-timer :proposal-id="$proposal->id" :end-time="$votingEnd" :start-time="$proposal->mined" />
+                                </div>
+
+                            {{-- ========== TIMELOCK PHASE ========== --}}
+                            @elseif(($lifecyclePhase ?? '') === 'timelock')
+                                <div class="sidebar-panel" style="border:1px solid rgba(0,228,255,0.2);">
+                                    <div class="sidebar-panel-title" style="color:var(--mr-cyan);">
+                                        <i class="fa-solid fa-lock-open" style="margin-right:4px;"></i> Timelock Period
+                                    </div>
+                                    <p style="font-size:13px; color:var(--mr-text-dim); margin-bottom:12px; line-height:1.6;">
+                                        This proposal passed and is in its timelock period. It will be enacted after the waiting period.
+                                    </p>
+                                    @if($proposal->timelock_ends_at)
+                                        <div style="text-align:center; padding:16px; background:var(--mr-dark); border-radius:8px;">
+                                            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--mr-text-dim); margin-bottom:6px;">Enacted In</div>
+                                            <div style="font-family:'Orbitron',sans-serif; font-size:20px; font-weight:700; color:var(--mr-cyan);">
+                                                {{ now()->diff(\Carbon\Carbon::parse($proposal->timelock_ends_at))->format('%dd %hh') }}
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                {{-- Vote Results --}}
+                                <div class="sidebar-panel">
+                                    <div class="sidebar-panel-title">Vote Results</div>
+                                    <div class="vote-display" id="vote-display">
+                                        <div class="vote-bar-container">
+                                            <div class="vote-bar-yay" id="yay-bar" style="width:0%"></div>
+                                            <div class="vote-bar-nay" id="nay-bar" style="width:0%"></div>
+                                        </div>
+                                        <div class="vote-counts">
+                                            <span class="vote-yay"><i class="fa-solid fa-thumbs-up"></i> <span id="yay-count">{{ $proposal->yays ?? 0 }}</span></span>
+                                            <span id="yay-pct" style="color:var(--mr-green); font-family:'Orbitron',sans-serif; font-weight:700;"></span>
+                                            <span id="nay-pct" style="color:var(--mr-red); font-family:'Orbitron',sans-serif; font-weight:700;"></span>
+                                            <span class="vote-nay"><span id="nay-count">{{ $proposal->nays ?? 0 }}</span> <i class="fa-solid fa-thumbs-down"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            {{-- ========== PASSED / ACTIVE / TERMINAL STATES ========== --}}
+                            @else
+                                {{-- Vote Breakdown for concluded proposals --}}
+                                @if(in_array($proposal->status, ['passed', 'rejected', 'active']))
+                                    <div class="sidebar-panel">
+                                        <div class="sidebar-panel-title">Vote Breakdown</div>
+                                        <div class="vote-display" id="vote-display">
+                                            <div class="vote-bar-container">
+                                                <div class="vote-bar-yay" id="yay-bar" style="width:0%"></div>
+                                                <div class="vote-bar-nay" id="nay-bar" style="width:0%"></div>
+                                            </div>
+                                            <div class="vote-counts">
+                                                <span class="vote-yay"><i class="fa-solid fa-thumbs-up"></i> <span id="yay-count">{{ $proposal->yays ?? 0 }}</span></span>
+                                                <span id="yay-pct" style="color:var(--mr-green); font-family:'Orbitron',sans-serif; font-weight:700;"></span>
+                                                <span id="nay-pct" style="color:var(--mr-red); font-family:'Orbitron',sans-serif; font-weight:700;"></span>
+                                                <span class="vote-nay"><span id="nay-count">{{ $proposal->nays ?? 0 }}</span> <i class="fa-solid fa-thumbs-down"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             @endif
 
-                            {{-- COUNTDOWN (active proposals) --}}
-                            @if($proposal->mined && $proposal->active)
+                            {{-- COUNTDOWN for legacy proposals without lifecycle timestamps --}}
+                            @if($proposal->mined && $proposal->active && !$proposal->voting_ends_at && ($lifecyclePhase ?? '') !== 'screening')
                                 @php
                                     $endTime = \Carbon\Carbon::parse($proposal->mined)->addDays($proposal->duration)->format('Y-m-d H:i:s');
                                 @endphp

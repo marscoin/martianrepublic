@@ -9,8 +9,37 @@
 <meta property="og:title" content="CoinShuffle: Secret Ballots on a Public Blockchain">
 <meta property="og:description" content="How CoinShuffle works step by step, why ballot secrecy matters for democracy, and how the Martian Republic achieves anonymous voting on a transparent ledger.">
 <meta property="og:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://martianrepublic.org/academy/coinshuffle-secret-ballots">
+<meta property="og:site_name" content="The Martian Republic">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-03-27">
+<meta property="article:author" content="The Martian Republic">
+<meta name="robots" content="index, follow">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CoinShuffle: Secret Ballots on a Public Blockchain">
+<meta name="twitter:description" content="How the Martian Republic achieves secret-ballot voting on a public blockchain using CoinShuffle. The cryptographic mixing protocol explained.">
+<meta name="twitter:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
-<link rel="canonical" href="https://www.martianrepublic.org/academy/coinshuffle-secret-ballots">
+<link rel="canonical" href="https://martianrepublic.org/academy/coinshuffle-secret-ballots">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "CoinShuffle: Secret Ballots on a Public Blockchain",
+  "description": "How the Martian Republic achieves secret-ballot voting on a public blockchain using CoinShuffle. The cryptographic mixing protocol explained step by step.",
+  "image": "https://martianrepublic.org/assets/citizen/mars_flag5.png",
+  "datePublished": "2026-03-27",
+  "author": { "@type": "Organization", "name": "The Martian Republic" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Martian Republic",
+    "url": "https://martianrepublic.org",
+    "logo": { "@type": "ImageObject", "url": "https://martianrepublic.org/assets/favicon.ico" }
+  },
+  "mainEntityOfPage": "https://martianrepublic.org/academy/coinshuffle-secret-ballots"
+}
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -9,8 +9,37 @@
 <meta property="og:title" content="How Mars Governs Itself: The Complete Guide to Martian Democracy">
 <meta property="og:description" content="The complete guide to the Martian Republic's governance system -- four tiers, secret ballots, and lessons from a decade of blockchain experiments.">
 <meta property="og:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://martianrepublic.org/academy/governance-and-voting">
+<meta property="og:site_name" content="The Martian Republic">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-03-27">
+<meta property="article:author" content="The Martian Republic">
+<meta name="robots" content="index, follow">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How Mars Governs Itself: The Complete Guide to Martian Democracy">
+<meta name="twitter:description" content="The Martian Republic's four-tier governance system explained. From signal polls to constitutional amendments, secret ballots to blockchain voting.">
+<meta name="twitter:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
-<link rel="canonical" href="https://www.martianrepublic.org/academy/governance-and-voting">
+<link rel="canonical" href="https://martianrepublic.org/academy/governance-and-voting">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "How Mars Governs Itself: The Complete Guide to Martian Democracy",
+  "description": "The Martian Republic's four-tier governance system explained. From signal polls to constitutional amendments, secret ballots to blockchain voting.",
+  "image": "https://martianrepublic.org/assets/citizen/mars_flag5.png",
+  "datePublished": "2026-03-27",
+  "author": { "@type": "Organization", "name": "The Martian Republic" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Martian Republic",
+    "url": "https://martianrepublic.org",
+    "logo": { "@type": "ImageObject", "url": "https://martianrepublic.org/assets/favicon.ico" }
+  },
+  "mainEntityOfPage": "https://martianrepublic.org/academy/governance-and-voting"
+}
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

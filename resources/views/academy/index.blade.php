@@ -9,8 +9,32 @@
 <meta property="og:title" content="The Academy - Martian Republic">
 <meta property="og:description" content="Deep knowledge for Martian citizens. Learn governance, blockchain, wallets, voting, and the science of Mars settlement.">
 <meta property="og:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://martianrepublic.org/academy">
+<meta property="og:site_name" content="The Martian Republic">
+<meta property="og:locale" content="en_US">
+<meta name="robots" content="index, follow">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Academy - Martian Republic">
+<meta name="twitter:description" content="Deep knowledge for Martian citizens. Learn governance, blockchain, wallets, voting, and the science of Mars settlement.">
+<meta name="twitter:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
-<link rel="canonical" href="https://www.martianrepublic.org/academy">
+<link rel="canonical" href="https://martianrepublic.org/academy">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "The Academy - Martian Republic",
+  "description": "Deep knowledge for Martian citizens. Learn governance, blockchain, wallets, voting, and the science of Mars settlement.",
+  "url": "https://martianrepublic.org/academy",
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Martian Republic",
+    "url": "https://martianrepublic.org",
+    "logo": { "@type": "ImageObject", "url": "https://martianrepublic.org/assets/favicon.ico" }
+  }
+}
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
