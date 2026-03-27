@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.css">
     <link rel="stylesheet" href="/assets/wallet/css/hd/hd.css?v=2.1">
     <link rel="stylesheet" href="/assets/wallet/js/plugins/magnific/magnific-popup.css">
-    <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
+    <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css?v=2">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin-extended.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="stylesheet" href="/assets/wallet/css/jquery.steps.css">

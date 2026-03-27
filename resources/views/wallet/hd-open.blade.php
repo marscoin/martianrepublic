@@ -13,7 +13,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="/assets/wallet/css/font-awesome.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
+    <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css?v=2">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/wallet/css/hd-open/hd-open.css">
