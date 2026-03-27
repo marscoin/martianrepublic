@@ -363,7 +363,8 @@
     }
 
     /* -- Footer -- */
-    .footer { border-top: 1px solid var(--mr-border) !important; padding: 20px 0 !important; background: var(--mr-void) !important; }
+    .footer { border-top: 1px solid var(--mr-border) !important; padding: 0 !important; height: 60px !important; background: var(--mr-void) !important; }
+    .content { padding-bottom: 40px !important; }
 
     /* -- Animations -- */
     @keyframes civicPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -375,7 +376,8 @@
     /* -- Misc -- */
     h1, h2, h3, h4, h5, h6 { color: #fff !important; }
     p { color: var(--mr-text) !important; }
-    a { color: var(--mr-cyan, #00e4ff) !important; }
+    a { color: var(--mr-cyan, #00e4ff); }
+    a.btn, a.gate-btn, a.vault-action-btn, a[style*="background: var(--mr-mars"] { color: #fff !important; }
     a:hover { color: #fff !important; }
     hr { border-color: var(--mr-border) !important; }
     .well { background: var(--mr-dark) !important; border-color: var(--mr-border) !important; border-radius: 8px !important; }
@@ -518,7 +520,7 @@
                                         <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--mr-text-dim, #8a8998); max-width: 440px; margin: 0 auto 28px; line-height: 1.7;">
                                             Register as a member of the General Martian Public. Take a photo, record a liveness video, and publish your identity to the blockchain.
                                         </div>
-                                        <a href="/citizen/join" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 36px; background: var(--mr-mars, #c84125); border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: #fff; text-decoration: none; transition: all 0.2s; animation: ctaPulse 2s ease-in-out infinite;" onmouseover="this.style.background='#d94e30'" onmouseout="this.style.background='var(--mr-mars)'">
+                                        <a href="/citizen/join" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 36px; background: var(--mr-mars, #c84125); border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: #fff !important; text-decoration: none !important; transition: all 0.2s; animation: ctaPulse 2s ease-in-out infinite;" onmouseover="this.style.background='#d94e30'" onmouseout="this.style.background='var(--mr-mars)'">
                                             <i class="fa fa-rocket"></i> Begin Registration
                                         </a>
                                         <style>@keyframes ctaPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(200,65,37,0.4); } 50% { box-shadow: 0 0 20px 6px rgba(200,65,37,0.15); } }</style>
