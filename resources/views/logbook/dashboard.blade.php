@@ -888,10 +888,13 @@
                 success: function(data) {
                     if(data.Hash !== "") {
                         $("#ipfs_path").val(data.Hash);
-                        alert("Successfully saved to the planetary file system!");
-                        location.href="/logbook/all#My"
+                        $("#saveLogLocalBtn").html('<i class="fa-solid fa-check-circle"></i> Published!').css({"background":"var(--mr-green)","border-color":"var(--mr-green)","color":"#fff","opacity":"1"});
+                        setTimeout(function() {
+                            location.href="/logbook/all#My"
+                        }, 1500);
                     } else {
                         console.error("No folder hash found in the response.");
+                        $("#saveLogLocalBtn").css("opacity", "1").css("pointer-events", "auto").html('<i class="fa-solid fa-satellite-dish"></i> Publish to IPFS');
                         alert("An error occurred. Please try again.");
                     }
                 },
