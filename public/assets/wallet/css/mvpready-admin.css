@@ -2551,7 +2551,7 @@ table.table thead .sorting_desc_disabled,
 /* ----------------------------------------------- */
 html,
 body {
-  height: 100%;
+  /* height: 100%; -- removed: breaks sticky footer on dark-themed pages */
   /* The html and body elements cannot have any padding or margin. */
 }
 /* Wrapper for page content to push down footer */
