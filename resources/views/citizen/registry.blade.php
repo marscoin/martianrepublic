@@ -523,7 +523,7 @@
                                         </a>
                                         <style>@keyframes ctaPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(200,65,37,0.4); } 50% { box-shadow: 0 0 20px 6px rgba(200,65,37,0.15); } }</style>
                                         <div style="margin-top: 24px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968);">
-                                            <i class="fa fa-clock" style="margin-right: 4px;"></i> Takes about 5 minutes · Requires camera access · ~0.02 MARS fee
+                                            <i class="fa fa-clock" style="margin-right: 4px;"></i> Takes about 5 minutes · Requires camera access · ~0.03 MARS network fee
                                         </div>
                                     </div>
                                 <?php }else{ ?>

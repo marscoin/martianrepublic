@@ -303,7 +303,7 @@
                         </div>
                         <div class="gate-review-row" style="border: none;">
                             <span class="gate-review-label">Fee</span>
-                            <span class="gate-review-value">~0.02 MARS</span>
+                            <span class="gate-review-value">~0.03 MARS</span>
                         </div>
                     </div>
 
