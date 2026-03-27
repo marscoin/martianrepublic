@@ -38,9 +38,9 @@
 
     /* Buttons */
     .gate-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 24px; border-radius: 10px; border: none; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
-    .gate-btn.primary { background: var(--mr-mars, #c84125); color: #fff; }
+    .gate-btn.primary { background: var(--mr-mars, #c84125); color: #fff !important; }
     .gate-btn.primary:hover { background: #d94e30; box-shadow: 0 4px 20px rgba(200,65,37,0.3); }
-    .gate-btn.secondary { background: transparent; border: 1px solid var(--mr-border-bright); color: var(--mr-text-dim); margin-top: 10px; }
+    .gate-btn.secondary { background: transparent; border: 1px solid var(--mr-border-bright); color: var(--mr-text-dim) !important; margin-top: 10px; }
     .gate-btn.success { background: var(--mr-green, #34d399); color: #000; }
     .gate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
