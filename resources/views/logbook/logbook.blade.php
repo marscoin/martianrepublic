@@ -135,17 +135,40 @@ function renderFileList() {
         if (file.size > 1048576) size = (file.size / 1048576).toFixed(1) + ' MB';
         var icon = file.type.startsWith('image/') ? 'fa-image' : 'fa-file';
 
-        html += '<div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--mr-surface); border:1px solid var(--mr-border); border-radius:6px; margin-bottom:6px;">';
-        html += '<i class="fa-solid ' + icon + '" style="color:var(--mr-cyan); font-size:14px;"></i>';
+        html += '<div class="file-item" style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--mr-surface); border:1px solid var(--mr-cyan); border-radius:6px; margin-bottom:6px; animation: fileAdded 0.5s ease-out;">';
+        html += '<i class="fa-solid ' + icon + '" style="color:var(--mr-cyan); font-size:16px;"></i>';
         html += '<div style="flex:1; min-width:0;">';
         html += '<div style="font-family:\'JetBrains Mono\',monospace; font-size:11px; color:var(--mr-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + file.name + '</div>';
         html += '<div style="font-size:10px; color:var(--mr-text-dim);">' + size + '</div>';
         html += '</div>';
-        html += '<button type="button" onclick="removeFile(' + i + ')" style="background:none; border:none; color:var(--mr-text-dim); cursor:pointer; padding:4px;" title="Remove"><i class="fa-solid fa-xmark"></i></button>';
+        html += '<button type="button" onclick="removeFile(' + i + ')" style="background:none; border:none; color:var(--mr-text-dim); cursor:pointer; padding:4px; font-size:14px;" title="Remove"><i class="fa-solid fa-xmark"></i></button>';
         html += '</div>';
     });
+
+    // Update drop zone text
+    var dz = document.getElementById('drop-zone');
+    if (uploadedFiles.length > 0) {
+        dz.querySelector('i').className = 'fa-solid fa-check-circle';
+        dz.querySelector('i').style.color = 'var(--mr-green)';
+    } else {
+        dz.querySelector('i').className = 'fa-solid fa-cloud-arrow-up';
+        dz.querySelector('i').style.color = 'var(--mr-text-dim)';
+    }
+
     document.getElementById('file-list').innerHTML = html;
+
+    // Fade border back to normal after animation
+    setTimeout(function() {
+        document.querySelectorAll('.file-item').forEach(function(el) {
+            el.style.borderColor = 'var(--mr-border)';
+        });
+    }, 600);
 }
+
+// Add animation keyframe
+var styleEl = document.createElement('style');
+styleEl.textContent = '@keyframes fileAdded { 0% { opacity:0; transform:translateY(-8px); border-color:var(--mr-cyan); } 100% { opacity:1; transform:translateY(0); } }';
+document.head.appendChild(styleEl);
 
 // Make uploadedFiles accessible globally for the publish flow
 window.getUploadedFiles = function() { return uploadedFiles; };
