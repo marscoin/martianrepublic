@@ -38,11 +38,8 @@
 
             foreach($stillGP as $gp){
 
-                // Get real endorsement count from Feed table (Profile.endorse_cnt may be stale)
-                $feedEndorsements = \App\Models\Feed::where('tag', 'ED')
-                    ->where('message', $gp->public_address)
-                    ->count();
-                $endorseCount = max($gp->endorse_cnt ?? 0, $feedEndorsements);
+                // Use cached endorsement count (preloaded or from profile)
+                $endorseCount = $gp->endorse_cnt ?? 0;
                 $threshold = $endorsementThreshold;
                 $isEligible = $endorseCount >= $threshold && $threshold > 0;
                 $progress = $threshold > 0 ? min(100, ($endorseCount / $threshold) * 100) : 100;
