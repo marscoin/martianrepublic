@@ -855,14 +855,29 @@
 
         $("#saveLogLocalBtn").click(function(event) {
             event.preventDefault();
+
+            // Validate required fields
+            if (!$("#title").val().trim()) {
+                alert("Title is required");
+                return;
+            }
+            if (!simplemde.value().trim()) {
+                alert("Entry content is required");
+                return;
+            }
+
             var formData = new FormData()
             var files = window.getUploadedFiles ? window.getUploadedFiles() : [];
+            console.log("Publishing with " + files.length + " files");
             files.forEach(function(file) {
                 formData.append('filenames[]', file);
             });
             formData.append('address', '<?=$public_address?>')
             formData.append('title', $("#title").val())
             formData.append('entry', simplemde.value())
+
+            // Disable button to prevent double-click
+            $("#saveLogLocalBtn").css("opacity", "0.5").css("pointer-events", "none").html('<i class="fa-solid fa-spinner fa-spin"></i> Publishing...');
             $.ajax({
                 url:"/api/permapinlog",
                 type:"POST",
@@ -880,8 +895,9 @@
                     }
                 },
                 error: function(errorResponse) {
-                    console.log(errorResponse);
-                    alert("Failed to save to the planetary file system.");
+                    console.error("Publish error:", errorResponse);
+                    alert("Failed to save to the planetary file system: " + (errorResponse.responseJSON?.error || "Unknown error"));
+                    $("#saveLogLocalBtn").css("opacity", "1").css("pointer-events", "auto").html('<i class="fa-solid fa-satellite-dish"></i> Publish to IPFS');
                 }
             });
         });
