@@ -429,8 +429,8 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: var(--mr-mars);
-        color: #fff;
+        background: var(--mr-mars) !important;
+        color: #fff !important;
         border: none;
         border-radius: 6px;
         padding: 8px 16px;
@@ -937,13 +937,24 @@
 
                         try {
                             const tx = await signMARS(message, mars_amount, io);
-                            $(".transaction-hash-link").text("" + tx.tx_hash)
+                            $(".transaction-hash-link").text(tx.tx_hash)
                             $(".transaction-hash-link").attr("href","https://explore.marscoin.org/tx/" + tx.tx_hash)
                             $(".modal-message").show();
                             $(".modal-footer").hide();
-                            const data = await doAjax("/api/setfeed", {"type": "LB", "txid": tx.tx_hash, message: $("#modal-document").val(), "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+                            $("#loading").hide();
+                            await doAjax("/api/setfeed", {"type": "LB", "txid": tx.tx_hash, message: publication, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+
+                            // Update the row in-place to show pending state
+                            var btn = $(".notarizemeModalBtn[rel='" + publication + "']").closest('td');
+                            btn.html('<span class="badge-pending"><i class="fa-solid fa-spinner fa-spin" style="font-size:9px;"></i> Pending attestation</span>');
+
+                            // Auto-close modal after 2s
+                            setTimeout(function() {
+                                $('#notarizemeModal').modal('hide');
+                            }, 2000);
                         } catch (e) {
-                            throw e;
+                            $("#loading").hide();
+                            alert("Notarization failed: " + (e.message || "Unknown error"));
                         }
                     } catch (e) {
                         throw e;
