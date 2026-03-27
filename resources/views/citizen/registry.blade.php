@@ -28,7 +28,7 @@
     /* ============================================ */
     /* THE CIVIC HALL: Citizen Registry Redesign    */
     /* ============================================ */
-    html, body { background: #06060c !important; color: var(--mr-text, #e0dfe6) !important; height: auto !important; }
+    html, body { background: #06060c !important; color: var(--mr-text, #e0dfe6) !important; }
     .footer { z-index: 100; position: relative; }
     .civic-page { min-height: 100vh; display: flex; flex-direction: column; }
     .civic-page .content { flex: 1; }
