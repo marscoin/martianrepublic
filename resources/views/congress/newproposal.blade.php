@@ -502,7 +502,7 @@
                             </select>
 
                             {{-- Descriptor text (hidden, used by modal) --}}
-                            <div class="descriptor-text" id="signal-descriptor" style="display:block; margin-top:16px; font-size:13px; color:var(--mr-text-dim); line-height:1.7;">Signal: Non-binding temperature check. 10% active quorum, simple majority, 7 sols. No CoinShuffle required.</div>
+                            <div class="descriptor-text" id="signal-descriptor" style="display:block; margin-top:16px; font-size:13px; color:var(--mr-text-dim); line-height:1.7;">Signal: Non-binding temperature check — think of it as a formal poll. 10% active quorum, simple majority, 7 sols. No CoinShuffle required.</div>
                             <div class="descriptor-text" id="operational-descriptor" style="display:none;">Operational: Routine governance, resource allocation, parameter changes. 25% active quorum, 60% approval, 14 sols + 3-sol timelock. Expires after 1 Martian year (668 sols).</div>
                             <div class="descriptor-text" id="legislative-descriptor" style="display:none;">Legislative: Significant policy, committees, major treasury decisions. 40% active quorum, 66% supermajority, 30 sols + 7-sol timelock. Quiet ending. Expires after 4 Earth years.</div>
                             <div class="descriptor-text" id="constitutional-descriptor" style="display:none;">Constitutional: Code changes, governance rules, citizenship parameters. 50% active quorum, 75% supermajority, 60 sols + 30-sol timelock. Quiet ending. Never expires. Proposal text = code diff.</div>
