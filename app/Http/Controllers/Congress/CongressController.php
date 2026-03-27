@@ -391,4 +391,38 @@ class CongressController extends Controller
     }
 
 
+	/**
+	 * Get the amendment diff and history for a proposal
+	 */
+	public function proposalDiff(Request $request)
+	{
+		$proposalId = $request->input('proposalId');
+
+		try {
+			$repo = new \App\Includes\LegislationRepo();
+
+			$diff = $repo->getAmendmentDiff((int) $proposalId);
+			$history = $repo->getProposalHistory((int) $proposalId);
+			$isAmended = $repo->isAmended((int) $proposalId);
+			$amendmentCount = $repo->getAmendmentCount((int) $proposalId);
+
+			return response()->json([
+				'success' => true,
+				'isAmended' => $isAmended,
+				'amendmentCount' => $amendmentCount,
+				'diff' => $diff,
+				'history' => $history,
+			]);
+		} catch (\Exception $e) {
+			Log::error("LegislationRepo error: " . $e->getMessage());
+			return response()->json([
+				'success' => false,
+				'isAmended' => false,
+				'diff' => null,
+				'history' => [],
+			]);
+		}
+	}
+
+
 }

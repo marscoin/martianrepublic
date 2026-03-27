@@ -87,3 +87,4 @@ tests/visual/integration-test.mjs
 # Node modules (puppeteer)
 node_modules/
 package-lock.json
+storage/legislation/

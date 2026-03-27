@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html@3.4.48/bundles/css/diff2html.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked@3.0.7/marked.min.js"></script>
     @livewireStyles
 
@@ -495,6 +496,9 @@
                             <button class="docket-tab" data-panel="timeline">
                                 <i class="fa-solid fa-clock-rotate-left"></i> Timeline
                             </button>
+                            <button class="docket-tab" data-panel="amendments" id="amendments-tab" style="display:none;">
+                                <i class="fa-solid fa-code-compare"></i> Amendments
+                            </button>
                             <button class="docket-tab" data-panel="comments">
                                 <i class="fa-solid fa-comments"></i> Discussion
                             </button>
@@ -545,6 +549,20 @@
                             @empty
                                 <p style="color:var(--mr-text-dim); text-align:center; padding:40px 0;">No activity recorded yet.</p>
                             @endforelse
+                        </div>
+
+                        {{-- COMMENTS PANEL --}}
+                        {{-- AMENDMENTS PANEL --}}
+                        <div class="docket-content docket-panel" id="panel-amendments" style="display:none;">
+                            <div id="diff-loading" style="text-align:center; padding:40px; color:var(--mr-text-dim);">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Loading amendment history...
+                            </div>
+                            <div id="diff-history" style="display:none; margin-bottom:24px;"></div>
+                            <div id="diff-container"></div>
+                            <div id="diff-empty" style="display:none; text-align:center; padding:40px; color:var(--mr-text-dim);">
+                                <i class="fa-solid fa-check-circle" style="font-size:24px; margin-bottom:8px; display:block; color:var(--mr-green);"></i>
+                                No amendments. This proposal has not been modified since submission.
+                            </div>
                         </div>
 
                         {{-- COMMENTS PANEL --}}
@@ -713,6 +731,7 @@
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.48/bundles/js/diff2html-ui.min.js"></script>
     @livewireScripts
 
     <script>
@@ -758,6 +777,84 @@
                 }
             }
         });
+    });
+
+    // Load amendment diff via LegislationRepo
+    $.ajax({
+        url: "/congress/proposal/diff",
+        type: "POST",
+        data: { proposalId: {{ $proposal->id }} },
+        dataType: 'json',
+        success: function(data) {
+            if (data.success && data.isAmended) {
+                // Show the Amendments tab
+                document.getElementById('amendments-tab').style.display = '';
+
+                // Render history
+                if (data.history && data.history.length > 0) {
+                    var historyHtml = '<div style="margin-bottom:20px;">';
+                    historyHtml += '<div style="font-family:\'Orbitron\',sans-serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--mr-text-dim); margin-bottom:12px;">Git History</div>';
+                    data.history.forEach(function(entry, i) {
+                        var icon = i === 0 ? 'fa-file-circle-plus' : 'fa-code-commit';
+                        var color = i === 0 ? 'var(--mr-green)' : 'var(--mr-cyan)';
+                        historyHtml += '<div style="display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--mr-border);">';
+                        historyHtml += '<i class="fa-solid ' + icon + '" style="color:' + color + '; margin-top:3px;"></i>';
+                        historyHtml += '<div style="flex:1;">';
+                        historyHtml += '<div style="font-size:14px; color:var(--mr-text);">' + entry.message + '</div>';
+                        historyHtml += '<div style="font-family:\'JetBrains Mono\',monospace; font-size:11px; color:var(--mr-text-dim); margin-top:2px;">';
+                        historyHtml += '<span style="color:var(--mr-cyan);">' + entry.hash + '</span> &middot; ' + entry.author;
+                        historyHtml += '</div></div></div>';
+                    });
+                    historyHtml += '</div>';
+                    $('#diff-history').html(historyHtml).show();
+                }
+
+                // Render diff with diff2html
+                if (data.diff) {
+                    var diff2htmlUi = new Diff2HtmlUI(
+                        document.getElementById('diff-container'),
+                        data.diff,
+                        {
+                            drawFileList: false,
+                            matching: 'lines',
+                            outputFormat: 'side-by-side',
+                            renderNothingWhenEmpty: false,
+                            colorScheme: 'dark',
+                        }
+                    );
+                    diff2htmlUi.draw();
+
+                    // Dark theme overrides for diff2html
+                    var style = document.createElement('style');
+                    style.textContent = `
+                        .d2h-wrapper { font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important; }
+                        .d2h-file-header { background: var(--mr-dark) !important; color: var(--mr-text) !important; border-color: var(--mr-border) !important; }
+                        .d2h-file-wrapper { border-color: var(--mr-border) !important; border-radius: 8px !important; overflow: hidden !important; }
+                        .d2h-code-linenumber { background: var(--mr-dark) !important; color: var(--mr-text-dim) !important; border-color: var(--mr-border) !important; }
+                        .d2h-code-line { background: var(--mr-surface) !important; color: var(--mr-text) !important; }
+                        .d2h-del { background: rgba(239,68,68,0.1) !important; }
+                        .d2h-ins { background: rgba(52,211,153,0.1) !important; }
+                        .d2h-del .d2h-code-line-ctn { background: rgba(239,68,68,0.15) !important; }
+                        .d2h-ins .d2h-code-line-ctn { background: rgba(52,211,153,0.15) !important; }
+                        .d2h-code-line-ctn { white-space: pre-wrap !important; }
+                        .d2h-diff-table { font-size: 12px !important; }
+                        .d2h-tag { display: none !important; }
+                        .d2h-info { background: var(--mr-dark) !important; color: var(--mr-text-dim) !important; border-color: var(--mr-border) !important; }
+                    `;
+                    document.head.appendChild(style);
+                }
+
+                $('#diff-loading').hide();
+            } else {
+                // No amendments
+                $('#diff-loading').hide();
+                $('#diff-empty').show();
+            }
+        },
+        error: function() {
+            $('#diff-loading').hide();
+            $('#diff-empty').show();
+        }
     });
     </script>
 </body>
