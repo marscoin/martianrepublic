@@ -84,14 +84,22 @@
                     </div>
                 </div>
 
-                {{-- Endorse Button (only for citizens, not self, not already citizen) --}}
+                {{-- Endorse Button or Pending Badge --}}
                 <?php if($isCitizen && $gp->public_address != $public_address && !$gp->citizen){ ?>
                 <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--mr-border, rgba(255,255,255,0.04)); text-align: right;">
+                    @if(!empty($gp->mined))
+                    {{-- GP is confirmed on-chain: show endorse button --}}
                     <a data-toggle="modal" href="#endorseModal" data-endorse="{{$gp->userid}}" data-name="{{$gp->firstname}} {{$gp->lastname}}" data-address="{{$gp->public_address}}"
                        class="endorse-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.25); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mr-green, #34d399); text-decoration: none; cursor: pointer; transition: all 0.2s;"
                        onmouseover="this.style.background='rgba(52,211,153,0.2)';this.style.borderColor='var(--mr-green)'" onmouseout="this.style.background='rgba(52,211,153,0.1)';this.style.borderColor='rgba(52,211,153,0.25)'">
                         <i class="fa fa-handshake"></i> Endorse for Citizenship
                     </a>
+                    @else
+                    {{-- GP not yet confirmed on blockchain --}}
+                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mr-amber, #f59e0b);">
+                        <i class="fa fa-spinner fa-spin"></i> Awaiting blockchain confirmation
+                    </span>
+                    @endif
                 </div>
                 <?php } ?>
             </div>

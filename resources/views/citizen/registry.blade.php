@@ -918,32 +918,50 @@ $("#confirm-endorse-btn").click(async (e)=>
 
     const io = await sendMARS(0.1, "<?= $public_address ?>");
     try {
+        // Disable button to prevent double-click
+        $("#confirm-endorse-btn").prop("disabled", true).text("Signing...");
+
         const tx = await signMARS(message, 1.1, io);
-        $("#publish_progress_message").show().text("Published successfully...");
-        if(tx.tx_hash){
-            $("#confirm-success-message").show()
-            $("#confirm-transaction-hash").text(tx.tx_hash)
-            $("#confirm-loading").hide();
+        if(tx && tx.tx_hash){
+            $("#confirm-endorse-btn").text("Recording...");
+            $("#confirm-transaction-hash").text(tx.tx_hash);
+            $(".transaction-hash-link").attr("href", "https://explore.marscoin.org/tx/" + tx.tx_hash);
+
             const edata = await doAjax("/api/setendorsed", {id: id});
-            if (edata.error) {
+            if (edata && edata.error) {
                 $("#modal-message-error").text(edata.error).show();
-                $("#modal-message-success").hide();
+                $("#confirm-loading").hide();
+                $("#confirm-endorse-btn").text("Failed").prop("disabled", true);
                 return;
             }
-            const data = await doAjax("/api/setfeed", {"type": "ED", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "message": address, "address": '<?=$public_address?>'});
-            if(data.Hash){
-                var msg = 'Endorsement submitted to Blockchain successfully!';
-                if (edata.promoted) {
-                    msg += ' This person has been promoted to Citizen status!';
-                } else {
-                    msg += ' (' + edata.endorse_cnt + '/' + edata.threshold + ' endorsements toward citizenship)';
-                }
-                if(!alert(msg)){window.location.reload();}
+
+            await doAjax("/api/setfeed", {"type": "ED", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "message": address, "address": '<?=$public_address?>'});
+
+            // Success!
+            $("#confirm-loading").hide();
+            $("#confirm-success-message").show();
+            $("#modal-message-success").show();
+            $("#confirm-endorse-btn").html('<i class="fa fa-check-circle"></i> Endorsed').prop("disabled", true).css({"background":"var(--mr-green)","border-color":"var(--mr-green)","color":"#fff"});
+
+            var msg = 'Endorsement submitted to blockchain successfully!';
+            if (edata && edata.promoted) {
+                msg += '\n\nThis person has been promoted to Citizen status!';
+            } else if (edata && edata.endorse_cnt !== undefined) {
+                msg += '\n\n(' + edata.endorse_cnt + '/' + edata.threshold + ' endorsements toward citizenship)';
             }
+            setTimeout(function() {
+                alert(msg);
+                window.location.reload();
+            }, 500);
+        } else {
+            $("#confirm-loading").hide();
+            $("#confirm-endorse-btn").text("Confirm Endorsement").prop("disabled", false);
+            alert("Transaction signing failed. Please try again.");
         }
 
     } catch (e) {
         $("#confirm-loading").hide();
+        $("#confirm-endorse-btn").text("Confirm Endorsement").prop("disabled", false);
         $("#modal-message-error").text("Endorsement failed: " + (e.message || "Unknown error")).show();
         console.error("Endorsement error:", e);
     }
