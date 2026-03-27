@@ -22,7 +22,7 @@
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
     <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"/>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="/assets/wallet/js/plugins/dataTables/dataTables.bootstrap.css">
     @livewireStyles
 
     <style>
@@ -791,7 +791,8 @@
     <script src="/assets/wallet/js/sha256.js"></script>
     <script src="/assets/wallet/js/dropify.js"></script>
     {{-- FilePond replaced with custom drag-and-drop upload in logbook.blade.php --}}
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+    <script src="/assets/wallet/js/plugins/dataTables/jquery.dataTables.js"></script>
+    <script src="/assets/wallet/js/plugins/dataTables/dataTables.bootstrap.js"></script>
 
     <script>
         var simplemde = new SimpleMDE({ element: document.getElementById("description") });
