@@ -833,21 +833,57 @@ class ApiController extends Controller {
 			return response()->json(['error' => 'Invalid IPFS hash'], 400);
 		}
 
+		$category = $data->data->category ?? '';
+		$tier = \App\Includes\GovernanceTiers::categoryToTier($category);
+		$tierConfig = \App\Includes\GovernanceTiers::get($tier);
+
 		$proposal = new Proposals;
 		$proposal->user_id = $uid;
 		$proposal->title = $data->data->title ?? '';
 		$proposal->description = $data->data->description ?? '';
-		$proposal->category = $data->data->category ?? '';
+		$proposal->category = $category;
+		$proposal->tier = $tier;
 		$proposal->author = Auth::user()->fullname;
 		$proposal->ipfs_hash = $embedded_link;
-		$proposal->participation = $data->data->participation ?? 0;
-		$proposal->threshold = $data->data->threshold ?? 0;
-		$proposal->duration = $data->data->duration ?? 0;
-		$proposal->expiration = $data->data->expiration ?? '';
+		$proposal->participation = $data->data->participation ?? $tierConfig['quorum_percent'];
+		$proposal->threshold = $data->data->threshold ?? $tierConfig['threshold'];
+		$proposal->duration = $data->data->duration ?? $tierConfig['duration_sols'];
+		$proposal->expiration = $data->data->expiration ?? $tierConfig['sunset_sols'];
 		$proposal->txid = $txid;
 		$proposal->public_address = $public_address;
+		$proposal->status = 'screening';
+
+		// Calculate lifecycle timestamps
+		$timestamps = \App\Includes\GovernanceTiers::calculateTimestamps($tier);
+		$proposal->screening_ends_at = $timestamps['screening_ends_at'];
+		$proposal->voting_ends_at = $timestamps['voting_ends_at'];
+		$proposal->timelock_ends_at = $timestamps['timelock_ends_at'];
+		$proposal->sunset_at = $timestamps['sunset_at'];
 
 		$proposal->save();
+
+		// Commit to LegislationRepo
+		try {
+			$repo = new \App\Includes\LegislationRepo();
+			$gitHash = $repo->submitProposal(
+				$proposal->id,
+				$proposal->title,
+				$proposal->description,
+				$proposal->author,
+				$tier,
+				[
+					'participation' => $proposal->participation . '%',
+					'threshold' => $proposal->threshold . '%',
+					'duration' => $proposal->duration . ' sols',
+					'expiration' => $proposal->expiration > 0 ? $proposal->expiration . ' sols' : 'never',
+					'txid' => $txid,
+				]
+			);
+			$proposal->git_hash = $gitHash;
+			$proposal->save();
+		} catch (\Exception $e) {
+			Log::warning('LegislationRepo commit failed: ' . $e->getMessage());
+		}
 		$prop_id = $proposal->id;
 
 		$authorName = $citcache ? ($citcache->firstname . ' ' . $citcache->lastname) : Auth::user()->fullname;

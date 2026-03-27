@@ -32,6 +32,39 @@ class CongressController extends Controller
 	{
 	}
 
+	/**
+	 * Sync proposal lifecycle phases based on timestamps.
+	 * Called before displaying proposals to ensure states are current.
+	 */
+	private function syncProposalPhases(): void
+	{
+		$now = now();
+
+		// Proposals in screening that should move to voting
+		Proposals::where('status', 'screening')
+			->whereNotNull('screening_ends_at')
+			->where('screening_ends_at', '<=', $now)
+			->update(['status' => 'voting']);
+
+		// Proposals in voting that have expired (voting period ended)
+		// Note: vote tallying and pass/fail determination happens separately
+		Proposals::where('status', 'voting')
+			->whereNotNull('voting_ends_at')
+			->where('voting_ends_at', '<=', $now)
+			->update(['active' => 0]);
+
+		// Legacy: also handle old-style expiration for pre-tier proposals
+		Proposals::where(DB::raw('DATE_ADD(mined, INTERVAL duration DAY)'), '<', $now)
+			->whereNull('voting_ends_at')
+			->update(['active' => 0]);
+
+		// Active proposals that have reached sunset
+		Proposals::where('status', 'active')
+			->whereNotNull('sunset_at')
+			->where('sunset_at', '<=', $now)
+			->update(['status' => 'sunset', 'active' => 0]);
+	}
+
 
 	//Get all inventory data and display table
 	//
@@ -167,13 +200,8 @@ class CongressController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			//check if any proposals have expired... if so, archive.
-			Proposals::where(DB::raw('DATE_ADD(mined, INTERVAL duration DAY)'), '<', now())
-        ->update(['active' => 0]);
-
-			$endTime = microtime(true);
-    		$executionTime = $endTime - $startTime;
-    		Log::info("Execution time2: {$executionTime} seconds");
+			// Sync all proposal lifecycle phases
+			$this->syncProposalPhases();
 
 			if(!$profile->citizen){
 				$view = View::make('congress.noteligableyet');
@@ -223,9 +251,7 @@ class CongressController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
-			//check if any proposals have expired... if so, archive.
-			Proposals::where(DB::raw('DATE_ADD(mined, INTERVAL duration DAY)'), '<', now())
-        ->update(['active' => 0]);
+			$this->syncProposalPhases();
 
 			if(!$profile->citizen){
 				$view = View::make('congress.noteligableyet');
@@ -331,6 +357,11 @@ class CongressController extends Controller
 			$view->isGP  = $profile->general_public;
 			$view->wallet_open = $profile->civic_wallet_open;
 			$view->public_address = $civic_wallet->public_addr;
+
+			// Compute current lifecycle phase
+			$view->lifecyclePhase = \App\Includes\GovernanceTiers::currentPhase($proposal);
+			$view->tierConfig = \App\Includes\GovernanceTiers::get($proposal->tier ?? 'signal');
+			$view->isProposer = ($proposal->user_id === $uid);
 
 			return $view;
 		}else{
