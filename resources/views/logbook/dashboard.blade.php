@@ -588,7 +588,8 @@
         font-family: 'JetBrains Mono', monospace;
         font-size: 12px;
     }
-    .modal-backdrop { background: rgba(6,6,12,0.85) !important; }
+    .modal-backdrop { background: rgba(6,6,12,0.7) !important; }
+    .modal-content { pointer-events: auto !important; }
 
     /* ---- Wallet Required / Empty States ---- */
     .empty-state {
@@ -1149,5 +1150,13 @@
     </script>
 
     @livewireScripts
+    <script>
+    // Fix modal stacking context: move modals to body so they're not trapped inside #wrapper
+    $(document).ready(function() {
+        $('.modal').each(function() {
+            $(this).appendTo('body');
+        });
+    });
+    </script>
 </body>
 </html>
