@@ -413,6 +413,10 @@ class ApiController extends Controller {
 		$profile = Profile::where('userid', '=', $uid)->first();
 		if ($profile) {
 			$profile->general_public = 1;
+			// Set has_application when GP application is submitted
+			if ($action_tag === 'GP') {
+				$profile->has_application = 1;
+			}
 			$profile->save();
 		}
 
