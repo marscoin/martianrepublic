@@ -1,553 +1,764 @@
+<!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
-    <title>Martian Republic - Congress</title>
+    <title>Bill #{{ $proposal->id }} - {{ $proposal->title }} - Martian Republic Congress</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="{{ substr($proposal->description, 0, 160) }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/assets/wallet/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-admin.css">
     <link rel="stylesheet" href="/assets/wallet/css/mvpready-flat.css">
-    <link rel="stylesheet" href="/assets/wallet/css/voting/voting.css">
-    <link rel="stylesheet" href="/assets/wallet/css/simplemde.min.css">
     <link rel="shortcut icon" href="/assets/favicon.ico">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-1cK78a1o+ht2JcaW6g8OXYwqpev9+6GqOkz9xmBN9iUUhIndKtxwILGWYOSibOKjLsEdjyjZvYDq/cZwNeak0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="/assets/wallet/js/plugins/scan/qrcode-gen.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@3.0.7/marked.min.js"></script>
+    @livewireStyles
 
+    @php
+        $createdAt = $proposal->mined ? \Carbon\Carbon::parse($proposal->mined) : null;
+        $statusClass = 'active';
+        $statusLabel = 'Active';
+        $statusIcon = 'fa-circle';
+        if ($proposal->status === 'passed') { $statusClass = 'passed'; $statusLabel = 'Passed'; $statusIcon = 'fa-check'; }
+        elseif ($proposal->status === 'rejected') { $statusClass = 'rejected'; $statusLabel = 'Rejected'; $statusIcon = 'fa-xmark'; }
+        elseif ($proposal->status === 'expired') { $statusClass = 'expired'; $statusLabel = 'Expired'; $statusIcon = 'fa-hourglass-end'; }
+        elseif ($proposal->status === 'closed') { $statusClass = 'closed'; $statusLabel = 'Closed'; $statusIcon = 'fa-lock'; }
+    @endphp
+
+    <style>
+    :root {
+        --mr-void: #06060c;
+        --mr-dark: #0c0c16;
+        --mr-surface: #12121e;
+        --mr-surface-raised: #1a1a2a;
+        --mr-mars: #c84125;
+        --mr-mars-glow: rgba(200,65,37,0.15);
+        --mr-cyan: #00e4ff;
+        --mr-green: #34d399;
+        --mr-amber: #f59e0b;
+        --mr-red: #ef4444;
+        --mr-text: #e4e4e7;
+        --mr-text-dim: #8a8998;
+        --mr-border: rgba(255,255,255,0.06);
+        --mr-border-bright: rgba(255,255,255,0.12);
+    }
+
+    html, body { background: #06060c !important; }
+    .footer { z-index: 100; position: relative; clear: both; }
+    #wrapper { overflow: hidden; }
+
+    .docket-page { min-height: 100vh; display: flex; flex-direction: column; }
+    .docket-page .content { flex: 1; }
+    .docket-page .footer { margin-top: auto; }
+
+    /* ---- Breadcrumb ---- */
+    .docket-breadcrumb {
+        padding: 20px 0 0;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 1px;
+    }
+    .docket-breadcrumb a { color: var(--mr-text-dim); text-decoration: none; transition: color 0.2s; }
+    .docket-breadcrumb a:hover { color: var(--mr-cyan); }
+    .docket-breadcrumb span { color: var(--mr-text-dim); margin: 0 8px; }
+
+    /* ---- Proposal Header ---- */
+    .docket-header {
+        padding: 32px 0 28px;
+        border-bottom: 1px solid var(--mr-border);
+        margin-bottom: 32px;
+        position: relative;
+    }
+    .docket-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px; left: 0;
+        width: 120px; height: 2px;
+        background: var(--mr-mars);
+    }
+    .docket-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+    .docket-bill-id {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim);
+        background: var(--mr-dark);
+        border: 1px solid var(--mr-border);
+        border-radius: 4px;
+        padding: 5px 12px;
+    }
+    .docket-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: 4px;
+    }
+    .docket-status.active { background: rgba(52,211,153,0.1); color: var(--mr-green); border: 1px solid rgba(52,211,153,0.2); }
+    .docket-status.passed { background: rgba(0,228,255,0.08); color: var(--mr-cyan); border: 1px solid rgba(0,228,255,0.15); }
+    .docket-status.rejected { background: rgba(239,68,68,0.1); color: var(--mr-red); border: 1px solid rgba(239,68,68,0.2); }
+    .docket-status.expired { background: rgba(245,158,11,0.1); color: var(--mr-amber); border: 1px solid rgba(245,158,11,0.2); }
+    .docket-status.closed { background: rgba(138,137,152,0.1); color: var(--mr-text-dim); border: 1px solid rgba(138,137,152,0.2); }
+
+    .docket-title {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        color: #fff;
+        margin: 0 0 10px;
+        line-height: 1.3;
+    }
+    .docket-sponsor {
+        font-size: 14px;
+        color: var(--mr-text-dim);
+    }
+    .docket-sponsor a { color: var(--mr-cyan); text-decoration: none; }
+    .docket-sponsor a:hover { color: #fff; }
+    .docket-sponsor .category {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--mr-mars);
+    }
+
+    /* ---- Content Tabs ---- */
+    .docket-tabs {
+        display: flex;
+        gap: 2px;
+        margin-bottom: 28px;
+        background: var(--mr-border);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .docket-tab {
+        background: var(--mr-surface);
+        border: none;
+        padding: 12px 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim);
+        cursor: pointer;
+        transition: all 0.25s ease;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .docket-tab:hover { background: var(--mr-surface-raised); color: var(--mr-text); }
+    .docket-tab.active { background: var(--mr-surface-raised); color: #fff; }
+    .docket-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 2px;
+        background: var(--mr-mars);
+    }
+
+    /* ---- Markdown Content ---- */
+    .docket-content {
+        background: var(--mr-surface);
+        border: 1px solid var(--mr-border);
+        border-radius: 10px;
+        padding: 32px;
+        min-height: 200px;
+    }
+    #markdown-container {
+        font-size: 15px;
+        line-height: 1.8;
+        color: var(--mr-text);
+    }
+    #markdown-container h1, #markdown-container h2, #markdown-container h3 { color: #fff; margin: 24px 0 12px; }
+    #markdown-container p { margin-bottom: 16px; }
+    #markdown-container a { color: var(--mr-cyan); }
+    #markdown-container code { background: var(--mr-dark); padding: 2px 6px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+    #markdown-container blockquote { border-left: 3px solid var(--mr-mars); padding-left: 16px; color: var(--mr-text-dim); margin: 16px 0; }
+    #markdown-container ul, #markdown-container ol { padding-left: 24px; margin-bottom: 16px; }
+
+    @if(!$proposal->mined && $proposal->active)
+    .docket-awaiting {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--mr-surface);
+        border: 1px solid rgba(245,158,11,0.2);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-top: 20px;
+        color: var(--mr-amber);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+    }
+    @endif
+
+    /* ---- Timeline ---- */
+    .timeline-item {
+        display: flex;
+        gap: 16px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--mr-border);
+    }
+    .timeline-item:last-child { border-bottom: none; }
+    .timeline-icon {
+        width: 36px; height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+    .timeline-icon.notarized { background: rgba(0,228,255,0.08); color: var(--mr-cyan); }
+    .timeline-icon.vote { background: rgba(52,211,153,0.08); color: var(--mr-green); }
+    .timeline-body { flex: 1; }
+    .timeline-body p { margin: 0; font-size: 14px; color: var(--mr-text); }
+    .timeline-body .timeline-meta {
+        font-size: 12px;
+        color: var(--mr-text-dim);
+        margin-top: 4px;
+    }
+    .timeline-body .timeline-meta a { color: var(--mr-cyan); text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+    /* ---- Comments ---- */
+    .comment-item {
+        display: flex;
+        gap: 14px;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--mr-border);
+    }
+    .comment-item:last-child { border-bottom: none; }
+    .comment-avatar-img {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--mr-border);
+        flex-shrink: 0;
+    }
+    .comment-content { flex: 1; }
+    .comment-author-name {
+        font-weight: 700;
+        color: #fff;
+        font-size: 14px;
+    }
+    .comment-date {
+        font-size: 12px;
+        color: var(--mr-text-dim);
+        margin-left: 8px;
+    }
+    .comment-text {
+        font-size: 14px;
+        color: var(--mr-text);
+        line-height: 1.7;
+        margin-top: 6px;
+    }
+    .comment-replies {
+        margin-left: 54px;
+        border-left: 2px solid var(--mr-border);
+        padding-left: 16px;
+    }
+
+    .comment-form textarea {
+        width: 100%;
+        background: var(--mr-dark);
+        border: 1px solid var(--mr-border);
+        border-radius: 8px;
+        padding: 14px;
+        color: var(--mr-text);
+        font-size: 14px;
+        resize: vertical;
+        min-height: 100px;
+    }
+    .comment-form textarea:focus { outline: none; border-color: var(--mr-cyan); }
+    .comment-form .btn-submit-comment {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--mr-mars);
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        margin-top: 12px;
+        transition: all 0.3s ease;
+    }
+    .comment-form .btn-submit-comment:hover { background: #a83520; }
+
+    /* ---- Sidebar ---- */
+    .docket-sidebar { position: sticky; top: 100px; }
+
+    .sidebar-panel {
+        background: var(--mr-surface);
+        border: 1px solid var(--mr-border);
+        border-radius: 10px;
+        padding: 24px;
+        margin-bottom: 16px;
+    }
+    .sidebar-panel-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--mr-text-dim);
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--mr-border);
+    }
+
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--mr-border);
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label {
+        font-size: 12px;
+        color: var(--mr-text-dim);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .stat-label i { width: 16px; text-align: center; }
+    .stat-value {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    /* ---- Vote Display ---- */
+    .vote-display {
+        margin-top: 16px;
+    }
+    .vote-bar-container {
+        display: flex;
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+        background: var(--mr-dark);
+        margin: 12px 0;
+    }
+    .vote-bar-yay { background: var(--mr-green); transition: width 0.6s ease; }
+    .vote-bar-nay { background: var(--mr-red); transition: width 0.6s ease; }
+
+    .vote-counts {
+        display: flex;
+        justify-content: space-between;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+    }
+    .vote-yay { color: var(--mr-green); }
+    .vote-nay { color: var(--mr-red); }
+
+    /* ---- Ballot CTA ---- */
+    .ballot-cta {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: var(--mr-mars);
+        color: #fff;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+    .ballot-cta:hover {
+        background: transparent;
+        border: 1px solid var(--mr-mars);
+        color: var(--mr-mars);
+        box-shadow: 0 0 30px rgba(200,65,37,0.2);
+        text-decoration: none;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--mr-text-dim);
+        text-decoration: none;
+        font-size: 13px;
+        margin-top: 32px;
+        transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--mr-cyan); text-decoration: none; }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 991px) {
+        .docket-title { font-size: 22px; }
+        .docket-content { padding: 20px; }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .docket-content { animation: fadeIn 0.5s ease-out; }
+    </style>
 </head>
 
-<body class=" ">
+<body class="docket-page">
     <div id="wrapper">
         <header class="navbar navbar-inverse" role="banner">
             <div class="container">
                 <div class="navbar-header">
                     @include('wallet.header')
-                </div> <!-- /.navbar-header -->
+                </div>
                 <nav class="collapse navbar-collapse" role="navigation">
                     @include('wallet.navbarleft')
                     @include('wallet.navbarright')
                 </nav>
-            </div> <!-- /.container -->
+            </div>
         </header>
         @include('wallet.mainnav', array('active'=>'congress'))
 
-        
         <div class="content">
-
             <div class="container">
 
+                {{-- BREADCRUMB --}}
+                <div class="docket-breadcrumb">
+                    <a href="/congress/all">Congress</a>
+                    <span>/</span>
+                    <a href="/congress/voting">Legislation</a>
+                    <span>/</span>
+                    <span style="color:var(--mr-text);">Bill #{{ $proposal->id }}</span>
+                </div>
 
-<div class="row layout layout-stack-sm layout-main-left">
-          <div class="col-sm-8 col-md-8 col-lg-9 layout-main">
-            <div class="posts">
-              <div class="post">
-                <div class="post-aside">
-                    @php
-                        $createdAt = \Carbon\Carbon::parse($proposal->mined);
-                    @endphp
-                    <div class="post-date">
-                        <span class="post-date-day">{{ $proposal->id }}</span>
-                        <span class="post-date-month">#</span>
-                        <span class="post-date-year">Bill</span>
-                    </div>
-
-                    <ul id="myTab" class="nav nav-pills nav-stacked">
-                        <li class="active">
-                            <a href="#info" data-toggle="tab">
-                            <i class="fa-solid fa-circle-info"></i>
+                {{-- PROPOSAL HEADER --}}
+                <div class="docket-header">
+                    <div class="docket-meta-row">
+                        <span class="docket-bill-id">
+                            <i class="fa-solid fa-landmark" style="margin-right:4px;"></i>
+                            Bill #{{ $proposal->id }}
+                        </span>
+                        <span class="docket-status {{ $statusClass }}">
+                            <i class="fa-solid {{ $statusIcon }}" @if($statusIcon === 'fa-circle') style="font-size:6px;" @endif></i>
+                            {{ $statusLabel }}
+                        </span>
+                        @if($proposal->ipfs_hash)
+                            <a href="{{ $proposal->ipfs_hash }}" target="_blank" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--mr-text-dim); text-decoration:none; letter-spacing:1px;">
+                                IPFS: {{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }}
+                                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:8px; margin-left:2px;"></i>
                             </a>
-                        </li>
-                        <li class="">
-                            <a href="#timeline" data-toggle="tab">
-                            <i class="fa-solid fa-timeline"></i>
-                            </a>
-                        </li>
-                        <li class="">
-                            <a href="#comments" data-toggle="tab">
-                            <i class="fa-solid fa-comment"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div> 
-
-                <div class="post-main">
-                <h3 class="post-title"><a href="#">{{ $proposal->title }}</a></h3>
-                <h4 class="post-meta">Submitted by <a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }}</a> in <a href="javascript:;">{{str_replace("poll", "Certified Poll", $proposal->category)}}</a></h4>
-                <h5>Proposal: {{ strtoupper(substr(str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash), 1, 8)) }} <a  target="_blank" href="{{$proposal->ipfs_hash}}"><i class="fa-solid fa-link"></i></a></h5>
-                  <div class="post-content">  
-                    
-                    <div id="myTabContent" class="tab-content stacked-content">  
-                        <div class="tab-pane fade active in" id="info">  
-                            <div id="markdown-container">Loading...</div>
-                        
-
-                        @if(!$proposal->mined && $proposal->active)
-                        <hr>
-                            <a href="" style=" text-align: center;" class="btn btn-lg btn-info demo-element "><i class="fa-solid fa-file-contract"></i> Submitted</a>
                         @endif
+                    </div>
+                    <h1 class="docket-title">{{ $proposal->title }}</h1>
+                    <div class="docket-sponsor">
+                        Sponsored by <a target="_blank" href="/citizen/id/{{ $proposal->public_address }}">{{ $proposal->author }}</a>
+                        &middot; <span class="category">{{ str_replace("poll", "Certified Poll", $proposal->category) }}</span>
+                        @if($createdAt)
+                            &middot; {{ $createdAt->format('M j, Y') }}
+                        @endif
+                    </div>
+                </div>
+
+                <div class="row">
+                    {{-- MAIN CONTENT --}}
+                    <div class="col-md-8 col-lg-9">
+
+                        {{-- CONTENT TABS --}}
+                        <div class="docket-tabs">
+                            <button class="docket-tab active" data-panel="info">
+                                <i class="fa-solid fa-file-lines"></i> Proposal
+                            </button>
+                            <button class="docket-tab" data-panel="timeline">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Timeline
+                            </button>
+                            <button class="docket-tab" data-panel="comments">
+                                <i class="fa-solid fa-comments"></i> Discussion
+                            </button>
                         </div>
-                        
-                        <div class="tab-pane fade" id="timeline">
-                            <h3 class="content-title"><u>Timeline</u></h3>
+
+                        {{-- INFO PANEL --}}
+                        <div class="docket-content docket-panel" id="panel-info">
+                            <div id="markdown-container">Loading...</div>
+
+                            @if(!$proposal->mined && $proposal->active)
+                                <div class="docket-awaiting">
+                                    <i class="fa-solid fa-spinner fa-spin"></i>
+                                    Awaiting blockchain notarization...
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- TIMELINE PANEL --}}
+                        <div class="docket-content docket-panel" id="panel-timeline" style="display:none;">
                             @forelse($activities as $activity)
-                            <div class="feed-item feed-item-file">
+                                <div class="timeline-item">
+                                    <div class="timeline-icon {{ $activity->tag === 'PR' ? 'notarized' : 'vote' }}">
                                         @if($activity->tag === 'PR')
-                                            <div class="feed-icon"><i style="padding-top: 10px;
-    font-size: 14px;" class="fa fa-link"></i></div><div class="feed-subject"><p>Proposal notarized</p></div>
-                                        @elseif($activity->tag === 'PRY')
-                                            <div class="feed-icon"><i class="fa fa-link"></i></div><div class="feed-subject"><p>Ballot cast</p></div>
-                                        @elseif($activity->tag === 'PRN')
-                                            <div class="feed-icon"><i class="fa fa-link"></i></div><div class="feed-subject"><p>Ballot cast</p></div>
-                                        @elseif($activity->tag === 'PRA')
-                                            <div class="feed-icon"><i class="fa fa-link"></i></div><div class="feed-subject"><p>Ballot cast</p></div>
-                                        @endif
-                                    <div class="feed-content">
-                                        @if($activity->tag === 'PR')
-                                            <p>{{ $activity->firstname }} {{ $activity->lastname }} successfully <strong>notarized</strong> a proposal</p>
+                                            <i class="fa-solid fa-link"></i>
+                                        @else
+                                            <i class="fa-solid fa-check-to-slot"></i>
                                         @endif
                                     </div>
-                                    <div class="feed-actions">
-                                        <a target="_blank" href="https://explore.marscoin.org/tx/{{ $activity->txid }}" class="pull-left"><i class="fa fa-lock"></i> {{ $activity->blockid }}</a> 
-                                        <a target="_blank" href="https://explore.marscoin.org/tx/{{ $activity->txid }}" class="pull-right">
-                                            <i class="fa fa-clock-o"></i>
-                                            @if ($activity->mined)
+                                    <div class="timeline-body">
+                                        @if($activity->tag === 'PR')
+                                            <p>{{ $activity->firstname }} {{ $activity->lastname }} <strong>notarized</strong> this proposal on-chain</p>
+                                        @else
+                                            <p>A ballot was cast</p>
+                                        @endif
+                                        <div class="timeline-meta">
+                                            <a href="https://explore.marscoin.org/tx/{{ $activity->txid }}" target="_blank">
+                                                <i class="fa-solid fa-cube"></i> {{ substr($activity->txid, 0, 16) }}...
+                                            </a>
+                                            &middot;
+                                            @if($activity->mined)
                                                 {{ \Carbon\Carbon::parse($activity->mined)->diffForHumans() }}
                                             @else
-                                                Date not available
+                                                Pending
                                             @endif
-                                        </a>
+                                        </div>
                                     </div>
                                 </div>
                             @empty
-                                <p>No recent activities found.</p>
+                                <p style="color:var(--mr-text-dim); text-align:center; padding:40px 0;">No activity recorded yet.</p>
                             @endforelse
                         </div>
-                       
-                        <div class="tab-pane fade" id="comments">
-                           
 
-<a id="comments"></a>
-<div class="heading-block">
-  <h3>Comments</h3>
-</div>
-<ol class="comment-list">
-  @foreach ($posts as $post)
-    {{-- Check if the post is a top-level post --}}
-    @if (is_null($post->post_id))
-      <li>
-        <div class="comment">
-          <div class="comment-avatar">
-            <img src="{{ $post->citizen->avatar_link }}"  onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'" class="avatar">
-          </div>
-          <div class="comment-meta">
-            <span class="comment-author">
-            <a href="javascript:;">{{ $post->authorName }}</a>
-            </span>
-            <a href="javascript:;" class="comment-timestamp">
-            {{ $post->created_at->format('F j, Y at h:i a') }}
-            </a>
-            -
-            <a class="comment-reply-link" href="javascript:;">Reply</a>
-          </div>
-          <div class="comment-body">
-            <p>{{ $post->content }}</p>
-          </div>
-        </div>
-        @if ($post->replies->isNotEmpty())
-        <ol class="comment-list">
-          @foreach ($post->replies as $reply)
-            @include('congress.reply', ['reply' => $reply])
-          @endforeach
-        </ol>
-      @endif
-      </li>
-    @endif
-  @endforeach
-</ol>
+                        {{-- COMMENTS PANEL --}}
+                        <div class="docket-content docket-panel" id="panel-comments" style="display:none;">
+                            @foreach($posts as $post)
+                                @if(is_null($post->post_id))
+                                    <div class="comment-item">
+                                        <img src="{{ $post->citizen->avatar_link }}"
+                                             onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'"
+                                             class="comment-avatar-img" alt="">
+                                        <div class="comment-content">
+                                            <span class="comment-author-name">{{ $post->authorName }}</span>
+                                            <span class="comment-date">{{ $post->created_at->format('M j, Y \a\t g:i a') }}</span>
+                                            <div class="comment-text">{{ $post->content }}</div>
+                                        </div>
+                                    </div>
+                                    @if($post->replies->isNotEmpty())
+                                        <div class="comment-replies">
+                                            @foreach($post->replies as $reply)
+                                                <div class="comment-item">
+                                                    <img src="{{ $reply->citizen->avatar_link ?? 'https://martianrepublic.org/assets/citizen/generic_profile.jpg' }}"
+                                                         onerror="this.onerror=null; this.src='https://martianrepublic.org/assets/citizen/generic_profile.jpg'"
+                                                         class="comment-avatar-img" alt="" style="width:32px;height:32px;">
+                                                    <div class="comment-content">
+                                                        <span class="comment-author-name">{{ $reply->authorName ?? 'Citizen' }}</span>
+                                                        <span class="comment-date">{{ $reply->created_at->format('M j, Y \a\t g:i a') }}</span>
+                                                        <div class="comment-text">{{ $reply->content }}</div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                @endif
+                            @endforeach
 
+                            @if($proposal->active)
+                                <div class="comment-form" style="margin-top:24px; padding-top:24px; border-top:1px solid var(--mr-border);">
+                                    <textarea id="comment-text" placeholder="Share your thoughts on this proposal..."></textarea>
+                                    <button class="btn-submit-comment" type="button">
+                                        <i class="fa-solid fa-paper-plane"></i> Post Comment
+                                    </button>
+                                </div>
+                            @else
+                                <p style="color:var(--mr-text-dim); text-align:center; padding:20px 0; font-style:italic;">
+                                    Public comment period has ended.
+                                </p>
+                            @endif
+                        </div>
 
-@if ($proposal->active)
-<br class="xs-60">
-<div class="heading-block">
-  <h3>Post a Comment</h3>
-</div>
-  <div class="form-group">
-    <div class="col-md-8 col-sm-12">
-      <label>Message: <span>*</span></label>
-      <textarea class="form-control" id="text" name="text" rows="6" cols="40"></textarea>
-    </div>
-  </div>
-  <div class="form-group">
-    <div class="col-md-8 col-sm-12">
-      <button class="btn btn-primary" type="submit">Submit Comment</button>
-    </div>
-  </div>
-</form>
-@else
-<h3>Public comment period ended</h3>
-@endif
+                        <a href="/congress/voting" class="back-link">
+                            <i class="fa-solid fa-arrow-left"></i> Back to Legislation
+                        </a>
+                    </div>
 
+                    {{-- SIDEBAR --}}
+                    <div class="col-md-4 col-lg-3">
+                        <div class="docket-sidebar">
 
+                            {{-- BALLOT CTA (active proposals only) --}}
+                            @if($proposal->mined && $proposal->active && $isCitizen && $proposal->txid)
+                                <a href="/congress/ballot/{{ $proposal->id }}" class="ballot-cta">
+                                    <i class="fa-solid fa-check-to-slot"></i> Request Ballot
+                                </a>
+                            @elseif($proposal->mined && $proposal->active && !$isCitizen)
+                                <div class="sidebar-panel" style="text-align:center;">
+                                    <p style="color:var(--mr-text-dim); font-size:13px; margin:0;">
+                                        <a href="/citizen/all" style="color:var(--mr-cyan); text-decoration:none;">Become a citizen</a> to cast your vote.
+                                    </p>
+                                </div>
+                            @endif
 
+                            {{-- VOTE BREAKDOWN --}}
+                            @if($proposal->status === 'passed' || $proposal->status === 'rejected' || ($proposal->mined && $proposal->active))
+                                <div class="sidebar-panel">
+                                    <div class="sidebar-panel-title">Vote Breakdown</div>
+                                    <div class="vote-display" id="vote-display">
+                                        <div class="vote-bar-container">
+                                            <div class="vote-bar-yay" id="yay-bar" style="width:0%"></div>
+                                            <div class="vote-bar-nay" id="nay-bar" style="width:0%"></div>
+                                        </div>
+                                        <div class="vote-counts">
+                                            <span class="vote-yay"><i class="fa-solid fa-thumbs-up"></i> <span id="yay-count">{{ $proposal->yays ?? 0 }}</span></span>
+                                            <span id="yay-pct" style="color:var(--mr-green); font-family:'Orbitron',sans-serif; font-weight:700;"></span>
+                                            <span id="nay-pct" style="color:var(--mr-red); font-family:'Orbitron',sans-serif; font-weight:700;"></span>
+                                            <span class="vote-nay"><span id="nay-count">{{ $proposal->nays ?? 0 }}</span> <i class="fa-solid fa-thumbs-down"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
 
+                            {{-- COUNTDOWN (active proposals) --}}
+                            @if($proposal->mined && $proposal->active)
+                                @php
+                                    $endTime = \Carbon\Carbon::parse($proposal->mined)->addDays($proposal->duration)->format('Y-m-d H:i:s');
+                                @endphp
+                                <div class="sidebar-panel">
+                                    <div class="sidebar-panel-title">Time Remaining</div>
+                                    <x-countdown-timer :proposal-id="$proposal->id" :end-time="$endTime" :start-time="$proposal->mined" />
+                                </div>
+                            @endif
 
+                            {{-- PARAMETERS --}}
+                            <div class="sidebar-panel">
+                                <div class="sidebar-panel-title">Parameters</div>
+                                <div class="stat-row">
+                                    <span class="stat-label"><i class="fa-solid fa-gavel" style="color:var(--mr-cyan);"></i> Threshold</span>
+                                    <span class="stat-value">{{ $proposal->threshold }}%</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label"><i class="fa-solid fa-users" style="color:var(--mr-cyan);"></i> Participation</span>
+                                    <span class="stat-value">{{ $proposal->participation }}%</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label"><i class="fa-solid fa-calendar" style="color:var(--mr-cyan);"></i> Duration</span>
+                                    <span class="stat-value">{{ $proposal->duration }}d</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label"><i class="fa-solid fa-hourglass" style="color:var(--mr-cyan);"></i> Expiration</span>
+                                    <span class="stat-value">{{ $proposal->expiration > 0 ? $proposal->expiration . 'y' : 'Never' }}</span>
+                                </div>
+                                @if($proposal->total_votes ?? false)
+                                    <div class="stat-row">
+                                        <span class="stat-label"><i class="fa-solid fa-check-double" style="color:var(--mr-green);"></i> Total Votes</span>
+                                        <span class="stat-value">{{ $proposal->total_votes }}</span>
+                                    </div>
+                                @endif
+                                @if($proposal->yay_percent ?? false)
+                                    <div class="stat-row">
+                                        <span class="stat-label"><i class="fa-solid fa-chart-pie" style="color:var(--mr-green);"></i> Approval</span>
+                                        <span class="stat-value" style="color:var(--mr-green);">{{ round($proposal->yay_percent, 1) }}%</span>
+                                    </div>
+                                @endif
+                                @if($proposal->status === 'closed' && $proposal->closed_reason)
+                                    <div class="stat-row">
+                                        <span class="stat-label"><i class="fa-solid fa-lock" style="color:var(--mr-text-dim);"></i> Closed Reason</span>
+                                        <span class="stat-value" style="font-size:11px; color:var(--mr-amber);">{{ $proposal->closed_reason }}</span>
+                                    </div>
+                                @endif
+                            </div>
 
-
-
-
-
-
-
-
+                            {{-- ON-CHAIN --}}
+                            @if($proposal->txid)
+                                <div class="sidebar-panel">
+                                    <div class="sidebar-panel-title">On-Chain Record</div>
+                                    <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--mr-text-dim); word-break:break-all;">
+                                        <a href="https://explore.marscoin.org/tx/{{ $proposal->txid }}" target="_blank" style="color:var(--mr-cyan); text-decoration:none;">
+                                            {{ substr($proposal->txid, 0, 24) }}...
+                                            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
 
                         </div>
                     </div>
-                  </div> <!-- /.post-content -->
-
-                </div> <!-- /.post-main -->
-
-              </div> <!-- /.post --> 
-
-            </div> <!-- /.posts -->
-
-            <br class="xs-30">
-
-
-            
-
-            
-
-          </div> <!-- /.col -->
-
-
-
-<div class="col-sm-4 col-md-4 col-lg-3 layout-sidebar" style="min-height:700px;">
-            <hr class="visible-xs">
-
-
-@if(!$proposal->mined && $proposal->active)
-<h5><i class="fa fa-spinner fa-spin fa-fw"></i> Awaiting Notarization ...</h5>
-
-<br class="xs-50">
-
-<div class="list-group">
-
-      <a href="javascript:;" class="list-group-item">
-          <h3 class="pull-right"><i class="fa fa-gavel text-primary"></i></h3>
-          <h4 class="list-group-item-heading">{{$proposal->threshold}}%</h4>
-          <p class="list-group-item-text">Required to pass</p>
-        </a>
-
-      <a href="javascript:;" class="list-group-item">
-        <h3 class="pull-right"><i class="fa fa-users  text-primary"></i></h3>
-        <h4 class="list-group-item-heading">{{$proposal->participation}}%</h4>
-        <p class="list-group-item-text">Citizen participation needed</p>
-      </a>
-
-      <a href="javascript:;" class="list-group-item">
-        <h3 class="pull-right"><i class="fa fa-calendar  text-primary"></i></h3>
-        <h4 class="list-group-item-heading">{{$proposal->participation}}</h4>
-        <p class="list-group-item-text">Vote duration in days</p>
-      </a>
-
-      <a href="javascript:;" class="list-group-item">
-        <h3 class="pull-right"><i class="fa fa-multiply  text-primary"></i></h3>
-        <h4 class="list-group-item-heading">{{$proposal->expiration}}</h4>
-        <p class="list-group-item-text">Automatic expiration in years</p>
-      </a>
-    </div>
-
-
-@elseif($proposal->mined && $proposal->active)
-            
-            <?php if($isCitizen){?>
-                
-                @if($proposal->txid)
-                    <a data-toggle="modal" target="_blank" href="/congress/ballot/{{$proposal->id}}" id="" style="width: 100%; text-align: center;" class="btn-lg btn-primary demo-element "><i class="fa-solid fa-check-to-slot"></i> Request Ballot</a>
-                @endif
-                    
-            <?php }else{ ?>
-                <p>To cast a vote, please <a href="/citizen/all">join the voter registry</a> first</p>
-            <?php } ?>
-
-
-            <br class="xs-180">
-            
-                  <h4>
-                    Vote Breakdown
-                  </h4>
-                
-                <div id="pie-chart" class="chart-holder-250"></div>
-
-                @php
-                $endTime = \Carbon\Carbon::parse($proposal->mined)->addDays($proposal->duration)->format('Y-m-d H:i:s');
-                @endphp
-                <x-countdown-timer :proposal-id="$proposal->id" :end-time="$endTime" :start-time="$proposal->mined" />
-
-                
-
-            <br class="xs-50">
-
-            <div class="list-group">
-
-                  <a href="javascript:;" class="list-group-item">
-                      <h3 class="pull-right"><i class="fa fa-gavel text-primary"></i></h3>
-                      <h4 class="list-group-item-heading">{{$proposal->threshold}}%</h4>
-                      <p class="list-group-item-text">Required to pass</p>
-                    </a>
-
-                  <a href="javascript:;" class="list-group-item">
-                    <h3 class="pull-right"><i class="fa fa-users  text-primary"></i></h3>
-                    <h4 class="list-group-item-heading">{{$proposal->participation}}%</h4>
-                    <p class="list-group-item-text">Citizen participation needed</p>
-                  </a>
-
-                  <a href="javascript:;" class="list-group-item">
-                    <h3 class="pull-right"><i class="fa fa-calendar  text-primary"></i></h3>
-                    <h4 class="list-group-item-heading">{{$proposal->duration}}</h4>
-                    <p class="list-group-item-text">Vote duration in days</p>
-                  </a>
-
-                  <a href="javascript:;" class="list-group-item">
-                    <h3 class="pull-right"><i class="fa fa-multiply  text-primary"></i></h3>
-                    <h4 class="list-group-item-heading">{{$proposal->expiration}}</h4>
-                    <p class="list-group-item-text">Automatic expiration in years</p>
-                  </a>
                 </div>
-@elseif($proposal->status == "passed")
-<a  style="width: 100%; text-align: center;" class="btn-lg btn-success demo-element "><i class="fa-solid fa-square-check"></i> Passed</a>
 
-<br class="xs-50">
-
-<div class="list-group">
-
-<a href="javascript:;" class="list-group-item">
-          <h3 class="pull-right"><i class="fa fa-gavel text-primary"></i></h3>
-          <h4 class="list-group-item-heading">{{$proposal->threshold}}%</h4>
-          <p class="list-group-item-text">Threshold for passing</p>
-        </a>
-
-
-        <a href="javascript:;" class="list-group-item">
-          <h3 class="pull-right"><i class="fa fa-hand-peace text-primary"></i></h3>
-          <h4 class="list-group-item-heading">{{round($proposal->yay_percent,2)}}%</h4>
-          <p class="list-group-item-text">of votes carried motion</p>
-        </a>
-
-    <a href="javascript:;" class="list-group-item">
-        <h3 class="pull-right"><i class="fa fa-calendar  text-primary"></i></h3>
-        <h4 class="list-group-item-heading">{{$proposal->participation}}</h4>
-        <p class="list-group-item-text">Days of voting</p>
-      </a>
-
-
-
-      <a href="javascript:;" class="list-group-item">
-        <h3 class="pull-right"><i class="fa fa-users  text-primary"></i></h3>
-        <h4 class="list-group-item-heading">{{$proposal->participation}}</h4>
-        <p class="list-group-item-text">Min. participation required</p>
-      </a>
-
-        <a href="javascript:;" class="list-group-item">
-          <h3 class="pull-right"><i class="fa fa-check-double text-primary"></i></h3>
-          <h4 class="list-group-item-heading">{{$proposal->total_votes}}</h4>
-          <p class="list-group-item-text">Actual votes received</p>
-        </a>
-
-
-        <a href="javascript:;" class="list-group-item">
-          <h3 class="pull-right"><i class="fa fa-thumbs-up text-primary"></i></h3>
-          <h4 class="list-group-item-heading">{{$proposal->yays}}</h4>
-          <p class="list-group-item-text">Yay votes</p>
-        </a>
-
-        <a href="javascript:;" class="list-group-item">
-          <h3 class="pull-right"><i class="fa fa-thumbs-down text-primary"></i></h3>
-          <h4 class="list-group-item-heading">{{$proposal->nays}}</h4>
-          <p class="list-group-item-text">Nay votes</p>
-        </a>
-
-      <a href="javascript:;" class="list-group-item">
-        <h3 class="pull-right"><i class="fa fa-multiply  text-primary"></i></h3>
-        <h4 class="list-group-item-heading">{{$proposal->expiration}}</h4>
-        <p class="list-group-item-text">Policy expiration term (in years)</p>
-      </a>
-    </div>
-
-
-@elseif($proposal->status == "rejected")
-<a  style="width: 100%; text-align: center;" class="btn-lg btn-danger demo-element "><i class="fa-regular fa-circle-xmark"></i> Rejected</a>
-
-<br class="xs-50">
-
-<div class="list-group">
-
-<a href="javascript:;" class="list-group-item">
-          <h3 class="pull-right"><i class="fa fa-gavel text-primary"></i></h3>
-          <h4 class="list-group-item-heading">{{$proposal->threshold}}%</h4>
-          <p class="list-group-item-text">Threshold for passing</p>
-        </a>
-
-
-        <a href="javascript:;" class="list-group-item">
-          <h3 class="pull-right"><i class="fa fa-hand-peace text-primary"></i></h3>
-          <h4 class="list-group-item-heading">{{round($proposal->nay_percent,2)}}%</h4>
-          <p class="list-group-item-text">of votes blocked motion</p>
-        </a>
-
-    <a href="javascript:;" class="list-group-item">
-        <h3 class="pull-right"><i class="fa fa-calendar  text-primary"></i></h3>
-        <h4 class="list-group-item-heading">{{$proposal->participation}}</h4>
-        <p class="list-group-item-text">Days of voting</p>
-      </a>
-
-      <a href="javascript:;" class="list-group-item">
-        <h3 class="pull-right"><i class="fa fa-users  text-primary"></i></h3>
-        <h4 class="list-group-item-heading">{{$proposal->participation}}</h4>
-        <p class="list-group-item-text">Min. participation required</p>
-      </a>
-
-        <a href="javascript:;" class="list-group-item">
-          <h3 class="pull-right"><i class="fa fa-check-double text-primary"></i></h3>
-          <h4 class="list-group-item-heading">{{$proposal->total_votes}}</h4>
-          <p class="list-group-item-text">Actual votes received</p>
-        </a>
-
-        <a href="javascript:;" class="list-group-item">
-          <h3 class="pull-right"><i class="fa fa-thumbs-down text-primary"></i></h3>
-          <h4 class="list-group-item-heading">{{$proposal->nays}}</h4>
-          <p class="list-group-item-text">Nay votes</p>
-        </a>
-
-
-        <a href="javascript:;" class="list-group-item">
-          <h3 class="pull-right"><i class="fa fa-thumbs-up text-primary"></i></h3>
-          <h4 class="list-group-item-heading">{{$proposal->yays}}</h4>
-          <p class="list-group-item-text">Yay votes</p>
-        </a>
-
-    </div>
-
-@elseif($proposal->status == "expired")
-<a href="#" style="width: 100%; text-align: center;" class="btn btn-warning"><i class="fa-solid fa-hourglass-end"></i> Expired</a>
-@elseif($proposal->status == "closed")
-<a href="#" style="width: 100%; text-align: center;" class="btn btn-tertiary"><i class="fa-solid fa-triangle-exclamation"></i> Closed</a>
-<div style="margin-top: 15px;">
-<h5>Reason: {{$proposal->closed_reason}}</h5>
-</div>
-
-
-@else
-<a href="#" style="width: 100%; text-align: center;" class="btn btn-tertiary">Concluded</a>
-@endif       
-            
-
-          </div> <!-- /.col -->
-
+            </div>
         </div>
+    </div>
 
+    <footer class="footer" style="border-top:1px solid var(--mr-border,rgba(255,255,255,0.06)); padding:20px 0; background:var(--mr-void,#06060c); z-index:100;">
+        @include('footer')
+    </footer>
 
+    <script src="/assets/wallet/js/dist/my_bundle.js"></script>
+    <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
+    <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
+    @livewireScripts
 
-        </div> <!-- /.container -->
-
-</div> <!-- .content -->
-
-</div> <!-- /#wrapper -->
-
-<footer class="footer">
-@include('footer')
-</footer>
-
-<script src="/assets/wallet/js/dist/my_bundle.js"></script>
-<script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
-<script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
-<script src="/assets/wallet/js/plugins/dataTables/jquery.dataTables.js"></script>
-<script src="/assets/wallet/js/plugins/dataTables/dataTables.bootstrap.js"></script>
-<script src="/assets/wallet/js/mvpready-core.js"></script>
-<script src="/assets/wallet/js/mvpready-admin.js"></script>
-<script src="/assets/wallet/js/demos/table_demo.js"></script>
-<script src="/assets/wallet/js/jquery-ui.min.js"></script>
-<script src="/assets/wallet/js/simplemde.min.js"></script>
-<script src="/assets/wallet/js/md5.min.js"></script>
-<script src="/assets/wallet/js/sha256.js"></script>
-
-<script src="/assets/wallet/js/plugins/flot/jquery.flot.js"></script>
-<script src="/assets/wallet/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
-<script src="/assets/wallet/js/plugins/flot/jquery.flot.pie.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked@3.0.7/marked.min.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });  
-
-});
-</script>
-<script>
-    
-
-$(document).ready(function() {
-    var htmlContent = marked(`{{ $proposal->description }}`);
-    document.getElementById('markdown-container').innerHTML = htmlContent;
-
-    $.ajax({
-        url: "/congress/vote/breakdown",
-        type: "POST", // Specify the method explicitly
-        data: { "proposalId": <?=$proposal->id?> },
-        dataType: 'json', // Expect a JSON response
-        success: function(data) {
-            chartOptions = {		
-                series: {
-                    pie: {
-                        show: true,  
-                        innerRadius: 0, 
-                        stroke: {
-                            width: 4
-                        }
-                    }
-                }, 
-                legend: {
-                    show: false,
-                    position: 'ne'
-                }, 
-                tooltip: true,
-                tooltipOpts: {
-                    content: '%s: %y'
-                },
-                grid: {
-                    hoverable: true
-                },
-                colors: mvpready_core.layoutColors
-            }
-
-            var chartData = [
-                { label: "Yay", data: Math.floor(data.yayPercent + 1) }, 
-                { label: "Nay", data: Math.floor(data.nayPercent + 1) }
-                // { label: "Yay", data: Math.floor (Math.random() * 100 + 250) }, 
-                // { label: "Nay", data: Math.floor (Math.random() * 100 + 350) }
-            ];
-
-            var holder = $('#pie-chart');
-            if (holder.length) {
-                $.plot(holder, chartData, chartOptions);
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.error("Error fetching vote breakdown: ", textStatus, errorThrown);
-        }
+    <script>
+    // Tab switching
+    document.querySelectorAll('.docket-tab').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.docket-tab').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const panel = this.getAttribute('data-panel');
+            document.querySelectorAll('.docket-panel').forEach(p => p.style.display = 'none');
+            const target = document.getElementById('panel-' + panel);
+            if (target) target.style.display = 'block';
+        });
     });
 
-});
-</script>
+    // Render markdown
+    $(document).ready(function() {
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+        });
 
+        try {
+            var htmlContent = marked(`{!! addslashes($proposal->description) !!}`);
+            document.getElementById('markdown-container').innerHTML = htmlContent;
+        } catch(e) {
+            document.getElementById('markdown-container').textContent = `{{ $proposal->description }}`;
+        }
+
+        // Load vote breakdown
+        $.ajax({
+            url: "/congress/vote/breakdown",
+            type: "POST",
+            data: { "proposalId": {{ $proposal->id }} },
+            dataType: 'json',
+            success: function(data) {
+                $('#yay-bar').css('width', data.yayPercent + '%');
+                $('#nay-bar').css('width', data.nayPercent + '%');
+                $('#yay-pct').text(data.yayPercent + '%');
+                $('#nay-pct').text(data.nayPercent + '%');
+                if (data.totalVotes > 0) {
+                    $('#yay-count').text(data.totalVotes - Math.round(data.totalVotes * data.nayPercent / 100));
+                    $('#nay-count').text(Math.round(data.totalVotes * data.nayPercent / 100));
+                }
+            }
+        });
+    });
+    </script>
 </body>
-
 </html>

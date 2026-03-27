@@ -876,7 +876,7 @@ img { max-width: 100%; height: auto; }
     </ul>
 
     <ul class="mr-nav-links">
-      <li><a target="_blank" href="https://marscoin.gitbook.io/marscoin-documentation/">Docs</a></li>
+      <li><a href="/academy">Academy</a></li>
       <li><a href="/login">Login</a></li>
       <li><a href="/signup" class="mr-nav-cta">Become a Citizen</a></li>
     </ul>
@@ -907,7 +907,7 @@ img { max-width: 100%; height: auto; }
           Become a Citizen
           <i class="fa fa-arrow-right"></i>
         </a>
-        <a href="https://marscoin.gitbook.io/marscoin-documentation/" target="_blank" class="mr-btn mr-btn-outline">
+        <a href="/academy" class="mr-btn mr-btn-outline">
           Read the Constitution
         </a>
       </div>
@@ -1182,7 +1182,7 @@ img { max-width: 100%; height: auto; }
       <div>
         <h5>Resources</h5>
         <ul class="mr-footer-links">
-          <li><a href="https://marscoin.gitbook.io/marscoin-documentation/" target="_blank">Documentation</a></li>
+          <li><a href="/academy">Academy</a></li>
           <li><a href="https://github.com/marscoin/martianrepublic" target="_blank">Source Code</a></li>
           <li><a href="https://apps.apple.com/us/app/martianrepublic/id6480416861" target="_blank">iOS App</a></li>
         </ul>

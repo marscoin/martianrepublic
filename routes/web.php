@@ -111,7 +111,22 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/logbook/all', 'Logbook\LogbookController@showAll');
 
 
-// 
+//
+// Academy Routes
+// ==================================================================================
+Route::get('/academy', function () {
+    return view('academy.index');
+});
+Route::get('/academy/{slug}', function ($slug) {
+    $viewName = 'academy.articles.' . $slug;
+    if (view()->exists($viewName)) {
+        return view($viewName);
+    }
+    abort(404);
+});
+
+
+//
 // Map/Geography Routes
 // ==================================================================================
 Route::get('/map/all', 'Planet\MapController@showAll');

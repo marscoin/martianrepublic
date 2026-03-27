@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html><head><title>BIP32 Derivation Test</title>
+<script src="/assets/wallet/js/dist/my_bundle.js"></script>
+<style>body{background:#0c0c16;color:#e0dfe6;font-family:monospace;padding:20px;font-size:13px;} 
+.ok{color:#34d399;} .fail{color:#c84125;} .warn{color:#f59e0b;} h2{color:#00e4ff;} pre{background:#06060c;padding:12px;border-radius:6px;overflow-x:auto;}</style>
+</head><body>
+<h1>BIP32 Derivation Comparison</h1>
+<div id="results">Running tests...</div>
+<script>
+const Marscoin = {
+    mainnet: {
+        messagePrefix: "\x19Marscoin Signed Message:\n", bech32: "M", bip44: 2,
+        bip32: { public: 0x043587cf, private: 0x04358394 },
+        pubKeyHash: 0x32, scriptHash: 0x32, wif: 0x80,
+    },
+};
+
+const mnemonic = "circle film slide velvet autumn library actual patient play whip roof marriage";
+const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
+
+let html = '<h2>Test Mnemonic: ' + mnemonic + '</h2>';
+html += '<p>Seed: ' + seed.toString('hex').substring(0,40) + '...</p>';
+
+// ====== Method 1: bitcoin.bip32 DIRECT (m/44'/2'/0'/0/0) ======
+try {
+    const root1 = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
+    const child1 = root1.derivePath("m/44'/2'/0'/0/0");
+    const addr1 = my_bundle.bitcoin.payments.p2pkh({ pubkey: child1.publicKey, network: Marscoin.mainnet }).address;
+    html += '<h2>Method 1: my_bundle.bitcoin.bip32 — DIRECT path</h2><pre>';
+    html += 'derivePath("m/44\'/2\'/0\'/0/0")\n';
+    html += 'PubKey:  ' + child1.publicKey.toString('hex') + '\n';
+    html += 'Address: ' + addr1 + '\n';
+    html += '</pre>';
+} catch(e) { html += '<p class="fail">Method 1 failed: ' + e.message + '</p>'; }
+
+// ====== Method 2: genSeed style (MIXED libraries) ======
+try {
+    const root2 = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
+    const account2 = root2.derivePath("m/44'/2'/0'").neutered();
+    const tpub = account2.toBase58();
+    // Re-import with my_bundle.bip32 (DIFFERENT library)
+    const hdNode2 = my_bundle.bip32.fromBase58(tpub, Marscoin.mainnet);
+    const child2 = hdNode2.derive(0).derive(0);
+    const addr2 = my_bundle.bitcoin.payments.p2pkh({ pubkey: child2.publicKey, network: Marscoin.mainnet }).address;
+    html += '<h2>Method 2: genSeed style (MIXED: bitcoin.bip32 → tpub → bip32)</h2><pre>';
+    html += 'bitcoin.bip32.fromSeed → derivePath("m/44\'/2\'/0\'") → neutered → toBase58\n';
+    html += 'bip32.fromBase58(tpub) → derive(0) → derive(0)\n';
+    html += 'tpub:    ' + tpub.substring(0,40) + '...\n';
+    html += 'PubKey:  ' + child2.publicKey.toString('hex') + '\n';
+    html += 'Address: ' + addr2 + '\n';
+    html += '</pre>';
+} catch(e) { html += '<p class="fail">Method 2 failed: ' + e.message + '</p>'; }
+
+// ====== Method 3: bitcoin.bip32 via tpub (same library round-trip) ======
+try {
+    const root3 = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
+    const account3 = root3.derivePath("m/44'/2'/0'").neutered();
+    const tpub3 = account3.toBase58();
+    // Re-import with SAME library
+    const hdNode3 = my_bundle.bitcoin.bip32.fromBase58(tpub3, Marscoin.mainnet);
+    const child3 = hdNode3.derive(0).derive(0);
+    const addr3 = my_bundle.bitcoin.payments.p2pkh({ pubkey: child3.publicKey, network: Marscoin.mainnet }).address;
+    html += '<h2>Method 3: bitcoin.bip32 ROUND-TRIP (same library)</h2><pre>';
+    html += 'bitcoin.bip32.fromSeed → neutered → toBase58 → bitcoin.bip32.fromBase58 → derive(0/0)\n';
+    html += 'PubKey:  ' + child3.publicKey.toString('hex') + '\n';
+    html += 'Address: ' + addr3 + '\n';
+    html += '</pre>';
+} catch(e) { html += '<p class="fail">Method 3 failed: ' + e.message + '</p>'; }
+
+// ====== Method 4: bip32 only (standalone) ======
+try {
+    const root4 = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet);
+    const child4 = root4.derivePath("m/44'/2'/0'/0/0");
+    const addr4 = my_bundle.bitcoin.payments.p2pkh({ pubkey: child4.publicKey, network: Marscoin.mainnet }).address;
+    html += '<h2>Method 4: my_bundle.bip32 DIRECT (standalone)</h2><pre>';
+    html += 'bip32.fromSeed → derivePath("m/44\'/2\'/0\'/0/0")\n';
+    html += 'PubKey:  ' + child4.publicKey.toString('hex') + '\n';
+    html += 'Address: ' + addr4 + '\n';
+    html += '</pre>';
+} catch(e) { html += '<p class="fail">Method 4 failed: ' + e.message + '</p>'; }
+
+// ====== COMPARISON ======
+html += '<h2>🔍 Comparison</h2><pre>';
+try {
+    const r = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
+    
+    const m1 = r.derivePath("m/44'/2'/0'/0/0");
+    const a1 = my_bundle.bitcoin.payments.p2pkh({pubkey:m1.publicKey,network:Marscoin.mainnet}).address;
+    
+    const acc = r.derivePath("m/44'/2'/0'").neutered();
+    const tpub = acc.toBase58();
+    const m2node = my_bundle.bip32.fromBase58(tpub, Marscoin.mainnet);
+    const m2 = m2node.derive(0).derive(0);
+    const a2 = my_bundle.bitcoin.payments.p2pkh({pubkey:m2.publicKey,network:Marscoin.mainnet}).address;
+    
+    const m3node = my_bundle.bitcoin.bip32.fromBase58(tpub, Marscoin.mainnet);
+    const m3 = m3node.derive(0).derive(0);
+    const a3 = my_bundle.bitcoin.payments.p2pkh({pubkey:m3.publicKey,network:Marscoin.mainnet}).address;
+    
+    const m4 = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet).derivePath("m/44'/2'/0'/0/0");
+    const a4 = my_bundle.bitcoin.payments.p2pkh({pubkey:m4.publicKey,network:Marscoin.mainnet}).address;
+    
+    html += 'Method 1 (bitcoin.bip32 direct):     ' + a1 + (a1===a2?' ':'') + '\n';
+    html += 'Method 2 (genSeed mixed):             ' + a2 + ' ← STORED IN DB\n';
+    html += 'Method 3 (bitcoin.bip32 round-trip):  ' + a3 + (a1===a3?' <span class="ok">= Method 1</span>':'<span class="fail">≠ Method 1</span>') + '\n';
+    html += 'Method 4 (bip32 standalone direct):   ' + a4 + (a4===a2?' <span class="ok">= Method 2</span>':'<span class="fail">≠ Method 2</span>') + '\n\n';
+    
+    html += 'PubKey match 1↔2? ' + (m1.publicKey.toString('hex')===m2.publicKey.toString('hex') ? '<span class="ok">YES</span>' : '<span class="fail">NO — derivation differs!</span>') + '\n';
+    html += 'PubKey match 1↔3? ' + (m1.publicKey.toString('hex')===m3.publicKey.toString('hex') ? '<span class="ok">YES</span>' : '<span class="fail">NO</span>') + '\n';
+    html += 'PubKey match 1↔4? ' + (m1.publicKey.toString('hex')===m4.publicKey.toString('hex') ? '<span class="ok">YES</span>' : '<span class="fail">NO</span>') + '\n';
+    html += 'PubKey match 2↔4? ' + (m2.publicKey.toString('hex')===m4.publicKey.toString('hex') ? '<span class="ok">YES — bip32 standalone matches genSeed</span>' : '<span class="fail">NO</span>') + '\n';
+
+    html += '\nKnown addresses:\n';
+    html += 'DB stored (genSeed):  MVk86WKySkawkjRqmiazWMnbrf39qpCkLD\n';
+    html += 'DB civic (pebas):     MLVcSocnecoZqXuk8Hy7DXvXHmnSwcBj4J\n';
+    html += '\nWhich method matches DB stored? ';
+    if (a1 === 'MVk86WKySkawkjRqmiazWMnbrf39qpCkLD') html += '<span class="ok">Method 1</span> ';
+    if (a2 === 'MVk86WKySkawkjRqmiazWMnbrf39qpCkLD') html += '<span class="ok">Method 2 (genSeed)</span> ';
+    if (a3 === 'MVk86WKySkawkjRqmiazWMnbrf39qpCkLD') html += '<span class="ok">Method 3</span> ';
+    if (a4 === 'MVk86WKySkawkjRqmiazWMnbrf39qpCkLD') html += '<span class="ok">Method 4</span> ';
+    
+    html += '\nWhich method matches DB civic?  ';
+    if (a1 === 'MLVcSocnecoZqXuk8Hy7DXvXHmnSwcBj4J') html += '<span class="ok">Method 1</span> ';
+    if (a2 === 'MLVcSocnecoZqXuk8Hy7DXvXHmnSwcBj4J') html += '<span class="ok">Method 2</span> ';
+    if (a3 === 'MLVcSocnecoZqXuk8Hy7DXvXHmnSwcBj4J') html += '<span class="ok">Method 3</span> ';
+    if (a4 === 'MLVcSocnecoZqXuk8Hy7DXvXHmnSwcBj4J') html += '<span class="ok">Method 4</span> ';
+    html += '\n(If neither matches civic, pebas Library C derives differently from ALL client methods)';
+} catch(e) { html += '<span class="fail">Comparison error: ' + e.message + '</span>'; }
+html += '</pre>';
+
+document.getElementById('results').innerHTML = html;
+</script>
+</body></html>
