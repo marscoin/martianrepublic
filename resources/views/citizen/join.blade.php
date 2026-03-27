@@ -350,7 +350,7 @@
     </main>
 
     </div> {{-- /#wrapper --}}
-    <footer class="footer" style="border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)); padding: 20px 0; background: #06060c; height: 60px;">
+    <footer class="footer" style="border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06)); padding: 0; background: #06060c; height: 60px;">
         @include('footer')
     </footer>
 
