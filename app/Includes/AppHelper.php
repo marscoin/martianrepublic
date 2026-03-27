@@ -687,7 +687,8 @@ class AppHelper{
 			return Cache::remember($cacheKey, 120, function () use ($publicAddr) {
 				// Primary: use local pebas (Electrum-based, more reliable)
 				try {
-					$response = @file_get_contents("http://localhost:3001/api/mars/balance?address={$publicAddr}");
+					$ctx = stream_context_create(['http' => ['timeout' => 5]]);
+				$response = @file_get_contents("http://localhost:3001/api/mars/balance?address={$publicAddr}", false, $ctx);
 					if ($response) {
 						$data = json_decode($response, true);
 						if (isset($data['balance'])) {
