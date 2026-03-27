@@ -31,7 +31,7 @@
        Martian Republic Mission Control Aesthetic
        ============================================ */
     html, body { background: #06060c !important; }
-    .footer { z-index: 100; position: relative; clear: both; }
+    .footer { z-index: 100; position: relative; clear: both; padding: 20px 0 !important; background: var(--mr-void, #06060c) !important; }
     #wrapper { overflow: hidden; }
 
     :root {
