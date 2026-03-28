@@ -63,24 +63,27 @@ async def ballotserver_start(room):
                         'peers': json.dumps(response['peers'])}
     if not dostart:
         raise Exception("BallotShuffle already Started")
+    # Send INITIATE_SHUFFLE to all participants
     for i in range(len(response['order']) - 1, -1, -1):
         ek = response['order'][i]
-        addr = response['peers'][ek]
-        for client, _ in room.items():
-            client_addr = str(client.remote_address[0]) + ":" + str(client.remote_address[1])
-            if client_addr == addr:
+        peer_addr = response['peers'][ek]  # This is now the Marscoin address
+        logging.info(f"Sending INITIATE_SHUFFLE to peer {peer_addr}")
+        for client, client_name in room.items():
+            if client_name == peer_addr:
                 await client.send('INITIATE_SHUFFLE_' + json.dumps(encoded_response))
+                break
 
-    # Perform shuffle in reverse order
+    # Perform shuffle starting with peer 0
     data = {}
     sources = {}
     CURRENT_SHUFFLE_PEER = 0
     ek = response['order'][CURRENT_SHUFFLE_PEER]
-    addr = response['peers'][ek]
-    for client, _ in room.items():
-        client_addr = str(client.remote_address[0]) + ":" + str(client.remote_address[1])
-        if client_addr == addr:
+    peer_addr = response['peers'][ek]  # Marscoin address
+    logging.info(f"Starting shuffle with peer 0: {peer_addr}")
+    for client, client_name in room.items():
+        if client_name == peer_addr:
             await client.send('PERFORM_SHUFFLE#' + json.dumps(data) + "#" + json.dumps(sources))
+            break
     return
 
 async def concatenateSignatures(signatures):
@@ -122,7 +125,7 @@ async def restore_client_state(websocket, client_id):
 async def save_client_state(client_id, state):
     client_states[client_id] = state
 
-async def client_handler(websocket, path):
+async def client_handler(websocket):
     client_id = None
     try:
         logging.debug(f'New voter: {websocket.remote_address}')
@@ -172,7 +175,9 @@ async def client_handler(websocket, path):
 
                 if "SUBMIT_KEY" in message:
                     key = message.split("#")[1]
-                    server.submit_public_key(key, f'{websocket.remote_address[0]}:{websocket.remote_address[1]}')
+                    # Use Marscoin address as peer identifier (not IP:port which breaks behind proxy)
+                    server.submit_public_key(key, name)
+                    logging.info(f"Key submitted by {name} (peer ID: {name})")
                     if len(rooms[room]) >= max_voters_required:
                         await ballotserver_start(rooms[room])
 
@@ -187,11 +192,12 @@ async def client_handler(websocket, path):
                         sources = obj['sources']
                         peer_index += 1
                         ek = response['order'][peer_index]
-                        addr = response['peers'][ek]
-                        for client, _ in rooms[room].items():
-                            client_addr = f'{client.remote_address[0]}:{client.remote_address[1]}'
-                            if client_addr == addr:
+                        peer_addr = response['peers'][ek]  # Marscoin address
+                        logging.info(f"Forwarding shuffle to peer {peer_index}: {peer_addr}")
+                        for client, client_name in rooms[room].items():
+                            if client_name == peer_addr:
                                 await client.send(f'PERFORM_SHUFFLE#{json.dumps(data)}#{json.dumps(sources)}')
+                                break
                     else:
                         logging.debug("Now sign the transaction?")
 
@@ -232,8 +238,12 @@ async def client_handler(websocket, path):
 
 
 async def main():
-    server = await websockets.serve(client_handler, str(BALLOT_SERVER_HOST), BALLOT_SERVER_PORT, ssl=ssl_context)
-    await server.wait_closed()
+    # SSL server on all interfaces (for direct ballot.martianrepublic.org connections)
+    server_ssl = await websockets.serve(client_handler, str(BALLOT_SERVER_HOST), BALLOT_SERVER_PORT, ssl=ssl_context)
+    # Plain server on localhost (for Apache reverse proxy via /wss/ballot)
+    server_plain = await websockets.serve(client_handler, "127.0.0.1", 3679)
+    logging.info(f"Plain WebSocket also listening on 127.0.0.1:3679 (for Apache proxy)")
+    await asyncio.gather(server_ssl.wait_closed(), server_plain.wait_closed())
 
 if __name__ == "__main__":
     loop = asyncio.new_event_loop()

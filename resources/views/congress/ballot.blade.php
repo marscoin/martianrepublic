@@ -762,7 +762,44 @@ $(document).ready(function() {
         if(event.data.includes("COMBINE_AND_BROADCAST")) {
             $("#messages").append('<br>> Combining signatures and broadcasting...');
             raw_tx = event.data.split("#")[1];
-            signed_raw_tx = combineAndBroadcastTransaction(raw_tx);
+            try {
+                $("#messages").append('<br>> DEBUG: parsing signed texts...');
+                var parsedTexts = JSON.parse(raw_tx);
+                $("#messages").append('<br>> DEBUG: ' + Object.keys(parsedTexts).length + ' signatures received');
+
+                var initial = parsedTexts[Object.keys(parsedTexts)[0]];
+                $("#messages").append('<br>> DEBUG: loading initial PSBT (' + initial.length + ' chars)...');
+                var psbt = my_bundle.bitcoin.Psbt.fromBase64(initial);
+
+                for (var i = 0; i < Object.keys(parsedTexts).length; i++) {
+                    var stext = parsedTexts[Object.keys(parsedTexts)[i]];
+                    $("#messages").append('<br>> DEBUG: combining signer ' + i + '...');
+                    var fin = my_bundle.bitcoin.Psbt.fromBase64(stext);
+                    psbt.combine(fin);
+                }
+
+                $("#messages").append('<br>> DEBUG: finalizing inputs...');
+                var tx = psbt.finalizeAllInputs().extractTransaction(true);
+                var txhash = tx.toHex();
+                $("#messages").append('<br>> DEBUG: tx hex ready (' + txhash.length + ' chars), broadcasting...');
+
+                broadcastTxHash(txhash).then(function(result) {
+                    $("#messages").append('<br>> DEBUG: broadcast result: ' + JSON.stringify(result));
+                    if (result && result.tx_hash) {
+                        $("#messages").append('<br>> SUCCESS: ballot tx ' + result.tx_hash);
+                        $("#pre-ballot").hide();
+                        $("#conf-ballot").show();
+                        pollConfirmation(result.tx_hash);
+                    } else {
+                        $("#messages").append('<br>> ERROR: no tx_hash in response');
+                    }
+                }).catch(function(err) {
+                    $("#messages").append('<br>> BROADCAST ERROR: ' + err.message);
+                });
+            } catch(e) {
+                $("#messages").append('<br>> COMBINE ERROR: ' + e.message);
+                $("#messages").append('<br>> STACK: ' + e.stack);
+            }
         }
     };
 
@@ -812,38 +849,65 @@ $(document).ready(function() {
 
     const broadcastTxHash = async (txhashstring) => {
         if (!txhashstring) throw new Error("Missing tx hash...");
-        const url = "https://pebas.marscoin.org/api/mars/broadcast"
+        const url = "https://pebas.marscoin.org/api/mars/broadcast";
         try {
-            const config = {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({a: 1, txhash: txhashstring})
+                body: JSON.stringify({ a: 1, txhash: txhashstring })
+            });
+            const data = await response.json();
+            if (data.error) {
+                $("#messages").append('<br>> BROADCAST REJECTED: ' + data.error);
+                return null;
             }
-            const response = await fetch(url, config)
-            if (response.ok) { return response.json() } else { console.log("Broadcast response not OK:", response) }
-        } catch (error) { console.error("Broadcast error:", error) }
+            return data;
+        } catch (error) {
+            $("#messages").append('<br>> BROADCAST ERROR: ' + error.message);
+            return null;
+        }
     }
 
     const combineAndBroadcastTransaction = async (signedTexts) => {
-        signedTexts = JSON.parse(signedTexts)
-        initial = signedTexts[0];
-        const psbt = my_bundle.bitcoin.Psbt.fromBase64(initial);
-        for (let i = 0; i < Object.keys(signedTexts).length; i++) {
-            stext = signedTexts[i];
-            fin = my_bundle.bitcoin.Psbt.fromBase64(stext);
-            psbt.combine(fin);
-        }
-        const tx = psbt.finalizeAllInputs().extractTransaction(true);
-        const txhash = tx.toHex()
         try {
-            const tx = await broadcastTxHash(txhash);
-            $("#pre-ballot").hide();
-            $("#conf-ballot").show();
-            pollConfirmation(tx.tx_hash);
-            return tx;
+            console.log("=== COMBINE START ===");
+            signedTexts = JSON.parse(signedTexts)
+            console.log("Signed texts count:", Object.keys(signedTexts).length);
+
+            initial = signedTexts[0];
+            console.log("Loading initial PSBT...");
+            const psbt = my_bundle.bitcoin.Psbt.fromBase64(initial);
+
+            for (let i = 0; i < Object.keys(signedTexts).length; i++) {
+                console.log("Combining signer " + i + "...");
+                stext = signedTexts[i];
+                fin = my_bundle.bitcoin.Psbt.fromBase64(stext);
+                psbt.combine(fin);
+            }
+
+            console.log("Finalizing all inputs...");
+            const tx = psbt.finalizeAllInputs().extractTransaction(true);
+            const txhash = tx.toHex();
+            console.log("Tx hex length:", txhash.length);
+            console.log("Broadcasting...");
+
+            const result = await broadcastTxHash(txhash);
+            console.log("Broadcast result:", JSON.stringify(result));
+
+            if (result && result.tx_hash) {
+                console.log("SUCCESS! tx_hash:", result.tx_hash);
+                $("#messages").append('<br>> Ballot transaction broadcast: ' + result.tx_hash);
+                $("#pre-ballot").hide();
+                $("#conf-ballot").show();
+                pollConfirmation(result.tx_hash);
+                return result;
+            } else {
+                console.error("Broadcast returned no tx_hash:", result);
+                $("#messages").append('<br>> ERROR: Broadcast failed - no tx hash returned');
+            }
         } catch (e) {
-            handleError()
-            throw e;
+            console.error("=== COMBINE ERROR ===", e.message, e.stack);
+            $("#messages").append('<br>> ERROR: ' + e.message);
         }
     }
 
