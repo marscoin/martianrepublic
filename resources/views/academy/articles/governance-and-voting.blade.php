@@ -8,7 +8,7 @@
 <meta name="keywords" content="Mars governance, blockchain voting, DAO, Martian Republic, CoinShuffle, democracy, proposals">
 <meta property="og:title" content="How Mars Governs Itself: The Complete Guide to Martian Democracy">
 <meta property="og:description" content="The complete guide to the Martian Republic's governance system -- four tiers, secret ballots, and lessons from a decade of blockchain experiments.">
-<meta property="og:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta property="og:image" content="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://martianrepublic.org/academy/governance-and-voting">
 <meta property="og:site_name" content="The Martian Republic">
@@ -19,7 +19,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="How Mars Governs Itself: The Complete Guide to Martian Democracy">
 <meta name="twitter:description" content="The Martian Republic's four-tier governance system explained. From signal polls to constitutional amendments, secret ballots to blockchain voting.">
-<meta name="twitter:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta name="twitter:image" content="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
 <link rel="canonical" href="https://martianrepublic.org/academy/governance-and-voting">
 <script type="application/ld+json">
@@ -28,7 +28,7 @@
   "@type": "Article",
   "headline": "How Mars Governs Itself: The Complete Guide to Martian Democracy",
   "description": "The Martian Republic's four-tier governance system explained. From signal polls to constitutional amendments, secret ballots to blockchain voting.",
-  "image": "https://martianrepublic.org/assets/citizen/mars_flag5.png",
+  "image": "https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png",
   "datePublished": "2026-03-27",
   "author": { "@type": "Organization", "name": "The Martian Republic" },
   "publisher": {
@@ -96,7 +96,7 @@ img { max-width: 100%; height: auto; }
 }
 .mr-nav .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
 .mr-nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.mr-nav-brand img { width: 32px; height: 32px; border-radius: 50%; }
+.mr-nav-brand img { width: 42px; height: 42px; border-radius: 50%; }
 .mr-nav-brand span { font-family: var(--mr-font-display); font-weight: 700; font-size: 15px; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; }
 .mr-nav-links { display: flex; align-items: center; gap: 28px; }
 .mr-nav-links a { color: var(--mr-text-dim); font-size: 14px; font-weight: 500; }
@@ -442,7 +442,7 @@ img { max-width: 100%; height: auto; }
 <nav class="mr-nav">
   <div class="nav-inner">
     <a href="/" class="mr-nav-brand">
-      <img src="/assets/citizen/mars_flag5.png" alt="Martian Republic">
+      <img src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic">
       <span>Martian Republic</span>
     </a>
     <div class="mr-nav-links">

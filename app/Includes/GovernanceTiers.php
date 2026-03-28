@@ -12,6 +12,13 @@ namespace App\Includes;
  */
 class GovernanceTiers
 {
+    // TEST MODE: Set to true to compress all timers for smoke testing
+    // Screening: 3 minutes instead of 3 sols
+    // Voting: scales proportionally (Signal 7min, Operational 14min, etc.)
+    // MUST be false in production
+    const TEST_MODE = true;
+    const TEST_MODE_MINUTES_PER_SOL = 1; // 1 minute = 1 sol in test mode
+
     // Duration of the screening period before voting opens (in sols/days)
     const SCREENING_DURATION_SOLS = 3;
 
@@ -108,18 +115,37 @@ class GovernanceTiers
         // If not yet mined/notarized, timestamps start from now
         $start = $minedAt ? \Carbon\Carbon::parse($minedAt) : now();
 
-        $screeningEnds = $start->copy()->addDays(self::SCREENING_DURATION_SOLS);
-        $votingEnds    = $screeningEnds->copy()->addDays($config['duration_sols']);
+        if (self::TEST_MODE) {
+            // Test mode: minutes instead of days
+            $m = self::TEST_MODE_MINUTES_PER_SOL;
+            $screeningEnds = $start->copy()->addMinutes(self::SCREENING_DURATION_SOLS * $m);
+            $votingEnds    = $screeningEnds->copy()->addMinutes($config['duration_sols'] * $m);
 
-        $timelockEnds = null;
-        if ($config['timelock_sols'] > 0) {
-            $timelockEnds = $votingEnds->copy()->addDays($config['timelock_sols']);
-        }
+            $timelockEnds = null;
+            if ($config['timelock_sols'] > 0) {
+                $timelockEnds = $votingEnds->copy()->addMinutes($config['timelock_sols'] * $m);
+            }
 
-        $sunsetAt = null;
-        if ($config['sunset_sols'] > 0) {
-            $baseDate = $timelockEnds ?? $votingEnds;
-            $sunsetAt = $baseDate->copy()->addDays($config['sunset_sols']);
+            $sunsetAt = null;
+            if ($config['sunset_sols'] > 0) {
+                $baseDate = $timelockEnds ?? $votingEnds;
+                $sunsetAt = $baseDate->copy()->addMinutes($config['sunset_sols'] * $m);
+            }
+        } else {
+            // Production: days (sols)
+            $screeningEnds = $start->copy()->addDays(self::SCREENING_DURATION_SOLS);
+            $votingEnds    = $screeningEnds->copy()->addDays($config['duration_sols']);
+
+            $timelockEnds = null;
+            if ($config['timelock_sols'] > 0) {
+                $timelockEnds = $votingEnds->copy()->addDays($config['timelock_sols']);
+            }
+
+            $sunsetAt = null;
+            if ($config['sunset_sols'] > 0) {
+                $baseDate = $timelockEnds ?? $votingEnds;
+                $sunsetAt = $baseDate->copy()->addDays($config['sunset_sols']);
+            }
         }
 
         return [

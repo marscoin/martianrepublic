@@ -8,7 +8,7 @@
 <meta name="keywords" content="Mars, Marscoin, governance, blockchain, voting, academy, education, Mars colony">
 <meta property="og:title" content="The Academy - Martian Republic">
 <meta property="og:description" content="Deep knowledge for Martian citizens. Learn governance, blockchain, wallets, voting, and the science of Mars settlement.">
-<meta property="og:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta property="og:image" content="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://martianrepublic.org/academy">
 <meta property="og:site_name" content="The Martian Republic">
@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The Academy - Martian Republic">
 <meta name="twitter:description" content="Deep knowledge for Martian citizens. Learn governance, blockchain, wallets, voting, and the science of Mars settlement.">
-<meta name="twitter:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta name="twitter:image" content="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
 <link rel="canonical" href="https://martianrepublic.org/academy">
 <script type="application/ld+json">
@@ -92,7 +92,7 @@ img { max-width: 100%; height: auto; }
 }
 .mr-nav .container { display: flex; align-items: center; justify-content: space-between; }
 .mr-nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.mr-nav-brand img { width: 32px; height: 32px; border-radius: 50%; }
+.mr-nav-brand img { width: 42px; height: 42px; border-radius: 50%; }
 .mr-nav-brand span { font-family: var(--mr-font-display); font-weight: 700; font-size: 15px; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; }
 .mr-nav-links { display: flex; align-items: center; gap: 28px; }
 .mr-nav-links a { color: var(--mr-text-dim); font-size: 14px; font-weight: 500; }
@@ -316,6 +316,9 @@ img { max-width: 100%; height: auto; }
 .article-thumb.blockchain { background: linear-gradient(135deg, rgba(0,228,255,0.2), rgba(52,211,153,0.1)); color: var(--mr-cyan); }
 .article-thumb.mars { background: linear-gradient(135deg, rgba(212,164,74,0.2), rgba(200,65,37,0.1)); color: var(--mr-amber); }
 .article-thumb.wallet { background: linear-gradient(135deg, rgba(52,211,153,0.2), rgba(0,228,255,0.1)); color: var(--mr-green); }
+.article-thumb.citizenship { background: linear-gradient(135deg, rgba(52,211,153,0.2), rgba(212,164,74,0.1)); color: var(--mr-green); }
+.article-thumb.mars { background: linear-gradient(135deg, rgba(212,164,74,0.2), rgba(200,65,37,0.1)); color: var(--mr-amber); }
+.article-thumb.wallet { background: linear-gradient(135deg, rgba(52,211,153,0.2), rgba(0,228,255,0.1)); color: var(--mr-green); }
 
 .article-body { display: flex; flex-direction: column; justify-content: center; }
 .article-tag {
@@ -450,7 +453,7 @@ img { max-width: 100%; height: auto; }
 <nav class="mr-nav">
   <div class="container">
     <a href="/" class="mr-nav-brand">
-      <img src="/assets/citizen/mars_flag5.png" alt="Martian Republic">
+      <img src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic">
       <span>Martian Republic</span>
     </a>
     <div class="mr-nav-links">
@@ -476,8 +479,8 @@ img { max-width: 100%; height: auto; }
     </p>
     <div class="hero-stats fade-up fade-up-d2">
       <div class="hero-stat">
-        <div class="hero-stat-value">4</div>
-        <div class="hero-stat-label">Learning Paths</div>
+        <div class="hero-stat-value">21</div>
+        <div class="hero-stat-label">Articles</div>
       </div>
       <div class="hero-stat">
         <div class="hero-stat-value">100%</div>
@@ -504,14 +507,14 @@ img { max-width: 100%; height: auto; }
         <div class="path-title">Mars &amp; Settlement</div>
         <div class="path-desc">The planet, its challenges, and why humanity must become multi-planetary. Habitats, resources, terraforming, and the case for Mars.</div>
         <div class="path-meta">4 ARTICLES &bull; FUNDAMENTALS</div>
-        <a href="#mars" class="path-link">Coming soon <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="/academy/why-mars" class="path-link">Start learning <i class="fa-solid fa-arrow-right"></i></a>
       </div>
       <div class="path-card fade-up fade-up-d1">
         <div class="path-number">02</div>
         <div class="path-title">Blockchain &amp; Marscoin</div>
         <div class="path-desc">How blockchains work, why they matter for governance, the history of Marscoin, HD wallets, IPFS, and cryptographic identity.</div>
         <div class="path-meta">6 ARTICLES &bull; TECHNICAL</div>
-        <a href="#blockchain" class="path-link">Coming soon <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="/academy/what-is-a-blockchain" class="path-link">Start learning <i class="fa-solid fa-arrow-right"></i></a>
       </div>
       <div class="path-card fade-up fade-up-d2">
         <div class="path-number">03</div>
@@ -525,7 +528,21 @@ img { max-width: 100%; height: auto; }
         <div class="path-title">Citizenship &amp; Identity</div>
         <div class="path-desc">The pioneer journey from arrival to full citizenship. Endorsements, civic wallets, identity verification, and what it means to be a Martian citizen.</div>
         <div class="path-meta">4 ARTICLES &bull; ONBOARDING</div>
-        <a href="#citizenship" class="path-link">Coming soon <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="/academy/the-pioneers-journey" class="path-link">Start learning <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="path-card fade-up fade-up-d1" style="border-color: var(--mr-mars-glow);">
+        <div class="path-number" style="color: var(--mr-mars-glow);">05</div>
+        <div class="path-title">The Complete Guide</div>
+        <div class="path-desc">New here? A visual, step-by-step walkthrough of the entire Martian Republic. From the speed-of-light problem to your first vote &mdash; in 16 interactive slides.</div>
+        <div class="path-meta">16 SLIDES &bull; START HERE</div>
+        <a href="/academy/complete-guide" class="path-link" style="color: var(--mr-mars-glow);">Launch the course <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="path-card fade-up fade-up-d2" style="border-color: var(--mr-amber);">
+        <div class="path-number" style="color: var(--mr-amber);">06</div>
+        <div class="path-title">The Seed</div>
+        <div class="path-desc">A civilization in a seed. The entire Martian Republic &mdash; blockchain, IPFS, governance, wallets, docs &mdash; as one bootable image. Download it. Flash it. Boot a new world.</div>
+        <div class="path-meta">1 DOWNLOAD &bull; EVERYTHING</div>
+        <a href="/academy/the-seed" class="path-link" style="color: var(--mr-amber);">See the product <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </div>
   </div>
@@ -604,39 +621,286 @@ img { max-width: 100%; height: auto; }
       </div>
     </a>
 
+    <!-- NEW LIVE ARTICLES -->
+    <a href="/academy/why-mars" class="article-card fade-up">
+      <div class="article-thumb mars" style="background:url('/assets/academy/why-mars.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag mars">Mars &amp; Settlement</span>
+        <h3 class="article-title">Why Mars? The Case for Becoming Multi-Planetary</h3>
+        <p class="article-excerpt">Robert Zubrin's Mars Direct plan, the SpaceX factor, the economic case for colonization, and why governance must be designed before the first boot touches regolith.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 25 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Fundamentals</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/living-on-mars" class="article-card fade-up fade-up-d1">
+      <div class="article-thumb mars" style="background:url('/assets/academy/living-on-mars.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag mars">Mars &amp; Settlement</span>
+        <h3 class="article-title">Living on Mars: Dust, Radiation, and the Architecture of Survival</h3>
+        <p class="article-excerpt">The real science of Mars habitation. Atmospheric composition, radiation shielding, water ice deposits, growing food, habitat design, energy systems, and why every resource decision is a governance decision.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 22 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Fundamentals</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/what-is-a-blockchain" class="article-card fade-up fade-up-d2">
+      <div class="article-thumb blockchain" style="background:url('/assets/academy/blockchain.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag blockchain">Blockchain &amp; Marscoin</span>
+        <h3 class="article-title">What Is a Blockchain? A First-Principles Explanation</h3>
+        <p class="article-excerpt">The Byzantine Generals Problem, hash functions, proof of work, public key cryptography, and OP_RETURN -- the actual computer science, explained from scratch.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 20 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Technical</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/marscoin-story" class="article-card fade-up fade-up-d3">
+      <div class="article-thumb blockchain" style="background:url('/assets/academy/marscoin-story.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag blockchain">Blockchain &amp; Marscoin</span>
+        <h3 class="article-title">Marscoin: Twelve Years Building a Currency for Another World</h3>
+        <p class="article-excerpt">From the 2014 genesis block to 2 terahashes in 2025. Exchange collapses, network attacks, the Musk tweet, 1 million MARS donated to the Mars Society, and 12 years of uninterrupted operations.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 25 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Essential</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/hd-wallets-and-civic-identity" class="article-card fade-up">
+      <div class="article-thumb wallet" style="background:url('/assets/academy/hd-wallets.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag wallet">Blockchain &amp; Marscoin</span>
+        <h3 class="article-title">HD Wallets &amp; Civic Identity: Your Key to Mars</h3>
+        <p class="article-excerpt">BIP32, BIP39, BIP44 -- the cryptographic tree that holds your money, proves your identity, records your votes, and stores your civic history. Treasury vs. civic addresses explained.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 20 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Technical</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/git-as-constitution" class="article-card fade-up fade-up-d1">
+      <div class="article-thumb governance" style="background:url('/assets/academy/git-constitution.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag governance">Governance</span>
+        <h3 class="article-title">Git as Constitution: When the Code IS the Law</h3>
+        <p class="article-excerpt">The radical idea that constitutional proposals are pull requests, laws are machine-verifiable, and forking is the ultimate check on tyranny.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 20 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Essential</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/defi-and-finance-on-mars" class="article-card fade-up fade-up-d2">
+      <div class="article-thumb governance" style="background:url('/assets/academy/defi-mars.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag governance">Governance</span>
+        <h3 class="article-title">DeFi on Mars: Finance Without Banks, 140 Million Miles from Wall Street</h3>
+        <p class="article-excerpt">No Federal Reserve. No SWIFT network. How decentralized finance, resource tokenization, civic reputation as credit, and parametric insurance create an autonomous Martian economy.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 22 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Essential</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/the-pioneers-journey" class="article-card fade-up fade-up-d3">
+      <div class="article-thumb citizenship" style="background:url('/assets/academy/pioneers-journey.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag citizenship">Citizenship &amp; Identity</span>
+        <h3 class="article-title">The Pioneer's Journey: From Earth to Martian Citizen</h3>
+        <p class="article-excerpt">The complete five-step path from account creation to full citizenship. Wallets, IPFS identity, liveness proofs, the endorsement formula, and social proof of work.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 18 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Onboarding</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- ROUND 3: TECHNICAL + PHILOSOPHY -->
+    <a href="/academy/ipfs-interplanetary-file-system" class="article-card fade-up">
+      <div class="article-thumb blockchain" style="background:url('/assets/academy/ipfs.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag blockchain">Blockchain &amp; Marscoin</span>
+        <h3 class="article-title">IPFS: The Interplanetary File System and Why Mars Needs It</h3>
+        <p class="article-excerpt">A dedicated, decentralized file storage system that runs by default on Mars so all citizens can share data from the get-go. Content addressing, Merkle DAGs, and how every citizen application, proposal, and vote record is stored without a central server.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 22 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Technical</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/op-return-blockchain-notarization" class="article-card fade-up fade-up-d1">
+      <div class="article-thumb blockchain" style="background:url('/assets/academy/op-return.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag blockchain">Blockchain &amp; Marscoin</span>
+        <h3 class="article-title">OP_RETURN: How the Martian Republic Writes History Into the Blockchain</h3>
+        <p class="article-excerpt">80 bytes. Less than a tweet. But in those bytes, the Republic records every citizen's identity, every proposal, every vote. The most underappreciated tool in blockchain technology, explained.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 20 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Technical</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/public-key-cryptography" class="article-card fade-up fade-up-d2">
+      <div class="article-thumb blockchain" style="background:url('/assets/academy/cryptography-keys.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag blockchain">Blockchain &amp; Marscoin</span>
+        <h3 class="article-title">Public-Key Cryptography: The Mathematics of Trust</h3>
+        <p class="article-excerpt">Diffie-Hellman, RSA, elliptic curves, secp256k1, ECDSA signatures -- the 1970s mathematics that makes every blockchain transaction, vote, and identity proof possible.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 25 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Technical</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/scrypt-vs-randomx" class="article-card fade-up fade-up-d3">
+      <div class="article-thumb blockchain" style="background:url('/assets/academy/scrypt-randomx.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag blockchain">Blockchain &amp; Marscoin</span>
+        <h3 class="article-title">Scrypt vs RandomX: The Mining Algorithm Debate for Mars</h3>
+        <p class="article-excerpt">Earth mining is an ASIC arms race. Mars needs general-purpose computers. The technical deep dive into which algorithm secures a colony's blockchain.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 22 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Technical</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/citizenship-by-endorsement" class="article-card fade-up">
+      <div class="article-thumb citizenship" style="background:url('/assets/academy/pioneers-journey.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag citizenship">Citizenship &amp; Identity</span>
+        <h3 class="article-title">Citizenship by Endorsement: A Philosophical Foundation for Martian Immigration</h3>
+        <p class="article-excerpt">From Aristotle to Arendt, Roman exile to blockchain identity. Why <em>jus testimonii</em> -- citizenship by testimony -- is the most transparent immigration system ever designed. The flagship essay.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 35 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Essential</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- ROUND 4: ADVANCED TOPICS -->
+    <a href="/academy/hash-war-protection" class="article-card fade-up">
+      <div class="article-thumb governance" style="background:url('/assets/academy/hash-war.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag governance">Governance</span>
+        <h3 class="article-title">Hash-War Protection: How Mars Defends Its Blockchain From Earth</h3>
+        <p class="article-excerpt">Earth miners could attack the Martian blockchain with superior hashrate. The Republic's solution: decentralized licensing, where citizens vote to authorize miners. Proof of Citizenship.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 22 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Advanced</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/blockchain-attested-data-streams" class="article-card fade-up fade-up-d1">
+      <div class="article-thumb blockchain" style="background:url('/assets/academy/data-streams.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag blockchain">Blockchain &amp; Marscoin</span>
+        <h3 class="article-title">Blockchain-Attested Data Streams: When Machines Report to the Republic</h3>
+        <p class="article-excerpt">Citizens elect deputies. Deputies certify instruments. Instruments attest data. Every oxygen reading, power metric, and sealant inspection — verified by a chain of trust from voters to sensors.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 25 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Advanced</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/the-logbook-blockchain-ip" class="article-card fade-up fade-up-d2">
+      <div class="article-thumb blockchain" style="background:url('/assets/academy/logbook-ip.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag blockchain">Blockchain &amp; Marscoin</span>
+        <h3 class="article-title">The Logbook: Blockchain-Notarized IP Without a Patent Office</h3>
+        <p class="article-excerpt">A botanist discovers faster potato growth on Mars. She notarizes the finding for 0.1 MARS. Five years later, the blockchain proves she published first. No lawyers. No patent office. Just math.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 18 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Essential</span>
+        </div>
+      </div>
+    </a>
+
+    <a href="/academy/the-public-good" class="article-card fade-up fade-up-d3">
+      <div class="article-thumb blockchain" style="background:url('/assets/academy/public-good.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag blockchain">Blockchain &amp; Marscoin</span>
+        <h3 class="article-title">The Public Good: Blockchains DO Have a Use Case &mdash; It's Public, Immutable Data</h3>
+        <p class="article-excerpt">The critics are right about 90% of blockchain projects. They're wrong about the 10% that matter: money, votes, property, identity, IP. Why a trustless ledger is civilization's most important tool.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 22 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> March 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Essential</span>
+        </div>
+      </div>
+    </a>
+
     <!-- UPCOMING ARTICLES -->
     <div class="upcoming-grid">
       <div class="upcoming-card">
-        <div class="upcoming-title">Git as Constitution</div>
-        <div class="upcoming-desc">The radical idea that code IS law, literally. How Constitutional proposals work as pull requests, and why machine-verifiable governance rules eliminate ambiguity.</div>
-      </div>
-      <div class="upcoming-card">
         <div class="upcoming-title">The Civic Alarm: Designing for Engagement</div>
         <div class="upcoming-desc">Tiered notifications, interest tagging, the UX of participation. How the Republic fights voter fatigue through design, not mandates.</div>
-      </div>
-
-      {{-- BLOCKCHAIN & WALLET SERIES --}}
-      <div class="upcoming-card">
-        <div class="upcoming-title">HD Wallets: Your Key to Mars</div>
-        <div class="upcoming-desc">How hierarchical deterministic wallets work, why they're essential, and the architecture behind civic vs treasury addresses.</div>
-      </div>
-      <div class="upcoming-card">
-        <div class="upcoming-title">Marscoin: A Currency for Another World</div>
-        <div class="upcoming-desc">The history, technology, and economics of Marscoin -- from its 2014 launch to its role as the backbone of Martian governance.</div>
-      </div>
-      <div class="upcoming-card">
-        <div class="upcoming-title">Blockchain-Attested Data Streams</div>
-        <div class="upcoming-desc">APIs that prove reality. How sensor data, inspections, and certifications can be cryptographically anchored for tamper-proof compliance.</div>
-      </div>
-
-      {{-- CITIZENSHIP & MARS SERIES --}}
-      <div class="upcoming-card">
-        <div class="upcoming-title">The Pioneer's Journey: From Earth to Citizen</div>
-        <div class="upcoming-desc">A complete guide to the citizenship process -- from account creation through endorsement to full civic participation.</div>
-      </div>
-      <div class="upcoming-card">
-        <div class="upcoming-title">Living on Mars: Challenges and Solutions</div>
-        <div class="upcoming-desc">Radiation, dust storms, thin atmosphere, and extreme cold. The real science of Mars habitation and what the Republic is building toward.</div>
       </div>
       <div class="upcoming-card">
         <div class="upcoming-title">Land Registry: Staking Claims on Mars</div>

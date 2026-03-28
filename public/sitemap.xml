@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Main Site -->
+  <url><loc>https://martianrepublic.org/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://martianrepublic.org/signup</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://martianrepublic.org/login</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://martianrepublic.org/congress/all</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
+  <!-- Academy Index -->
+  <url><loc>https://martianrepublic.org/academy</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+
+  <!-- Academy: Interactive Course & The Seed -->
+  <url><loc>https://martianrepublic.org/academy/complete-guide</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://martianrepublic.org/academy/the-seed</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Academy: Mars & Settlement -->
+  <url><loc>https://martianrepublic.org/academy/why-mars</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://martianrepublic.org/academy/living-on-mars</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Academy: Blockchain & Marscoin -->
+  <url><loc>https://martianrepublic.org/academy/what-is-a-blockchain</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://martianrepublic.org/academy/marscoin-story</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://martianrepublic.org/academy/hd-wallets-and-civic-identity</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://martianrepublic.org/academy/ipfs-interplanetary-file-system</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://martianrepublic.org/academy/op-return-blockchain-notarization</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://martianrepublic.org/academy/public-key-cryptography</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://martianrepublic.org/academy/scrypt-vs-randomx</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://martianrepublic.org/academy/the-logbook-blockchain-ip</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://martianrepublic.org/academy/the-public-good</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+
+  <!-- Academy: Governance & Congress -->
+  <url><loc>https://martianrepublic.org/academy/governance-and-voting</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://martianrepublic.org/academy/history-of-blockchain-governance</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://martianrepublic.org/academy/coinshuffle-secret-ballots</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://martianrepublic.org/academy/dynamic-quorum</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://martianrepublic.org/academy/git-as-constitution</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://martianrepublic.org/academy/defi-and-finance-on-mars</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://martianrepublic.org/academy/hash-war-protection</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://martianrepublic.org/academy/blockchain-attested-data-streams</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+
+  <!-- Academy: Citizenship & Identity -->
+  <url><loc>https://martianrepublic.org/academy/the-pioneers-journey</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://martianrepublic.org/academy/citizenship-by-endorsement</loc><lastmod>2026-03-28</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+
+</urlset>

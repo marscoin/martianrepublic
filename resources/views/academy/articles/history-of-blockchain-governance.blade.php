@@ -8,7 +8,7 @@
 <meta name="keywords" content="blockchain governance, DAO history, Bitcoin BIP, The DAO hack, Beanstalk, Steem Hive, Tezos, MakerDAO, Compound, Curve Wars">
 <meta property="og:title" content="The History of Blockchain Governance: From Bitcoin to DAOs">
 <meta property="og:description" content="The real stories behind blockchain governance -- flash loan attacks, hostile takeovers, billion-dollar bribery markets, and the rare systems that actually work.">
-<meta property="og:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta property="og:image" content="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://martianrepublic.org/academy/history-of-blockchain-governance">
 <meta property="og:site_name" content="The Martian Republic">
@@ -19,7 +19,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The History of Blockchain Governance: From Bitcoin to DAOs">
 <meta name="twitter:description" content="From Bitcoin's rough consensus to The DAO hack, Beanstalk's $182M flash loan exploit, the Steem/Hive war, and the $46M Curve bribery market.">
-<meta name="twitter:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta name="twitter:image" content="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
 <link rel="canonical" href="https://martianrepublic.org/academy/history-of-blockchain-governance">
 <script type="application/ld+json">
@@ -28,7 +28,7 @@
   "@type": "Article",
   "headline": "The History of Blockchain Governance: From Bitcoin to DAOs",
   "description": "From Bitcoin's rough consensus to The DAO hack, Beanstalk's $182M flash loan exploit, the Steem/Hive war, and the $46M Curve bribery market. The real history of blockchain governance.",
-  "image": "https://martianrepublic.org/assets/citizen/mars_flag5.png",
+  "image": "https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png",
   "datePublished": "2026-03-27",
   "author": { "@type": "Organization", "name": "The Martian Republic" },
   "publisher": {
@@ -96,7 +96,7 @@ img { max-width: 100%; height: auto; }
 }
 .mr-nav .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
 .mr-nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.mr-nav-brand img { width: 32px; height: 32px; border-radius: 50%; }
+.mr-nav-brand img { width: 42px; height: 42px; border-radius: 50%; }
 .mr-nav-brand span { font-family: var(--mr-font-display); font-weight: 700; font-size: 15px; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; }
 .mr-nav-links { display: flex; align-items: center; gap: 28px; }
 .mr-nav-links a { color: var(--mr-text-dim); font-size: 14px; font-weight: 500; }
@@ -407,7 +407,7 @@ img { max-width: 100%; height: auto; }
 <nav class="mr-nav">
   <div class="nav-inner">
     <a href="/" class="mr-nav-brand">
-      <img src="/assets/citizen/mars_flag5.png" alt="Martian Republic">
+      <img src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic">
       <span>Martian Republic</span>
     </a>
     <div class="mr-nav-links">

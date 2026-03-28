@@ -122,6 +122,12 @@ Route::get('/academy', function () {
     return view('academy.index');
 });
 Route::get('/academy/{slug}', function ($slug) {
+    // Check for top-level academy views first (e.g., complete-guide)
+    $topLevel = 'academy.' . $slug;
+    if (view()->exists($topLevel) && $slug !== 'index') {
+        return view($topLevel);
+    }
+    // Then check articles subdirectory
     $viewName = 'academy.articles.' . $slug;
     if (view()->exists($viewName)) {
         return view($viewName);

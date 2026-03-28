@@ -126,7 +126,7 @@ class CongressController extends Controller
 			->leftJoin('forum_posts', 'proposals.discussion', '=', 'forum_posts.thread_id')
 			->select('proposals.*', DB::raw('COUNT(forum_posts.id) as post_count'))
 			->where('proposals.active', '=', 1)
-			->whereIn('status', ['submitted','voting'])
+			->whereIn('status', ['submitted','voting','screening','challenged'])
 			->groupBy('proposals.id')
 			->get();
 

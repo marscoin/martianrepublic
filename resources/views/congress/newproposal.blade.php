@@ -786,8 +786,13 @@
                                         $("#loading").hide();
                                         $(".modal-footer").hide();
                                         const cacheData = await doAjax("/api/cacheproposal", {"type": "PR", "txid": tx.tx_hash, message: jsonString, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
-                                        if (cacheData.Discussion) {
-                                            location.href = "/forum/c/2-proposals";
+                                        if (cacheData && cacheData.Proposal) {
+                                            // Redirect to the new proposal page
+                                            location.href = "/congress/proposal/" + cacheData.Proposal;
+                                        } else {
+                                            console.error("cacheproposal response:", cacheData);
+                                            // Fallback: redirect to voting hub
+                                            location.href = "/congress/voting";
                                         }
                                     }
                                 } catch (e) {

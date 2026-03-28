@@ -8,7 +8,7 @@
 <meta name="keywords" content="CoinShuffle, secret ballot, blockchain voting, cryptographic mixing, Marscoin, privacy, MACI, zk-SNARKs, Martian Republic">
 <meta property="og:title" content="CoinShuffle: Secret Ballots on a Public Blockchain">
 <meta property="og:description" content="How CoinShuffle works step by step, why ballot secrecy matters for democracy, and how the Martian Republic achieves anonymous voting on a transparent ledger.">
-<meta property="og:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta property="og:image" content="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://martianrepublic.org/academy/coinshuffle-secret-ballots">
 <meta property="og:site_name" content="The Martian Republic">
@@ -19,7 +19,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="CoinShuffle: Secret Ballots on a Public Blockchain">
 <meta name="twitter:description" content="How the Martian Republic achieves secret-ballot voting on a public blockchain using CoinShuffle. The cryptographic mixing protocol explained.">
-<meta name="twitter:image" content="https://martianrepublic.org/assets/citizen/mars_flag5.png">
+<meta name="twitter:image" content="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
 <link rel="canonical" href="https://martianrepublic.org/academy/coinshuffle-secret-ballots">
 <script type="application/ld+json">
@@ -28,7 +28,7 @@
   "@type": "Article",
   "headline": "CoinShuffle: Secret Ballots on a Public Blockchain",
   "description": "How the Martian Republic achieves secret-ballot voting on a public blockchain using CoinShuffle. The cryptographic mixing protocol explained step by step.",
-  "image": "https://martianrepublic.org/assets/citizen/mars_flag5.png",
+  "image": "https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png",
   "datePublished": "2026-03-27",
   "author": { "@type": "Organization", "name": "The Martian Republic" },
   "publisher": {
@@ -96,7 +96,7 @@ img { max-width: 100%; height: auto; }
 }
 .mr-nav .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
 .mr-nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.mr-nav-brand img { width: 32px; height: 32px; border-radius: 50%; }
+.mr-nav-brand img { width: 42px; height: 42px; border-radius: 50%; }
 .mr-nav-brand span { font-family: var(--mr-font-display); font-weight: 700; font-size: 15px; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; }
 .mr-nav-links { display: flex; align-items: center; gap: 28px; }
 .mr-nav-links a { color: var(--mr-text-dim); font-size: 14px; font-weight: 500; }
@@ -414,7 +414,7 @@ img { max-width: 100%; height: auto; }
 <nav class="mr-nav">
   <div class="nav-inner">
     <a href="/" class="mr-nav-brand">
-      <img src="/assets/citizen/mars_flag5.png" alt="Martian Republic">
+      <img src="/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic">
       <span>Martian Republic</span>
     </a>
     <div class="mr-nav-links">
