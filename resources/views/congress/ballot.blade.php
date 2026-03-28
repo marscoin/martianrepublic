@@ -810,6 +810,20 @@ $(document).ready(function() {
         return signer1.toBase64();
     }
 
+    const broadcastTxHash = async (txhashstring) => {
+        if (!txhashstring) throw new Error("Missing tx hash...");
+        const url = "https://pebas.marscoin.org/api/mars/broadcast"
+        try {
+            const config = {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                body: JSON.stringify({a: 1, txhash: txhashstring})
+            }
+            const response = await fetch(url, config)
+            if (response.ok) { return response.json() } else { console.log("Broadcast response not OK:", response) }
+        } catch (error) { console.error("Broadcast error:", error) }
+    }
+
     const combineAndBroadcastTransaction = async (signedTexts) => {
         signedTexts = JSON.parse(signedTexts)
         initial = signedTexts[0];
@@ -914,20 +928,6 @@ $(document).ready(function() {
     }
 
     const handleError = (str) => { console.log("ERROR:", str) }
-
-    const broadcastTxHash = async (txhashstring) => {
-        if (!txhashstring) throw new Error("Missing tx hash...");
-        const url = "https://pebas.marscoin.org/api/mars/broadcast"
-        try {
-            const config = {
-                method: 'POST',
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({a: 1, txhash: txhashstring})
-            }
-            const response = await fetch(url, config)
-            if (response.ok) { return response.json() } else { console.log(response) }
-        } catch (error) { console.log(error) }
-    }
 
 });
 </script>
