@@ -704,7 +704,7 @@ $(document).ready(function() {
     if(domain == "local")
         socket = new WebSocket("wss://127.0.0.1:3678");
     else
-        socket = new WebSocket("wss://martianrepublic.org:3678");
+        socket = new WebSocket("wss://martianrepublic.org/wss/ballot");
 
     socket.onopen = function(e) {
         $("#messages").append("<br>> Connection established");
