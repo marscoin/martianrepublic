@@ -85,9 +85,20 @@
                 </div>
 
                 {{-- Endorse Button or Pending Badge --}}
-                <?php if($isCitizen && $gp->public_address != $public_address && !$gp->citizen){ ?>
+                <?php if($isCitizen && $gp->public_address != $public_address && !$gp->citizen){
+                    // Check if current user already endorsed this person
+                    $alreadyEndorsed = \App\Models\Feed::where('userid', Auth::id())
+                        ->where('tag', 'ED')
+                        ->where('message', $gp->public_address)
+                        ->exists();
+                ?>
                 <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--mr-border, rgba(255,255,255,0.04)); text-align: right;">
-                    @if(!empty($gp->mined))
+                    @if($alreadyEndorsed)
+                    {{-- Already endorsed by this citizen --}}
+                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.15); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mr-green, #34d399); opacity: 0.7;">
+                        <i class="fa fa-check-circle"></i> You endorsed this citizen
+                    </span>
+                    @elseif(!empty($gp->mined))
                     {{-- GP is confirmed on-chain: show endorse button --}}
                     <a data-toggle="modal" href="#endorseModal" data-endorse="{{$gp->userid}}" data-name="{{$gp->firstname}} {{$gp->lastname}}" data-address="{{$gp->public_address}}"
                        class="endorse-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.25); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mr-green, #34d399); text-decoration: none; cursor: pointer; transition: all 0.2s;"
