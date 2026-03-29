@@ -94,7 +94,7 @@ class ForumController extends Controller
             )
             ->where('forum_posts.thread_id', $id)
             ->whereNull('forum_posts.deleted_at')
-            ->orderBy('forum_posts.sequence')
+            ->orderByRaw('forum_posts.id = ? DESC', [$thread->first_post_id])
             ->orderBy('forum_posts.created_at')
             ->get();
 
