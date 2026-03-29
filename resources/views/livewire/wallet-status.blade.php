@@ -31,12 +31,17 @@
 
     @script
     <script>
-        $wire.on('balanceUpdated', () => {
-            toastr.options = {
-                "positionClass": "toast-bottom-right",
-                "timeOut": "5000",
+        let lastKnownBalance = null;
+        $wire.on("balanceUpdated", () => {
+            const newBalance = "{{ $balance }}";
+            if (lastKnownBalance !== null && lastKnownBalance !== newBalance) {
+                toastr.options = {
+                    "positionClass": "toast-bottom-right",
+                    "timeOut": "5000",
+                }
+                toastr.info("Balance updated: " + newBalance + " MARS");
             }
-            toastr.info('Balance updated: {{ $balance }} MARS');
+            lastKnownBalance = newBalance;
         });
     </script>
     @endscript

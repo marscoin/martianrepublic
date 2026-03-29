@@ -95,17 +95,25 @@ Route::middleware(['auth'])->group(function () {
 //
 // Congress Routes
 // ==================================================================================
+Route::post("/api/ai/chat", [App\Http\Controllers\AiHelperController::class, "chat"]);
+
 Route::get('/congress/all', 'Congress\CongressController@showAll');
 Route::get('/congress/proposal/{id?}', 'Congress\CongressController@proposal');
 Route::middleware(['auth'])->group(function () {
     Route::any('/congress/voting', 'Congress\CongressController@showVoting');
     Route::any('/congress/voting/new', 'Congress\CongressController@newProposal');
+    Route::get("/congress/ballot/pending", "Congress\CongressController@pendingBallots");
     Route::get('/congress/ballot/{propid?}', 'Congress\CongressController@acquireBallot');
     Route::post('/congress/vote/breakdown', 'Congress\CongressController@breakdown');
     Route::post('/congress/proposal/diff', 'Congress\CongressController@proposalDiff');
     Route::post('/congress/proposal/withdraw', 'Congress\CongressController@withdrawProposal');
     Route::post('/congress/proposal/amend', 'Congress\CongressController@amendProposal');
     Route::post('/congress/proposal/challenge', 'Congress\CongressController@challengeTier');
+    Route::post("/congress/ballot/backup-key", "Congress\CongressController@backupBallotKey");
+    Route::post("/congress/ballot/restore-key", "Congress\CongressController@restoreBallotKey");
+    Route::post("/congress/ballot/update-tx", "Congress\CongressController@updateBallotTx");
+    Route::post("/congress/ballot/confirm", "Congress\CongressController@confirmBallot");
+    Route::post("/congress/ballot/mark-used", "Congress\CongressController@markBallotUsed");
 });
 
 

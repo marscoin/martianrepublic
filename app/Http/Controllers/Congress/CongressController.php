@@ -13,6 +13,8 @@ use App\Models\CivicWallet;
 use App\Models\Proposals;
 use App\Models\Vote;
 use App\Models\Posts;
+use App\Models\Ballots;
+use App\Notifications\BallotReadyNotification;
 use Illuminate\Support\Facades\View;
 use App\Includes\jsonRPCClient;
 use App\Includes\AppHelper;
@@ -622,5 +624,183 @@ class CongressController extends Controller
 		return response()->json(['success' => true, 'message' => "Challenge submitted: reclassify to {$proposedTier}"]);
 	}
 
+
+	/**
+	 * Store encrypted ballot key backup (client-side encrypted)
+	 */
+	public function backupBallotKey(Request $request)
+	{
+		if (!Auth::check()) return response()->json(['error' => 'Unauthorized'], 401);
+
+		$request->validate([
+			'proposal_id' => 'required|integer',
+			'encrypted_key' => 'required|string',
+			'encryption_iv' => 'required|string|max:64',
+			'hidden_target' => 'required|string|max:64',
+		]);
+
+		$uid = Auth::user()->id;
+		$proposalId = $request->input('proposal_id');
+
+		$ballot = Ballots::updateOrCreate(
+			['userid' => $uid, 'proposalid' => $proposalId],
+			[
+				'encrypted_key' => $request->input('encrypted_key'),
+				'encryption_iv' => $request->input('encryption_iv'),
+				'hidden_target' => $request->input('hidden_target'),
+				'status' => 'in_shuffle',
+			]
+		);
+
+		Log::info("Ballot key backed up for user {$uid}, proposal {$proposalId}");
+		return response()->json(['success' => true, 'ballot_id' => $ballot->id]);
+	}
+
+	/**
+	 * Restore encrypted ballot key (client decrypts with mnemonic)
+	 */
+	public function restoreBallotKey(Request $request)
+	{
+		if (!Auth::check()) return response()->json(['error' => 'Unauthorized'], 401);
+
+		$proposalId = $request->input('proposal_id');
+		$uid = Auth::user()->id;
+
+		$ballot = Ballots::where('userid', $uid)
+			->where('proposalid', $proposalId)
+			->whereNotNull('encrypted_key')
+			->first();
+
+		if (!$ballot) {
+			return response()->json(['found' => false]);
+		}
+
+		return response()->json([
+			'found' => true,
+			'encrypted_key' => $ballot->encrypted_key,
+			'encryption_iv' => $ballot->encryption_iv,
+			'hidden_target' => $ballot->hidden_target,
+			'status' => $ballot->status,
+			'ballot_txid' => $ballot->ballot_txid,
+			'confirmed' => $ballot->confirmed_at !== null,
+		]);
+	}
+
+	/**
+	 * Update ballot with shuffle transaction ID
+	 */
+	public function updateBallotTx(Request $request)
+	{
+		if (!Auth::check()) return response()->json(['error' => 'Unauthorized'], 401);
+
+		$request->validate([
+			'proposal_id' => 'required|integer',
+			'ballot_txid' => 'required|string|max:128',
+		]);
+
+		$uid = Auth::user()->id;
+		$ballot = Ballots::where('userid', $uid)
+			->where('proposalid', $request->input('proposal_id'))
+			->first();
+
+		if (!$ballot) {
+			return response()->json(['error' => 'Ballot not found'], 404);
+		}
+
+		$ballot->ballot_txid = $request->input('ballot_txid');
+		$ballot->status = 'received';
+		$ballot->save();
+
+		return response()->json(['success' => true]);
+	}
+
+	/**
+	 * Confirm ballot transaction and notify user via email
+	 */
+	public function confirmBallot(Request $request)
+	{
+		if (!Auth::check()) return response()->json(['error' => 'Unauthorized'], 401);
+
+		$proposalId = $request->input('proposal_id');
+		$uid = Auth::user()->id;
+
+		$ballot = Ballots::where('userid', $uid)
+			->where('proposalid', $proposalId)
+			->whereNotNull('ballot_txid')
+			->first();
+
+		if (!$ballot) {
+			return response()->json(['confirmed' => false]);
+		}
+
+		if ($ballot->confirmed_at) {
+			return response()->json(['confirmed' => true, 'already' => true]);
+		}
+
+		// Mark as confirmed
+		$ballot->confirmed_at = now();
+		$ballot->save();
+
+		// Send email notification if not already sent
+		if (!$ballot->notified) {
+			try {
+				$proposal = Proposals::find($proposalId);
+				$user = User::find($uid);
+				if ($user && $proposal) {
+					$user->notify(new BallotReadyNotification(
+						$proposalId,
+						$proposal->title,
+						$ballot->ballot_txid
+					));
+					$ballot->notified = true;
+					$ballot->save();
+					Log::info("Ballot ready email sent to user {$uid} for proposal {$proposalId}");
+				}
+			} catch (\Exception $e) {
+				Log::error("Failed to send ballot notification: " . $e->getMessage());
+			}
+		}
+
+		return response()->json(['confirmed' => true, 'notified' => $ballot->notified]);
+	}
+
+	/**
+	 * Mark ballot as used (after voting)
+	 */
+	public function markBallotUsed(Request $request)
+	{
+		if (!Auth::check()) return response()->json(['error' => 'Unauthorized'], 401);
+
+		$proposalId = $request->input('proposal_id');
+		$uid = Auth::user()->id;
+
+		Ballots::where('userid', $uid)
+			->where('proposalid', $proposalId)
+			->update([
+				'status' => 'used',
+				'encrypted_key' => null,
+				'encryption_iv' => null,
+			]);
+
+		return response()->json(['success' => true]);
+	}
+
+	/**
+	 * Get pending ballots for current user (for site-wide banner)
+	 */
+	public function pendingBallots()
+	{
+		if (!Auth::check()) return response()->json([]);
+
+		$uid = Auth::user()->id;
+		$pending = Ballots::where('userid', $uid)
+			->where('status', 'received')
+			->whereNotNull('confirmed_at')
+			->whereNotNull('encrypted_key')
+			->with('proposal:id,title')
+			->get(['id', 'proposalid', 'confirmed_at']);
+
+		return response()->json($pending);
+	}
 
 }

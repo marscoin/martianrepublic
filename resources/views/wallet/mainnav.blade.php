@@ -159,3 +159,5 @@
         };
     })();
 </script>
+
+<x-ai-helper />

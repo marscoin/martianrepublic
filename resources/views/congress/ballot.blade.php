@@ -763,6 +763,122 @@ function clearBallotState() {
     try { sessionStorage.removeItem(STORAGE_KEY); } catch(e) {}
 }
 
+// --- Server-side encrypted ballot key backup ---
+// Encrypts ballot key client-side using AES-GCM with a key derived from the mnemonic.
+// Server only stores ciphertext it cannot decrypt.
+
+async function deriveEncryptionKey(mnemonic) {
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+        'raw', enc.encode(mnemonic), 'PBKDF2', false, ['deriveKey']
+    );
+    return crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt: enc.encode('martian-ballot-v1'), iterations: 100000, hash: 'SHA-256' },
+        keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+    );
+}
+
+async function encryptBallotKey(randomBytes, mnemonic) {
+    const key = await deriveEncryptionKey(mnemonic);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const enc = new TextEncoder();
+    const encrypted = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv: iv }, key, enc.encode(randomBytes)
+    );
+    return {
+        ciphertext: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
+        iv: btoa(String.fromCharCode(...iv))
+    };
+}
+
+async function decryptBallotKey(ciphertext, iv, mnemonic) {
+    const key = await deriveEncryptionKey(mnemonic);
+    const ivBytes = Uint8Array.from(atob(iv), c => c.charCodeAt(0));
+    const ctBytes = Uint8Array.from(atob(ciphertext), c => c.charCodeAt(0));
+    const decrypted = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: ivBytes }, key, ctBytes
+    );
+    return new TextDecoder().decode(decrypted);
+}
+
+async function backupBallotKeyToServer(randomBytes, hiddenTarget) {
+    try {
+        const mnemonic = WalletKey.get();
+        if (!mnemonic) { console.warn('[Ballot] No mnemonic for key backup'); return; }
+        const { ciphertext, iv } = await encryptBallotKey(randomBytes, mnemonic);
+        const resp = await fetch('/congress/ballot/backup-key', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            body: JSON.stringify({ proposal_id: <?=$propid?>, encrypted_key: ciphertext, encryption_iv: iv, hidden_target: hiddenTarget })
+        });
+        const data = await resp.json();
+        console.log('%c[Ballot] Key backed up to server (ballot #' + data.ballot_id + ')', 'color: #34d399; font-weight: bold;');
+    } catch(e) {
+        console.error('[Ballot] Key backup failed:', e);
+    }
+}
+
+async function updateBallotTxOnServer(txid) {
+    try {
+        await fetch('/congress/ballot/update-tx', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            body: JSON.stringify({ proposal_id: <?=$propid?>, ballot_txid: txid })
+        });
+        console.log('[Ballot] Ballot txid saved to server');
+    } catch(e) { console.error('[Ballot] Failed to save txid:', e); }
+}
+
+async function confirmBallotOnServer() {
+    try {
+        const resp = await fetch('/congress/ballot/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            body: JSON.stringify({ proposal_id: <?=$propid?> })
+        });
+        const data = await resp.json();
+        if (data.notified) console.log('%c[Ballot] Email notification sent!', 'color: #34d399; font-weight: bold;');
+    } catch(e) { console.error('[Ballot] Confirm failed:', e); }
+}
+
+async function markBallotUsedOnServer() {
+    try {
+        await fetch('/congress/ballot/mark-used', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            body: JSON.stringify({ proposal_id: <?=$propid?> })
+        });
+        console.log('[Ballot] Ballot marked as used, encrypted key wiped');
+    } catch(e) { console.error('[Ballot] Mark used failed:', e); }
+}
+
+async function restoreBallotKeyFromServer() {
+    try {
+        const resp = await fetch('/congress/ballot/restore-key', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            body: JSON.stringify({ proposal_id: <?=$propid?> })
+        });
+        const data = await resp.json();
+        if (!data.found) return null;
+
+        const mnemonic = WalletKey.get();
+        if (!mnemonic) return null;
+
+        const randomBytesHex = await decryptBallotKey(data.encrypted_key, data.encryption_iv, mnemonic);
+        return {
+            random_bytes: randomBytesHex,
+            hidden_target: data.hidden_target,
+            ballot_txid: data.ballot_txid,
+            confirmed: data.confirmed,
+            status: data.status
+        };
+    } catch(e) {
+        console.error('[Ballot] Key restore failed:', e);
+        return null;
+    }
+}
+
 $(document).ready(function() {
 
     // ============================================================
@@ -812,6 +928,9 @@ $(document).ready(function() {
         const child = root.derivePath("m/44'/2'/0'/0/0");
         const wif = child.toWIF()
         local_key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
+        yk = local_key.privateKey.toString('hex')
+        yp = local_key.publicKey.toString('hex')
+        yb = my_bundle.Buffer.from(yp, 'hex')
     }
 
     const initBallot = async () => {
@@ -841,6 +960,8 @@ $(document).ready(function() {
             propid: <?=$propid?>,
             step: 3
         });
+        // Also backup encrypted key to server (user can close browser)
+        backupBallotKeyToServer('<?=$random_bytes?>', hidden_target);
 
         await new Promise(r => setTimeout(r, 300));
         document.getElementById('prep-keys').classList.remove('active');
@@ -876,6 +997,7 @@ $(document).ready(function() {
             if(data && data.confirmations && data.confirmations > 0){
                 clearTimeout(ptimer);
                 goToStep(6); // Show vote buttons!
+                confirmBallotOnServer(); // Notify user via email
             }
         });
         ptimer = setTimeout(pollConfirmation, 15000, txId); // Poll every 15s
@@ -991,7 +1113,14 @@ $(document).ready(function() {
 
     function signPartial(psbtBaseText) {
         const signer1 = my_bundle.bitcoin.Psbt.fromBase64(psbtBaseText);
-        signer1.signAllInputs(local_key);
+        // Sign only our input (not all -- each voter signs their own)
+        for (let i = 0; i < signer1.inputCount; i++) {
+            try {
+                signer1.signInput(i, local_key);
+            } catch(e) {
+                // Expected: can't sign inputs belonging to other voters
+            }
+        }
         return signer1.toBase64();
     }
 
@@ -1117,7 +1246,8 @@ $(document).ready(function() {
                         if (result && result.tx_hash) {
                             setPhase('phase-broadcast', 'done');
                             // Save ballot tx to sessionStorage
-                            saveBallotState({ ballot_txid: result.tx_hash, step: 5 });
+                            var _prev = loadBallotState() || {}; _prev.ballot_txid = result.tx_hash; _prev.step = 5; saveBallotState(_prev);
+                            updateBallotTxOnServer(result.tx_hash);
                             // Go to Step 5: Confirming
                             goToStep(5);
                             pollConfirmation(result.tx_hash);
@@ -1179,6 +1309,7 @@ $(document).ready(function() {
                 $("#cast_confirmation").text(tx.tx_hash);
                 $("#cast_confirmation").attr("href", "https://explore.marscoin.org/tx/" + tx.tx_hash);
                 clearBallotState(); // Clear sessionStorage — vote is done
+                markBallotUsedOnServer(); // Wipe encrypted key from server
                 goToStep(7);
 
                 // Record the vote
@@ -1237,37 +1368,63 @@ $(document).ready(function() {
     $("#pra").click(function(e) { e.preventDefault(); castVote('abstain'); });
 
     // ============================================================
-    // ON LOAD: Check sessionStorage for resume
+    // ON LOAD: Check server backup first, then sessionStorage
     // ============================================================
-    var savedState = loadBallotState();
-    if (savedState) {
-        console.log('%c[Ballot] Resuming from saved state, step: ' + savedState.step, 'color: #f59e0b; font-weight: bold;');
+    (async function() {
+        // Try server-side backup first (survives tab close)
+        var serverState = await restoreBallotKeyFromServer();
+        if (serverState) {
+            console.log("%c[Ballot] Restoring from server backup", "color: #34d399; font-weight: bold;");
+            var rb = serverState.random_bytes;
+            rb = parseHexString(rb);
+            var mnemonic = my_bundle.bip39.entropyToMnemonic(createHexString(rb));
+            genSeed(mnemonic);
+            hidden_target = serverState.hidden_target;
 
-        // Restore ballot keys from saved random_bytes
-        if (savedState.random_bytes && savedState.hidden_target) {
-            console.log('[Ballot] Restoring ballot keys from sessionStorage');
-            var rb = savedState.random_bytes;
-            rb = parseHexString(createHexString(rb));
-            var mnemonic = my_bundle.bip39.entropyToMnemonic(rb);
-            genSeed(mnemonic); // This sets bpkk globally
-            hidden_target = savedState.hidden_target;
+            if (serverState.confirmed) {
+                // Ballot confirmed — go straight to voting!
+                await getLocalKey();
+                goToStep(6);
+                return;
+            }
+            if (serverState.ballot_txid) {
+                goToStep(5);
+                pollConfirmation(serverState.ballot_txid);
+                return;
+            }
+            // Keys exist but shuffle not done — reconnect
+            inputBlock = await getInputBlock();
+            await getLocalKey();
+            goToStep(3);
+            connectToServer();
+            return;
         }
 
-        if (savedState.ballot_txid) {
-            // Ballot was broadcast — resume confirming (Step 5) or vote (Step 6)
-            goToStep(5);
-            pollConfirmation(savedState.ballot_txid);
-        } else if (savedState.step >= 3) {
-            // Keys were generated but shuffle not complete — restart from Step 3
-            getInputBlock().then(function(ib) {
-                inputBlock = ib;
-                return getLocalKey();
-            }).then(function() {
-                goToStep(3);
-                connectToServer();
-            });
+        // Fallback: sessionStorage (same-tab resilience)
+        var savedState = loadBallotState();
+        if (savedState) {
+            console.log("%c[Ballot] Resuming from sessionStorage, step: " + savedState.step, "color: #f59e0b; font-weight: bold;");
+            if (savedState.random_bytes && savedState.hidden_target) {
+                var rb2 = savedState.random_bytes;
+                rb2 = parseHexString(createHexString(rb2));
+                var mn = my_bundle.bip39.entropyToMnemonic(rb2);
+                genSeed(mn);
+                hidden_target = savedState.hidden_target;
+            }
+            if (savedState.ballot_txid) {
+                goToStep(5);
+                pollConfirmation(savedState.ballot_txid);
+            } else if (savedState.step >= 3) {
+                getInputBlock().then(function(ib) {
+                    inputBlock = ib;
+                    return getLocalKey();
+                }).then(function() {
+                    goToStep(3);
+                    connectToServer();
+                });
+            }
         }
-    }
+    })();
 
 }); // end document.ready
 </script>

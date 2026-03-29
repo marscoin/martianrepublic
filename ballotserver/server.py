@@ -144,8 +144,19 @@ async def client_handler(websocket):
 
         if existing_client:
             logging.debug(f"Existing connection found for {address}, closing it.")
-            await clients[existing_client]["websocket"].close()
-            del clients[existing_client]
+            old_ws = clients[existing_client]["websocket"]
+            old_room = clients[existing_client].get("room")
+            # Remove from rooms BEFORE closing - prevents old handler's finally from interfering
+            if old_room and old_room in rooms and old_ws in rooms[old_room]:
+                del rooms[old_room][old_ws]
+            # Remove from clients BEFORE closing - the await old_ws.close() suspends us,
+            # letting the old handler's finally block run. If it deletes the client first,
+            # our del below would KeyError and crash the new handler before it registers.
+            clients.pop(existing_client, None)
+            try:
+                await old_ws.close()
+            except Exception:
+                pass
 
         client_id = str(uuid.uuid4())
         clients[client_id] = {"websocket": websocket, "name": name, "room": room, "address": address, "last_seen": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
@@ -185,7 +196,7 @@ async def client_handler(websocket):
                     peer_index = int(message.split("#")[1])
                     SHUFFLE[peer_index] = message.split("#")[2]
                     PEER_NUM = len(rooms[room])
-                    if len(SHUFFLE) <= PEER_NUM:
+                    if len(SHUFFLE) < PEER_NUM:
                         obj = SHUFFLE[peer_index]
                         obj = ast.literal_eval(obj)
                         data = obj['data']

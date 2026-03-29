@@ -465,6 +465,10 @@
                                 transform: translateY(-1px);
                             }
                         </style>
+                        {{-- Mars Clock Widget --}}
+                        <div style="margin-top: 16px;">
+                            <x-mars-clock />
+                        </div>
                     </div>
                     <div class="col-md-5">
                         <div class="section-label">Republic Activity</div>
