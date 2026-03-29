@@ -708,21 +708,21 @@
                                         <div class="forum-thread-meta">
                                             <span class="forum-category-label" style="color: {{ $catColor }};">{{ $thread->category_title ?? 'General' }}</span>
                                             <span class="forum-author">{{ $thread->author_name ?? 'Anonymous' }}</span>
-                                            <span class="forum-time">{{ $thread->created_at->diffForHumans() }}</span>
+                                            <span class="forum-time">{{ \Carbon\Carbon::parse($thread->created_at)->diffForHumans() }}</span>
                                         </div>
-                                        @if($thread->proposal)
+                                        @if($thread->proposal_id)
                                         <div class="forum-proposal-link">
                                             @php
                                                 $tierClass = 'tier-signal';
-                                                $tierName = $thread->proposal->category ?? 'Signal';
+                                                $tierName = $thread->proposal_tier ?? 'Signal';
                                                 if (stripos($tierName, 'operational') !== false) $tierClass = 'tier-operational';
                                                 elseif (stripos($tierName, 'legislative') !== false) $tierClass = 'tier-legislative';
                                                 elseif (stripos($tierName, 'constitutional') !== false) $tierClass = 'tier-constitutional';
                                             @endphp
                                             <span class="tier-badge {{ $tierClass }}">{{ strtoupper($tierName) }}</span>
-                                            <span>Bill #{{ $thread->proposal->id }}</span>
-                                            <span class="forum-proposal-status {{ $thread->proposal->active ? '' : 'status-closed' }}">
-                                                {{ $thread->proposal->active ? 'VOTING OPEN' : strtoupper($thread->proposal->status ?? 'CLOSED') }}
+                                            <span>Bill #{{ $thread->proposal_id }}</span>
+                                            <span class="forum-proposal-status {{ ($thread->proposal_status == 'voting') ? '' : 'status-closed' }}">
+                                                {{ ($thread->proposal_status == 'voting') ? 'VOTING OPEN' : strtoupper($thread->proposal_status ?? 'CLOSED') }}
                                             </span>
                                         </div>
                                         @endif
@@ -757,21 +757,21 @@
                                         <div class="forum-thread-meta">
                                             <span class="forum-category-label" style="color: {{ $catColor }};">{{ $thread->category_title ?? 'General' }}</span>
                                             <span class="forum-author">{{ $thread->author_name ?? 'Anonymous' }}</span>
-                                            <span class="forum-time">{{ $thread->created_at->diffForHumans() }}</span>
+                                            <span class="forum-time">{{ \Carbon\Carbon::parse($thread->created_at)->diffForHumans() }}</span>
                                         </div>
-                                        @if($thread->proposal)
+                                        @if($thread->proposal_id)
                                         <div class="forum-proposal-link">
                                             @php
                                                 $tierClass = 'tier-signal';
-                                                $tierName = $thread->proposal->category ?? 'Signal';
+                                                $tierName = $thread->proposal_tier ?? 'Signal';
                                                 if (stripos($tierName, 'operational') !== false) $tierClass = 'tier-operational';
                                                 elseif (stripos($tierName, 'legislative') !== false) $tierClass = 'tier-legislative';
                                                 elseif (stripos($tierName, 'constitutional') !== false) $tierClass = 'tier-constitutional';
                                             @endphp
                                             <span class="tier-badge {{ $tierClass }}">{{ strtoupper($tierName) }}</span>
-                                            <span>Bill #{{ $thread->proposal->id }}</span>
-                                            <span class="forum-proposal-status {{ $thread->proposal->active ? '' : 'status-closed' }}">
-                                                {{ $thread->proposal->active ? 'VOTING OPEN' : strtoupper($thread->proposal->status ?? 'CLOSED') }}
+                                            <span>Bill #{{ $thread->proposal_id }}</span>
+                                            <span class="forum-proposal-status {{ ($thread->proposal_status == 'voting') ? '' : 'status-closed' }}">
+                                                {{ ($thread->proposal_status == 'voting') ? 'VOTING OPEN' : strtoupper($thread->proposal_status ?? 'CLOSED') }}
                                             </span>
                                         </div>
                                         @endif

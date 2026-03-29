@@ -810,7 +810,7 @@
                                                 {{ $isCitizen ? 'CITIZEN' : 'VISITOR' }}
                                             </span>
                                         </div>
-                                        <span class="forum-post-time">{{ $post->created_at->diffForHumans() }}</span>
+                                        <span class="forum-post-time">{{ \Carbon\Carbon::parse($post->created_at)->diffForHumans() }}</span>
                                     </div>
 
                                     {{-- Quoted parent post if reply --}}
