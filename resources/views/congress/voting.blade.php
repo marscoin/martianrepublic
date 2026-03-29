@@ -591,6 +591,9 @@
                     </button>
                     <button class="hall-filter" data-tab="Expired">
                         Expired
+                        @if($expired->count() > 0)
+                            <span class="count">{{ $expired->count() }}</span>
+                        @endif
                     </button>
                     <button class="hall-filter" data-tab="Closed">
                         Closed
