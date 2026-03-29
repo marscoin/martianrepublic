@@ -539,6 +539,48 @@ img { max-width: 100%; height: auto; }
   margin-top: 16px;
 }
 
+/* ---- SHOWCASE (Linear-style perspective screenshots) ---- */
+.mr-showcase-media {
+  position: relative;
+  perspective: 1200px;
+}
+.mr-screenshot-wrap {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,228,255,0.04);
+  border: 1px solid var(--mr-border-bright);
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.mr-perspective-right .mr-screenshot-wrap {
+  transform: rotateY(-4deg) rotateX(2deg) scale(0.98);
+}
+.mr-perspective-left .mr-screenshot-wrap {
+  transform: rotateY(4deg) rotateX(2deg) scale(0.98);
+}
+.mr-perspective-right:hover .mr-screenshot-wrap,
+.mr-perspective-left:hover .mr-screenshot-wrap {
+  transform: rotateY(0) rotateX(0) scale(1);
+}
+.mr-screenshot-wrap img {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+}
+.mr-screenshot-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 50%, var(--mr-void) 100%);
+  border-radius: 12px;
+}
+.mr-perspective-right .mr-screenshot-fade {
+  background: linear-gradient(135deg, transparent 40%, var(--mr-void) 95%);
+}
+.mr-perspective-left .mr-screenshot-fade {
+  background: linear-gradient(225deg, transparent 40%, var(--mr-void) 95%);
+}
+
 /* ---- MISSION / MANIFESTO ---- */
 .mr-mission {
   background: var(--mr-dark);
@@ -1056,37 +1098,65 @@ img { max-width: 100%; height: auto; }
   </div>
 </section>
 
-<!-- ============ WALLET SECTION ============ -->
-<section class="mr-section">
+
+<!-- ============ SHOWCASE: DASHBOARD ============ -->
+<section class="mr-section mr-showcase">
   <div class="container">
     <div class="mr-split mr-reveal">
-      <div class="mr-split-media">
-        <img src="/assets/wallet/img/marscoin_wallet.png" alt="Marscoin Wallet" loading="lazy">
-      </div>
       <div class="mr-split-text">
-        <span class="mr-section-label">Wallet</span>
-        <h2>Non-custodial HD wallet, built in</h2>
-        <p>Create a two-factor authenticated account that serves as a backup for your wallet generated locally on your device. Your keys never leave your browser.</p>
-        <p>Seed phrase recovery, encrypted backups, and simple send/receive functionality. The currency of future Mars, available today.</p>
-        <a href="/signup" class="mr-btn mr-btn-outline">Create a Wallet</a>
+        <span class="mr-section-label">Command Center</span>
+        <h2>Your civic dashboard on Mars</h2>
+        <p>Real-time financial overview, activity feed, Mars time clock, and blockchain status. Everything a Martian citizen needs, in one dark-themed command center.</p>
+        <p>Non-custodial HD wallet with seed phrase recovery. Your keys never leave your browser. The currency of future Mars, available today.</p>
+        <a href="/signup" class="mr-btn mr-btn-outline">Create Your Wallet</a>
+      </div>
+      <div class="mr-showcase-media mr-perspective-right">
+        <div class="mr-screenshot-wrap">
+          <img src="/assets/landing/img/features/dashboard.png" alt="Martian Republic Dashboard" loading="lazy">
+          <div class="mr-screenshot-fade"></div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ VOTER REGISTRY ============ -->
-<section class="mr-section" style="padding-top: 0;">
+<!-- ============ SHOWCASE: CONGRESS ============ -->
+<section class="mr-section mr-showcase" style="padding-top: 0;">
   <div class="container">
     <div class="mr-split reverse mr-reveal">
+      <div class="mr-showcase-media mr-perspective-left">
+        <div class="mr-screenshot-wrap">
+          <img src="/assets/landing/img/features/congress-hall.png" alt="Martian Congress Hall" loading="lazy">
+          <div class="mr-screenshot-fade"></div>
+        </div>
+      </div>
+      <div class="mr-split-text">
+        <span class="mr-section-label">Congress</span>
+        <h2>Direct democracy on the blockchain</h2>
+        <p>Submit proposals, debate in public forums, and vote with cryptographic anonymity. Four governance tiers ensure the right level of scrutiny for every decision.</p>
+        <p>CoinShuffle ballots make your vote untraceable while keeping it publicly auditable. Transparent process, secret ballot.</p>
+        <a href="/congress/all" class="mr-btn mr-btn-outline">Enter Congress Hall</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SHOWCASE: BALLOT ============ -->
+<section class="mr-section mr-showcase" style="padding-top: 0;">
+  <div class="container">
+    <div class="mr-split mr-reveal">
       <div class="mr-split-text">
         <span class="mr-section-label">Identity</span>
         <h2>Proof-of-Humanity voter registry</h2>
-        <p>A community-driven identity attestation system where members invite and vouch for new citizens using clear programmatic guidelines that future proposals can modify.</p>
-        <p>Starting with a liveness test and peer endorsement, the registry could scale to kiosk-style terminals upon arrival on Mars. After registration, citizens are vetted and integrated by the community itself.</p>
+        <p>Community-driven identity attestation where citizens invite and vouch for new members. Starting with liveness tests and peer endorsement, scaling to kiosk terminals on Mars.</p>
+        <p>Every citizen gets a cryptographic civic address. One person, one vote, verified by the community itself.</p>
         <a href="/signup" class="mr-btn mr-btn-outline">Register as a Citizen</a>
       </div>
-      <div class="mr-split-media">
-        <img src="/assets/citizen/registry_screenshot.png" alt="Citizen Registry" loading="lazy">
+      <div class="mr-showcase-media mr-perspective-right">
+        <div class="mr-screenshot-wrap">
+          <img src="/assets/landing/img/features/ballot-wizard.png" alt="Secret Ballot Wizard" loading="lazy">
+          <div class="mr-screenshot-fade"></div>
+        </div>
       </div>
     </div>
   </div>
