@@ -539,60 +539,65 @@ img { max-width: 100%; height: auto; }
   margin-top: 16px;
 }
 
-/* ---- SHOWCASE (Linear-style perspective screenshots) ---- */
+/* ---- SHOWCASE (Apple-style angled spotlight) ---- */
 .mr-showcase-media {
   position: relative;
-  perspective: 1200px;
+  perspective: 1800px;
+  overflow: visible;
 }
 .mr-screenshot-wrap {
   position: relative;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,228,255,0.04);
-  border: 1px solid var(--mr-border-bright);
-  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border: none;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform-origin: center center;
 }
 .mr-perspective-right .mr-screenshot-wrap {
-  transform: rotateY(-4deg) rotateX(2deg) scale(0.98);
+  transform: rotateY(-14deg) rotateX(4deg) scale(1.15);
+  transform-origin: 30% 40%;
 }
 .mr-perspective-left .mr-screenshot-wrap {
-  transform: rotateY(4deg) rotateX(2deg) scale(0.98);
+  transform: rotateY(14deg) rotateX(4deg) scale(1.15);
+  transform-origin: 70% 40%;
 }
-.mr-perspective-right:hover .mr-screenshot-wrap,
+.mr-perspective-right:hover .mr-screenshot-wrap {
+  transform: rotateY(-8deg) rotateX(2deg) scale(1.18);
+}
 .mr-perspective-left:hover .mr-screenshot-wrap {
-  transform: rotateY(0) rotateX(0) scale(1);
+  transform: rotateY(8deg) rotateX(2deg) scale(1.18);
 }
 .mr-screenshot-wrap img {
   display: block;
   width: 100%;
-  border-radius: 12px;
+}
+/* Radial spotlight + edge dissolve */
+.mr-screenshot-wrap {
+  -webkit-mask-image: radial-gradient(ellipse 70% 65% at 50% 40%, black 20%, transparent 70%);
+  mask-image: radial-gradient(ellipse 70% 65% at 50% 40%, black 20%, transparent 70%);
 }
 .mr-perspective-right .mr-screenshot-wrap {
-  -webkit-mask-image:
-    linear-gradient(to bottom, black 0, black 50%, transparent 95%),
-    linear-gradient(to right, black 0, black 60%, transparent 100%),
-    linear-gradient(to left, black 0, black 80%, transparent 100%);
-  mask-image:
-    linear-gradient(to bottom, black 0, black 50%, transparent 95%),
-    linear-gradient(to right, black 0, black 60%, transparent 100%),
-    linear-gradient(to left, black 0, black 80%, transparent 100%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 40% 40%, black 15%, transparent 65%);
+  mask-image: radial-gradient(ellipse 75% 70% at 40% 40%, black 15%, transparent 65%);
 }
 .mr-perspective-left .mr-screenshot-wrap {
-  -webkit-mask-image:
-    linear-gradient(to bottom, black 0, black 50%, transparent 95%),
-    linear-gradient(to left, black 0, black 60%, transparent 100%),
-    linear-gradient(to right, black 0, black 80%, transparent 100%);
-  mask-image:
-    linear-gradient(to bottom, black 0, black 50%, transparent 95%),
-    linear-gradient(to left, black 0, black 60%, transparent 100%),
-    linear-gradient(to right, black 0, black 80%, transparent 100%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 60% 40%, black 15%, transparent 65%);
+  mask-image: radial-gradient(ellipse 75% 70% at 60% 40%, black 15%, transparent 65%);
+}
+/* Subtle glow underneath */
+.mr-showcase-media::after {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 20%;
+  right: 20%;
+  height: 60px;
+  background: radial-gradient(ellipse at center, rgba(0,228,255,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  filter: blur(20px);
 }
 .mr-screenshot-fade {
-  display: none; /* replaced by mask-image on parent */
+  display: none;
 }
 .mr-screenshot-fade {
   display: none; /* replaced by mask-image on parent */
