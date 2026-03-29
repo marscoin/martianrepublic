@@ -554,18 +554,18 @@ img { max-width: 100%; height: auto; }
   transform-origin: center center;
 }
 .mr-perspective-right .mr-screenshot-wrap {
-  transform: rotateY(-14deg) rotateX(4deg) scale(1.15);
+  transform: rotateY(-12deg) rotateX(3deg) scale(1.35);
   transform-origin: 30% 40%;
 }
 .mr-perspective-left .mr-screenshot-wrap {
-  transform: rotateY(14deg) rotateX(4deg) scale(1.15);
+  transform: rotateY(12deg) rotateX(3deg) scale(1.35);
   transform-origin: 70% 40%;
 }
 .mr-perspective-right:hover .mr-screenshot-wrap {
-  transform: rotateY(-8deg) rotateX(2deg) scale(1.18);
+  transform: rotateY(-6deg) rotateX(1deg) scale(1.38);
 }
 .mr-perspective-left:hover .mr-screenshot-wrap {
-  transform: rotateY(8deg) rotateX(2deg) scale(1.18);
+  transform: rotateY(6deg) rotateX(1deg) scale(1.38);
 }
 .mr-screenshot-wrap img {
   display: block;
@@ -573,16 +573,16 @@ img { max-width: 100%; height: auto; }
 }
 /* Radial spotlight + edge dissolve */
 .mr-screenshot-wrap {
-  -webkit-mask-image: radial-gradient(ellipse 70% 65% at 50% 40%, black 20%, transparent 70%);
-  mask-image: radial-gradient(ellipse 70% 65% at 50% 40%, black 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 45%, black 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse 90% 85% at 50% 45%, black 30%, transparent 80%);
 }
 .mr-perspective-right .mr-screenshot-wrap {
-  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 40% 40%, black 15%, transparent 65%);
-  mask-image: radial-gradient(ellipse 75% 70% at 40% 40%, black 15%, transparent 65%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 85% at 45% 45%, black 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse 90% 85% at 45% 45%, black 30%, transparent 80%);
 }
 .mr-perspective-left .mr-screenshot-wrap {
-  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 60% 40%, black 15%, transparent 65%);
-  mask-image: radial-gradient(ellipse 75% 70% at 60% 40%, black 15%, transparent 65%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 85% at 55% 45%, black 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse 90% 85% at 55% 45%, black 30%, transparent 80%);
 }
 /* Subtle glow underneath */
 .mr-showcase-media::after {
