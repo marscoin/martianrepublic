@@ -490,6 +490,16 @@
                                 {{ substr($proposal->description, 0, 200) }}@if(strlen($proposal->description) > 200)...@endif
                             </div>
                             @endif
+                            <div style="display:flex; gap:16px; margin-top:14px;">
+                                <a href="/congress/proposal/{{ $proposal->id }}" target="_blank" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--mr-cyan); text-decoration:none; letter-spacing:1px;">
+                                    <i class="fa-solid fa-file-lines" style="margin-right:4px;"></i> READ FULL PROPOSAL <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:8px; margin-left:2px;"></i>
+                                </a>
+                                @if($proposal->discussion)
+                                <a href="/forum/t/{{ $proposal->discussion }}-{{ Str::slug($proposal->title) }}" target="_blank" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--mr-text-dim); text-decoration:none; letter-spacing:1px;">
+                                    <i class="fa-solid fa-comments" style="margin-right:4px;"></i> DISCUSSION <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:8px; margin-left:2px;"></i>
+                                </a>
+                                @endif
+                            </div>
                         </div>
 
                         <div class="info-bullets">
