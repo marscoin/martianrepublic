@@ -957,6 +957,7 @@
                                     </a>
                                 </div>
                             </div>
+                            <x-ballot-window />
                         </div>
                     </div>
                 </div>
