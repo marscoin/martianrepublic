@@ -660,7 +660,7 @@
                                                 @endif
                                             </div>
                                             <div class="proposal-stats">
-                                                <a href="/forum/t/{{ $proposal->discussion }}" class="proposal-discussion">
+                                                <a href="/forum/t/{{ $proposal->discussion }}-{{ Str::slug($proposal->title) }}" class="proposal-discussion">
                                                     <i class="fa-solid fa-comment"></i> {{ $proposal->post_count }} comments
                                                 </a>
                                             </div>
@@ -720,7 +720,7 @@
                                                     <div class="nay-bar" style="width: {{ $proposal->nay_percent }}%"></div>
                                                 </div>
                                             </div>
-                                            <a href="/forum/t/{{ $proposal->discussion }}" class="proposal-discussion">
+                                            <a href="/forum/t/{{ $proposal->discussion }}-{{ Str::slug($proposal->title) }}" class="proposal-discussion">
                                                 <i class="fa-solid fa-comment"></i> {{ $proposal->post_count }} comments
                                             </a>
                                         </div>
@@ -764,7 +764,7 @@
                                             <div class="proposal-stats">
                                                 <span class="proposal-stat"><i class="fa-solid fa-calendar-xmark"></i> Rejected</span>
                                             </div>
-                                            <a href="/forum/t/{{ $proposal->discussion }}" class="proposal-discussion">
+                                            <a href="/forum/t/{{ $proposal->discussion }}-{{ Str::slug($proposal->title) }}" class="proposal-discussion">
                                                 <i class="fa-solid fa-comment"></i> {{ $proposal->post_count }} comments
                                             </a>
                                         </div>
@@ -808,7 +808,7 @@
                                             <div class="proposal-stats">
                                                 <span class="proposal-stat"><i class="fa-solid fa-hourglass-end"></i> Voting period elapsed</span>
                                             </div>
-                                            <a href="/forum/t/{{ $proposal->discussion }}" class="proposal-discussion">
+                                            <a href="/forum/t/{{ $proposal->discussion }}-{{ Str::slug($proposal->title) }}" class="proposal-discussion">
                                                 <i class="fa-solid fa-comment"></i> {{ $proposal->post_count }} comments
                                             </a>
                                         </div>
@@ -852,7 +852,7 @@
                                             <div class="proposal-stats">
                                                 <span class="proposal-stat"><i class="fa-solid fa-lock"></i> {{ $proposal->closed_reason }}</span>
                                             </div>
-                                            <a href="/forum/t/{{ $proposal->discussion }}" class="proposal-discussion">
+                                            <a href="/forum/t/{{ $proposal->discussion }}-{{ Str::slug($proposal->title) }}" class="proposal-discussion">
                                                 <i class="fa-solid fa-comment"></i> {{ $proposal->post_count }} comments
                                             </a>
                                         </div>
@@ -903,7 +903,7 @@
                                         </div>
                                         <div class="proposal-card-footer">
                                             <div class="proposal-stats">
-                                                <a href="/forum/t/{{ $proposal->discussion }}" class="proposal-discussion">
+                                                <a href="/forum/t/{{ $proposal->discussion }}-{{ Str::slug($proposal->title) }}" class="proposal-discussion">
                                                     <i class="fa-solid fa-comment"></i> {{ $proposal->post_count }}
                                                 </a>
                                             </div>
