@@ -567,18 +567,38 @@ img { max-width: 100%; height: auto; }
   width: 100%;
   border-radius: 12px;
 }
+.mr-perspective-right .mr-screenshot-wrap {
+  -webkit-mask-image:
+    linear-gradient(to bottom, black 0, black 50%, transparent 95%),
+    linear-gradient(to right, black 0, black 60%, transparent 100%),
+    linear-gradient(to left, black 0, black 80%, transparent 100%);
+  mask-image:
+    linear-gradient(to bottom, black 0, black 50%, transparent 95%),
+    linear-gradient(to right, black 0, black 60%, transparent 100%),
+    linear-gradient(to left, black 0, black 80%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+.mr-perspective-left .mr-screenshot-wrap {
+  -webkit-mask-image:
+    linear-gradient(to bottom, black 0, black 50%, transparent 95%),
+    linear-gradient(to left, black 0, black 60%, transparent 100%),
+    linear-gradient(to right, black 0, black 80%, transparent 100%);
+  mask-image:
+    linear-gradient(to bottom, black 0, black 50%, transparent 95%),
+    linear-gradient(to left, black 0, black 60%, transparent 100%),
+    linear-gradient(to right, black 0, black 80%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
 .mr-screenshot-fade {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, transparent 50%, var(--mr-void) 100%);
-  border-radius: 12px;
+  display: none; /* replaced by mask-image on parent */
 }
-.mr-perspective-right .mr-screenshot-fade {
-  background: linear-gradient(135deg, transparent 40%, var(--mr-void) 95%);
+.mr-screenshot-fade {
+  display: none; /* replaced by mask-image on parent */
 }
-.mr-perspective-left .mr-screenshot-fade {
-  background: linear-gradient(225deg, transparent 40%, var(--mr-void) 95%);
+.mr-screenshot-fade {
+  display: none; /* replaced by mask-image on parent */
 }
 
 /* ---- MISSION / MANIFESTO ---- */
