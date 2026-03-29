@@ -39,6 +39,18 @@ Route::get('/status', 'StatusController@showStatus');
 
 
 //
+// Native Forum (The Forum) — registered before vendor routes for priority
+// ==================================================================================
+Route::middleware(['auth'])->group(function () {
+    Route::get('/forum', 'ForumController@index')->name('forum.home')->withoutMiddleware(['auth']);
+    Route::get('/forum/t/{id}', 'ForumController@show')->name('forum.thread.show')->withoutMiddleware(['auth']);
+    Route::get('/forum/c/{id}', 'ForumController@categoryThreads')->name('forum.category')->withoutMiddleware(['auth']);
+    Route::post('/forum/thread', 'ForumController@storeThread')->name('forum.thread.store');
+    Route::post('/forum/t/{id}/post', 'ForumController@storePost')->name('forum.post.store');
+});
+
+
+//
 // Wallet (all require authentication)
 // ==================================================================================
 
