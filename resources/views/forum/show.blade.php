@@ -822,7 +822,7 @@
                                     @endif
 
                                     <div class="forum-post-body">
-                                        {!! nl2br(e($post->content)) !!}
+                                        {!! Str::markdown($post->content) !!}
                                     </div>
 
                                     @if(!$thread->locked)
