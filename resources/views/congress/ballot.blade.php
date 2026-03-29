@@ -723,8 +723,11 @@
 // --- Wizard Navigation ---
 var currentStep = 1;
 
+var stepNames = ['', 'Proposal Info', 'Preparing Ballot', 'Waiting for Citizens', 'Shuffling', 'Confirming on Chain', 'Cast Vote', 'Success'];
+
 function goToStep(step) {
     currentStep = step;
+    console.log('%c[Ballot] Step ' + step + ': ' + (stepNames[step] || ''), 'color: #00e4ff; font-weight: bold;');
     // Hide all steps
     document.querySelectorAll('.ballot-step').forEach(function(s) { s.classList.remove('active'); });
     // Show target step
@@ -1021,6 +1024,7 @@ $(document).ready(function() {
             socket = new WebSocket("wss://martianrepublic.org/wss/ballot");
 
         socket.onopen = function(e) {
+            console.log('%c[Ballot] WebSocket connected', 'color: #34d399;');
             socket.send("{{$public_address}}_{{ strtoupper(substr(str_replace('https://ipfs.marscoin.org/ipfs/', '', $proposal->ipfs_hash), 1, 8)) }}");
         };
 
@@ -1036,6 +1040,7 @@ $(document).ready(function() {
             }
 
             if (event.data == "JOINED_ACK") {
+                console.log('%c[Ballot] JOINED_ACK — submitting ephemeral key', 'color: #34d399;');
                 socket.send("SUBMIT_KEY#"+ek+"#")
             }
 
@@ -1131,14 +1136,14 @@ $(document).ready(function() {
         };
 
         socket.onclose = function(event) {
-            if (currentStep < 5) {
-                // Connection lost during shuffle — show warning
-                console.log("WebSocket closed:", event.code);
+            console.log('%c[Ballot] WebSocket closed: code=' + event.code, 'color: #f59e0b;');
+            if (currentStep >= 2 && currentStep <= 4) {
+                console.warn('[Ballot] Connection lost during active shuffle phase!');
             }
         };
 
         socket.onerror = function(error) {
-            console.error("WebSocket error:", error);
+            console.error('[Ballot] WebSocket error:', error);
         };
     }
 
