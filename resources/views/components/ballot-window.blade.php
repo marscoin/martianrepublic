@@ -166,7 +166,7 @@
     function updateOnlineCount() {
         // For now, show a placeholder. In production, this would query the ballot server.
         const el = document.getElementById('bw-online-count');
-        if (el) el.textContent = '{{ $active->count() > 0 ? "—" : "0" }}';
+        if (el) el.textContent = '—';
     }
 
     update();
