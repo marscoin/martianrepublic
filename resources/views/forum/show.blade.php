@@ -714,7 +714,7 @@
                     <a href="/forum">The Forum</a>
                     <span class="sep">&rsaquo;</span>
                     @if(isset($thread->category))
-                        <a href="/forum/c/{{ $thread->category_id }}-{{ Str::slug($thread->category->name ?? '') }}">{{ $thread->category->name ?? 'General' }}</a>
+                        <a href="/forum/c/{{ $thread->category_id }}-{{ Str::slug($thread->category_title ?? '') }}">{{ $thread->category_title ?? 'General' }}</a>
                         <span class="sep">&rsaquo;</span>
                     @endif
                     <span class="current">{{ Str::limit($thread->title, 60) }}</span>
@@ -776,7 +776,7 @@
                 <div class="forum-thread-header-full">
                     <h1>{{ $thread->title }}</h1>
                     <div class="forum-thread-info">
-                        <span>Started by {{ $thread->author_name ?? $thread->user->name ?? 'Anonymous' }}</span>
+                        <span>Started by {{ $thread->author_name ?? 'Anonymous' }}</span>
                         <span>&middot;</span>
                         <span>{{ $thread->created_at->format('M j, Y') }}</span>
                         <span>&middot;</span>
@@ -797,7 +797,7 @@
                                 <div class="forum-post-content">
                                     <div class="forum-post-header">
                                         <div class="forum-post-author">
-                                            <span class="author-name">{{ $post->author_name ?? $post->user->name ?? 'Anonymous' }}</span>
+                                            <span class="author-name">{{ $post->author_name ?? 'Anonymous' }}</span>
                                             @php
                                                 $isCitizen = false;
                                                 if (isset($post->user) && isset($post->user->citizen)) {
@@ -816,7 +816,7 @@
                                     {{-- Quoted parent post if reply --}}
                                     @if(isset($post->parent) && $post->parent)
                                         <div class="forum-quote">
-                                            <span class="quote-author">{{ $post->parent->author_name ?? $post->parent->user->name ?? 'Anonymous' }}</span>
+                                            <span class="quote-author">{{ $post->parent_author ?? 'Anonymous' }}</span>
                                             <p>{{ Str::limit(strip_tags($post->parent->content), 200) }}</p>
                                         </div>
                                     @endif
@@ -828,10 +828,10 @@
                                     @if(!$thread->locked)
                                     <div class="forum-post-actions">
                                         @auth
-                                        <button class="post-action" onclick="quotePost({{ $post->id }}, '{{ addslashes($post->author_name ?? $post->user->name ?? 'Anonymous') }}', {{ json_encode(Str::limit($post->content, 200)) }})">
+                                        <button class="post-action" onclick="quotePost({{ $post->id }}, '{{ addslashes($post->author_name ?? 'Anonymous') }}', {{ json_encode(Str::limit($post->content, 200)) }})">
                                             <i class="fa-solid fa-quote-left"></i> Quote
                                         </button>
-                                        <button class="post-action" onclick="replyTo({{ $post->id }}, '{{ addslashes($post->author_name ?? $post->user->name ?? 'Anonymous') }}')">
+                                        <button class="post-action" onclick="replyTo({{ $post->id }}, '{{ addslashes($post->author_name ?? 'Anonymous') }}')">
                                             <i class="fa-solid fa-reply"></i> Reply
                                         </button>
                                         @endauth

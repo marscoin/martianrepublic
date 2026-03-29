@@ -647,9 +647,9 @@
                     @if(isset($categories))
                         @foreach($categories as $category)
                             <button class="forum-filter" data-cat="{{ $category->id }}">
-                                {{ $category->name }}
-                                @if($category->threads_count > 0)
-                                    <span class="count">{{ $category->threads_count }}</span>
+                                {{ $category->title }}
+                                @if($category->thread_count > 0)
+                                    <span class="count">{{ $category->thread_count }}</span>
                                 @endif
                             </button>
                         @endforeach
@@ -664,7 +664,7 @@
                         <option value="">Select category...</option>
                         @if(isset($categories))
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                <option value="{{ $category->id }}">{{ $category->title }}</option>
                             @endforeach
                         @endif
                     </select>
@@ -706,8 +706,8 @@
                                             </div>
                                         </div>
                                         <div class="forum-thread-meta">
-                                            <span class="forum-category-label" style="color: {{ $catColor }};">{{ $thread->category->name ?? 'General' }}</span>
-                                            <span class="forum-author">{{ $thread->author_name ?? $thread->user->name ?? 'Anonymous' }}</span>
+                                            <span class="forum-category-label" style="color: {{ $catColor }};">{{ $thread->category_title ?? 'General' }}</span>
+                                            <span class="forum-author">{{ $thread->author_name ?? 'Anonymous' }}</span>
                                             <span class="forum-time">{{ $thread->created_at->diffForHumans() }}</span>
                                         </div>
                                         @if($thread->proposal)
@@ -755,8 +755,8 @@
                                             </div>
                                         </div>
                                         <div class="forum-thread-meta">
-                                            <span class="forum-category-label" style="color: {{ $catColor }};">{{ $thread->category->name ?? 'General' }}</span>
-                                            <span class="forum-author">{{ $thread->author_name ?? $thread->user->name ?? 'Anonymous' }}</span>
+                                            <span class="forum-category-label" style="color: {{ $catColor }};">{{ $thread->category_title ?? 'General' }}</span>
+                                            <span class="forum-author">{{ $thread->author_name ?? 'Anonymous' }}</span>
                                             <span class="forum-time">{{ $thread->created_at->diffForHumans() }}</span>
                                         </div>
                                         @if($thread->proposal)
@@ -827,9 +827,9 @@
                                         <div class="sidebar-stat-row">
                                             <span class="sidebar-stat-label">
                                                 <span class="sidebar-cat-dot" style="background: {{ $catColors[$category->id] ?? 'var(--mr-text-dim)' }};"></span>
-                                                {{ $category->name }}
+                                                {{ $category->title }}
                                             </span>
-                                            <span class="sidebar-stat-value">{{ $category->threads_count ?? 0 }}</span>
+                                            <span class="sidebar-stat-value">{{ $category->thread_count ?? 0 }}</span>
                                         </div>
                                     @endforeach
                                 @endif
