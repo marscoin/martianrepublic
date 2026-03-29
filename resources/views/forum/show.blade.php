@@ -778,7 +778,7 @@
                     <div class="forum-thread-info">
                         <span>Started by {{ $thread->author_name ?? 'Anonymous' }}</span>
                         <span>&middot;</span>
-                        <span>{{ $thread->created_at->format('M j, Y') }}</span>
+                        <span>{{ \Carbon\Carbon::parse($thread->created_at)->format('M j, Y') }}</span>
                         <span>&middot;</span>
                         <span>{{ isset($posts) ? $posts->count() : 0 }} {{ (isset($posts) && $posts->count() === 1) ? 'post' : 'posts' }}</span>
                         @if($thread->locked)

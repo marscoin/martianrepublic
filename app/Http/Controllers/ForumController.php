@@ -62,6 +62,7 @@ class ForumController extends Controller
      */
     public function show($id)
     {
+        $id = (int) $id;
         $thread = DB::table('forum_threads')
             ->join('users', 'forum_threads.author_id', '=', 'users.id')
             ->leftJoin('forum_categories', 'forum_threads.category_id', '=', 'forum_categories.id')
@@ -311,6 +312,7 @@ class ForumController extends Controller
      */
     public function categoryThreads($categoryId)
     {
+        $categoryId = (int) $categoryId;
         $category = DB::table('forum_categories')
             ->where('id', $categoryId)
             ->first();
