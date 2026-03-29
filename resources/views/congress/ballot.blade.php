@@ -1240,10 +1240,33 @@ $(document).ready(function() {
     // ON LOAD: Check sessionStorage for resume
     // ============================================================
     var savedState = loadBallotState();
-    if (savedState && savedState.ballot_txid) {
-        // We have a ballot tx — resume polling (Step 5)
-        goToStep(5);
-        pollConfirmation(savedState.ballot_txid);
+    if (savedState) {
+        console.log('%c[Ballot] Resuming from saved state, step: ' + savedState.step, 'color: #f59e0b; font-weight: bold;');
+
+        // Restore ballot keys from saved random_bytes
+        if (savedState.random_bytes && savedState.hidden_target) {
+            console.log('[Ballot] Restoring ballot keys from sessionStorage');
+            var rb = savedState.random_bytes;
+            rb = parseHexString(createHexString(rb));
+            var mnemonic = my_bundle.bip39.entropyToMnemonic(rb);
+            genSeed(mnemonic); // This sets bpkk globally
+            hidden_target = savedState.hidden_target;
+        }
+
+        if (savedState.ballot_txid) {
+            // Ballot was broadcast — resume confirming (Step 5) or vote (Step 6)
+            goToStep(5);
+            pollConfirmation(savedState.ballot_txid);
+        } else if (savedState.step >= 3) {
+            // Keys were generated but shuffle not complete — restart from Step 3
+            getInputBlock().then(function(ib) {
+                inputBlock = ib;
+                return getLocalKey();
+            }).then(function() {
+                goToStep(3);
+                connectToServer();
+            });
+        }
     }
 
 }); // end document.ready
