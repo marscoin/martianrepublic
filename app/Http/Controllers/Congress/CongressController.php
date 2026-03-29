@@ -120,6 +120,7 @@ class CongressController extends Controller
 			->leftJoin('forum_posts', 'proposals.discussion', '=', 'forum_posts.thread_id')
 			->select('proposals.*', DB::raw('COUNT(forum_posts.id) as post_count'))
 			->groupBy('proposals.id')
+			->orderBy('proposals.id', 'desc')
 			->get();
 
 			$active = DB::table('proposals')
@@ -128,6 +129,7 @@ class CongressController extends Controller
 			->where('proposals.active', '=', 1)
 			->whereIn('status', ['submitted','voting','screening','challenged'])
 			->groupBy('proposals.id')
+			->orderBy('proposals.id', 'desc')
 			->get();
 
 			$passed = DB::table('proposals as p')
@@ -163,6 +165,7 @@ class CongressController extends Controller
 				')
 				->where('p.status', '=', 'passed')
 				->groupBy('p.id', 'yay_votes.yays', 'nay_votes.nays', 'fp.post_count')
+				->orderBy('p.id', 'desc')
 				->get();
 
 
@@ -171,6 +174,7 @@ class CongressController extends Controller
 			->select('proposals.*', DB::raw('COUNT(forum_posts.id) as post_count'))
 			->where('proposals.status', '=', 'rejected')
 			->groupBy('proposals.id')
+			->orderBy('proposals.id', 'desc')
 			->get();
 
 			$closed = DB::table('proposals')
@@ -179,6 +183,7 @@ class CongressController extends Controller
 			->where('proposals.status', '=', 'closed')
 			->where('proposals.active', '=', 0)
 			->groupBy('proposals.id')
+			->orderBy('proposals.id', 'desc')
 			->get();
 
 
@@ -187,6 +192,7 @@ class CongressController extends Controller
 			->select('proposals.*', DB::raw('COUNT(forum_posts.id) as post_count'))
 			->whereNotIn('status', ['rejected','passed', 'closed'])
 			->groupBy('proposals.id')
+			->orderBy('proposals.id', 'desc')
 			->get();
 			
 			$endTime = microtime(true);
