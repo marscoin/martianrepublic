@@ -813,13 +813,7 @@
                                         <span class="forum-post-time">{{ \Carbon\Carbon::parse($post->created_at)->diffForHumans() }}</span>
                                     </div>
 
-                                    {{-- Quoted parent post if reply --}}
-                                    @if(isset($post->parent) && $post->parent)
-                                        <div class="forum-quote">
-                                            <span class="quote-author">{{ $post->parent_author ?? 'Anonymous' }}</span>
-                                            <p>{{ Str::limit(strip_tags($post->parent->content), 200) }}</p>
-                                        </div>
-                                    @endif
+                                    {{-- Quoted content is rendered inline via markdown blockquotes --}}
 
                                     <div class="forum-post-body">
                                         {!! Str::markdown($post->content) !!}
