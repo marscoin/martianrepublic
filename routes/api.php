@@ -24,10 +24,6 @@ Route::post('/marsauth', 'App\Http\Controllers\ApiController@marsAuth')->middlew
 Route::get('/citizen/{address}', 'App\Http\Controllers\ApiController@showCitizen')->name('api_show');
 
 Route::post('/token', 'App\Http\Controllers\ApiController@token')->middleware('throttle:10,1');
-
-// Test route disabled in production for security
-// Route::get('/test', 'App\Http\Controllers\ApiController@test');
-
 Route::post('/scitizen', 'App\Http\Controllers\ApiController@scitizen')->middleware(['auth:sanctum'])->name('api_scitizen');
 Route::post('/pinpic', 'App\Http\Controllers\ApiController@pinpic')->middleware(['auth:sanctum'])->name('api_pinpic');
 Route::post('/pinvideo', 'App\Http\Controllers\ApiController@pinvideo')->middleware(['auth:sanctum'])->name('api_pinvideo');
@@ -38,8 +34,6 @@ Route::post('/user/block/{id}', 'App\Http\Controllers\ApiController@blockUser')-
 
 Route::get('/eula', 'App\Http\Controllers\ApiController@handleEula')->middleware(['auth:sanctum'])->name('api_handle_eula');
 Route::get('/set/eula', 'App\Http\Controllers\ApiController@setEula')->middleware(['auth:sanctum'])->name('api_set_eula');
-
-
 Route::get('/forum/thread/{threadId}/comments', 'App\Http\Controllers\ApiController@getThreadComments')->middleware(['auth:sanctum'])->name('api_forum_comments');
 
 Route::get('/forum/category/{categoryId}/threads', 'App\Http\Controllers\ApiController@getThreadsByCategory')->middleware(['auth:sanctum'])->name('api_forum_threads');
@@ -47,6 +41,4 @@ Route::get('/forum/categories/threads', 'App\Http\Controllers\ApiController@getA
 
 Route::post('/forum/thread', 'App\Http\Controllers\ApiController@createThread')->middleware(['auth:sanctum'])->name('api_create_thread');
 Route::post('/forum/thread/{threadId}/comment', 'App\Http\Controllers\ApiController@createComment')->middleware(['auth:sanctum'])->name('api_create_comment');
-
-
 Route::get('/mstatus', 'App\Http\Controllers\StatusController@getSystemStatus')->middleware(['auth:sanctum'])->name('api_mobile_status');

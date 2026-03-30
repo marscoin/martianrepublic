@@ -72,12 +72,12 @@ class ApiController extends Controller {
 			$file_path = "./assets/citizen/" . $safeAddress . "/profile_pic." . $safeExtension;
 
 			file_put_contents($file_path, $decodedData);
-			$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+			$hash = AppHelper::upload($file_path, config('blockchain.ipfs.api_url') . "/api/v0/add?pin=true");
 
 			$citcache = Citizen::where('userid', '=', $uid)->first();
 			if(is_null($citcache)) $citcache = new Citizen;
 			$citcache->userid = $uid;
-			$citcache->avatar_link = "https://ipfs.marscoin.org/ipfs/".$hash;
+			$citcache->avatar_link = config('blockchain.ipfs.gateway_url').$hash;
 			$citcache->save();
 
 			return response()->json(["Hash" => $hash], 200);
@@ -126,12 +126,12 @@ class ApiController extends Controller {
 				$file_path = "./assets/citizen/" . $safeAddress  . "/";
 				$request->file('file')->move($file_path, "profile_video.webm" );
 				$file_path = $file_path . "profile_video.webm";
-				$hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+				$hash = AppHelper::upload($file_path, config('blockchain.ipfs.api_url') . "/api/v0/add?pin=true");
 
 				$citcache = Citizen::where('userid', '=', $uid)->first();
 				if(is_null($citcache)) $citcache = new Citizen;
 				$citcache->userid = $uid;
-				$citcache->liveness_link = "https://ipfs.marscoin.org/ipfs/".$hash;
+				$citcache->liveness_link = config('blockchain.ipfs.gateway_url').$hash;
 				$citcache->save();
 
 				return response()->json(["Hash" => $hash], 200);
@@ -213,7 +213,7 @@ class ApiController extends Controller {
 		}
 
 		try {
-			$hash = AppHelper::uploadFolder($file_path, 'http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter'); // Example: use a config value or env variable
+			$hash = AppHelper::uploadFolder($file_path, config('blockchain.ipfs.api_url') . '/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter'); // Example: use a config value or env variable
 			AppHelper::insertPublicationCache($uid, $file_path, $hash, $title);
 		} catch (\Exception $e) {
 			// Handle error; possibly log it and return a user-friendly message
@@ -247,7 +247,7 @@ class ApiController extends Controller {
 			return response()->json(["error" => "Unauthorized: you can only remove your own publications."], 403);
 		}
 
-		$ipfsApiUrl = 'http://127.0.0.1:5001/api/v0/pin/rm?arg=' . urlencode($cid) . "&recursive=true";
+		$ipfsApiUrl = config('blockchain.ipfs.api_url') . '/api/v0/pin/rm?arg=' . urlencode($cid) . "&recursive=true";
 		Log::debug($ipfsApiUrl);
 		try {
 			// Initialize cURL session
@@ -370,10 +370,10 @@ class ApiController extends Controller {
 			// Check if the type contains the word 'log'
 			if (strpos($safeType, 'log') !== false) {
 				// The type contains 'log', use uploadFolder
-				$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
+				$apiResponse = AppHelper::uploadFolder($file_path, config('blockchain.ipfs.api_url') . "/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
 			} else {
 				// The type does not contain 'log', use upload
-				$apiResponse = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+				$apiResponse = AppHelper::upload($file_path, config('blockchain.ipfs.api_url') . "/api/v0/add?pin=true");
 			}
 
 			if (is_string($apiResponse)) {
@@ -484,7 +484,7 @@ class ApiController extends Controller {
 			return response()->json(['error' => 'Invalid Marscoin address.'], 400);
 		}
 
-		$json = AppHelper::file_get_contents_curl("http://explore1.marscoin.org/api/txs/?address=" . urlencode($address));
+		$json = AppHelper::file_get_contents_curl(config('blockchain.explorer.fallback_url') . "/api/txs/?address=" . urlencode($address));
 
 		return response($json)->header('Content-Type', 'application/json');
 	}
@@ -600,7 +600,7 @@ class ApiController extends Controller {
 	public function marsPrice()
 	{
 		try {
-			$response = @file_get_contents('https://price.marscoin.org/json/');
+			$response = @file_get_contents(config('blockchain.price.marscoin_url'));
 			if ($response) {
 				return response($response)->header('Content-Type', 'application/json');
 			}
@@ -617,7 +617,7 @@ class ApiController extends Controller {
 			return response()->json(['error' => 'Missing parameters'], 400);
 		}
 		try {
-			$url = 'http://localhost:3001/api/mars/utxo-multi?xpub=' . urlencode($xpub) . '&receiver_address=' . urlencode($receiver) . '&amount=' . urlencode($amount);
+			$url = config('blockchain.pebas.url') . '/api/mars/utxo-multi?xpub=' . urlencode($xpub) . '&receiver_address=' . urlencode($receiver) . '&amount=' . urlencode($amount);
 			$json = @file_get_contents($url);
 			if ($json) {
 				return response($json)->header('Content-Type', 'application/json');
@@ -633,7 +633,7 @@ class ApiController extends Controller {
 			return response()->json(['error' => 'Invalid address'], 400);
 		}
 		try {
-			$json = @file_get_contents('http://localhost:3001/api/mars/txhistory/?address=' . urlencode($address));
+			$json = @file_get_contents(config('blockchain.pebas.url') . '/api/mars/txhistory/?address=' . urlencode($address));
 			if ($json) {
 				return response($json)->header('Content-Type', 'application/json');
 			}
@@ -674,7 +674,7 @@ class ApiController extends Controller {
 
 		try {
 			$response = \Illuminate\Support\Facades\Http::timeout(30)
-				->get("http://localhost:3001/api/mars/discover", [
+				->get(config('blockchain.pebas.url') . "/api/mars/discover", [
 					'xpub' => $xpub,
 					'gap_limit' => $gapLimit,
 				]);

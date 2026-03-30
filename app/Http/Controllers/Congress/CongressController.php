@@ -82,7 +82,7 @@ class CongressController extends Controller
 		$view->citizenCount = DB::table('feed')->where('tag', 'CT')->distinct('userid')->count('userid');
 		$view->publicCount = DB::table('feed')->where('tag', 'GP')->distinct('userid')->count('userid');
 		try {
-			$view->blockHeight = @file_get_contents('http://localhost:3001/api/mars/balance?address=MDCURC61G7A5jNRjnDq42XB1RvU51y4Ftx') ? json_decode(file_get_contents('https://explore.marscoin.org/api/status?q=getInfo'))->info->blocks ?? '---' : '---';
+			$view->blockHeight = @file_get_contents(config('blockchain.pebas.url') . '/api/mars/balance?address=MDCURC61G7A5jNRjnDq42XB1RvU51y4Ftx') ? json_decode(file_get_contents(config('blockchain.explorer.primary_url') . '/api/status?q=getInfo'))->info->blocks ?? '---' : '---';
 		} catch (\Exception $e) {
 			$view->blockHeight = '---';
 		}

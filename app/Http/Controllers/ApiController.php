@@ -520,12 +520,12 @@ class ApiController extends Controller
         $file_path = "./assets/citizen/" . $safeAddress . "/profile_pic." . $safeExtension;
 
         file_put_contents($file_path, $decodedData);
-        $hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+        $hash = AppHelper::upload($file_path, config('blockchain.ipfs.api_url') . "/api/v0/add?pin=true");
 
         $citcache = Citizen::where('userid', '=', $uid)->first();
         if(is_null($citcache)) $citcache = new Citizen;
         $citcache->userid = $uid;
-        $citcache->avatar_link = "https://ipfs.marscoin.org/ipfs/".$hash;
+        $citcache->avatar_link = config('blockchain.ipfs.gateway_url').$hash;
         $citcache->save();
 
         return (new Response(json_encode(array("Hash" => $hash)), 200))
@@ -576,12 +576,12 @@ class ApiController extends Controller
             $file_path = "./assets/citizen/" . $safeAddress  . "/";
             $request->file('file')->move($file_path, "profile_video.webm" );
             $file_path = $file_path . "profile_video.webm";
-            $hash = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+            $hash = AppHelper::upload($file_path, config('blockchain.ipfs.api_url') . "/api/v0/add?pin=true");
             Log::debug('upload complete: ' . $hash);
             $citcache = Citizen::where('userid', '=', $uid)->first();
             if(is_null($citcache)) $citcache = new Citizen;
             $citcache->userid = $uid;
-            $citcache->liveness_link = "https://ipfs.marscoin.org/ipfs/".$hash;
+            $citcache->liveness_link = config('blockchain.ipfs.gateway_url').$hash;
             $citcache->save();
             Log::debug('saved cit data');
             return (new Response(json_encode(array("Hash" => $hash)), 200))
@@ -776,10 +776,10 @@ class ApiController extends Controller
 			// Check if the type contains the word 'log'
 			if (strpos($safeType, 'log') !== false) {
 				// The type contains 'log', use uploadFolder
-				$apiResponse = AppHelper::uploadFolder($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
+				$apiResponse = AppHelper::uploadFolder($file_path, config('blockchain.ipfs.api_url') . "/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter");
 			} else {
 				// The type does not contain 'log', use upload
-				$apiResponse = AppHelper::upload($file_path, "http://127.0.0.1:5001/api/v0/add?pin=true");
+				$apiResponse = AppHelper::upload($file_path, config('blockchain.ipfs.api_url') . "/api/v0/add?pin=true");
 			}
 
 			if (is_string($apiResponse)) {

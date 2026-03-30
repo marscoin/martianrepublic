@@ -12,6 +12,41 @@ class Proposals extends Model {
 	 */
 	protected $table = 'proposals';
 
+	protected $fillable = [
+		'user_id',
+		'title',
+		'description',
+		'category',
+		'tier',
+		'discussion',
+		'mined',
+		'author',
+		'ipfs_hash',
+		'original_ipfs_hash',
+		'original_description',
+		'threshold',
+		'participation',
+		'duration',
+		'expiration',
+		'txid',
+		'git_hash',
+		'public_address',
+		'mars_paid',
+		'active',
+		'voting_extended',
+		'quiet_ending_triggered_at',
+		'status',
+		'votes_required',
+		'citizen_count',
+		'closed_reason',
+		'screening_ends_at',
+		'voting_ends_at',
+		'timelock_ends_at',
+		'enacted_at',
+		'sunset_at',
+		'amended_at',
+	];
+
 	/**
 	 * The attributes excluded from the model's JSON form.
 	 *

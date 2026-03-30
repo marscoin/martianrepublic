@@ -321,9 +321,9 @@ class AppHelper{
 		public static function stats()
 		{
 			$array["coincount"] = 35000000;
-			$json = AppHelper::file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
+			$json = AppHelper::file_get_contents_curl(config('blockchain.explorer.primary_url') . '/api/status?q=getInfo');
 			$array["network"] = json_decode($json, true);
-			$json2 = AppHelper::file_get_contents_curl('http://explore.marscoin.org/api/status?q=getTxOutSetInfo');
+			$json2 = AppHelper::file_get_contents_curl(config('blockchain.explorer.primary_url') . '/api/status?q=getTxOutSetInfo');
 			$total = json_decode($json2, true);
 			if ($total && count($total) > 0)
 				$array["coincount"] = round($total['txoutsetinfo']['total_amount'], 2);
@@ -522,7 +522,7 @@ class AppHelper{
 			//find user's GP transaction in cache
 			$transaction_gp = Feed::where('address', '=', $address)->where('tag', '=', "GP")->first();
 			//pull up transaction using blockchain explorer
-			$json = AppHelper::file_get_contents_curl("http://explore1.marscoin.org/api/tx/".$transaction_gp['txid']);
+			$json = AppHelper::file_get_contents_curl(config('blockchain.explorer.fallback_url') . "/api/tx/" . $transaction_gp['txid']);
 			if($json)
 			{
 				$tx = json_decode($json);
@@ -535,7 +535,7 @@ class AppHelper{
 					if(count($p) > 0)
 					{
 						$ipfs_hash = $p[1];
-						$data = AppHelper::file_get_contents_curl("https://ipfs.marscoin.org/ipfs/".$ipfs_hash);
+						$data = AppHelper::file_get_contents_curl(config('blockchain.ipfs.gateway_url') . $ipfs_hash);
 						$file_path = "./assets/citizen/" . $address . "/data.json";
 						file_put_contents($file_path, $data);
 						$d = json_decode($data);
@@ -656,7 +656,7 @@ class AppHelper{
 			// Function to get the price from CoinGecko with caching
 		public static function getMarscoinPrice()
 		{
-			$url = "https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd";
+			$url = config('blockchain.price.coingecko_url');
 
 			// Use the Cache facade with the remember method
 			$marsPriceData = Cache::remember('marscoin_price', 5, function () use ($url) {
@@ -688,7 +688,7 @@ class AppHelper{
 				// Primary: use local pebas (Electrum-based, more reliable)
 				try {
 					$ctx = stream_context_create(['http' => ['timeout' => 5]]);
-				$response = @file_get_contents("http://localhost:3001/api/mars/balance?address={$publicAddr}", false, $ctx);
+				$response = @file_get_contents(config('blockchain.pebas.url') . "/api/mars/balance?address={$publicAddr}", false, $ctx);
 					if ($response) {
 						$data = json_decode($response, true);
 						if (isset($data['balance'])) {
@@ -701,7 +701,7 @@ class AppHelper{
 
 				// Fallback: explorer API (returns balance in satoshis)
 				try {
-					$response = @file_get_contents("https://explore.marscoin.org/api/addr/{$publicAddr}/balance");
+					$response = @file_get_contents(config('blockchain.explorer.primary_url') . "/api/addr/{$publicAddr}/balance");
 					if ($response !== false && is_numeric($response)) {
 						return $response * 0.00000001;
 					}
@@ -715,7 +715,7 @@ class AppHelper{
 
 		public static function getMarscoinTotalReceived($publicAddr)
 		{
-			$url = "https://explore.marscoin.org/api/addr/{$publicAddr}/totalReceived";
+			$url = config('blockchain.explorer.primary_url') . "/api/addr/{$publicAddr}/totalReceived";
 			$cacheKey = 'marscoin_total_received_' . $publicAddr;
 
 			$totalReceived = Cache::remember($cacheKey, 300, function () use ($url) {
@@ -737,7 +737,7 @@ class AppHelper{
 
 		public static function getMarscoinTotalSent($publicAddr)
 		{
-			$url = "https://explore.marscoin.org/api/addr/{$publicAddr}/totalSent";
+			$url = config('blockchain.explorer.primary_url') . "/api/addr/{$publicAddr}/totalSent";
 			$cacheKey = 'marscoin_total_sent_' . $publicAddr;
 
 			$totalSent = Cache::remember($cacheKey, 300, function () use ($url) {
@@ -764,7 +764,7 @@ class AppHelper{
 			$totalAmount = Cache::remember($cacheKey, 180, function () {
 				// Primary: marscoin-cli (fastest, most reliable)
 				try {
-					$output = shell_exec('/usr/local/bin/marscoin-cli -datadir=/root/.marscoin gettxoutsetinfo 2>/dev/null');
+					$output = shell_exec(config('blockchain.rpc.cli_path') . ' -datadir=' . config('blockchain.rpc.data_dir') . ' gettxoutsetinfo 2>/dev/null');
 					if ($output) {
 						$data = json_decode($output, true);
 						if ($data && isset($data['total_amount'])) {
@@ -777,7 +777,7 @@ class AppHelper{
 
 				// Fallback: explorer API
 				try {
-					$url = "https://explore.marscoin.org/api/status?q=getTxOutSetInfo";
+					$url = config('blockchain.explorer.primary_url') . "/api/status?q=getTxOutSetInfo";
 					$response = file_get_contents($url);
 					$data = json_decode($response, true);
 					if ($data && isset($data['txoutsetinfo']['total_amount'])) {
@@ -794,7 +794,7 @@ class AppHelper{
 
 		public static function getMarscoinNetworkInfo()
 		{
-			$url = "http://explore2.marscoin.org/api/status?q=getInfo";
+			$url = config('blockchain.explorer.secondary_url') . "/api/status?q=getInfo";
 			$cacheKey = 'marscoin_network_info';
 
 			$networkInfo = Cache::remember($cacheKey, 60, function () use ($url) {

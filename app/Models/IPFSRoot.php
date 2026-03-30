@@ -7,6 +7,11 @@ class IPFSRoot extends Model {
 
     protected $table = 'ipfs_root';
 
+    protected $fillable = [
+        'folder_hash',
+        'author',
+    ];
+
 }
 
 ?>

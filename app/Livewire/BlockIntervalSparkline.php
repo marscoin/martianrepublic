@@ -10,9 +10,6 @@ class BlockIntervalSparkline extends Component
     public float $avgInterval = 0;
     public float $currentDifficulty = 0;
 
-    private const CLI = '/usr/local/bin/marscoin-cli';
-    private const DATA_DIR = '/root/.marscoin';
-
     public function mount()
     {
         $this->fetchIntervals();
@@ -20,7 +17,9 @@ class BlockIntervalSparkline extends Component
 
     private function cli(string ...$args): ?string
     {
-        $command = array_merge([self::CLI, '-datadir=' . self::DATA_DIR], $args);
+        $cli = config('blockchain.rpc.cli_path');
+        $dataDir = config('blockchain.rpc.data_dir');
+        $command = array_merge([$cli, '-datadir=' . $dataDir], $args);
         $result = Process::timeout(10)->run($command);
         return $result->successful() ? trim($result->output()) : null;
     }

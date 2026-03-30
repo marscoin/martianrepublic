@@ -12,9 +12,6 @@ class BlockDisplay extends Component
     public $timeSinceLastBlock = "n/a";
     public $lastBlockMinedAt;
 
-    private const CLI = '/usr/local/bin/marscoin-cli';
-    private const DATA_DIR = '/root/.marscoin';
-
     public function mount()
     {
         $this->fetchBlockNumber();
@@ -22,15 +19,18 @@ class BlockDisplay extends Component
 
     public function fetchBlockNumber()
     {
+        $cli = config('blockchain.rpc.cli_path');
+        $dataDir = config('blockchain.rpc.data_dir');
+
         try {
-            $result = Process::timeout(10)->run([self::CLI, '-datadir=' . self::DATA_DIR, 'getblockcount']);
+            $result = Process::timeout(10)->run([$cli, '-datadir=' . $dataDir, 'getblockcount']);
             if ($result->successful() && is_numeric(trim($result->output()))) {
                 $height = (int) trim($result->output());
 
-                $result = Process::timeout(10)->run([self::CLI, '-datadir=' . self::DATA_DIR, 'getblockhash', (string) $height]);
+                $result = Process::timeout(10)->run([$cli, '-datadir=' . $dataDir, 'getblockhash', (string) $height]);
                 $hash = trim($result->output());
                 if ($result->successful() && $hash) {
-                    $result = Process::timeout(10)->run([self::CLI, '-datadir=' . self::DATA_DIR, 'getblock', $hash]);
+                    $result = Process::timeout(10)->run([$cli, '-datadir=' . $dataDir, 'getblock', $hash]);
                     $block = json_decode($result->output(), true);
                     if ($block && isset($block['time'])) {
                         $this->blockNumber = $height;
@@ -47,7 +47,7 @@ class BlockDisplay extends Component
 
         // Fallback: explorer API
         try {
-            $response = Http::timeout(10)->get('https://explore1.marscoin.org/api/status?q=getInfo');
+            $response = Http::timeout(10)->get(config('blockchain.explorer.fallback_url') . '/api/status?q=getInfo');
             if ($response->successful()) {
                 $this->blockNumber = $response->json()['info']['blocks'] ?? '---';
                 $this->dispatch('block-update');

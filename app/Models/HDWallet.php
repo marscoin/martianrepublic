@@ -12,6 +12,15 @@ class HDWallet extends Model {
 	 */
 	protected $table = 'hd_wallet';
 
+	protected $fillable = [
+		'user_id',
+		'wallet_type',
+		'backup',
+		'encrypted_seed',
+		'public_addr',
+		'opened_at',
+	];
+
 	/**
 	 * The attributes excluded from the model's JSON form.
 	 *

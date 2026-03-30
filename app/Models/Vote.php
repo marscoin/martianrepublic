@@ -12,6 +12,14 @@ class Vote extends Model {
 	 */
 	protected $table = 'votes';
 
+	protected $fillable = [
+		'vote',
+		'proposal_id',
+		'txid',
+		'mined',
+		'block',
+	];
+
 	/**
 	 * The attributes excluded from the model's JSON form.
 	 *

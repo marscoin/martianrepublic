@@ -12,6 +12,16 @@ class Publication extends Model {
 
     protected $table = 'publications';
 
+    protected $fillable = [
+        'userid',
+        'title',
+        'ipfs_hash',
+        'local_path',
+        'notarization',
+        'notarized_at',
+        'blockid',
+    ];
+
 }
 
 ?>

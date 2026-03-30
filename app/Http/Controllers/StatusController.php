@@ -112,7 +112,7 @@ class StatusController extends Controller {
 
 		//blockexplorer check
 		try {
-    		$json = AppHelper::file_get_contents_curl('http://explore.marscoin.org/api/status?q=getInfo');
+    		$json = AppHelper::file_get_contents_curl(config('blockchain.explorer.primary_url') . '/api/status?q=getInfo');
     		$a = json_decode($json, true);
     		if($a)
     			$blockexplorer = "success";
@@ -125,7 +125,7 @@ class StatusController extends Controller {
 
 		//pebas api check
 		try {
-    		$json = AppHelper::file_get_contents_curl('https://pebas.marscoin.org/api/mars/utxo?sender_address=MRKAuE7k9UhANQ8JjoU5A9KACic5Rt2Diz&receiver_address=MRKAuE7k9UhANQ8JjoU5A9KACic5Rt2Diz&amount=0.1');
+    		$json = AppHelper::file_get_contents_curl(config('blockchain.pebas.public_url') . '/api/mars/utxo?sender_address=MRKAuE7k9UhANQ8JjoU5A9KACic5Rt2Diz&receiver_address=MRKAuE7k9UhANQ8JjoU5A9KACic5Rt2Diz&amount=0.1');
     		$a = json_decode($json, true);
 			//Log::debug($a);
     		if($a)
@@ -140,7 +140,7 @@ class StatusController extends Controller {
 		
 		//ipfs node check
 		try {
-    		$a = AppHelper::file_get_contents_curl('http://127.0.0.1:5001/api/v0/swarm/peers');
+    		$a = AppHelper::file_get_contents_curl(config('blockchain.ipfs.api_url') . '/api/v0/swarm/peers');
     		if($a)
     			$ipfs_status = "success";
     		else $ipfs_status = "danger";
@@ -194,7 +194,7 @@ class StatusController extends Controller {
 
         // IPFS node check
         try {
-            $a = AppHelper::file_get_contents_curl('http://127.0.0.1:5001/api/v0/swarm/peers');
+            $a = AppHelper::file_get_contents_curl(config('blockchain.ipfs.api_url') . '/api/v0/swarm/peers');
             $response['ipfs_status'] = $a ? 'online' : 'offline';
         } catch (\Exception $e) {
             $response['ipfs_status'] = 'offline';
@@ -215,7 +215,9 @@ class StatusController extends Controller {
         return response()->json($response);
     }
 
-    private function checkBallotServer($host = '127.0.0.1', $port = 3678) {
+    private function checkBallotServer($host = null, $port = null) {
+        $host = $host ?? config('blockchain.ballot.host', '127.0.0.1');
+        $port = $port ?? config('blockchain.ballot.port', 3678);
         $context = stream_context_create([
             'ssl' => [
                 'verify_peer' => false,

@@ -7,6 +7,12 @@ class Voucher extends Model {
 
     protected $table = 'vouchers';
 
+    protected $fillable = [
+        'user_id',
+        'user_account',
+        'redeemed',
+    ];
+
 }
 
 ?>
