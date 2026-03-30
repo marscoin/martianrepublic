@@ -99,7 +99,7 @@
   - Create `app/Services/TwoFactorService.php` — setup, verify, backup codes
   - Create `app/Services/IpfsService.php` — upload, pin, validate
 
-- [ ] **A3. Models missing $fillable — mass assignment risk**
+- [x] **A3. Models missing $fillable — mass assignment risk**
   - `app/Models/Proposals.php` — no $fillable at all
   - `app/Models/Vote.php` — no $fillable
   - `app/Models/Threads.php` — no $fillable
@@ -107,7 +107,7 @@
 
 ### High
 
-- [ ] **A4. Hardcoded URLs scattered across controllers**
+- [x] **A4. Hardcoded URLs scattered across controllers**
   - RPC endpoints: `http://localhost:3001/...` in 4+ controllers
   - IPFS endpoints: `http://127.0.0.1:5001/...` in ApiController
   - Explorer URLs: `https://explore.marscoin.org/...` in CongressController
@@ -122,7 +122,7 @@
   - `app/Includes/AppHelper.php` — mixed concerns (network, IPFS, formatting, crypto)
   - Fix: Break into focused helpers or move to service layer
 
-- [ ] **A7. Dead code and backup files in repo**
+- [x] **A7. Dead code and backup files in repo**
   - `app/Http/Controllers/ApiController.php.bak` — 38KB backup file
   - `app/Includes/AppHelper.php.bak` — 17KB backup file
   - `app/Models/Pkimport.php` — unused model
@@ -137,7 +137,7 @@
   - Mix of string notation `'Wallet\DashboardController@show'` and array `[Controller::class, 'method']`
   - Fix: Standardize to array notation (Laravel 9+ convention)
 
-- [ ] **A9. Missing database indexes on frequently queried columns**
+- [x] **A9. Missing database indexes on frequently queried columns**
   - `feed.userid` — no index (used in every feed query)
   - `forum_threads.category_id` — no index
   - `proposals.status` — no index (used in phase sync)
