@@ -55,6 +55,7 @@ class InjectSentryJs
           'Non-Error promise rejection',
           /^Loading chunk/,
           /Failed to execute 'showModal'/,
+          /Error invoking postEvent/,
         ],
       });
     </script>
