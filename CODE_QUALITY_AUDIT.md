@@ -10,47 +10,47 @@
 
 ### Critical
 
-- [ ] **S1. Command injection via shell_exec()**
+- [x] **S1. Command injection via shell_exec()**
   - `app/Livewire/BlockDisplay.php:26` — `$height` passed to shell_exec unsanitized
   - `app/Livewire/BlockIntervalSparkline.php:29` — loop variable passed to shell_exec
   - `app/Includes/LegislationRepo.php:233` — `$cmd` interpolated into shell command
   - Fix: Use Laravel `Process` facade, `escapeshellarg()` all dynamic parts
 
-- [ ] **S2. XSS via unescaped output `{!! !!}`**
+- [x] **S2. XSS via unescaped output `{!! !!}`**
   - `resources/views/congress/proposal.blade.php:871` — `{!! addslashes($proposal->description) !!}`
   - `resources/views/forum/show.blade.php:819,825,828` — `{!! Str::markdown($post->content) !!}`
   - `resources/views/livewire/civic-status-feed.blade.php:28` — `{!! $activity->displayMessage !!}`
   - `resources/views/wallet/mainnav.blade.php:107,110,113` — unescaped nav content
   - Fix: Use HTMLPurifier on markdown output, `{{ }}` for all user content
 
-- [ ] **S3. No input validation on Congress endpoints**
+- [x] **S3. No input validation on Congress endpoints**
   - `app/Http/Controllers/Congress/CongressController.php:505-507` — amendment with no validation
   - `CongressController.php:574-576` — tier challenge with no validation
   - `CongressController.php:643-650` — ballot keys stored without validation
   - Fix: Add FormRequest validation classes for all state-changing endpoints
 
-- [ ] **S4. Ballot encryption keys stored plaintext in database**
+- [x] **S4. Ballot encryption keys stored plaintext in database**
   - `app/Models/Ballots.php` — `encrypted_key`, `encryption_iv` stored as plain text
   - Fix: Add `'encrypted_key' => 'encrypted'` cast in model
 
 ### High
 
-- [ ] **S5. CSP allows unsafe-inline and unsafe-eval**
+- [x] **S5. CSP allows unsafe-inline and unsafe-eval**
   - `app/Http/Middleware/SecurityHeaders.php:24` — defeats XSS protection
   - Fix: Nonce-based inline scripts, remove unsafe directives (phased rollout)
 
-- [ ] **S6. No rate limiting on most write endpoints**
+- [x] **S6. No rate limiting on most write endpoints**
   - `/api/ai/chat` — can exhaust OpenRouter API quota
   - `/forum/thread`, `/forum/t/{id}/post` — spam risk
   - `/congress/voting/new` — proposal spam
   - `/contact` — contact form spam
   - Fix: Add `throttle` middleware to all write endpoints
 
-- [ ] **S7. 2FA brute-force — no lockout**
+- [x] **S7. 2FA brute-force — no lockout**
   - `app/Http/Controllers/Wallet/DashboardController.php:74-80` — no rate limit on 2FA attempts
   - Fix: 5 failed attempts → 15 min lockout, log all attempts
 
-- [ ] **S8. Sanctum tokens never expire**
+- [x] **S8. Sanctum tokens never expire**
   - `app/Http/Controllers/ApiController.php:370` — `createToken()` with no expiry
   - Fix: Set `'expiration' => 60` in Sanctum config
 
@@ -58,7 +58,7 @@
   - `app/Includes/AppHelper.php:376,416` — `realpath()` used but no base-path validation
   - Fix: Assert resolved path starts with storage directory
 
-- [ ] **S10. Log level debug in production**
+- [x] **S10. Log level debug in production**
   - `.env:14` — `LOG_LEVEL=debug` leaks sensitive info
   - Fix: Change to `LOG_LEVEL=warning`
 
@@ -72,11 +72,11 @@
   - `Congress/CongressController.php:82` — `file_get_contents()` with no timeout
   - Fix: Use `Http::timeout(5)->get()` with try-catch
 
-- [ ] **S13. Missing HSTS preload directive**
+- [x] **S13. Missing HSTS preload directive**
   - `SecurityHeaders.php` — HSTS missing `preload`
   - Fix: Append `; preload` to HSTS header
 
-- [ ] **S14. Composer audit allows failures in CI**
+- [x] **S14. Composer audit allows failures in CI**
   - `security-scan.yaml:39` — `composer audit || true` masks vulnerabilities
   - Fix: Remove `|| true`, let failures block the build
 
