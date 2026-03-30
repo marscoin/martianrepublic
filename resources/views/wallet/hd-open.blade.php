@@ -1,4 +1,4 @@
-{{-- v2026.03.30.2 --}}
+{{-- v2026.03.30.3 --}}
 <html lang="en" class="no-js">
 <head>
     <title>Marscoin Wallet</title>
@@ -1710,69 +1710,49 @@
                         console.log('Multi-wallet: found', storedMnemonics.length, 'stored mnemonics');
                         
                         for (const otherMnemonic of storedMnemonics) {
-                            if (otherMnemonic === unlockedWallet.trim()) continue; // skip primary
+                            if (otherMnemonic === unlockedWallet.trim()) continue;
                             console.log('Multi-wallet: scanning additional mnemonic...');
-                                    console.log('Multi-wallet: found additional mnemonic for', wallet.type, wallet.public_addr);
-                                    
-                                    // Derive addresses from the other mnemonic
-                                    const otherSeed = my_bundle.bip39.mnemonicToSeedSync(otherMnemonic);
-                                    const otherRoot = my_bundle.bitcoin.bip32.fromSeed(otherSeed, Marscoin.mainnet);
-                                    const otherAddresses = [];
-                                    
-                                    for (const path of ["m/44'/2'/0'", "m/44'/2'/0'/0'"]) {
-                                        try {
-                                            const account = otherRoot.derivePath(path);
-                                            for (let chain = 0; chain <= 1; chain++) {
-                                                for (let index = 0; index < 10; index++) {
-                                                    const addr = nodeToLegacyAddress(account.derive(chain).derive(index));
-                                                    otherAddresses.push({
-                                                        address: addr,
-                                                        path: path + '/' + chain + '/' + index,
-                                                        chain: chain === 0 ? 'receiving' : 'change',
-                                                        index: index,
-                                                        scheme: wallet.type + '-wallet',
-                                                    });
-                                                }
-                                            }
-                                        } catch(e) {}
-                                    }
-                                    
-                                    // Also add the stored address directly
-                                    otherAddresses.push({
-                                        address: wallet.public_addr,
-                                        path: 'stored/' + wallet.type,
-                                        chain: 'receiving',
-                                        index: 0,
-                                        scheme: wallet.type + '-stored',
-                                    });
-                                    
-                                    // Check these addresses against blockchain
-                                    try {
-                                        const seen = new Set(otherAddresses.map(a => a.address));
-                                        const unique = otherAddresses.filter(a => { 
-                                            if (seen.has(a.address)) { seen.delete(a.address); return true; } 
-                                            return false; 
-                                        });
-                                        
-                                        const resp = await $.ajax({
-                                            url: '/api/discover',
-                                            type: 'POST',
-                                            data: JSON.stringify({ addresses: unique }),
-                                            contentType: 'application/json',
-                                        });
-                                        
-                                        if (resp.addresses && resp.addresses.length > 0) {
-                                            for (const found of resp.addresses) {
-                                                found.chain = 'hd-wallet';
-                                                result.discovered.push(found);
-                                                result.totalBalance += found.balance;
-                                            }
-                                            console.log('Multi-wallet: found', resp.addresses.length, 'addresses with', resp.totalBalance, 'MARS');
+                            
+                            const otherSeed = my_bundle.bip39.mnemonicToSeedSync(otherMnemonic);
+                            const otherRoot = my_bundle.bitcoin.bip32.fromSeed(otherSeed, Marscoin.mainnet);
+                            const otherAddresses = [];
+                            
+                            for (const path of ["m/44'/2'/0'", "m/44'/2'/0'/0'"]) {
+                                try {
+                                    const account = otherRoot.derivePath(path);
+                                    for (let chain = 0; chain <= 1; chain++) {
+                                        for (let index = 0; index < 10; index++) {
+                                            const addr = nodeToLegacyAddress(account.derive(chain).derive(index));
+                                            otherAddresses.push({
+                                                address: addr,
+                                                path: path + '/' + chain + '/' + index,
+                                                chain: chain === 0 ? 'receiving' : 'change',
+                                                index: index,
+                                                scheme: 'legacy-wallet',
+                                            });
                                         }
-                                    } catch(e) {
-                                        console.warn('Multi-wallet discovery failed:', e);
                                     }
+                                } catch(e) { /* skip */ }
+                            }
+                            
+                            try {
+                                const unique = [...new Map(otherAddresses.map(a => [a.address, a])).values()];
+                                const resp = await $.ajax({
+                                    url: '/api/discover',
+                                    type: 'POST',
+                                    data: JSON.stringify({ addresses: unique }),
+                                    contentType: 'application/json',
+                                });
+                                if (resp.addresses && resp.addresses.length > 0) {
+                                    for (const found of resp.addresses) {
+                                        found.chain = 'legacy';
+                                        result.discovered.push(found);
+                                        result.totalBalance += found.balance;
+                                    }
+                                    console.log('Multi-wallet: found', resp.addresses.length, 'addresses with', resp.totalBalance, 'MARS');
                                 }
+                            } catch(e) {
+                                console.warn('Multi-wallet scan failed:', e);
                             }
                         }
                     } catch(e) {
