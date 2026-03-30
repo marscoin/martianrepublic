@@ -54,6 +54,7 @@ class InjectSentryJs
           'ResizeObserver loop',
           'Non-Error promise rejection',
           /^Loading chunk/,
+          /Failed to execute 'showModal'/,
         ],
       });
     </script>
