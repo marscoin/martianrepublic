@@ -2258,17 +2258,29 @@
                         console.error(`  Key pubkey:      ${keyPub}`);
                         console.error(`  Match: ${inputAddr === derivedAddr}`);
 
-                        // Try brute-force: scan first 20 receiving + 20 change paths
+                        // Try brute-force: scan paths from ALL known mnemonics
                         let signed = false;
-                        for (let chain = 0; chain <= 1 && !signed; chain++) {
-                            for (let idx = 0; idx < 20 && !signed; idx++) {
-                                try {
-                                    const tryChild = root.derivePath(`m/44'/2'/0'/${chain}/${idx}`);
-                                    const tryKey = my_bundle.bitcoin.ECPair.fromWIF(tryChild.toWIF(), Marscoin.mainnet);
-                                    psbt.signInput(i, tryKey);
-                                    console.log(`  ✓ Signed with brute-force path m/44'/2'/0'/${chain}/${idx}`);
-                                    signed = true;
-                                } catch (e) { /* try next */ }
+                        const allMnemonics = JSON.parse(localStorage.getItem('_allMnemonics') || '[]');
+                        const paths = ["m/44'/2'/0'", "m/44'/2'/0'/0'"];
+                        
+                        for (const tryMnemonic of allMnemonics) {
+                            if (signed) break;
+                            const trySeed = my_bundle.bip39.mnemonicToSeedSync(tryMnemonic);
+                            const tryRoot = my_bundle.bitcoin.bip32.fromSeed(trySeed, Marscoin.mainnet);
+                            
+                            for (const basePath of paths) {
+                                if (signed) break;
+                                for (let chain = 0; chain <= 1 && !signed; chain++) {
+                                    for (let idx = 0; idx < 20 && !signed; idx++) {
+                                        try {
+                                            const tryChild = tryRoot.derivePath(`${basePath}/${chain}/${idx}`);
+                                            const tryKey = my_bundle.bitcoin.ECPair.fromWIF(tryChild.toWIF(), Marscoin.mainnet);
+                                            psbt.signInput(i, tryKey);
+                                            console.log(`  ✓ Signed with multi-wallet path ${basePath}/${chain}/${idx}`);
+                                            signed = true;
+                                        } catch (e) { /* try next */ }
+                                    }
+                                }
                             }
                         }
                         if (!signed) {
