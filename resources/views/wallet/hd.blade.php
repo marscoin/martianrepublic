@@ -2159,19 +2159,15 @@
                     // Decrypt ALL wallet seeds with both PBKDF2 rounds and store mnemonics
                     // This enables multi-wallet discovery on the Bridge page
                     try {
-                        const allWallets = {!! json_encode(
-                            $wallets->map(fn($w) => ['encrypted_seed' => $w->encrypted_seed, 'public_addr' => $w->public_addr, 'type' => 'hd'])->merge(
-                                $civic_wallet ? [['encrypted_seed' => $civic_wallet->encrypted_seed, 'public_addr' => $civic_wallet->public_addr, 'type' => 'civic']] : []
-                            )->values()
-                        ) !!};
+                        const allWallets = {!! $all_seeds_json ?? '[]' !!};
                         
                         const hashed100k = hashPassword(wallet_password);
                         const hashed1 = hashPasswordLegacy(wallet_password);
                         const allMnemonics = [];
                         
                         for (const w of allWallets) {
-                            if (!w.encrypted_seed) continue;
-                            const enc = w.encrypted_seed.replace(/\s+/g, '');
+                            if (!w.s) continue;
+                            const enc = w.s.replace(/\s+/g, '');
                             let mnem = null;
                             
                             // Try 100k rounds
@@ -2190,7 +2186,7 @@
                             
                             if (mnem && !allMnemonics.includes(mnem)) {
                                 allMnemonics.push(mnem);
-                                console.log('Multi-wallet: decrypted', w.type, w.public_addr);
+                                console.log('Multi-wallet: decrypted', w.t, w.a);
                             }
                         }
                         

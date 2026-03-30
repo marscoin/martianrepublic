@@ -407,6 +407,21 @@ class DashboardController extends Controller
 			$data = json_decode(file_get_contents("/home/mars/constitution/marswallet.json"), true);
 			$view->SALT = $data['salt'];
 			$view->iv = $data['iv'];
+
+			// Pre-compute all wallet seeds for multi-wallet discovery
+			$allSeeds = [];
+			if ($wallets) {
+				foreach ($wallets as $w) {
+					if ($w->encrypted_seed && $w->public_addr) {
+						$allSeeds[] = ['s' => $w->encrypted_seed, 'a' => $w->public_addr, 't' => 'hd'];
+					}
+				}
+			}
+			if ($civic_wallet && $civic_wallet->encrypted_seed) {
+				$allSeeds[] = ['s' => $civic_wallet->encrypted_seed, 'a' => $civic_wallet->public_addr, 't' => 'civic'];
+			}
+			$view->all_seeds_json = json_encode($allSeeds);
+
 			return $view;
 		} else {
 			return redirect('/login');
