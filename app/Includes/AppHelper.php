@@ -522,7 +522,7 @@ class AppHelper{
 			//find user's GP transaction in cache
 			$transaction_gp = Feed::where('address', '=', $address)->where('tag', '=', "GP")->first();
 			//pull up transaction using blockchain explorer
-			$json = AppHelper::file_get_contents_curl(config('blockchain.explorer.fallback_url') . "/api/tx/" . $transaction_gp['txid']);
+				$json = AppHelper::file_get_contents_curl(config('blockchain.explorer.fallback_url') . "/api/tx/" . $transaction_gp['txid']);
 			if($json)
 			{
 				$tx = json_decode($json);
