@@ -2010,6 +2010,9 @@
 
                 if (decrypted) {
                     WalletKey.set(decrypted);
+                    // Persist password hashes for multi-wallet discovery on hd-open page
+                    localStorage.setItem('_walletHashedPw', hashPassword(wallet_password));
+                    localStorage.setItem('_walletHashedPwLegacy', hashPasswordLegacy(wallet_password));
                     if (usedLegacy) {
                         // Re-encrypt with stronger hash on next createwallet call
                         console.log("Legacy wallet detected - upgrading encryption");
