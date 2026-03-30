@@ -2,6 +2,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Illuminate\Support\Facades\Process;
 
 class BlockIntervalSparkline extends Component
 {
@@ -9,26 +10,38 @@ class BlockIntervalSparkline extends Component
     public float $avgInterval = 0;
     public float $currentDifficulty = 0;
 
+    private const CLI = '/usr/local/bin/marscoin-cli';
+    private const DATA_DIR = '/root/.marscoin';
+
     public function mount()
     {
         $this->fetchIntervals();
     }
 
+    private function cli(string ...$args): ?string
+    {
+        $command = array_merge([self::CLI, '-datadir=' . self::DATA_DIR], $args);
+        $result = Process::timeout(10)->run($command);
+        return $result->successful() ? trim($result->output()) : null;
+    }
+
     public function fetchIntervals()
     {
         try {
-            $height = (int) trim(shell_exec('/usr/local/bin/marscoin-cli -datadir=/root/.marscoin getblockcount 2>/dev/null'));
+            $output = $this->cli('getblockcount');
+            if (!$output || !is_numeric($output)) return;
+            $height = (int) $output;
             if ($height < 2) return;
 
             $intervals = [];
             $prevTime = null;
-            // Fetch last 30 blocks for the sparkline
             $startBlock = max(1, $height - 29);
 
             for ($i = $startBlock; $i <= $height; $i++) {
-                $hash = trim(shell_exec("/usr/local/bin/marscoin-cli -datadir=/root/.marscoin getblockhash {$i} 2>/dev/null"));
+                $hash = $this->cli('getblockhash', (string) $i);
                 if (!$hash) continue;
-                $blockJson = shell_exec("/usr/local/bin/marscoin-cli -datadir=/root/.marscoin getblock {$hash} 2>/dev/null");
+                $blockJson = $this->cli('getblock', $hash);
+                if (!$blockJson) continue;
                 $block = json_decode($blockJson, true);
                 if (!$block || !isset($block['time'])) continue;
 

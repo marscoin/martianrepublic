@@ -816,16 +816,16 @@
                                     {{-- Quoted content is rendered inline via markdown blockquotes --}}
 
                                     <div class="forum-post-body">
-                                        {!! Str::markdown($post->content) !!}
+                                        {!! Str::markdown(strip_tags($post->content, "<p><br><strong><em><ul><ol><li><h1><h2><h3><h4><h5><h6><blockquote><code><pre><a><img><table><thead><tbody><tr><th><td><hr><del><sup><sub><dl><dt><dd>")) !!}
                                     </div>
 
                                     @if(!$thread->locked)
                                     <div class="forum-post-actions">
                                         @auth
-                                        <button class="post-action" onclick="quotePost({{ $post->id }}, '{{ addslashes($post->author_name ?? 'Anonymous') }}', {{ json_encode(Str::limit($post->content, 200)) }})">
+                                        <button class="post-action" onclick="quotePost({{ $post->id }}, {{ json_encode($post->author_name ?? 'Anonymous') }}, {{ json_encode(Str::limit($post->content, 200)) }})">
                                             <i class="fa-solid fa-quote-left"></i> Quote
                                         </button>
-                                        <button class="post-action" onclick="replyTo({{ $post->id }}, '{{ addslashes($post->author_name ?? 'Anonymous') }}')">
+                                        <button class="post-action" onclick="replyTo({{ $post->id }}, {{ json_encode($post->author_name ?? 'Anonymous') }})">
                                             <i class="fa-solid fa-reply"></i> Reply
                                         </button>
                                         @endauth
@@ -1016,7 +1016,7 @@
                 success: function(response) {
                     // Build new post HTML
                     var post = response.post || response;
-                    var authorName = post.author_name || '{{ Auth::check() ? addslashes(Auth::user()->name ?? Auth::user()->email) : "You" }}';
+                    var authorName = post.author_name || {!! json_encode(Auth::check() ? (Auth::user()->name ?? Auth::user()->email) : 'You') !!};
                     var isCitizen = post.is_citizen || false;
                     var badgeClass = isCitizen ? 'citizen' : 'general';
                     var badgeText = isCitizen ? 'CITIZEN' : 'VISITOR';

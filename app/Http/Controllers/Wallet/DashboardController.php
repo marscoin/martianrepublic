@@ -73,6 +73,13 @@ class DashboardController extends Controller
 			$google2fa = app(Google2FA::class);
 			$secret = $request->input('secret');
 			if ($secret) {
+				// Rate limit 2FA attempts: 5 per 15 minutes
+				$cacheKey = '2fa_attempts:' . Auth::id();
+				$attempts = (int) Cache::get($cacheKey, 0);
+				if ($attempts >= 5) {
+					return redirect('/twofa')->with('error', 'Too many failed attempts. Please wait 15 minutes.');
+				}
+
 				$view = View::make('wallet.hello2fa');
 				$view->qrcode_image = NULL;
 				$profile = Profile::where('userid', '=', Auth::user()->id)->first();
@@ -87,6 +94,7 @@ class DashboardController extends Controller
 					$view->isvalid = "Success";
 					return redirect('wallet/dashboard')->with('success', 'Two-factor authentication enabled! Your account is now secured.');
 				} else {
+					Cache::put($cacheKey, $attempts + 1, now()->addMinutes(15));
 					$view->isvalid = "Failed";
 				}
 
@@ -170,16 +178,25 @@ class DashboardController extends Controller
 
 
 			if ($secret) {
+				// Rate limit 2FA attempts: 5 per 15 minutes
+				$cacheKey = '2fa_attempts:' . Auth::id();
+				$attempts = (int) Cache::get($cacheKey, 0);
+				if ($attempts >= 5) {
+					return redirect('/twofachallenge')->with('error', 'Too many failed attempts. Please wait 15 minutes.');
+				}
+
 				$profile = Profile::where('userid', '=', Auth::user()->id)->first();
 				$google2fa_secret = $profile->twofakey;
 				$valid = $google2fa->verifyKey($google2fa_secret, $secret);
 				if ($valid) {
+					Cache::forget($cacheKey);
 
 					$profile->openchallenge = 0;
 					$profile->save();
 
 					return redirect('wallet/dashboard');
 				} else {
+					Cache::put($cacheKey, $attempts + 1, now()->addMinutes(15));
 					$view = View::make('wallet.challenge2fa');
 					return $view;
 				}

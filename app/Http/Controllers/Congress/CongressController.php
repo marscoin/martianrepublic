@@ -3,6 +3,9 @@ namespace App\Http\Controllers\Congress;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\AmendProposalRequest;
+use App\Http\Requests\ChallengeTierRequest;
+use App\Http\Requests\BallotKeyRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Profile;
 use App\Models\Feed;
@@ -500,11 +503,12 @@ class CongressController extends Controller
 	/**
 	 * Amend a proposal during screening (proposer only, max 1 amendment)
 	 */
-	public function amendProposal(Request $request)
+	public function amendProposal(AmendProposalRequest $request)
 	{
-		$proposalId = $request->input('proposalId');
-		$newDescription = $request->input('description');
-		$newTitle = $request->input('title');
+		$validated = $request->validated();
+		$proposalId = $validated['proposalId'];
+		$newDescription = $validated['description'];
+		$newTitle = $validated['title'];
 		$uid = Auth::user()->id;
 
 		$proposal = Proposals::find($proposalId);
@@ -553,7 +557,7 @@ class CongressController extends Controller
 				$proposal->author,
 				$proposal->tier,
 				[],
-				$request->input('note', 'Amended during screening')
+				($validated['note'] ?? 'Amended during screening')
 			);
 			$proposal->git_hash = $gitHash;
 			$proposal->save();
@@ -569,11 +573,12 @@ class CongressController extends Controller
 	/**
 	 * Challenge a proposal's tier classification during screening
 	 */
-	public function challengeTier(Request $request)
+	public function challengeTier(ChallengeTierRequest $request)
 	{
-		$proposalId = $request->input('proposalId');
-		$proposedTier = $request->input('proposedTier');
-		$reason = $request->input('reason', '');
+		$validated = $request->validated();
+		$proposalId = $validated['proposalId'];
+		$proposedTier = $validated['proposedTier'];
+		$reason = $validated['reason'];
 		$uid = Auth::user()->id;
 
 		$proposal = Proposals::find($proposalId);
@@ -628,26 +633,18 @@ class CongressController extends Controller
 	/**
 	 * Store encrypted ballot key backup (client-side encrypted)
 	 */
-	public function backupBallotKey(Request $request)
+	public function backupBallotKey(BallotKeyRequest $request)
 	{
-		if (!Auth::check()) return response()->json(['error' => 'Unauthorized'], 401);
-
-		$request->validate([
-			'proposal_id' => 'required|integer',
-			'encrypted_key' => 'required|string',
-			'encryption_iv' => 'required|string|max:64',
-			'hidden_target' => 'required|string|max:64',
-		]);
-
+		$validated = $request->validated();
 		$uid = Auth::user()->id;
-		$proposalId = $request->input('proposal_id');
+		$proposalId = $validated['proposal_id'];
 
 		$ballot = Ballots::updateOrCreate(
 			['userid' => $uid, 'proposalid' => $proposalId],
 			[
-				'encrypted_key' => $request->input('encrypted_key'),
-				'encryption_iv' => $request->input('encryption_iv'),
-				'hidden_target' => $request->input('hidden_target'),
+				'encrypted_key' => $validated['encrypted_key'],
+				'encryption_iv' => $validated['encryption_iv'] ?? null,
+				'hidden_target' => $validated['hidden_target'] ?? null,
 				'status' => 'in_shuffle',
 			]
 		);

@@ -104,13 +104,13 @@
 <script>
     toastr.options = { "positionClass": "toast-top-right", "timeOut": "4000", "closeButton": true };
     @if(session('message'))
-        toastr.success("{!! addslashes(session('message')) !!}");
+        toastr.success({!! json_encode(session('message')) !!});
     @endif
     @if(session('error'))
-        toastr.error("{!! addslashes(session('error')) !!}");
+        toastr.error({!! json_encode(session('error')) !!});
     @endif
     @if(session('warning'))
-        toastr.warning("{!! addslashes(session('warning')) !!}");
+        toastr.warning({!! json_encode(session('warning')) !!});
     @endif
 
     // Wallet Key Manager - encrypts mnemonic in localStorage with session token

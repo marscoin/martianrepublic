@@ -868,7 +868,7 @@
         });
 
         try {
-            var htmlContent = marked(`{!! addslashes($proposal->description) !!}`);
+            var htmlContent = marked(JSON.parse({!! json_encode(json_encode($proposal->description)) !!}));
             document.getElementById('markdown-container').innerHTML = htmlContent;
         } catch(e) {
             document.getElementById('markdown-container').textContent = `{{ $proposal->description }}`;

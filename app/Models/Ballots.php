@@ -18,6 +18,8 @@ class Ballots extends Model
     protected $casts = [
         'confirmed_at' => 'datetime',
         'notified' => 'boolean',
+        'encrypted_key' => 'encrypted',
+        'encryption_iv' => 'encrypted',
     ];
 
     /** @return BelongsTo<User, self> */

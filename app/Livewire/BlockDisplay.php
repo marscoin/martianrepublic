@@ -4,12 +4,16 @@ namespace App\Livewire;
 use Carbon\Carbon;
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Process;
 
 class BlockDisplay extends Component
 {
     public $blockNumber = 'Loading...';
     public $timeSinceLastBlock = "n/a";
     public $lastBlockMinedAt;
+
+    private const CLI = '/usr/local/bin/marscoin-cli';
+    private const DATA_DIR = '/root/.marscoin';
 
     public function mount()
     {
@@ -18,15 +22,16 @@ class BlockDisplay extends Component
 
     public function fetchBlockNumber()
     {
-        // Primary: use marscoin-cli directly (fastest, most reliable)
         try {
-            $output = shell_exec('/usr/local/bin/marscoin-cli -datadir=/root/.marscoin getblockcount 2>/dev/null');
-            if ($output && is_numeric(trim($output))) {
-                $height = (int) trim($output);
-                $hash = trim(shell_exec("/usr/local/bin/marscoin-cli -datadir=/root/.marscoin getblockhash {$height} 2>/dev/null"));
-                if ($hash) {
-                    $blockJson = shell_exec("/usr/local/bin/marscoin-cli -datadir=/root/.marscoin getblock {$hash} 2>/dev/null");
-                    $block = json_decode($blockJson, true);
+            $result = Process::timeout(10)->run([self::CLI, '-datadir=' . self::DATA_DIR, 'getblockcount']);
+            if ($result->successful() && is_numeric(trim($result->output()))) {
+                $height = (int) trim($result->output());
+
+                $result = Process::timeout(10)->run([self::CLI, '-datadir=' . self::DATA_DIR, 'getblockhash', (string) $height]);
+                $hash = trim($result->output());
+                if ($result->successful() && $hash) {
+                    $result = Process::timeout(10)->run([self::CLI, '-datadir=' . self::DATA_DIR, 'getblock', $hash]);
+                    $block = json_decode($result->output(), true);
                     if ($block && isset($block['time'])) {
                         $this->blockNumber = $height;
                         $this->lastBlockMinedAt = Carbon::createFromTimestamp($block['time']);

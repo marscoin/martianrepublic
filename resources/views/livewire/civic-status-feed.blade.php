@@ -25,7 +25,7 @@
                     </div>
                     <div style="flex: 1; min-width: 0;">
                         <div style="font-size: 13px; color: var(--mr-text, #e0dfe6); line-height: 1.4;">
-                            {!! $activity->displayMessage !!}
+                            {{ $activity->displayMessage }}
                         </div>
                         <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-faint, #5a5968); margin-top: 3px;">
                             @if($activity->mined)

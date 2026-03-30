@@ -36,7 +36,7 @@ jobs:
           composer install --prefer-dist --no-progress --no-suggest
 
       - name: Check for known vulnerabilities
-        run: composer audit || true
+        run: composer audit
 
       - name: Verify no PHP files in upload directories
         run: |

@@ -34,7 +34,7 @@ Route::get('/support', function () {
         return view('support')->render();
     });
 });
-Route::post('/contact', 'ContactFormController@sendEmail')->name('contact.send');
+Route::post('/contact', 'ContactFormController@sendEmail')->middleware('throttle:3,1')->name('contact.send');
 Route::get('/status', 'StatusController@showStatus');
 
 
@@ -45,8 +45,8 @@ Route::get("/forum", "ForumController@index")->name("forum.home");
 Route::get("/forum/t/{id}-{slug?}", "ForumController@show")->where("id", "[0-9]+")->name("forum.thread.show");
 Route::get("/forum/c/{id}-{slug?}", "ForumController@categoryThreads")->where("id", "[0-9]+")->name("forum.category");
 Route::middleware(["auth"])->group(function () {
-    Route::post("/forum/thread", "ForumController@storeThread")->name("forum.thread.store");
-    Route::post("/forum/t/{id}/post", "ForumController@storePost")->name("forum.post.store");
+    Route::post("/forum/thread", "ForumController@storeThread")->middleware("throttle:5,1")->name("forum.thread.store");
+    Route::post("/forum/t/{id}/post", "ForumController@storePost")->middleware("throttle:10,1")->name("forum.post.store");
 });
 
 
@@ -119,7 +119,7 @@ Route::middleware(['auth'])->group(function () {
 //
 // Congress Routes
 // ==================================================================================
-Route::post("/api/ai/chat", [App\Http\Controllers\AiHelperController::class, "chat"]);
+Route::post("/api/ai/chat", [App\Http\Controllers\AiHelperController::class, "chat"])->middleware("throttle:20,1");
 
 Route::get('/congress/all', 'Congress\CongressController@showAll');
 Route::get('/congress/proposal/{id?}', 'Congress\CongressController@proposal');

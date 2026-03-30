@@ -3,6 +3,7 @@
 namespace App\Includes;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
 
 /**
  * LegislationRepo — Git-based proposal versioning for the Martian Republic
@@ -229,7 +230,7 @@ class LegislationRepo
 
     private function git(string $cmd): string
     {
-        $full = "cd " . escapeshellarg($this->repoPath) . " && git {$cmd} 2>&1";
-        return shell_exec($full) ?? '';
+        $result = Process::timeout(30)->path($this->repoPath)->run("git {$cmd} 2>&1");
+        return $result->output() ?? '';
     }
 }
