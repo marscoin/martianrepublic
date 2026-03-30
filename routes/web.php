@@ -103,6 +103,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/inventory/{id}/delete', 'Inventory\InventoryController@destroy');
 });
 
+//
+// BADS Instrument Registry Routes
+// ==================================================================================
+Route::middleware(['auth'])->group(function () {
+    Route::get('/inventory/instruments', 'InstrumentController@index')->name('instruments.index');
+    Route::get('/inventory/instruments/create', 'InstrumentController@create')->name('instruments.create');
+    Route::post('/inventory/instruments', 'InstrumentController@store')->name('instruments.store');
+    Route::get('/inventory/instruments/{id}', 'InstrumentController@show')->name('instruments.show');
+    Route::get('/inventory/committees', 'InstrumentController@committees')->name('committees.index');
+    Route::get('/api/instruments/{id}/chain', 'InstrumentController@chainOfTrust');
+});
+
 
 //
 // Congress Routes
