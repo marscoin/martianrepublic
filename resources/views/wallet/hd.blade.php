@@ -2156,6 +2156,51 @@
                     WalletKey.set(decrypted)
                     $("#selected_wallet").val(JSON.stringify(selected_wallet))
 
+                    // Decrypt ALL wallet seeds with both PBKDF2 rounds and store mnemonics
+                    // This enables multi-wallet discovery on the Bridge page
+                    try {
+                        const allWallets = {!! json_encode(
+                            $wallets->map(fn($w) => ['encrypted_seed' => $w->encrypted_seed, 'public_addr' => $w->public_addr, 'type' => 'hd'])->merge(
+                                $civic_wallet ? [['encrypted_seed' => $civic_wallet->encrypted_seed, 'public_addr' => $civic_wallet->public_addr, 'type' => 'civic']] : []
+                            )->values()
+                        ) !!};
+                        
+                        const hashed100k = hashPassword(wallet_password);
+                        const hashed1 = hashPasswordLegacy(wallet_password);
+                        const allMnemonics = [];
+                        
+                        for (const w of allWallets) {
+                            if (!w.encrypted_seed) continue;
+                            const enc = w.encrypted_seed.replace(/\s+/g, '');
+                            let mnem = null;
+                            
+                            // Try 100k rounds
+                            try {
+                                const d = my_bundle.decrypt(enc, hashed100k, iv);
+                                if (d && d.trim().split(' ').length >= 12) mnem = d.trim();
+                            } catch(e) {}
+                            
+                            // Try 1 round
+                            if (!mnem) {
+                                try {
+                                    const d = my_bundle.decrypt(enc, hashed1, iv);
+                                    if (d && d.trim().split(' ').length >= 12) mnem = d.trim();
+                                } catch(e) {}
+                            }
+                            
+                            if (mnem && !allMnemonics.includes(mnem)) {
+                                allMnemonics.push(mnem);
+                                console.log('Multi-wallet: decrypted', w.type, w.public_addr);
+                            }
+                        }
+                        
+                        // Store all mnemonics for the Bridge page discovery
+                        localStorage.setItem('_allMnemonics', JSON.stringify(allMnemonics));
+                        console.log('Multi-wallet: stored', allMnemonics.length, 'unique mnemonics');
+                    } catch(e) {
+                        console.warn('Multi-wallet decrypt failed:', e.message);
+                    }
+
                     // If unlocked with legacy hash, re-encrypt with stronger hash
                     if (usedLegacy) {
                         try {

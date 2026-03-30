@@ -1704,44 +1704,14 @@
                 console.log("Wallet found. Starting HD address discovery...");
                 // Kick off HD address scan in background — then also scan other wallet seeds
                 discoverHDAddresses(unlockedWallet).then(async (result) => {
-                    // Also try decrypting other wallet seeds (may use different mnemonics / PBKDF2 rounds)
+                    // Scan additional mnemonics discovered during unlock (stored in localStorage)
                     try {
-                        const allWalletsRaw = '{!! addslashes($all_wallets ?? "[]") !!}';
-                        console.log('Multi-wallet: raw JSON length:', allWalletsRaw.length);
-                        const allWallets = JSON.parse(allWalletsRaw);
-                        const hashedCurrent = window._walletHashedPw || localStorage.getItem('_walletHashedPw') || '';
-                        const hashedLegacy = window._walletHashedPwLegacy || localStorage.getItem('_walletHashedPwLegacy') || '';
+                        const storedMnemonics = JSON.parse(localStorage.getItem('_allMnemonics') || '[]');
+                        console.log('Multi-wallet: found', storedMnemonics.length, 'stored mnemonics');
                         
-                        console.log('Multi-wallet: wallets count:', allWallets.length, 'hashedPw:', hashedCurrent ? 'YES' : 'NO', 'hashedLegacy:', hashedLegacy ? 'YES' : 'NO');
-                        
-                        if (allWallets.length > 0 && hashedCurrent) {
-                            
-                            for (const wallet of allWallets) {
-                                console.log('Multi-wallet: checking', wallet.type, wallet.public_addr, 'seed:', wallet.encrypted_seed?.substring(0,20) + '...');
-                                
-                                // Skip if this address is already in our results
-                                if (result.discovered.some(a => a.address === wallet.public_addr)) {
-                                    console.log('Multi-wallet: skipping (already discovered)');
-                                    continue;
-                                }
-                                
-                                // Try decrypting with both PBKDF2 round counts
-                                let otherMnemonic = null;
-                                try { 
-                                    const d = my_bundle.decrypt(wallet.encrypted_seed, hashedCurrent, {!! json_encode($iv ?? []) !!});
-                                    console.log('Multi-wallet: 100k-round decrypt result:', d ? d.substring(0,30) + '...' : 'null', 'words:', d ? d.trim().split(' ').length : 0);
-                                    if (d && d.trim().split(' ').length >= 12) otherMnemonic = d.trim();
-                                } catch(e) { console.log('Multi-wallet: 100k-round decrypt error:', e.message); }
-                                
-                                if (!otherMnemonic) {
-                                    try {
-                                        const d = my_bundle.decrypt(wallet.encrypted_seed, hashedLegacy, {!! json_encode($iv ?? []) !!});
-                                        console.log('Multi-wallet: 1-round decrypt result:', d ? d.substring(0,30) + '...' : 'null', 'words:', d ? d.trim().split(' ').length : 0);
-                                        if (d && d.trim().split(' ').length >= 12) otherMnemonic = d.trim();
-                                    } catch(e) { console.log('Multi-wallet: 1-round decrypt error:', e.message); }
-                                }
-                                
-                                if (otherMnemonic && otherMnemonic !== unlockedWallet.trim()) {
+                        for (const otherMnemonic of storedMnemonics) {
+                            if (otherMnemonic === unlockedWallet.trim()) continue; // skip primary
+                            console.log('Multi-wallet: scanning additional mnemonic...');
                                     console.log('Multi-wallet: found additional mnemonic for', wallet.type, wallet.public_addr);
                                     
                                     // Derive addresses from the other mnemonic
