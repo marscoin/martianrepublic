@@ -921,8 +921,19 @@
                             <h3 class="bridge-card-title portlet-title"><i class="fa fa-layer-group" style="margin-right: 6px; color: var(--mr-cyan);"></i> HD Addresses</h3>
                             <div class="portlet-body">
                                 <h2 id="hd-total-balance" style="font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 700; color: #fff; margin: 0 0 12px;">
-                                    <i class="fa fa-spinner fa-spin" style="color: var(--mr-text-dim);"></i> <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--mr-text-dim);">Discovering addresses...</span>
+                                    <span id="hd-discovery-status">
+                                        <i class="fa fa-spinner fa-spin" style="color: var(--mr-cyan);"></i>
+                                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mr-text-dim);">Scanning derivation paths...</span>
+                                    </span>
                                 </h2>
+                                <div id="hd-discovery-progress" style="margin-bottom: 12px; display: none;">
+                                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-dim); line-height: 1.8;">
+                                        <div id="dp-standard"><i class="fa fa-circle-notch fa-spin" style="width: 12px; color: var(--mr-text-faint);"></i> m/44'/2'/0' <span style="color: var(--mr-text-faint);">— Standard BIP44</span></div>
+                                        <div id="dp-genseed"><i class="fa fa-circle-notch fa-spin" style="width: 12px; color: var(--mr-text-faint);"></i> m/44'/2'/0'/0' <span style="color: var(--mr-text-faint);">— Extended derivation</span></div>
+                                        <div id="dp-genseed-alt"><i class="fa fa-circle-notch fa-spin" style="width: 12px; color: var(--mr-text-faint);"></i> m/44'/2'/0' (alt) <span style="color: var(--mr-text-faint);">— Legacy library</span></div>
+                                        <div id="dp-marscoin"><i class="fa fa-circle-notch fa-spin" style="width: 12px; color: var(--mr-text-faint);"></i> m/44'/107'/0' <span style="color: var(--mr-text-faint);">— Marscoin native</span></div>
+                                    </div>
+                                </div>
                                 <div id="hd-address-list" style="margin-top: 12px; font-size: 12px; display: none;"></div>
                                 <a href="javascript:;" id="hd-toggle-addresses" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-cyan, #00e4ff); display: none; margin-top: 8px;">
                                     <i class="fa fa-chevron-down" style="margin-right: 4px; font-size: 8px;"></i> Show all addresses
@@ -1318,19 +1329,17 @@
             const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
             const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
 
-            // Three derivation schemes that exist in the wild:
-            const schemes = [
-                { name: 'standard',  path: "m/44'/2'/0'"    },  // Standard Litecoin BIP44
-                { name: 'genseed',   path: "m/44'/2'/0'/0'" },  // genSeed extra hardened level
-                { name: 'marscoin',  path: "m/44'/107'/0'"  },  // Legacy Marscoin coin type
-            ];
-
+            // Derivation schemes that exist in the wild.
+            // CRITICAL: genSeed used my_bundle.bip32 (standalone BIP32Factory/tiny-secp256k1)
+            // which derives DIFFERENT child keys than my_bundle.bitcoin.bip32 (bitcoinjs-lib built-in).
+            // We must try BOTH libraries.
             const GAP_LIMIT = 20;
             const addresses = [];
 
-            for (const scheme of schemes) {
+            // Helper: derive addresses using a specific bip32 library
+            function deriveAddresses(bip32Lib, schemeName, path) {
                 try {
-                    const accountNode = root.derivePath(scheme.path);
+                    const accountNode = bip32Lib.fromSeed(seed, Marscoin.mainnet).derivePath(path);
                     for (let chain = 0; chain <= 1; chain++) {
                         const chainNode = accountNode.derive(chain);
                         for (let index = 0; index < GAP_LIMIT; index++) {
@@ -1338,25 +1347,67 @@
                             const addr = nodeToLegacyAddress(childNode);
                             addresses.push({
                                 address: addr,
-                                path: scheme.path + '/' + chain + '/' + index,
+                                path: path + '/' + chain + '/' + index,
                                 chain: chain === 0 ? 'receiving' : 'change',
                                 index: index,
-                                scheme: scheme.name,
+                                scheme: schemeName,
                             });
                         }
                     }
                 } catch(e) {
-                    console.warn('Skipping scheme ' + scheme.name + ':', e.message);
+                    console.warn('Skipping scheme ' + schemeName + ':', e.message);
                 }
             }
 
-            console.log('Discovery: checking ' + addresses.length + ' addresses across ' + schemes.length + ' schemes');
+            // Scheme 1: Standard BIP44 via bitcoinjs-lib bip32
+            deriveAddresses(my_bundle.bitcoin.bip32, 'standard', "m/44'/2'/0'");
+
+            // Scheme 2: genSeed path via bitcoinjs-lib bip32  
+            deriveAddresses(my_bundle.bitcoin.bip32, 'genseed', "m/44'/2'/0'/0'");
+
+            // Scheme 3: genSeed via standalone bip32 (BIP32Factory/tiny-secp256k1)
+            // This is what genSeed() ACTUALLY used — different library, different addresses!
+            if (my_bundle.bip32) {
+                deriveAddresses(my_bundle.bip32, 'genseed-alt', "m/44'/2'/0'");
+            }
+
+            // Scheme 4: Legacy Marscoin coin type
+            deriveAddresses(my_bundle.bitcoin.bip32, 'marscoin', "m/44'/107'/0'");
+
+            // Scheme 5: Also try standalone bip32 with genSeed's extra hardened level
+            if (my_bundle.bip32) {
+                deriveAddresses(my_bundle.bip32, 'genseed-alt-h', "m/44'/2'/0'/0'");
+            }
+
+            // Deduplicate addresses (same address from different schemes)
+            const seen = new Set();
+            const uniqueAddresses = addresses.filter(a => {
+                if (seen.has(a.address)) return false;
+                seen.add(a.address);
+                return true;
+            });
+
+            // Debug: show first address from each scheme
+            const schemeNames = [...new Set(uniqueAddresses.map(a => a.scheme))];
+            for (const name of schemeNames) {
+                const first = uniqueAddresses.find(a => a.scheme === name && a.chain === 'receiving' && a.index === 0);
+                if (first) console.log('Discovery [' + name + '] first addr: ' + first.address + ' path: ' + first.path);
+            }
+            console.log('Discovery: checking ' + uniqueAddresses.length + ' unique addresses (' + addresses.length + ' total across 5 schemes)');
+            console.log('Expected HD addr: {{ $public_addr }}');
+
+            // Show progress UI
+            $('#hd-discovery-progress').show();
 
             try {
+                // Mark derivation complete
+                $('#dp-standard i, #dp-genseed i, #dp-genseed-alt i, #dp-marscoin i').removeClass('fa-circle-notch fa-spin').addClass('fa-check').css('color', 'var(--mr-green)');
+                $('#hd-discovery-status span').text('Scanning ' + addresses.length + ' addresses against blockchain...');
+
                 const resp = await $.ajax({
                     url: '/api/discover',
                     type: 'POST',
-                    data: JSON.stringify({ addresses: addresses }),
+                    data: JSON.stringify({ addresses: uniqueAddresses }),
                     contentType: 'application/json',
                 });
 
@@ -1365,11 +1416,26 @@
                 var discovered = resp.addresses || [];
                 var totalBal = resp.totalBalance || 0;
 
-                // Log which schemes had funds
+                // Log which schemes had funds and update UI
                 const schemesFound = [...new Set(discovered.map(a => a.scheme))];
                 if (schemesFound.length > 0) {
                     console.log('Discovery: found funds in schemes:', schemesFound.join(', '));
                 }
+
+                // Update progress indicators with results
+                const schemeMap = { standard: '#dp-standard', genseed: '#dp-genseed', 'genseed-alt': '#dp-genseed-alt', 'genseed-alt-h': '#dp-genseed-alt', marscoin: '#dp-marscoin' };
+                for (const [name, selector] of Object.entries(schemeMap)) {
+                    const count = discovered.filter(a => a.scheme === name).length;
+                    if (count > 0) {
+                        $(selector + ' i').css('color', 'var(--mr-cyan)');
+                        $(selector).append(' <span style="color: var(--mr-cyan);">— ' + count + ' found</span>');
+                    } else {
+                        $(selector + ' i').removeClass('fa-check').addClass('fa-minus').css('color', 'var(--mr-text-faint)');
+                    }
+                }
+
+                // Fade out progress after 3 seconds
+                setTimeout(() => { $('#hd-discovery-progress').fadeOut(500); }, 3000);
 
                 // Check legacy/stored wallet address (may have been created by older code)
                 // This catches addresses not in the standard HD derivation tree
