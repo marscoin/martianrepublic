@@ -234,7 +234,7 @@ class CongressController extends Controller
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->wallet_open = $profile->civic_wallet_open;
-			$view->public_address = $civic_wallet->public_addr;
+			$view->public_address = $civic_wallet?->public_addr ?? "";
 			$endTime = microtime(true);
     		$executionTime = $endTime - $startTime;
     		Log::info("Execution time4a: {$executionTime} seconds");
@@ -276,7 +276,7 @@ class CongressController extends Controller
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->wallet_open = $profile->civic_wallet_open;
-			$view->public_address = $civic_wallet->public_addr;
+			$view->public_address = $civic_wallet?->public_addr ?? "";
 
 			return $view;
 		}else{
@@ -367,7 +367,7 @@ class CongressController extends Controller
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
 			$view->wallet_open = $profile->civic_wallet_open;
-			$view->public_address = $civic_wallet->public_addr;
+			$view->public_address = $civic_wallet?->public_addr ?? "";
 
 			// Compute current lifecycle phase
 			$view->lifecyclePhase = \App\Includes\GovernanceTiers::currentPhase($proposal);
@@ -397,10 +397,10 @@ class CongressController extends Controller
 			$view->fullname = Auth::user()->fullname;
 			$view->isCitizen = $profile->citizen;
 			$view->isGP  = $profile->general_public;
-			$view->wallet_open = $civic_wallet->id;
+			$view->wallet_open = $civic_wallet?->id ?? null;
 			$view->propid = $propid;
 			$view->random_bytes = bin2hex(random_bytes(16));
-			$view->public_address = $civic_wallet->public_addr;
+			$view->public_address = $civic_wallet?->public_addr ?? "";
 			$view->slug = AppHelper::createSlug($proposal->discussion, $proposal->title);
 
 			return $view;
