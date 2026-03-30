@@ -140,8 +140,8 @@ PROMPT;
         ]);
 
         $userMessages = array_slice($request->input('messages'), -10);
-        $apiKey = env('OPENROUTER_API_KEY');
-        $model = env('OPENROUTER_MODEL', 'qwen/qwen3-235b-a22b-2507');
+        $apiKey = config('services.openrouter.api_key');
+        $model = config('services.openrouter.model', 'qwen/qwen3-235b-a22b-2507');
 
         $messages = array_merge(
             [['role' => 'system', 'content' => $this->getSystemPrompt()]],

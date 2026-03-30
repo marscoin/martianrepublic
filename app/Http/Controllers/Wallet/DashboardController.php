@@ -721,6 +721,8 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
+				$user = Auth::user();
+				$citizen = $user->citizen;
 			$view = View::make('wallet.reports');
 			$view->network = AppHelper::getMarscoinNetworkInfo();
 			$view->user = $user;
@@ -775,6 +777,8 @@ class DashboardController extends Controller
 					return redirect('/twofachallenge');
 				}
 			}
+				$user = Auth::user();
+				$citizen = $user->citizen;
 			$view = View::make('wallet.camera');
 			$view->email = Auth::user()->email;
 			$view->network = AppHelper::getMarscoinNetworkInfo();

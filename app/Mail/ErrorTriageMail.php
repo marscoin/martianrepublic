@@ -43,7 +43,7 @@ class ErrorTriageMail extends Mailable
 
     private function extractSeverity(): string
     {
-        if (preg_match('/\*\*Severity\*\*\s*[—–:-]\s*(Critical|High|Medium|Low)/i', $this->aiSummary, $m)) {
+        if (preg_match('/\*\*Severity\*\*\s*[—–:\-]\s*(Critical|High|Medium|Low)/iu', $this->aiSummary, $m)) {
             return strtoupper($m[1]);
         }
         return 'ERROR';

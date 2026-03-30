@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Ballots extends Model
 {
@@ -19,12 +20,14 @@ class Ballots extends Model
         'notified' => 'boolean',
     ];
 
-    public function user()
+    /** @return BelongsTo<User, self> */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'userid');
     }
 
-    public function proposal()
+    /** @return BelongsTo<Proposals, self> */
+    public function proposal(): BelongsTo
     {
         return $this->belongsTo(Proposals::class, 'proposalid');
     }

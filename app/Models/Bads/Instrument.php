@@ -1,6 +1,8 @@
 <?php
 namespace App\Models\Bads;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Instrument extends Model
@@ -42,8 +44,15 @@ class Instrument extends Model
         0x07 => 'Deputy Cascade', 0x08 => 'Replaced',
     ];
 
-    public function certifiedBy() { return $this->belongsTo(Deputy::class, 'certified_by_deputy_id'); }
-    public function attestations() { return $this->hasMany(Attestation::class); }
-    public function anomalies() { return $this->hasMany(Anomaly::class); }
-    public function calibrations() { return $this->hasMany(CalibrationRecord::class); }
+    /** @return BelongsTo<Deputy, self> */
+    public function certifiedBy(): BelongsTo { return $this->belongsTo(Deputy::class, 'certified_by_deputy_id'); }
+
+    /** @return HasMany<Attestation> */
+    public function attestations(): HasMany { return $this->hasMany(Attestation::class); }
+
+    /** @return HasMany<Anomaly> */
+    public function anomalies(): HasMany { return $this->hasMany(Anomaly::class); }
+
+    /** @return HasMany<CalibrationRecord> */
+    public function calibrations(): HasMany { return $this->hasMany(CalibrationRecord::class); }
 }

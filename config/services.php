@@ -24,6 +24,11 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
+    'openrouter' => [
+        'api_key' => env('OPENROUTER_API_KEY'),
+        'model' => env('OPENROUTER_MODEL', 'qwen/qwen3-235b-a22b-2507'),
+    ],
+
     'error_triage' => [
         'openrouter_key' => env('OPENROUTER_TRIAGE_KEY'),
         'model' => env('OPENROUTER_TRIAGE_MODEL', 'openrouter/auto'),
