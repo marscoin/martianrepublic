@@ -632,13 +632,65 @@ class ApiController extends Controller {
 		if (!$address || !AppHelper::isValidMarscoinAddress($address)) {
 			return response()->json(['error' => 'Invalid address'], 400);
 		}
+
+		// Try Pebas first (has full Electrum history)
 		try {
-			$json = @file_get_contents(config('blockchain.pebas.url') . '/api/mars/txhistory/?address=' . urlencode($address));
-			if ($json) {
-				return response($json)->header('Content-Type', 'application/json');
+			$response = \Illuminate\Support\Facades\Http::timeout(5)
+				->get(config('blockchain.pebas.url') . '/api/mars/txhistory/', ['address' => $address]);
+			if ($response->successful()) {
+				$data = $response->json();
+				if (!isset($data['error'])) {
+					return response()->json($data);
+				}
 			}
 		} catch (\Exception $e) {}
-		return response()->json(['error' => 'Transaction history unavailable'], 500);
+
+		// Fallback: marscoind scantxoutset + getrawtransaction (txindex=1)
+		try {
+			$cli = config('blockchain.rpc.cli_path');
+			$dataDir = config('blockchain.rpc.data_dir');
+			$descriptors = json_encode(['addr(' . $address . ')']);
+
+			$result = \Illuminate\Support\Facades\Process::timeout(30)->run([
+				$cli, '-datadir=' . $dataDir, 'scantxoutset', 'start', $descriptors,
+			]);
+
+			if (!$result->successful()) {
+				return response()->json(['error' => 'Transaction history unavailable'], 500);
+			}
+
+			$scan = json_decode($result->output(), true);
+			$utxos = $scan['unspents'] ?? [];
+			$transactions = [];
+
+			foreach (array_slice($utxos, 0, 50) as $utxo) {
+				try {
+					$txResult = \Illuminate\Support\Facades\Process::timeout(10)->run([
+						$cli, '-datadir=' . $dataDir, 'getrawtransaction', $utxo['txid'], '1',
+					]);
+					if ($txResult->successful()) {
+						$tx = json_decode($txResult->output(), true);
+						$transactions[] = [
+							'txid' => $utxo['txid'],
+							'amount' => $utxo['amount'],
+							'confirmations' => $utxo['confirmations'] ?? 0,
+							'height' => $utxo['height'] ?? null,
+							'time' => $tx['time'] ?? null,
+							'blocktime' => $tx['blocktime'] ?? null,
+						];
+					}
+				} catch (\Exception $e) { continue; }
+			}
+
+			return response()->json([
+				'address' => $address,
+				'balance' => $scan['total_amount'] ?? 0,
+				'transactions' => $transactions,
+				'source' => 'marscoind',
+			]);
+		} catch (\Exception $e) {
+			return response()->json(['error' => 'Transaction history unavailable: ' . $e->getMessage()], 500);
+		}
 	}
 
 	public function closewallet(Request $request)
