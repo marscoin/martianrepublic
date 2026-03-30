@@ -24,6 +24,13 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
+    'error_triage' => [
+        'openrouter_key' => env('OPENROUTER_TRIAGE_KEY'),
+        'model' => env('OPENROUTER_TRIAGE_MODEL', 'openrouter/auto'),
+        'emails' => env('ERROR_TRIAGE_EMAILS', 'info@marscoin.org'),
+        'cooldown_minutes' => env('ERROR_TRIAGE_COOLDOWN', 15),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
