@@ -128,6 +128,67 @@ try {
 } catch(e) { html += '<span class="fail">Comparison error: ' + e.message + '</span>'; }
 html += '</pre>';
 
+
+// ====== EXHAUSTIVE WHITESPACE TEST ======
+html += '<h2>🔍 Exhaustive Whitespace Test</h2>';
+html += '<p>Target: MVk86WKySkawkjRqmiazWMnbrf39qpCkLD</p>';
+const mnemonicWithSpace = mnemonic + ' ';
+const mnemonicWithNewline = mnemonic + '\n';
+const variants = [
+    { name: 'Original (trimmed)', m: mnemonic },
+    { name: 'Trailing space x1', m: mnemonic + ' ' },
+    { name: 'Trailing space x2', m: mnemonic + '  ' },
+    { name: 'Trailing newline (LF)', m: mnemonic + '\n' },
+    { name: 'Trailing CR+LF', m: mnemonic + '\r\n' },
+    { name: 'Trailing CR', m: mnemonic + '\r' },
+    { name: 'Trailing tab', m: mnemonic + '\t' },
+    { name: 'Trailing nbsp (\\u00a0)', m: mnemonic + '\u00a0' },
+    { name: 'Leading space', m: ' ' + mnemonic },
+    { name: 'Leading newline', m: '\n' + mnemonic },
+    { name: 'Leading tab', m: '\t' + mnemonic },
+    { name: 'Both leading+trailing space', m: ' ' + mnemonic + ' ' },
+    { name: 'Double space after word 1', m: mnemonic.replace('circle ', 'circle  ') },
+    { name: 'Double space after word 6', m: mnemonic.replace('library ', 'library  ') },
+    { name: 'Newline between words', m: mnemonic.replace('autumn ', 'autumn\n') },
+    { name: 'Tab between words', m: mnemonic.replace('autumn ', 'autumn\t') },
+    { name: 'Trailing space+newline', m: mnemonic + ' \n' },
+    { name: 'Trailing newline+space', m: mnemonic + '\n ' },
+    { name: 'NFKD normalized', m: mnemonic.normalize('NFKD') },
+    { name: 'NFC normalized', m: mnemonic.normalize('NFC') },
+    { name: 'Lowercase (no-op)', m: mnemonic.toLowerCase() },
+];
+
+html += '<pre>';
+for (const v of variants) {
+    try {
+        const vSeed = my_bundle.bip39.mnemonicToSeedSync(v.m);
+        const vRoot = my_bundle.bitcoin.bip32.fromSeed(vSeed, Marscoin.mainnet);
+
+        // Standard path
+        const vChild1 = vRoot.derivePath("m/44'/2'/0'/0/0");
+        const vAddr1 = my_bundle.bitcoin.payments.p2pkh({pubkey: vChild1.publicKey, network: Marscoin.mainnet}).address;
+
+        // genSeed path
+        const vChild2 = vRoot.derivePath("m/44'/2'/0'/0'");
+        const vNode2 = my_bundle.bip32 ? my_bundle.bip32.fromBase58(vChild2.toBase58(), Marscoin.mainnet) : vRoot.derivePath("m/44'/2'/0'/0'");
+        const vAddr2 = my_bundle.bitcoin.payments.p2pkh({pubkey: vNode2.derive(0).derive(0).publicKey, network: Marscoin.mainnet}).address;
+
+        const match1 = vAddr1 === 'MVk86WKySkawkjRqmiazWMnbrf39qpCkLD' ? ' <span class="ok">MATCH HD!</span>' : '';
+        const match2 = vAddr2 === 'MVk86WKySkawkjRqmiazWMnbrf39qpCkLD' ? ' <span class="ok">MATCH HD!</span>' : '';
+        const matchCivic1 = vAddr1 === 'MLVcSocnecoZqXuk8Hy7DXvXHmnSwcBj4J' ? ' <span class="ok">MATCH CIVIC</span>' : '';
+        const matchCivic2 = vAddr2 === 'MLVcSocnecoZqXuk8Hy7DXvXHmnSwcBj4J' ? ' <span class="ok">MATCH CIVIC</span>' : '';
+
+        html += v.name + ':\n';
+        html += '  m/44\'/2\'/0\'/0/0:     ' + vAddr1 + match1 + matchCivic1 + '\n';
+        html += '  genSeed mixed-lib:      ' + vAddr2 + match2 + matchCivic2 + '\n\n';
+    } catch(e) {
+        html += v.name + ': <span class="fail">' + e.message + '</span>\n\n';
+    }
+}
+html += 'Target HD:    MVk86WKySkawkjRqmiazWMnbrf39qpCkLD\n';
+html += 'Target Civic: MLVcSocnecoZqXuk8Hy7DXvXHmnSwcBj4J\n';
+html += '</pre>';
+
 document.getElementById('results').innerHTML = html;
 </script>
 </body></html>
