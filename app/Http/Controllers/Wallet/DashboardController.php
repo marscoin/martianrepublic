@@ -474,6 +474,27 @@ class DashboardController extends Controller
 				// Pass civic wallet address for HD discovery linking
 				$view->civic_addr = $civic_wallet ? $civic_wallet->public_addr : '';
 
+				// Pass ALL wallet encrypted seeds for multi-wallet discovery
+				// Some wallets were encrypted with legacy 1-round PBKDF2
+				$allWallets = [];
+				foreach ($wallets as $w) {
+					if ($w->encrypted_seed && $w->public_addr) {
+						$allWallets[] = [
+							'encrypted_seed' => $w->encrypted_seed,
+							'public_addr' => $w->public_addr,
+							'type' => 'hd',
+						];
+					}
+				}
+				if ($civic_wallet && $civic_wallet->encrypted_seed) {
+					$allWallets[] = [
+						'encrypted_seed' => $civic_wallet->encrypted_seed,
+						'public_addr' => $civic_wallet->public_addr,
+						'type' => 'civic',
+					];
+				}
+				$view->all_wallets = json_encode($allWallets);
+
 				return $view;
 			}else{
 				return redirect('/wallet/dashboard/hd');

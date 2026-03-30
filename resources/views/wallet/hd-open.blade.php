@@ -1327,8 +1327,19 @@
         async function discoverHDAddresses(mnemonic) {
             // Multi-path discovery via local marscoind (no Electrum dependency)
             // Derives addresses from all known BIP44 paths and checks UTXOs in one RPC call
-            const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
+            const trimmedMnemonic = mnemonic.trim();
+            const seed = my_bundle.bip39.mnemonicToSeedSync(trimmedMnemonic);
             const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
+
+            // ALSO try the mnemonic WITHOUT trim — genSeed() historically didn't trim,
+            // so if the mnemonic was stored with trailing whitespace, it produces
+            // a completely different seed and therefore different addresses.
+            let untrimmedRoot = null;
+            if (mnemonic !== trimmedMnemonic) {
+                console.log('Discovery: mnemonic has whitespace differences — scanning untrimmed variant too');
+                const untrimmedSeed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
+                untrimmedRoot = my_bundle.bitcoin.bip32.fromSeed(untrimmedSeed, Marscoin.mainnet);
+            }
 
             // Derivation schemes that exist in the wild.
             // CRITICAL: genSeed used my_bundle.bip32 (standalone BIP32Factory/tiny-secp256k1)
@@ -1424,6 +1435,31 @@
 
             // Scheme 5: Legacy Marscoin coin type
             deriveAddresses(my_bundle.bitcoin.bip32, 'marscoin', "m/44'/107'/0'");
+
+            // Scheme 6+: If mnemonic had whitespace, try ALL paths with untrimmed seed
+            if (untrimmedRoot) {
+                function deriveUntrimmed(schemeName, path) {
+                    try {
+                        const accountNode = untrimmedRoot.derivePath(path);
+                        for (let chain = 0; chain <= 1; chain++) {
+                            const chainNode = accountNode.derive(chain);
+                            for (let index = 0; index < GAP_LIMIT; index++) {
+                                const childNode = chainNode.derive(index);
+                                const addr = nodeToLegacyAddress(childNode);
+                                addresses.push({
+                                    address: addr,
+                                    path: path + '/' + chain + '/' + index + ' (untrimmed)',
+                                    chain: chain === 0 ? 'receiving' : 'change',
+                                    index: index,
+                                    scheme: schemeName,
+                                });
+                            }
+                        }
+                    } catch(e) { console.warn('Skipping ' + schemeName + ':', e.message); }
+                }
+                deriveUntrimmed('untrimmed-std', "m/44'/2'/0'");
+                deriveUntrimmed('untrimmed-genseed', "m/44'/2'/0'/0'");
+            }
 
             // Deduplicate addresses (same address from different schemes)
             const seen = new Set();
@@ -1666,8 +1702,103 @@
             }
             else {
                 console.log("Wallet found. Starting HD address discovery...");
-                // Kick off HD address scan in background
-                discoverHDAddresses(unlockedWallet).then(result => {
+                // Kick off HD address scan in background — then also scan other wallet seeds
+                discoverHDAddresses(unlockedWallet).then(async (result) => {
+                    // Also try decrypting other wallet seeds (may use different mnemonics / PBKDF2 rounds)
+                    try {
+                        const allWallets = JSON.parse('{!! addslashes($all_wallets ?? "[]") !!}');
+                        const password = document.getElementById('unlock-password')?.value || '';
+                        
+                        if (allWallets.length > 0 && password) {
+                            const hashedCurrent = hashPassword(password);
+                            const hashedLegacy = hashPasswordLegacy(password);
+                            
+                            for (const wallet of allWallets) {
+                                // Skip if this address is already in our results
+                                if (result.discovered.some(a => a.address === wallet.public_addr)) continue;
+                                
+                                // Try decrypting with both PBKDF2 round counts
+                                let otherMnemonic = null;
+                                try { 
+                                    const d = my_bundle.decrypt(wallet.encrypted_seed, hashedCurrent, {!! json_encode($iv ?? []) !!});
+                                    if (d && d.trim().split(' ').length >= 12) otherMnemonic = d.trim();
+                                } catch(e) {}
+                                
+                                if (!otherMnemonic) {
+                                    try {
+                                        const d = my_bundle.decrypt(wallet.encrypted_seed, hashedLegacy, {!! json_encode($iv ?? []) !!});
+                                        if (d && d.trim().split(' ').length >= 12) otherMnemonic = d.trim();
+                                    } catch(e) {}
+                                }
+                                
+                                if (otherMnemonic && otherMnemonic !== unlockedWallet.trim()) {
+                                    console.log('Multi-wallet: found additional mnemonic for', wallet.type, wallet.public_addr);
+                                    
+                                    // Derive addresses from the other mnemonic
+                                    const otherSeed = my_bundle.bip39.mnemonicToSeedSync(otherMnemonic);
+                                    const otherRoot = my_bundle.bitcoin.bip32.fromSeed(otherSeed, Marscoin.mainnet);
+                                    const otherAddresses = [];
+                                    
+                                    for (const path of ["m/44'/2'/0'", "m/44'/2'/0'/0'"]) {
+                                        try {
+                                            const account = otherRoot.derivePath(path);
+                                            for (let chain = 0; chain <= 1; chain++) {
+                                                for (let index = 0; index < 10; index++) {
+                                                    const addr = nodeToLegacyAddress(account.derive(chain).derive(index));
+                                                    otherAddresses.push({
+                                                        address: addr,
+                                                        path: path + '/' + chain + '/' + index,
+                                                        chain: chain === 0 ? 'receiving' : 'change',
+                                                        index: index,
+                                                        scheme: wallet.type + '-wallet',
+                                                    });
+                                                }
+                                            }
+                                        } catch(e) {}
+                                    }
+                                    
+                                    // Also add the stored address directly
+                                    otherAddresses.push({
+                                        address: wallet.public_addr,
+                                        path: 'stored/' + wallet.type,
+                                        chain: 'receiving',
+                                        index: 0,
+                                        scheme: wallet.type + '-stored',
+                                    });
+                                    
+                                    // Check these addresses against blockchain
+                                    try {
+                                        const seen = new Set(otherAddresses.map(a => a.address));
+                                        const unique = otherAddresses.filter(a => { 
+                                            if (seen.has(a.address)) { seen.delete(a.address); return true; } 
+                                            return false; 
+                                        });
+                                        
+                                        const resp = await $.ajax({
+                                            url: '/api/discover',
+                                            type: 'POST',
+                                            data: JSON.stringify({ addresses: unique }),
+                                            contentType: 'application/json',
+                                        });
+                                        
+                                        if (resp.addresses && resp.addresses.length > 0) {
+                                            for (const found of resp.addresses) {
+                                                found.chain = 'hd-wallet';
+                                                result.discovered.push(found);
+                                                result.totalBalance += found.balance;
+                                            }
+                                            console.log('Multi-wallet: found', resp.addresses.length, 'addresses with', resp.totalBalance, 'MARS');
+                                        }
+                                    } catch(e) {
+                                        console.warn('Multi-wallet discovery failed:', e);
+                                    }
+                                }
+                            }
+                        }
+                    } catch(e) {
+                        console.warn('Multi-wallet scan error:', e);
+                    }
+                    
                     renderAddressDiscovery(result);
 
                     // Update the nav balance widget with HD total
