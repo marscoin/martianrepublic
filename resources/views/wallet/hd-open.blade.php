@@ -1,3 +1,4 @@
+{{-- v2026.03.30.2 --}}
 <html lang="en" class="no-js">
 <head>
     <title>Marscoin Wallet</title>
@@ -1365,19 +1366,64 @@
             // Scheme 2: genSeed path via bitcoinjs-lib bip32  
             deriveAddresses(my_bundle.bitcoin.bip32, 'genseed', "m/44'/2'/0'/0'");
 
-            // Scheme 3: genSeed via standalone bip32 (BIP32Factory/tiny-secp256k1)
-            // This is what genSeed() ACTUALLY used — different library, different addresses!
+            // Scheme 3: EXACT genSeed reproduction — the critical one!
+            // genSeed uses bitcoin.bip32 to derive, serializes to tpub, then
+            // re-imports with my_bundle.bip32 (DIFFERENT library). The serialize/
+            // deserialize round-trip between libraries produces different child keys.
             if (my_bundle.bip32) {
-                deriveAddresses(my_bundle.bip32, 'genseed-alt', "m/44'/2'/0'");
+                try {
+                    const gsAccount = root.derivePath("m/44'/2'/0'/0'");
+                    const gsTpub = gsAccount.toBase58();
+                    const gsNode = my_bundle.bip32.fromBase58(gsTpub, Marscoin.mainnet);
+                    // genSeed does gsNode.derive(0).derive(0) for the first address
+                    for (let chain = 0; chain <= 1; chain++) {
+                        const chainNode = gsNode.derive(chain);
+                        for (let index = 0; index < GAP_LIMIT; index++) {
+                            const childNode = chainNode.derive(index);
+                            const addr = nodeToLegacyAddress(childNode);
+                            addresses.push({
+                                address: addr,
+                                path: "m/44'/2'/0'/0'/" + chain + "/" + index + " (mixed-lib)",
+                                chain: chain === 0 ? 'receiving' : 'change',
+                                index: index,
+                                scheme: 'genseed-mixed',
+                            });
+                        }
+                    }
+                    console.log('Discovery [genseed-mixed] first addr:', addresses.find(a => a.scheme === 'genseed-mixed' && a.index === 0)?.address);
+                } catch(e) {
+                    console.warn('Skipping genseed-mixed:', e.message);
+                }
             }
 
-            // Scheme 4: Legacy Marscoin coin type
+            // Scheme 4: Same mixed-lib trick but from m/44'/2'/0' (no extra hardened)
+            if (my_bundle.bip32) {
+                try {
+                    const gsAccount2 = root.derivePath("m/44'/2'/0'").neutered();
+                    const gsTpub2 = gsAccount2.toBase58();
+                    const gsNode2 = my_bundle.bip32.fromBase58(gsTpub2, Marscoin.mainnet);
+                    for (let chain = 0; chain <= 1; chain++) {
+                        const chainNode = gsNode2.derive(chain);
+                        for (let index = 0; index < GAP_LIMIT; index++) {
+                            const childNode = chainNode.derive(index);
+                            const addr = nodeToLegacyAddress(childNode);
+                            addresses.push({
+                                address: addr,
+                                path: "m/44'/2'/0'/" + chain + "/" + index + " (mixed-lib-std)",
+                                chain: chain === 0 ? 'receiving' : 'change',
+                                index: index,
+                                scheme: 'standard-mixed',
+                            });
+                        }
+                    }
+                    console.log('Discovery [standard-mixed] first addr:', addresses.find(a => a.scheme === 'standard-mixed' && a.index === 0)?.address);
+                } catch(e) {
+                    console.warn('Skipping standard-mixed:', e.message);
+                }
+            }
+
+            // Scheme 5: Legacy Marscoin coin type
             deriveAddresses(my_bundle.bitcoin.bip32, 'marscoin', "m/44'/107'/0'");
-
-            // Scheme 5: Also try standalone bip32 with genSeed's extra hardened level
-            if (my_bundle.bip32) {
-                deriveAddresses(my_bundle.bip32, 'genseed-alt-h', "m/44'/2'/0'/0'");
-            }
 
             // Deduplicate addresses (same address from different schemes)
             const seen = new Set();
@@ -1478,7 +1524,7 @@
                     discovered: discovered,
                     totalBalance: totalBal,
                     totalUnconfirmed: resp.totalUnconfirmed || 0,
-                    xpub: xpub,
+                    xpub: null, // xpub no longer used in multi-path discovery
                 };
             } catch (serverErr) {
                 console.warn("Server-side discovery failed, falling back to client-side:", serverErr);
