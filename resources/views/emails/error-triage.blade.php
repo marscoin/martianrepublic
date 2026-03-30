@@ -12,7 +12,7 @@
 
 <!-- Header -->
 <tr><td style="background: linear-gradient(135deg, #2a1a1a 0%, #12121e 100%); padding: 40px 40px 30px; text-align: center;">
-    <img src="https://www.martianrepublic.org/images/logo.png" alt="Martian Republic" width="48" style="margin-bottom: 16px;">
+    <img src="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic" width="48" style="margin-bottom: 16px;">
     <h1 style="margin: 0; font-family: 'Orbitron', sans-serif; font-size: 20px; color: #ff4444; letter-spacing: 2px;">⚠ ERROR TRIAGE ALERT</h1>
     <p style="margin: 8px 0 0; color: #8a8998; font-size: 14px;">AI-assisted error analysis for the Martian Republic</p>
 </td></tr>

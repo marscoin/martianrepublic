@@ -12,7 +12,7 @@
 
 <!-- Header -->
 <tr><td style="background: linear-gradient(135deg, #1a1a2a 0%, #12121e 100%); padding: 40px 40px 30px; text-align: center;">
-    <img src="https://www.martianrepublic.org/images/logo.png" alt="Martian Republic" width="48" style="margin-bottom: 16px;">
+    <img src="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png" alt="Martian Republic" width="48" style="margin-bottom: 16px;">
     <h1 style="margin: 0; font-family: 'Orbitron', sans-serif; font-size: 22px; color: #00e4ff; letter-spacing: 2px;">YOUR BALLOT IS READY</h1>
     <p style="margin: 8px 0 0; color: #8a8998; font-size: 14px;">Cast your vote on the Marscoin blockchain</p>
 </td></tr>
