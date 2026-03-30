@@ -88,3 +88,4 @@ tests/visual/integration-test.mjs
 node_modules/
 package-lock.json
 storage/legislation/
+backups/

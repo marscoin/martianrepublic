@@ -10,91 +10,11 @@ use App\Models\Profile;
 use App\Http\Controllers\ForumController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 
-uses(Tests\TestCase::class)->beforeEach(function () {
-    $schema = Schema::connection('sqlite');
-    $schema->dropAllTables();
-
-    $schema->create('users', function ($table) {
-        $table->id();
-        $table->string('fullname');
-        $table->string('email')->unique();
-        $table->string('password');
-        $table->timestamps();
-        $table->rememberToken();
-    });
-
-    $schema->create('sessions', function ($table) {
-        $table->string('id')->primary();
-        $table->foreignId('user_id')->nullable()->index();
-        $table->string('ip_address', 45)->nullable();
-        $table->text('user_agent')->nullable();
-        $table->longText('payload');
-        $table->integer('last_activity')->index();
-    });
-
-    $schema->create('profile', function ($table) {
-        $table->integer('id', true);
-        $table->integer('userid')->nullable()->unique();
-        $table->integer('twofaset')->nullable();
-        $table->string('twofakey', 500)->nullable();
-        $table->integer('openchallenge')->nullable();
-        $table->timestamps();
-        $table->integer('wallet_open')->default(0);
-        $table->integer('civic_wallet_open')->default(0);
-        $table->integer('general_public')->nullable();
-        $table->integer('endorse_cnt')->nullable();
-        $table->integer('citizen')->nullable();
-    });
-
-    $schema->create('forum_categories', function ($table) {
-        $table->id();
-        $table->unsignedBigInteger('parent_id')->nullable();
-        $table->string('title');
-        $table->text('description')->nullable();
-        $table->string('color', 7)->default('#00e4ff');
-        $table->integer('weight')->default(0);
-        $table->boolean('accepts_threads')->default(true);
-        $table->boolean('is_private')->default(false);
-        $table->integer('thread_count')->default(0);
-        $table->integer('post_count')->default(0);
-        $table->timestamps();
-    });
-
-    $schema->create('forum_threads', function ($table) {
-        $table->id();
-        $table->unsignedBigInteger('category_id');
-        $table->unsignedBigInteger('author_id');
-        $table->string('title');
-        $table->string('slug')->nullable();
-        $table->boolean('pinned')->default(false);
-        $table->boolean('locked')->default(false);
-        $table->integer('reply_count')->default(0);
-        $table->timestamps();
-        $table->softDeletes();
-    });
-
-    $schema->create('forum_posts', function ($table) {
-        $table->id();
-        $table->unsignedBigInteger('thread_id');
-        $table->unsignedBigInteger('author_id');
-        $table->text('body');
-        $table->integer('sequence')->default(1);
-        $table->timestamps();
-        $table->softDeletes();
-    });
-
-    $schema->create('proposals', function ($table) {
-        $table->integer('id', true);
-        $table->integer('user_id')->nullable();
-        $table->string('title', 500)->nullable();
-        $table->text('description')->nullable();
-        $table->string('status', 50)->default('submitted');
-        $table->string('tier', 50)->nullable();
-        $table->integer('discussion')->nullable();
-        $table->timestamps();
-    });
+uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(function () {
+    $this->createCoreTables();
+    $this->createForumTables();
+    $this->createProposalTables();
 });
 
 test('ForumController class exists and has expected methods', function () {

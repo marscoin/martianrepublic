@@ -146,7 +146,6 @@ We welcome contributions! Here's how:
 4. Run `./vendor/bin/pest --exclude-group wip` (all tests must pass)
 5. Submit a pull request with a clear description
 
-See [CODE_QUALITY_AUDIT.md](CODE_QUALITY_AUDIT.md) for known issues and improvement opportunities.
 
 ### Areas Where Help Is Needed
 

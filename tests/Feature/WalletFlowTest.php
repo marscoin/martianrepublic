@@ -16,145 +16,15 @@ use App\Models\Feed;
 use App\Models\InventoryItem;
 use App\Models\Proposals;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 
-uses(Tests\TestCase::class)->beforeEach(function () {
-    $schema = Schema::connection('sqlite');
-    $schema->dropAllTables();
-
-    $schema->create('users', function ($table) {
-        $table->id();
-        $table->string('fullname');
-        $table->string('email')->unique();
-        $table->string('password');
-        $table->timestamps();
-        $table->rememberToken();
-    });
-
-    $schema->create('sessions', function ($table) {
-        $table->string('id')->primary();
-        $table->foreignId('user_id')->nullable()->index();
-        $table->string('ip_address', 45)->nullable();
-        $table->text('user_agent')->nullable();
-        $table->longText('payload');
-        $table->integer('last_activity')->index();
-    });
-
-    $schema->create('profile', function ($table) {
-        $table->integer('id', true);
-        $table->integer('userid')->nullable()->unique();
-        $table->integer('twofaset')->nullable();
-        $table->string('twofakey', 500)->nullable();
-        $table->integer('openchallenge')->nullable();
-        $table->timestamps();
-        $table->integer('wallet_open')->default(0);
-        $table->integer('civic_wallet_open')->default(0);
-        $table->integer('general_public')->nullable();
-        $table->integer('endorse_cnt')->nullable();
-        $table->integer('citizen')->nullable();
-        $table->integer('has_application')->nullable()->default(0);
-        $table->integer('signed_eula')->nullable()->default(0);
-    });
-
-    $schema->create('civic_wallet', function ($table) {
-        $table->integer('id', true);
-        $table->integer('user_id')->nullable();
-        $table->string('wallet_type', 50)->nullable();
-        $table->text('backup')->nullable();
-        $table->text('encrypted_seed')->nullable();
-        $table->string('public_addr', 100)->nullable()->unique();
-        $table->timestamp('opened_at')->nullable();
-        $table->timestamps();
-    });
-
-    $schema->create('hd_wallet', function ($table) {
-        $table->integer('id', true);
-        $table->integer('user_id')->nullable();
-        $table->string('wallet_type', 50)->nullable();
-        $table->text('backup')->nullable();
-        $table->text('encrypted_seed')->nullable();
-        $table->string('public_addr', 100)->nullable()->unique();
-        $table->timestamp('opened_at')->nullable();
-        $table->timestamps();
-    });
-
-    $schema->create('citizen', function ($table) {
-        $table->integer('id', true);
-        $table->integer('userid')->nullable();
-        $table->string('firstname', 100)->nullable();
-        $table->string('lastname', 100)->nullable();
-        $table->string('displayname', 200)->nullable();
-        $table->text('shortbio')->nullable();
-        $table->string('avatar_link', 500)->nullable();
-        $table->string('liveness_link', 500)->nullable();
-        $table->string('public_address', 100)->nullable();
-        $table->timestamps();
-    });
-
-    $schema->create('feed', function ($table) {
-        $table->integer('id', true);
-        $table->integer('userid')->nullable();
-        $table->string('address', 100)->nullable();
-        $table->string('tag', 10)->nullable();
-        $table->text('message')->nullable();
-        $table->string('txid', 200)->nullable();
-        $table->string('embedded_link', 500)->nullable();
-        $table->string('ipfs_hash', 200)->nullable();
-        $table->integer('blockid')->nullable();
-        $table->timestamp('mined')->nullable();
-        $table->timestamps();
-    });
-
-    $schema->create('proposals', function ($table) {
-        $table->integer('id', true);
-        $table->integer('user_id')->nullable();
-        $table->string('title', 500)->nullable();
-        $table->text('description')->nullable();
-        $table->string('category', 100)->nullable();
-        $table->string('status', 50)->default('submitted');
-        $table->integer('active')->default(1);
-        $table->integer('duration')->nullable();
-        $table->integer('discussion')->nullable();
-        $table->string('txid', 200)->nullable();
-        $table->string('ipfs_hash', 200)->nullable();
-        $table->timestamps();
-        $table->timestamp('mined')->nullable();
-    });
-
-    $schema->create('votes', function ($table) {
-        $table->integer('id', true);
-        $table->integer('proposal_id')->nullable();
-        $table->string('vote', 5)->nullable();
-        $table->string('txid', 200)->nullable();
-        $table->timestamps();
-    });
-
-    $schema->create('publications', function ($table) {
-        $table->integer('id', true);
-        $table->integer('userid')->nullable();
-        $table->string('title', 500)->nullable();
-        $table->text('content')->nullable();
-        $table->string('ipfs_hash', 200)->nullable();
-        $table->timestamps();
-    });
-
-    $schema->create('inventory_items', function ($table) {
-        $table->id();
-        $table->integer('userid');
-        $table->string('name');
-        $table->text('description')->nullable();
-        $table->string('category');
-        $table->integer('quantity')->default(1);
-        $table->string('unit')->nullable();
-        $table->string('location')->nullable();
-        $table->string('condition');
-        $table->string('ipfs_hash')->nullable();
-        $table->string('notarization')->nullable();
-        $table->timestamp('notarized_at')->nullable();
-        $table->string('image_path')->nullable();
-        $table->timestamps();
-        $table->softDeletes();
-    });
+uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(function () {
+    $this->createCoreTables();
+    $this->createWalletTables();
+    $this->createCitizenTable();
+    $this->createFeedTable();
+    $this->createProposalTables();
+    $this->createPublicationTable();
+    $this->createInventoryTable();
 });
 
 // Helper to create a fully set-up user with wallet
