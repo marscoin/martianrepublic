@@ -155,7 +155,7 @@
 
 ### Critical
 
-- [ ] **T1. ApiController — 20+ methods, 0 tests**
+- [x] **T1. ApiController — 20+ methods, 0 tests**
   - `allPublic()`, `allCitizen()`, `marsAuth()`, `token()`, `deleteUser()`, `blockUser()`
   - These handle mobile auth and critical API flows
 
@@ -169,20 +169,20 @@
 
 ### High
 
-- [ ] **T4. Test data duplication across 5 files**
+- [x] **T4. Test data duplication across 5 files**
   - User/Profile/Session schema created separately in each test file
   - Fix: Extract shared `DatabaseSetup` trait or use migration paths
 
-- [ ] **T5. Controllers with zero test coverage**
+- [x] **T5. Controllers with zero test coverage**
   - `StatusController`, `ContactFormController`, `InventoryController`
   - `LogbookController`, `MapController`, `Wallet/ApiController`
   - 14/22 controllers have no dedicated tests
 
-- [ ] **T6. No middleware tests**
+- [x] **T6. No middleware tests**
   - `SecurityHeaders`, `InjectSentryJs`, `Authenticate` untested
   - Fix: Verify headers present, Sentry script injected
 
-- [ ] **T7. CI has no coverage threshold**
+- [x] **T7. CI has no coverage threshold**
   - Pipeline runs coverage but doesn't enforce minimum %
   - Fix: Add minimum coverage gate (start at 40%, increase to 60%)
 
