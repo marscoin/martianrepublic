@@ -1706,28 +1706,39 @@
                 discoverHDAddresses(unlockedWallet).then(async (result) => {
                     // Also try decrypting other wallet seeds (may use different mnemonics / PBKDF2 rounds)
                     try {
-                        const allWallets = JSON.parse('{!! addslashes($all_wallets ?? "[]") !!}');
-                        const hashedCurrent = window._walletHashedPw || '';
-                        const hashedLegacy = window._walletHashedPwLegacy || '';
+                        const allWalletsRaw = '{!! addslashes($all_wallets ?? "[]") !!}';
+                        console.log('Multi-wallet: raw JSON length:', allWalletsRaw.length);
+                        const allWallets = JSON.parse(allWalletsRaw);
+                        const hashedCurrent = window._walletHashedPw || localStorage.getItem('_walletHashedPw') || '';
+                        const hashedLegacy = window._walletHashedPwLegacy || localStorage.getItem('_walletHashedPwLegacy') || '';
+                        
+                        console.log('Multi-wallet: wallets count:', allWallets.length, 'hashedPw:', hashedCurrent ? 'YES' : 'NO', 'hashedLegacy:', hashedLegacy ? 'YES' : 'NO');
                         
                         if (allWallets.length > 0 && hashedCurrent) {
                             
                             for (const wallet of allWallets) {
+                                console.log('Multi-wallet: checking', wallet.type, wallet.public_addr, 'seed:', wallet.encrypted_seed?.substring(0,20) + '...');
+                                
                                 // Skip if this address is already in our results
-                                if (result.discovered.some(a => a.address === wallet.public_addr)) continue;
+                                if (result.discovered.some(a => a.address === wallet.public_addr)) {
+                                    console.log('Multi-wallet: skipping (already discovered)');
+                                    continue;
+                                }
                                 
                                 // Try decrypting with both PBKDF2 round counts
                                 let otherMnemonic = null;
                                 try { 
                                     const d = my_bundle.decrypt(wallet.encrypted_seed, hashedCurrent, {!! json_encode($iv ?? []) !!});
+                                    console.log('Multi-wallet: 100k-round decrypt result:', d ? d.substring(0,30) + '...' : 'null', 'words:', d ? d.trim().split(' ').length : 0);
                                     if (d && d.trim().split(' ').length >= 12) otherMnemonic = d.trim();
-                                } catch(e) {}
+                                } catch(e) { console.log('Multi-wallet: 100k-round decrypt error:', e.message); }
                                 
                                 if (!otherMnemonic) {
                                     try {
                                         const d = my_bundle.decrypt(wallet.encrypted_seed, hashedLegacy, {!! json_encode($iv ?? []) !!});
+                                        console.log('Multi-wallet: 1-round decrypt result:', d ? d.substring(0,30) + '...' : 'null', 'words:', d ? d.trim().split(' ').length : 0);
                                         if (d && d.trim().split(' ').length >= 12) otherMnemonic = d.trim();
-                                    } catch(e) {}
+                                    } catch(e) { console.log('Multi-wallet: 1-round decrypt error:', e.message); }
                                 }
                                 
                                 if (otherMnemonic && otherMnemonic !== unlockedWallet.trim()) {
@@ -2652,6 +2663,10 @@
             // Stash hashes for multi-wallet discovery
             window._walletHashedPw = hashed;
             window._walletHashedPwLegacy = hashPasswordLegacy(user_password);
+            
+            // Persist password hashes in localStorage for multi-wallet discovery
+            localStorage.setItem('_walletHashedPw', hashed);
+            localStorage.setItem('_walletHashedPwLegacy', hashPasswordLegacy(user_password));
 
 
             const user_wallet = "{{ $public_addr }}"
