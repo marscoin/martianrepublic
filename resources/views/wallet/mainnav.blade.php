@@ -69,7 +69,7 @@
                     @else
                     <li class="dropdown">
                 @endif
-                <a href="/inventory/all">
+                <a href="/inventory/instruments">
                     Inventory
                 </a>
                 </li>
