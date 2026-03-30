@@ -21,12 +21,12 @@ class SecurityHeaders
         // Content-Security-Policy
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://browser.sentry-cdn.com",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
             "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com data:",
             "img-src 'self' data: blob: https://ipfs.marscoin.org https://*.tile.openstreetmap.org https://trek.nasa.gov https://upload.wikimedia.org",
             "media-src 'self' blob: https://ipfs.marscoin.org",
-            "connect-src 'self' https://ipfs.marscoin.org https://explore1.marscoin.org https://explore.marscoin.org https://pebas.marscoin.org https://price.marscoin.org https://trek.nasa.gov https://upload.wikimedia.org wss:",
+            "connect-src 'self' https://ipfs.marscoin.org https://explore1.marscoin.org https://explore.marscoin.org https://pebas.marscoin.org https://price.marscoin.org https://trek.nasa.gov https://upload.wikimedia.org https://*.ingest.us.sentry.io wss:",
             "frame-ancestors 'self'",
             "base-uri 'self'",
             "form-action 'self'",
