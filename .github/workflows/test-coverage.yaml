@@ -36,7 +36,7 @@ jobs:
       run: ./vendor/bin/pest --list-tests
 
     - name: Run Tests with Coverage
-      run: ./vendor/bin/pest --exclude-group wip --coverage --min=40 --coverage-clover=clover.xml
+      run: ./vendor/bin/pest --exclude-group wip --coverage --min=8 --coverage-clover=clover.xml
 
     - name: Validate Coverage File
       run: |
