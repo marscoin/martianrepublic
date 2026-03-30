@@ -1707,11 +1707,10 @@
                     // Also try decrypting other wallet seeds (may use different mnemonics / PBKDF2 rounds)
                     try {
                         const allWallets = JSON.parse('{!! addslashes($all_wallets ?? "[]") !!}');
-                        const password = document.getElementById('unlock-password')?.value || '';
+                        const hashedCurrent = window._walletHashedPw || '';
+                        const hashedLegacy = window._walletHashedPwLegacy || '';
                         
-                        if (allWallets.length > 0 && password) {
-                            const hashedCurrent = hashPassword(password);
-                            const hashedLegacy = hashPasswordLegacy(password);
+                        if (allWallets.length > 0 && hashedCurrent) {
                             
                             for (const wallet of allWallets) {
                                 // Skip if this address is already in our results
@@ -2650,6 +2649,9 @@
         function unlockWallet(user_password, encrypted_seed) {
 
             const hashed = hashPassword(user_password);
+            // Stash hashes for multi-wallet discovery
+            window._walletHashedPw = hashed;
+            window._walletHashedPwLegacy = hashPasswordLegacy(user_password);
 
 
             const user_wallet = "{{ $public_addr }}"
