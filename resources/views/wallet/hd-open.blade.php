@@ -1313,23 +1313,63 @@
         // Scans BIP44 derivation paths to find all addresses with balance
         // ============================================================
         async function discoverHDAddresses(mnemonic) {
-            // Server-side discovery via pebas (fast, single API call)
-            // Pebas now uses bitcoinjs-lib bip32 (same as client) - one source of truth
+            // Multi-path discovery via local marscoind (no Electrum dependency)
+            // Derives addresses from all known BIP44 paths and checks UTXOs in one RPC call
             const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
             const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
-            const xpub = root.derivePath("m/44'/2'/0'").neutered().toBase58();
+
+            // Three derivation schemes that exist in the wild:
+            const schemes = [
+                { name: 'standard',  path: "m/44'/2'/0'"    },  // Standard Litecoin BIP44
+                { name: 'genseed',   path: "m/44'/2'/0'/0'" },  // genSeed extra hardened level
+                { name: 'marscoin',  path: "m/44'/107'/0'"  },  // Legacy Marscoin coin type
+            ];
+
+            const GAP_LIMIT = 20;
+            const addresses = [];
+
+            for (const scheme of schemes) {
+                try {
+                    const accountNode = root.derivePath(scheme.path);
+                    for (let chain = 0; chain <= 1; chain++) {
+                        const chainNode = accountNode.derive(chain);
+                        for (let index = 0; index < GAP_LIMIT; index++) {
+                            const childNode = chainNode.derive(index);
+                            const addr = nodeToLegacyAddress(childNode);
+                            addresses.push({
+                                address: addr,
+                                path: scheme.path + '/' + chain + '/' + index,
+                                chain: chain === 0 ? 'receiving' : 'change',
+                                index: index,
+                                scheme: scheme.name,
+                            });
+                        }
+                    }
+                } catch(e) {
+                    console.warn('Skipping scheme ' + scheme.name + ':', e.message);
+                }
+            }
+
+            console.log('Discovery: checking ' + addresses.length + ' addresses across ' + schemes.length + ' schemes');
 
             try {
                 const resp = await $.ajax({
                     url: '/api/discover',
                     type: 'POST',
-                    data: { xpub: xpub, gap_limit: 20 },
+                    data: JSON.stringify({ addresses: addresses }),
+                    contentType: 'application/json',
                 });
 
                 if (resp.error) throw new Error(resp.error);
 
                 var discovered = resp.addresses || [];
                 var totalBal = resp.totalBalance || 0;
+
+                // Log which schemes had funds
+                const schemesFound = [...new Set(discovered.map(a => a.scheme))];
+                if (schemesFound.length > 0) {
+                    console.log('Discovery: found funds in schemes:', schemesFound.join(', '));
+                }
 
                 // Check legacy/stored wallet address (may have been created by older code)
                 // This catches addresses not in the standard HD derivation tree
