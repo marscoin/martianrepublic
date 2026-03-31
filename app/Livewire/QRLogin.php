@@ -14,7 +14,7 @@ class QRLogin extends Component
 
     public $qrCode = '';
 
-    public $qrCodeImage;
+    public string $qrCodeImage = "";
 
     public function mount()
     {

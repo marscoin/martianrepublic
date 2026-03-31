@@ -17,7 +17,7 @@
         </div>
         <div wire:loading.remove wire:poll.30000ms="generateQRCode">
             @if($qrCodeImage)
-                <img src="data:image/png;base64,{{ $qrCodeImage }}" height="250" width="250">
+                <img src="data:image/png;base64,{{ is_string($qrCodeImage) ? $qrCodeImage : (is_array($qrCodeImage) ? json_encode($qrCodeImage) : '') }}" height="250" width="250">
             @endif
         </div>
         
