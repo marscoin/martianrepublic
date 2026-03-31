@@ -92,7 +92,7 @@
   - `app/Http/Controllers/Wallet/ApiController.php` — 923 lines, 23+ methods
     - Split into: `IpfsController`, `WalletTransactionController`, `FeedController`
 
-- [ ] **A2. No service layer — all logic in controllers**
+- [x] **A2. No service layer — all logic in controllers**
   - Create `app/Services/ProposalService.php` — phase sync, lifecycle
   - Create `app/Services/BallotService.php` — acquire, confirm, encrypt
   - Create `app/Services/WalletService.php` — balance aggregation, address discovery
