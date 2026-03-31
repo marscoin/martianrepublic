@@ -21,9 +21,8 @@ return new class extends Migration
             $table->rememberToken();
             $table->enum('status', ['active', 'inactive'])->nullable()->default('active');
         });
-    
-    }
 
+    }
 
     /**
      * Reverse the migrations.

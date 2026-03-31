@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -12,7 +13,7 @@ class Ballots extends Model
     protected $fillable = [
         'userid', 'proposalid', 'btxid', 'status',
         'encrypted_key', 'encryption_iv', 'ballot_txid',
-        'confirmed_at', 'notified', 'hidden_target'
+        'confirmed_at', 'notified', 'hidden_target',
     ];
 
     protected $casts = [
@@ -37,7 +38,7 @@ class Ballots extends Model
     /**
      * Get pending ballots that are confirmed but not yet voted on.
      */
-    public static function pendingForUser(int $userId): \Illuminate\Database\Eloquent\Collection
+    public static function pendingForUser(int $userId): Collection
     {
         return static::where('userid', $userId)
             ->where('status', 'received')

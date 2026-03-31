@@ -2,13 +2,14 @@
 
 namespace TeamTeaTime\Forum\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use TeamTeaTime\Forum\Support\Api\ForumApi;
 
 class ThreadResource extends JsonResource
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)
@@ -40,7 +41,7 @@ class ThreadResource extends JsonResource
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      */
     public function with($request)

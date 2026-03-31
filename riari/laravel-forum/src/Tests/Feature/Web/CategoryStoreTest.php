@@ -12,6 +12,7 @@ class CategoryStoreTest extends FeatureTestCase
     private const ROUTE = 'category.store';
 
     private UserFactory $userFactory;
+
     private User $user;
 
     protected function setUp(): void

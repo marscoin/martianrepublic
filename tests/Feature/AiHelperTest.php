@@ -4,16 +4,16 @@
  * Tests for the AI helper (Olympus) and error triage system.
  */
 
-use App\Mail\ErrorTriageMail;
 use App\Jobs\ErrorTriageJob;
-use Illuminate\Support\Facades\Schema;
+use App\Mail\ErrorTriageMail;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class)->beforeEach(function () {
+uses(TestCase::class)->beforeEach(function () {
     $this->artisan('migrate:fresh', [
         '--path' => [
             'database/migrations/2025_01_26_202544_create_users_table.php',
             'database/migrations/2025_01_26_202544_create_mars_sessions_table.php',
-        ]
+        ],
     ]);
 });
 

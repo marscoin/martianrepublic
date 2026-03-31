@@ -20,10 +20,10 @@ class BallotKeyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'proposal_id'    => 'required|integer',
-            'encrypted_key'  => 'required|string|max:2000',
-            'encryption_iv'  => 'nullable|string|max:500',
-            'hidden_target'  => 'nullable|string|max:200',
+            'proposal_id' => 'required|integer',
+            'encrypted_key' => 'required|string|max:2000',
+            'encryption_iv' => 'nullable|string|max:500',
+            'hidden_target' => 'nullable|string|max:200',
         ];
     }
 }

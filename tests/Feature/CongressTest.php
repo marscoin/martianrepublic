@@ -6,15 +6,15 @@
  * RouteServiceProvider namespace prefix issues in test environment.
  */
 
-use App\Models\User;
-use App\Models\Profile;
-use App\Models\Proposals;
-use App\Models\Ballots;
 use App\Http\Controllers\Congress\CongressController;
+use App\Models\Ballots;
+use App\Models\Proposals;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\Request;
+use Tests\CreatesTestDatabase;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(function () {
+uses(TestCase::class, CreatesTestDatabase::class)->beforeEach(function () {
     $this->createCoreTables();
     $this->createProposalTables();
     $this->createBallotTable();
@@ -22,7 +22,7 @@ uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(functi
 });
 
 test('Proposals model has correct table and casts', function () {
-    $proposal = new Proposals();
+    $proposal = new Proposals;
     expect($proposal->getTable())->toBe('proposals');
     expect($proposal->getCasts())->toHaveKey('created_at');
 });

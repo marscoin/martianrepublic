@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -8,8 +9,8 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @var string
  */
-class Publication extends Model {
-
+class Publication extends Model
+{
     protected $table = 'publications';
 
     protected $fillable = [
@@ -21,7 +22,4 @@ class Publication extends Model {
         'notarized_at',
         'blockid',
     ];
-
 }
-
-?>

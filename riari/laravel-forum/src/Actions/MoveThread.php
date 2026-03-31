@@ -9,6 +9,7 @@ use TeamTeaTime\Forum\Models\Thread;
 class MoveThread extends BaseAction
 {
     private Thread $thread;
+
     private Category $destinationCategory;
 
     public function __construct(Thread $thread, Category $destinationCategory)

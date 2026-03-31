@@ -12,7 +12,9 @@ class CountdownTimer extends Component
      * Create a new component instance.
      */
     public $endTime;
+
     public $proposalId;
+
     public $startTime;
 
     public function __construct($proposalId, $endTime, $startTime)

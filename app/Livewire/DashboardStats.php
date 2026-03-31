@@ -2,14 +2,32 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\{CivicWallet, Proposals, Profile, HDWallet};
-use Illuminate\Support\Facades\Auth;
 use App\Includes\AppHelper;
+use App\Models\CivicWallet;
+use App\Models\HDWallet;
+use App\Models\Profile;
+use App\Models\Proposals;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class DashboardStats extends Component
 {
-    public $public_addr, $balance, $received, $sent, $forum_count, $proposal_count, $citizen_status, $wallet_open;
+    public $public_addr;
+
+    public $balance;
+
+    public $received;
+
+    public $sent;
+
+    public $forum_count;
+
+    public $proposal_count;
+
+    public $citizen_status;
+
+    public $wallet_open;
+
     public $isLoaded = false;
 
     public function mount()
@@ -17,18 +35,14 @@ class DashboardStats extends Component
         $uid = Auth::user()->id;
         $profile = Profile::where('userid', '=', $uid)->first();
         $openwallet = null;
-        if($profile && $profile->wallet_open > 0)
-        {
+        if ($profile && $profile->wallet_open > 0) {
             $openwallet = HDWallet::where('id', '=', $profile->wallet_open)->first();
             $this->public_addr = $openwallet ? $openwallet->public_address : 'n/a';
-        }
-        else if ($profile && $profile->civic_wallet_open > 0)
-        {
+        } elseif ($profile && $profile->civic_wallet_open > 0) {
             $openwallet = CivicWallet::where('id', '=', $profile->civic_wallet_open)->first();
             $this->public_addr = $openwallet ? $openwallet->public_address : 'n/a';
-        }
-        else{
-            $this->public_addr =  "n/a";
+        } else {
+            $this->public_addr = 'n/a';
         }
         $this->received = 0;
         $this->sent = 0;
@@ -41,22 +55,19 @@ class DashboardStats extends Component
 
     public function loadData()
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect('/login');
         }
         $user = Auth::user();
         $uid = $user->id;
         $profile = Profile::where('userid', '=', $uid)->first();
         $openwallet = null;
-        if($profile->wallet_open > 0)
-        {
+        if ($profile->wallet_open > 0) {
             $openwallet = HDWallet::where('id', '=', $profile->wallet_open)->first();
             $this->public_addr = $openwallet ? $openwallet->public_addr : '';
-        }
-        else if ($profile->civic_wallet_open > 0)
-        {
+        } elseif ($profile->civic_wallet_open > 0) {
             $openwallet = CivicWallet::where('id', '=', $profile->civic_wallet_open)->first();
-            $this->public_addr = $openwallet ? $openwallet->public_addr : ''; 
+            $this->public_addr = $openwallet ? $openwallet->public_addr : '';
         }
         $this->received = $openwallet ? AppHelper::getMarscoinTotalReceived($this->public_addr) : 0;
         $this->sent = $openwallet ? AppHelper::getMarscoinTotalSent($this->public_addr) : 0;

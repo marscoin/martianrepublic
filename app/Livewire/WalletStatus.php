@@ -2,34 +2,40 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\Profile; 
-use App\Models\CivicWallet; 
-use App\Models\HDWallet; 
 use App\Includes\AppHelper;
+use App\Models\CivicWallet;
+use App\Models\HDWallet;
+use App\Models\Profile;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class WalletStatus extends Component
 {
     public $uid;
+
     public $balance = 0;
+
     public $loading = true;
+
     public $wallet_open = false;
+
     public $previous_balance = 0;
-    
+
     public function loadWalletData()
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             $this->loading = false;
+
             return;
         }
         $profile = Profile::where('userid', '=', $user->id)->first();
 
-        if (!$profile || ($profile->wallet_open == 0 && $profile->civic_wallet_open == 0)) {
+        if (! $profile || ($profile->wallet_open == 0 && $profile->civic_wallet_open == 0)) {
             $this->wallet_open = false;
             $this->balance = 0;
             $this->loading = false;
+
             return;
         }
 

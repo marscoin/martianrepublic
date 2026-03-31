@@ -8,6 +8,7 @@ use TeamTeaTime\Forum\Models\Thread;
 class DeleteThread extends BaseAction
 {
     private Thread $thread;
+
     private bool $permaDelete;
 
     public function __construct(Thread $thread, bool $permaDelete = false)

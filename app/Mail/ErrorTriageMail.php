@@ -46,6 +46,7 @@ class ErrorTriageMail extends Mailable
         if (preg_match('/\*\*Severity\*\*\s*[—–:\-]\s*(Critical|High|Medium|Low)/iu', $this->aiSummary, $m)) {
             return strtoupper($m[1]);
         }
+
         return 'ERROR';
     }
 }

@@ -2,15 +2,17 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\{CivicWallet, HDWallet, Profile};
-use Illuminate\Support\Facades\Auth;
 use App\Includes\AppHelper;
+use App\Models\CivicWallet;
+use App\Models\HDWallet;
+use App\Models\Profile;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class HodlerStats extends Component
 {
-
     public $coincount;
+
     public $balance;
 
     public function mount()
@@ -23,7 +25,9 @@ class HodlerStats extends Component
     public function loadCoinCount()
     {
         $user = Auth::user();
-        if (!$user) return;
+        if (! $user) {
+            return;
+        }
 
         $totalBalance = 0;
         $profile = Profile::where('userid', '=', $user->id)->first();

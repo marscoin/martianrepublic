@@ -3,8 +3,15 @@
 namespace App\Exceptions;
 
 use App\Jobs\ErrorTriageJob;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -57,13 +64,13 @@ class Handler extends ExceptionHandler
 
         // Skip non-500 exceptions (validation, auth, 404, etc.)
         $skipExceptions = [
-            \Illuminate\Auth\AuthenticationException::class,
-            \Illuminate\Auth\Access\AuthorizationException::class,
-            \Illuminate\Database\Eloquent\ModelNotFoundException::class,
-            \Illuminate\Validation\ValidationException::class,
-            \Symfony\Component\HttpKernel\Exception\HttpException::class,
-            \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class,
-            \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException::class,
+            AuthenticationException::class,
+            AuthorizationException::class,
+            ModelNotFoundException::class,
+            ValidationException::class,
+            HttpException::class,
+            NotFoundHttpException::class,
+            MethodNotAllowedHttpException::class,
         ];
 
         foreach ($skipExceptions as $type) {
@@ -73,8 +80,8 @@ class Handler extends ExceptionHandler
         }
 
         // Dedup: same exception class + file + line = same error
-        $fingerprint = md5(get_class($e) . $e->getFile() . $e->getLine());
-        $cacheKey = 'error_triage:' . $fingerprint;
+        $fingerprint = md5(get_class($e).$e->getFile().$e->getLine());
+        $cacheKey = 'error_triage:'.$fingerprint;
         $cooldown = (int) config('services.error_triage.cooldown_minutes', 15);
 
         if (Cache::has($cacheKey)) {

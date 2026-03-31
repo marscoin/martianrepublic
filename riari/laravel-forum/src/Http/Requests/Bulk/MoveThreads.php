@@ -17,6 +17,7 @@ class MoveThreads extends FormRequest implements FulfillableRequest
     use AuthorizesAfterValidation;
 
     private ?Collection $sourceCategories = null;
+
     private ?Category $destinationCategory = null;
 
     public function rules(): array

@@ -1,22 +1,22 @@
 <?php
 
 namespace App\Livewire;
-use Illuminate\Support\Facades\Auth;
+
 use App\Models\CivicWallet;
-use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\Feed;
+use Livewire\Component;
 
 class CitizenStats extends Component
 {
-
     public $userId;
-    public $userAddress; 
+
+    public $userAddress;
 
     public function mount()
     {
         $uid = Auth::user()->id;
-		$civic = CivicWallet::where('user_id', '=', $uid)->first();
+        $civic = CivicWallet::where('user_id', '=', $uid)->first();
         $this->userId = $uid;
         $this->userAddress = $civic ? $civic->public_addr : '';
     }
@@ -29,7 +29,7 @@ class CitizenStats extends Component
             ->count();
 
         $endorsedReceivedCount = DB::table('feed')
-            ->where('message', 'like', '%' . $this->userAddress . '%')
+            ->where('message', 'like', '%'.$this->userAddress.'%')
             ->where('tag', 'ED') // Assuming this is how you determine endorsements received
             ->count();
 

@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 
-class Voucher extends Model {
-
+class Voucher extends Model
+{
     protected $table = 'vouchers';
 
     protected $fillable = [
@@ -12,7 +13,4 @@ class Voucher extends Model {
         'user_account',
         'redeemed',
     ];
-
 }
-
-?>

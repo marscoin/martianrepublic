@@ -9,7 +9,9 @@ use TeamTeaTime\Forum\Models\Thread;
 class DeleteThreads extends BaseAction
 {
     private array $threadIds;
+
     private bool $includeTrashed;
+
     private bool $permaDelete;
 
     public function __construct(array $threadIds, bool $includeTrashed, bool $permaDelete = false)

@@ -9,7 +9,9 @@ use TeamTeaTime\Forum\Models\Post;
 class DeletePosts extends BaseAction
 {
     private array $postIds;
+
     private bool $includeTrashed;
+
     private bool $permaDelete;
 
     public function __construct(array $postIds, bool $includeTrashed, bool $permaDelete = false)

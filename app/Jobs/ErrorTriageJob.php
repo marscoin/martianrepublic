@@ -37,6 +37,7 @@ class ErrorTriageJob implements ShouldQueue
 
         if (! $apiKey) {
             Log::warning('ErrorTriage: No OpenRouter API key configured');
+
             return;
         }
 
@@ -95,7 +96,7 @@ PROMPT;
     {
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
+                'Authorization' => 'Bearer '.$apiKey,
                 'HTTP-Referer' => 'https://martianrepublic.org',
                 'X-Title' => 'Martian Republic Error Triage',
             ])->timeout(30)->post('https://openrouter.ai/api/v1/chat/completions', [
@@ -112,14 +113,16 @@ PROMPT;
             $usedModel = $data['model'] ?? $model;
 
             if ($content) {
-                return $content . "\n\n— Triaged by: {$usedModel}";
+                return $content."\n\n— Triaged by: {$usedModel}";
             }
 
             Log::warning('ErrorTriage: Empty AI response', ['response' => $data]);
-            return 'AI triage unavailable — empty response from ' . $model;
+
+            return 'AI triage unavailable — empty response from '.$model;
         } catch (\Throwable $e) {
             Log::warning('ErrorTriage: AI call failed', ['error' => $e->getMessage()]);
-            return 'AI triage unavailable — ' . $e->getMessage();
+
+            return 'AI triage unavailable — '.$e->getMessage();
         }
     }
 }

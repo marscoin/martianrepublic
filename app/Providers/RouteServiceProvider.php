@@ -18,6 +18,7 @@ class RouteServiceProvider extends ServiceProvider
      * @var string
      */
     public const HOME = '/wallet/dashboard';
+
     public const CHECK = '/check';
 
     /**

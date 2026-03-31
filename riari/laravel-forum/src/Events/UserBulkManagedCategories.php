@@ -10,6 +10,7 @@ class UserBulkManagedCategories extends BaseEvent
     public $user;
 
     public int $categoriesAffected;
+
     public array $categoryData;
 
     public function __construct($user, int $categoriesAffected, array $categoryData)

@@ -20,9 +20,9 @@ class ChallengeTierRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'proposalId'   => 'required|integer',
+            'proposalId' => 'required|integer',
             'proposedTier' => 'required|in:signal,operational,legislative,constitutional',
-            'reason'       => 'required|string|max:5000',
+            'reason' => 'required|string|max:5000',
         ];
     }
 }

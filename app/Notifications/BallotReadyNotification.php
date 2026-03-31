@@ -24,13 +24,13 @@ class BallotReadyNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Your Ballot is Ready — ' . $this->proposalTitle)
+            ->subject('Your Ballot is Ready — '.$this->proposalTitle)
             ->view('emails.ballot.ready', [
                 'user' => $notifiable,
                 'proposalId' => $this->proposalId,
                 'proposalTitle' => $this->proposalTitle,
                 'ballotTxid' => $this->ballotTxid,
-                'voteUrl' => url('/congress/ballot/' . $this->proposalId),
+                'voteUrl' => url('/congress/ballot/'.$this->proposalId),
             ]);
     }
 }

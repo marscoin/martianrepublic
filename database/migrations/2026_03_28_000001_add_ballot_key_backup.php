@@ -23,7 +23,7 @@ return new class extends Migration
         Schema::table('ballots', function (Blueprint $table) {
             $table->dropColumn([
                 'encrypted_key', 'encryption_iv', 'ballot_txid',
-                'confirmed_at', 'notified', 'hidden_target'
+                'confirmed_at', 'notified', 'hidden_target',
             ]);
         });
     }

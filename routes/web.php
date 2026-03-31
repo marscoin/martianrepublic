@@ -1,16 +1,27 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AiHelperController;
+use App\Http\Controllers\ApiController;
+use App\Http\Controllers\Citizen\IdentityController;
+use App\Http\Controllers\Congress\CongressController;
+use App\Http\Controllers\ContactFormController;
+use App\Http\Controllers\ForumController;
+use App\Http\Controllers\InstrumentController;
+use App\Http\Controllers\Inventory\InventoryController;
+use App\Http\Controllers\Logbook\LogbookController;
+use App\Http\Controllers\Planet\MapController;
+use App\Http\Controllers\StatusController;
 use App\Http\Controllers\Wallet\DashboardController;
+use App\Http\Controllers\Wallet\DiscoveryController;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth'])
     ->name('dashboard');
-    
+
 Route::get('/', function () {
     return Cache::remember('home.page', 260000, function () {
         return view('landing')->render();
@@ -34,118 +45,112 @@ Route::get('/support', function () {
         return view('support')->render();
     });
 });
-Route::post('/contact', 'ContactFormController@sendEmail')->middleware('throttle:3,1')->name('contact.send');
-Route::get('/status', 'StatusController@showStatus');
-
+Route::post('/contact', [ContactFormController::class, 'sendEmail'])->middleware('throttle:3,1')->name('contact.send');
+Route::get('/status', [StatusController::class, 'showStatus']);
 
 //
 // Native Forum (The Forum) — registered before vendor routes for priority
 // ==================================================================================
-Route::get("/forum", "ForumController@index")->name("forum.home");
-Route::get("/forum/t/{id}-{slug?}", "ForumController@show")->where("id", "[0-9]+")->name("forum.thread.show");
-Route::get("/forum/c/{id}-{slug?}", "ForumController@categoryThreads")->where("id", "[0-9]+")->name("forum.category");
-Route::middleware(["auth"])->group(function () {
-    Route::post("/forum/thread", "ForumController@storeThread")->middleware("throttle:5,1")->name("forum.thread.store");
-    Route::post("/forum/t/{id}/post", "ForumController@storePost")->middleware("throttle:10,1")->name("forum.post.store");
+Route::get('/forum', [ForumController::class, 'index'])->name('forum.home');
+Route::get('/forum/t/{id}-{slug?}', [ForumController::class, 'show'])->where('id', '[0-9]+')->name('forum.thread.show');
+Route::get('/forum/c/{id}-{slug?}', [ForumController::class, 'categoryThreads'])->where('id', '[0-9]+')->name('forum.category');
+Route::middleware(['auth'])->group(function () {
+    Route::post('/forum/thread', [ForumController::class, 'storeThread'])->middleware('throttle:5,1')->name('forum.thread.store');
+    Route::post('/forum/t/{id}/post', [ForumController::class, 'storePost'])->middleware('throttle:10,1')->name('forum.post.store');
 });
-
 
 //
 // Wallet (all require authentication)
 // ==================================================================================
 
 Route::middleware(['auth'])->group(function () {
-    Route::any('/wallet/dashboard', 'Wallet\DashboardController@showDashboard');
-    Route::get('/wallet/profile', 'Wallet\DashboardController@showProfile');
-    Route::get('/wallet/dashboard/buy', 'Wallet\DashboardController@showBuy');
-    Route::get('/wallet/dashboard/send', 'Wallet\DashboardController@showSend');
-    Route::get('/wallet/dashboard/receive', 'Wallet\DashboardController@showReceive');
-    Route::get('/wallet/reports', 'Wallet\DashboardController@showReports');
-    Route::get('/wallet/features', 'Wallet\DashboardController@showFeatures');
-    Route::get('/wallet/camera', 'Wallet\DashboardController@showCamera');
-    Route::get('/wallet/dashboard/transactions', 'Wallet\DashboardController@showTransactions');
-    Route::get('/wallet/anchor', 'Wallet\DashboardController@anchor');
-    Route::post('/wallet/forget', 'Wallet\DashboardController@forgetWallet');
+    Route::any('/wallet/dashboard', [DashboardController::class, 'showDashboard']);
+    Route::get('/wallet/profile', [DashboardController::class, 'showProfile']);
+    Route::get('/wallet/dashboard/buy', [DashboardController::class, 'showBuy']);
+    Route::get('/wallet/dashboard/send', [DashboardController::class, 'showSend']);
+    Route::get('/wallet/dashboard/receive', [DashboardController::class, 'showReceive']);
+    Route::get('/wallet/reports', [DashboardController::class, 'showReports']);
+    Route::get('/wallet/features', [DashboardController::class, 'showFeatures']);
+    Route::get('/wallet/camera', [DashboardController::class, 'showCamera']);
+    Route::get('/wallet/dashboard/transactions', [DashboardController::class, 'showTransactions']);
+    Route::get('/wallet/anchor', [DashboardController::class, 'anchor']);
+    Route::post('/wallet/forget', [DashboardController::class, 'forgetWallet']);
 
-    Route::any('/wallet/dashboard/hd', 'Wallet\DashboardController@listHDWallet');
-    Route::get('/wallet/create', 'Wallet\DashboardController@showCreateWallet');
-    Route::any('/wallet/dashboard/hd-open', 'Wallet\DashboardController@showHDOpen');
-    Route::any('/wallet/dashboard/hd-close', 'Wallet\DashboardController@showHDClose');
-    Route::any('/wallet/getwallet', 'Wallet\DashboardController@getWallet');
-    Route::any('/wallet/failwallet', 'Wallet\DashboardController@failWallet');
+    Route::any('/wallet/dashboard/hd', [DashboardController::class, 'listHDWallet']);
+    Route::get('/wallet/create', [DashboardController::class, 'showCreateWallet']);
+    Route::any('/wallet/dashboard/hd-open', [DashboardController::class, 'showHDOpen']);
+    Route::any('/wallet/dashboard/hd-close', [DashboardController::class, 'showHDClose']);
+    Route::any('/wallet/getwallet', [DashboardController::class, 'getWallet']);
+    Route::any('/wallet/failwallet', [DashboardController::class, 'failWallet']);
 
-    Route::post('/wallet/createwallet', 'Wallet\DashboardController@postCreateWallet');
-    Route::post('/wallet/dashboard/buy', 'Wallet\DashboardController@postBuy');
+    Route::post('/wallet/createwallet', [DashboardController::class, 'postCreateWallet']);
+    Route::post('/wallet/dashboard/buy', [DashboardController::class, 'postBuy']);
 
-    Route::any('/check', 'Wallet\DashboardController@showChallenge');
-    Route::any('/twofa', 'Wallet\DashboardController@show2FA');
-    Route::any('/twofachallenge', 'Wallet\DashboardController@show2FAChallenge');
+    Route::any('/check', [DashboardController::class, 'showChallenge']);
+    Route::any('/twofa', [DashboardController::class, 'show2FA']);
+    Route::any('/twofachallenge', [DashboardController::class, 'show2FAChallenge']);
 });
 
-
-// 
+//
 // Citizen Routes
 // ==================================================================================
-Route::get('/citizen/all', 'Citizen\IdentityController@showAll');
-Route::get('/citizen/join', 'Citizen\IdentityController@showJoin');
-Route::get('/citizen/printout', 'Citizen\IdentityController@printout');
-Route::get('/citizen/printout2', 'Citizen\IdentityController@printout2');
-Route::get('/citizen/printout3', 'Citizen\IdentityController@printout3');
-Route::get('/citizen/id/{address?}', 'Citizen\IdentityController@showId');
+Route::get('/citizen/all', [IdentityController::class, 'showAll']);
+Route::get('/citizen/join', [IdentityController::class, 'showJoin']);
+Route::get('/citizen/printout', [IdentityController::class, 'printout']);
+Route::get('/citizen/printout2', [IdentityController::class, 'printout2']);
+Route::get('/citizen/printout3', [IdentityController::class, 'printout3']);
+Route::get('/citizen/id/{address?}', [IdentityController::class, 'showId']);
 
 //
 // Inventory Routes
 // ==================================================================================
-Route::get('/inventory/all', 'Inventory\InventoryController@showAll');
+Route::get('/inventory/all', [InventoryController::class, 'showAll']);
 Route::middleware(['auth'])->group(function () {
-    Route::post('/inventory/store', 'Inventory\InventoryController@store');
-    Route::post('/inventory/{id}/update', 'Inventory\InventoryController@update');
-    Route::post('/inventory/{id}/delete', 'Inventory\InventoryController@destroy');
+    Route::post('/inventory/store', [InventoryController::class, 'store']);
+    Route::post('/inventory/{id}/update', [InventoryController::class, 'update']);
+    Route::post('/inventory/{id}/delete', [InventoryController::class, 'destroy']);
 });
 
 //
 // BADS Instrument Registry Routes
 // ==================================================================================
 Route::middleware(['auth'])->group(function () {
-    Route::get('/inventory/instruments', 'InstrumentController@index')->name('instruments.index');
-    Route::get('/inventory/instruments/create', 'InstrumentController@create')->name('instruments.create');
-    Route::post('/inventory/instruments', 'InstrumentController@store')->name('instruments.store');
-    Route::get('/inventory/instruments/{id}', 'InstrumentController@show')->name('instruments.show');
-    Route::get('/inventory/committees', 'InstrumentController@committees')->name('committees.index');
-    Route::get('/api/instruments/{id}/chain', 'InstrumentController@chainOfTrust');
+    Route::get('/inventory/instruments', [InstrumentController::class, 'index'])->name('instruments.index');
+    Route::get('/inventory/instruments/create', [InstrumentController::class, 'create'])->name('instruments.create');
+    Route::post('/inventory/instruments', [InstrumentController::class, 'store'])->name('instruments.store');
+    Route::get('/inventory/instruments/{id}', [InstrumentController::class, 'show'])->name('instruments.show');
+    Route::get('/inventory/committees', [InstrumentController::class, 'committees'])->name('committees.index');
+    Route::get('/api/instruments/{id}/chain', [InstrumentController::class, 'chainOfTrust']);
 });
-
 
 //
 // Congress Routes
 // ==================================================================================
-Route::post("/api/ai/chat", [App\Http\Controllers\AiHelperController::class, "chat"])->middleware("throttle:20,1");
+Route::post('/api/ai/chat', [AiHelperController::class, 'chat'])->middleware('throttle:20,1');
 
-Route::get('/congress/all', 'Congress\CongressController@showAll');
-Route::get('/congress/proposal/{id?}', 'Congress\CongressController@proposal');
+Route::get('/congress/all', [CongressController::class, 'showAll']);
+Route::get('/congress/proposal/{id?}', [CongressController::class, 'proposal']);
 Route::middleware(['auth'])->group(function () {
-    Route::any('/congress/voting', 'Congress\CongressController@showVoting');
-    Route::any('/congress/voting/new', 'Congress\CongressController@newProposal');
-    Route::get("/congress/ballot/pending", "Congress\CongressController@pendingBallots");
-    Route::get('/congress/ballot/{propid?}', 'Congress\CongressController@acquireBallot');
-    Route::post('/congress/vote/breakdown', 'Congress\CongressController@breakdown');
-    Route::post('/congress/proposal/diff', 'Congress\CongressController@proposalDiff');
-    Route::post('/congress/proposal/withdraw', 'Congress\CongressController@withdrawProposal');
-    Route::post('/congress/proposal/amend', 'Congress\CongressController@amendProposal');
-    Route::post('/congress/proposal/challenge', 'Congress\CongressController@challengeTier');
-    Route::post("/congress/ballot/backup-key", "Congress\CongressController@backupBallotKey");
-    Route::post("/congress/ballot/restore-key", "Congress\CongressController@restoreBallotKey");
-    Route::post("/congress/ballot/update-tx", "Congress\CongressController@updateBallotTx");
-    Route::post("/congress/ballot/confirm", "Congress\CongressController@confirmBallot");
-    Route::post("/congress/ballot/mark-used", "Congress\CongressController@markBallotUsed");
+    Route::any('/congress/voting', [CongressController::class, 'showVoting']);
+    Route::any('/congress/voting/new', [CongressController::class, 'newProposal']);
+    Route::get('/congress/ballot/pending', [CongressController::class, 'pendingBallots']);
+    Route::get('/congress/ballot/{propid?}', [CongressController::class, 'acquireBallot']);
+    Route::post('/congress/vote/breakdown', [CongressController::class, 'breakdown']);
+    Route::post('/congress/proposal/diff', [CongressController::class, 'proposalDiff']);
+    Route::post('/congress/proposal/withdraw', [CongressController::class, 'withdrawProposal']);
+    Route::post('/congress/proposal/amend', [CongressController::class, 'amendProposal']);
+    Route::post('/congress/proposal/challenge', [CongressController::class, 'challengeTier']);
+    Route::post('/congress/ballot/backup-key', [CongressController::class, 'backupBallotKey']);
+    Route::post('/congress/ballot/restore-key', [CongressController::class, 'restoreBallotKey']);
+    Route::post('/congress/ballot/update-tx', [CongressController::class, 'updateBallotTx']);
+    Route::post('/congress/ballot/confirm', [CongressController::class, 'confirmBallot']);
+    Route::post('/congress/ballot/mark-used', [CongressController::class, 'markBallotUsed']);
 });
 
-
-// 
+//
 // Logbook Routes
 // ==================================================================================
-Route::get('/logbook/all', 'Logbook\LogbookController@showAll');
-
+Route::get('/logbook/all', [LogbookController::class, 'showAll']);
 
 //
 // Academy Routes
@@ -155,57 +160,54 @@ Route::get('/academy', function () {
 });
 Route::get('/academy/{slug}', function ($slug) {
     // Check for top-level academy views first (e.g., complete-guide)
-    $topLevel = 'academy.' . $slug;
+    $topLevel = 'academy.'.$slug;
     if (view()->exists($topLevel) && $slug !== 'index') {
         return view($topLevel);
     }
     // Then check articles subdirectory
-    $viewName = 'academy.articles.' . $slug;
+    $viewName = 'academy.articles.'.$slug;
     if (view()->exists($viewName)) {
         return view($viewName);
     }
     abort(404);
 });
 
-
 //
 // Map/Geography Routes
 // ==================================================================================
-Route::get('/map/all', 'Planet\MapController@showAll');
-Route::get('/map/embed', 'Planet\MapController@embed');
-
-
+Route::get('/map/all', [MapController::class, 'showAll']);
+Route::get('/map/embed', [MapController::class, 'embed']);
 
 //
 // Internal API (all require authentication)
 // ==================================================================================
 Route::middleware(['auth'])->group(function () {
-    Route::get('/api/balance/{account?}', 'Wallet\ApiController@getBalance');
-    Route::post('/api/permapinpic', 'Wallet\ApiController@permapinpic');
-    Route::post('/api/permapinvideo', 'Wallet\ApiController@permapinvideo');
-    Route::post('/api/permapinlog', 'Wallet\ApiController@permapinlog');
-    Route::post('/api/permapinjson', 'Wallet\ApiController@permapinjson');
-    Route::post('/api/setfeed', 'Wallet\ApiController@setfeed');
-    Route::post('/api/getTransactions', 'Wallet\ApiController@getTransactions');
-    Route::post('/api/setfullname', 'Wallet\ApiController@setfullname');
-    Route::post('/api/closewallet', 'Wallet\ApiController@closewallet');
-    Route::post('/api/cacheproposal', 'Wallet\ApiController@cacheproposal');
-    Route::post('/api/cacheonboarding', 'Wallet\ApiController@cacheonboarding');
-    Route::post('/api/removelog', 'Wallet\ApiController@removepinlog');
-    Route::post('/api/rejection', 'Wallet\ApiController@rejectApplication');
-    Route::post('/api/balance', 'Wallet\ApiController@getBalance');
-    Route::post('/api/price', 'Wallet\ApiController@getPrice');
-    Route::post('/api/dismiss', 'Wallet\ApiController@dismissAlert');
-    Route::post('/api/rename', 'Wallet\ApiController@renameWallet');
-    Route::post('/api/link-civic', 'Wallet\ApiController@linkCivicWallet');
-    Route::post('/api/discover', 'Wallet\DiscoveryController@discover');
-    Route::get('/api/address/{address}/transactions', 'Wallet\DiscoveryController@addressTransactions');
-    Route::get('/api/mars-price', 'Wallet\ApiController@marsPrice');
-    Route::get('/api/mars-txhistory', 'Wallet\ApiController@marsTxHistory');
-    Route::get('/api/mars-utxo-multi', 'Wallet\ApiController@marsUtxoMulti');
+    Route::get('/api/balance/{account?}', [App\Http\Controllers\Wallet\ApiController::class, 'getBalance']);
+    Route::post('/api/permapinpic', [App\Http\Controllers\Wallet\ApiController::class, 'permapinpic']);
+    Route::post('/api/permapinvideo', [App\Http\Controllers\Wallet\ApiController::class, 'permapinvideo']);
+    Route::post('/api/permapinlog', [App\Http\Controllers\Wallet\ApiController::class, 'permapinlog']);
+    Route::post('/api/permapinjson', [App\Http\Controllers\Wallet\ApiController::class, 'permapinjson']);
+    Route::post('/api/setfeed', [App\Http\Controllers\Wallet\ApiController::class, 'setfeed']);
+    Route::post('/api/getTransactions', [App\Http\Controllers\Wallet\ApiController::class, 'getTransactions']);
+    Route::post('/api/setfullname', [App\Http\Controllers\Wallet\ApiController::class, 'setfullname']);
+    Route::post('/api/closewallet', [App\Http\Controllers\Wallet\ApiController::class, 'closewallet']);
+    Route::post('/api/cacheproposal', [App\Http\Controllers\Wallet\ApiController::class, 'cacheproposal']);
+    Route::post('/api/cacheonboarding', [App\Http\Controllers\Wallet\ApiController::class, 'cacheonboarding']);
+    Route::post('/api/removelog', [App\Http\Controllers\Wallet\ApiController::class, 'removepinlog']);
+    Route::post('/api/rejection', [App\Http\Controllers\Wallet\ApiController::class, 'rejectApplication']);
+    Route::post('/api/balance', [App\Http\Controllers\Wallet\ApiController::class, 'getBalance']);
+    Route::post('/api/price', [App\Http\Controllers\Wallet\ApiController::class, 'getPrice']);
+    Route::post('/api/dismiss', [App\Http\Controllers\Wallet\ApiController::class, 'dismissAlert']);
+    Route::post('/api/rename', [App\Http\Controllers\Wallet\ApiController::class, 'renameWallet']);
+    Route::post('/api/link-civic', [App\Http\Controllers\Wallet\ApiController::class, 'linkCivicWallet']);
+    Route::post('/api/discover', [DiscoveryController::class, 'discover']);
+    Route::get('/api/address/{address}/transactions', [DiscoveryController::class, 'addressTransactions']);
+    Route::get('/api/mars-price', [App\Http\Controllers\Wallet\ApiController::class, 'marsPrice']);
+    Route::get('/api/mars-txhistory', [App\Http\Controllers\Wallet\ApiController::class, 'marsTxHistory']);
+    Route::get('/api/mars-utxo-multi', [App\Http\Controllers\Wallet\ApiController::class, 'marsUtxoMulti']);
 });
 
 //
 // Mobile Authenticator Login
 // ================================================================================
-Route::get('/api/checkauth', 'App\Http\Controllers\ApiController@checkAuth')->name('api_marsauthcheck');
+Route::get('/api/checkauth', [ApiController::class, 'checkAuth'])->name('api_marsauthcheck');

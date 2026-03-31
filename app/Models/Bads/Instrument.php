@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Models\Bads;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,7 +15,7 @@ class Instrument extends Model
         'address', 'did', 'pubkey_hex', 'crypto_suite_id', 'device_type', 'device_type_name',
         'device_category', 'make', 'model', 'serial', 'dice_cdi_hash', 'status',
         'certified_by_deputy_id', 'cert_txid', 'mqtt_namespace', 'operational_params',
-        'location', 'firmware_version', 'revoke_txid', 'revoke_reason', 'revoke_notes'
+        'location', 'firmware_version', 'revoke_txid', 'revoke_reason', 'revoke_notes',
     ];
 
     protected $casts = ['operational_params' => 'array'];
@@ -45,14 +47,26 @@ class Instrument extends Model
     ];
 
     /** @return BelongsTo<Deputy, self> */
-    public function certifiedBy(): BelongsTo { return $this->belongsTo(Deputy::class, 'certified_by_deputy_id'); }
+    public function certifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(Deputy::class, 'certified_by_deputy_id');
+    }
 
     /** @return HasMany<Attestation> */
-    public function attestations(): HasMany { return $this->hasMany(Attestation::class); }
+    public function attestations(): HasMany
+    {
+        return $this->hasMany(Attestation::class);
+    }
 
     /** @return HasMany<Anomaly> */
-    public function anomalies(): HasMany { return $this->hasMany(Anomaly::class); }
+    public function anomalies(): HasMany
+    {
+        return $this->hasMany(Anomaly::class);
+    }
 
     /** @return HasMany<CalibrationRecord> */
-    public function calibrations(): HasMany { return $this->hasMany(CalibrationRecord::class); }
+    public function calibrations(): HasMany
+    {
+        return $this->hasMany(CalibrationRecord::class);
+    }
 }

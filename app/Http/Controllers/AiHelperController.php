@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AiHelperController extends Controller
@@ -73,15 +72,17 @@ PROMPT;
 
         $keywords = array_filter(
             explode(' ', strtolower(preg_replace('/[^a-zA-Z0-9\s]/', '', $query))),
-            fn($w) => strlen($w) > 2
+            fn ($w) => strlen($w) > 2
         );
 
-        if (empty($keywords)) return 'No results found.';
+        if (empty($keywords)) {
+            return 'No results found.';
+        }
 
         $results = [];
 
         foreach ($searchPaths as $path) {
-            $files = glob($path . '/*.blade.php') ?: [];
+            $files = glob($path.'/*.blade.php') ?: [];
             foreach ($files as $file) {
                 $content = file_get_contents($file);
                 $text = strip_tags($content);
@@ -101,33 +102,36 @@ PROMPT;
                         $offset = 0;
                         while (($pos = strpos($lower, $kw, $offset)) !== false && count($excerpts) < 3) {
                             $start = max(0, $pos - 80);
-                            $excerpts[] = '...' . trim(substr($text, $start, 250)) . '...';
+                            $excerpts[] = '...'.trim(substr($text, $start, 250)).'...';
                             $offset = $pos + strlen($kw) + 100;
                         }
                     }
                     $results[] = [
                         'score' => $score,
                         'slug' => $slug,
-                        'url' => '/academy/' . $slug,
+                        'url' => '/academy/'.$slug,
                         'excerpts' => array_unique(array_slice($excerpts, 0, 3)),
                     ];
                 }
             }
         }
 
-        usort($results, fn($a, $b) => $b['score'] <=> $a['score']);
+        usort($results, fn ($a, $b) => $b['score'] <=> $a['score']);
         $top = array_slice($results, 0, 3);
 
-        if (empty($top)) return 'No matching Academy articles found for: ' . $query;
+        if (empty($top)) {
+            return 'No matching Academy articles found for: '.$query;
+        }
 
         $output = "Search results for \"{$query}\":\n\n";
         foreach ($top as $r) {
             $output .= "--- {$r['url']} (relevance: {$r['score']}) ---\n";
             foreach ($r['excerpts'] as $ex) {
-                $output .= $ex . "\n";
+                $output .= $ex."\n";
             }
             $output .= "\n";
         }
+
         return $output;
     }
 
@@ -150,7 +154,7 @@ PROMPT;
 
         // Step 1: Non-streaming call to check for tool use
         $firstResponse = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $apiKey,
+            'Authorization' => 'Bearer '.$apiKey,
             'HTTP-Referer' => 'https://martianrepublic.org',
             'X-Title' => 'Martian Republic',
         ])->timeout(30)->post('https://openrouter.ai/api/v1/chat/completions', [
@@ -164,13 +168,13 @@ PROMPT;
         $firstData = $firstResponse->json();
         $choice = $firstData['choices'][0] ?? null;
 
-        if (!$choice) {
+        if (! $choice) {
             return response()->json(['error' => 'No response from AI'], 502);
         }
 
         // Step 2: If tool call, execute and do a second call with results
         if (($choice['finish_reason'] ?? '') === 'tool_calls' ||
-            !empty($choice['message']['tool_calls'])) {
+            ! empty($choice['message']['tool_calls'])) {
 
             $toolCalls = $choice['message']['tool_calls'] ?? [];
             $assistantMsg = $choice['message'];
@@ -194,8 +198,9 @@ PROMPT;
 
         // No tool call — stream directly from the first response content
         $content = $choice['message']['content'] ?? '';
+
         return new StreamedResponse(function () use ($content) {
-            echo 'data: ' . json_encode(['content' => $content]) . "\n\n";
+            echo 'data: '.json_encode(['content' => $content])."\n\n";
             echo "data: [DONE]\n\n";
             ob_flush();
             flush();
@@ -211,7 +216,7 @@ PROMPT;
     {
         return new StreamedResponse(function () use ($messages, $apiKey, $model) {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
+                'Authorization' => 'Bearer '.$apiKey,
                 'HTTP-Referer' => 'https://martianrepublic.org',
                 'X-Title' => 'Martian Republic',
             ])->withOptions([
@@ -225,11 +230,13 @@ PROMPT;
             ]);
 
             $body = $response->getBody();
-            while (!$body->eof()) {
+            while (! $body->eof()) {
                 $line = '';
-                while (!$body->eof()) {
+                while (! $body->eof()) {
                     $char = $body->read(1);
-                    if ($char === "\n") break;
+                    if ($char === "\n") {
+                        break;
+                    }
                     $line .= $char;
                 }
                 $line = trim($line);
@@ -242,7 +249,7 @@ PROMPT;
                     $json = json_decode($data, true);
                     if ($json && isset($json['choices'][0]['delta']['content'])) {
                         $token = $json['choices'][0]['delta']['content'];
-                        echo 'data: ' . json_encode(['content' => $token]) . "\n\n";
+                        echo 'data: '.json_encode(['content' => $token])."\n\n";
                         ob_flush();
                         flush();
                     }

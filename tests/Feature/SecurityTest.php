@@ -1,11 +1,14 @@
 <?php
 
+use Illuminate\Database\Eloquent\Model;
+use Tests\CreatesTestDatabase;
+use Tests\TestCase;
+
 /**
  * Cross-cutting security tests.
  * Validates config integrity, token expiry, model safety, and .env protection.
  */
-
-uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(function () {
+uses(TestCase::class, CreatesTestDatabase::class)->beforeEach(function () {
     $this->createCoreTables();
 });
 
@@ -93,11 +96,11 @@ test('all models have $fillable or $guarded defined', function () {
     $unprotectedModels = [];
 
     foreach ($modelDirs as $dir) {
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             continue;
         }
 
-        $files = glob($dir . '/*.php');
+        $files = glob($dir.'/*.php');
         foreach ($files as $file) {
             $content = file_get_contents($file);
 
@@ -107,14 +110,14 @@ test('all models have $fillable or $guarded defined', function () {
                 $namespace = $nsMatch[1];
             }
             if (preg_match('/class\s+(\w+)/', $content, $classMatch)) {
-                $fqcn = $namespace . '\\' . $classMatch[1];
+                $fqcn = $namespace.'\\'.$classMatch[1];
 
                 // Only check Eloquent models
-                if (!class_exists($fqcn)) {
+                if (! class_exists($fqcn)) {
                     continue;
                 }
                 $reflection = new ReflectionClass($fqcn);
-                if (!$reflection->isSubclassOf(\Illuminate\Database\Eloquent\Model::class)) {
+                if (! $reflection->isSubclassOf(Model::class)) {
                     continue;
                 }
 
@@ -123,7 +126,7 @@ test('all models have $fillable or $guarded defined', function () {
                 $hasGuarded = $reflection->hasProperty('guarded') &&
                     $reflection->getProperty('guarded')->getDeclaringClass()->getName() === $fqcn;
 
-                if (!$hasFillable && !$hasGuarded) {
+                if (! $hasFillable && ! $hasGuarded) {
                     $unprotectedModels[] = $fqcn;
                 }
             }
@@ -131,7 +134,7 @@ test('all models have $fillable or $guarded defined', function () {
     }
 
     expect($unprotectedModels)->toBeEmpty(
-        'These models lack $fillable or $guarded: ' . implode(', ', $unprotectedModels)
+        'These models lack $fillable or $guarded: '.implode(', ', $unprotectedModels)
     );
 });
 
@@ -140,7 +143,7 @@ test('all models have $fillable or $guarded defined', function () {
 // ============================================================
 
 test('404 pages still return security headers', function () {
-    $response = $this->get('/nonexistent-page-' . uniqid());
+    $response = $this->get('/nonexistent-page-'.uniqid());
     $response->assertHeader('X-Content-Type-Options', 'nosniff');
     $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
 });

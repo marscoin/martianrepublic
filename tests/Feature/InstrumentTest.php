@@ -4,19 +4,21 @@
  * Tests for BADS Instrument Registry, Chain of Trust models, and controller.
  */
 
-use App\Models\User;
-use App\Models\Profile;
-use App\Models\CivicWallet;
-use App\Models\Bads\OversightCommittee;
+use App\Http\Controllers\InstrumentController;
+use App\Models\Bads\Anomaly;
+use App\Models\Bads\Attestation;
+use App\Models\Bads\CalibrationRecord;
 use App\Models\Bads\Deputy;
 use App\Models\Bads\Instrument;
-use App\Models\Bads\CalibrationRecord;
-use App\Models\Bads\Attestation;
-use App\Models\Bads\Anomaly;
-use App\Http\Controllers\InstrumentController;
+use App\Models\Bads\OversightCommittee;
+use App\Models\CivicWallet;
+use App\Models\Profile;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Tests\CreatesTestDatabase;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(function () {
+uses(TestCase::class, CreatesTestDatabase::class)->beforeEach(function () {
     $this->createCoreTables();
     $this->createWalletTables();
     $this->createProposalTables();

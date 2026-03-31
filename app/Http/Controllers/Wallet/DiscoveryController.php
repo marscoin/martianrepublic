@@ -36,7 +36,7 @@ class DiscoveryController extends Controller
 
         // Batch check via scantxoutset — single RPC call for all addresses
         $descriptors = array_map(function ($a) {
-            return 'addr(' . $a['address'] . ')';
+            return 'addr('.$a['address'].')';
         }, $addresses);
 
         $cli = config('blockchain.rpc.cli_path');
@@ -45,17 +45,18 @@ class DiscoveryController extends Controller
 
         try {
             $result = Process::timeout(60)->run([
-                $cli, '-datadir=' . $dataDir, 'scantxoutset', 'start',
+                $cli, '-datadir='.$dataDir, 'scantxoutset', 'start',
                 $descriptorJson,
             ]);
 
-            if (!$result->successful()) {
+            if (! $result->successful()) {
                 Log::warning('Discovery: scantxoutset failed', ['error' => $result->errorOutput()]);
+
                 return response()->json(['error' => 'UTXO scan failed'], 500);
             }
 
             $scan = json_decode($result->output(), true);
-            if (!$scan || !isset($scan['unspents'])) {
+            if (! $scan || ! isset($scan['unspents'])) {
                 return response()->json(['error' => 'Invalid scan result'], 500);
             }
 
@@ -67,9 +68,11 @@ class DiscoveryController extends Controller
                 if (preg_match('/addr\(([A-Za-z0-9]+)\)/', $utxo['desc'] ?? '', $m)) {
                     $addr = $m[1];
                 }
-                if (!$addr) continue;
+                if (! $addr) {
+                    continue;
+                }
 
-                if (!isset($utxoMap[$addr])) {
+                if (! isset($utxoMap[$addr])) {
                     $utxoMap[$addr] = ['balance' => 0, 'utxoCount' => 0];
                 }
                 $utxoMap[$addr]['balance'] += $utxo['amount'];
@@ -99,13 +102,14 @@ class DiscoveryController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Discovery: exception', ['error' => $e->getMessage()]);
-            return response()->json(['error' => 'Discovery failed: ' . $e->getMessage()], 500);
+
+            return response()->json(['error' => 'Discovery failed: '.$e->getMessage()], 500);
         }
 
         // Cache discovered derivation schemes for this user
         if (Auth::check() && count($discovered) > 0) {
             $schemes = array_unique(array_column($discovered, 'scheme'));
-            Cache::put('wallet_schemes:' . Auth::id(), $schemes, now()->addDays(30));
+            Cache::put('wallet_schemes:'.Auth::id(), $schemes, now()->addDays(30));
         }
 
         return response()->json([
@@ -122,7 +126,7 @@ class DiscoveryController extends Controller
      */
     public function addressTransactions(Request $request, string $address)
     {
-        if (!preg_match('/^M[A-Za-z0-9]{25,34}$/', $address)) {
+        if (! preg_match('/^M[A-Za-z0-9]{25,34}$/', $address)) {
             return response()->json(['error' => 'Invalid address'], 400);
         }
 
@@ -132,11 +136,11 @@ class DiscoveryController extends Controller
         // Get UTXOs for this address
         try {
             $result = Process::timeout(30)->run([
-                $cli, '-datadir=' . $dataDir, 'scantxoutset', 'start',
-                json_encode(['addr(' . $address . ')']),
+                $cli, '-datadir='.$dataDir, 'scantxoutset', 'start',
+                json_encode(['addr('.$address.')']),
             ]);
 
-            if (!$result->successful()) {
+            if (! $result->successful()) {
                 return response()->json(['error' => 'Scan failed'], 500);
             }
 
@@ -148,7 +152,7 @@ class DiscoveryController extends Controller
             foreach (array_slice($utxos, 0, 50) as $utxo) {
                 try {
                     $txResult = Process::timeout(10)->run([
-                        $cli, '-datadir=' . $dataDir, 'getrawtransaction',
+                        $cli, '-datadir='.$dataDir, 'getrawtransaction',
                         $utxo['txid'], '1',
                     ]);
 

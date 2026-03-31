@@ -1,15 +1,16 @@
 <?php
 
+use Tests\TestCase;
+
 /**
  * Tests for the Academy section — public learning content.
  */
-
-uses(Tests\TestCase::class)->beforeEach(function () {
+uses(TestCase::class)->beforeEach(function () {
     $this->artisan('migrate:fresh', [
         '--path' => [
             'database/migrations/2025_01_26_202544_create_users_table.php',
             'database/migrations/2025_01_26_202544_create_mars_sessions_table.php',
-        ]
+        ],
     ]);
 });
 

@@ -4,6 +4,4 @@ namespace TeamTeaTime\Forum\Events;
 
 use TeamTeaTime\Forum\Events\Types\CollectionEvent;
 
-class UserViewingUnread extends CollectionEvent
-{
-}
+class UserViewingUnread extends CollectionEvent {}

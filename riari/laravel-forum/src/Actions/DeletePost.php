@@ -8,6 +8,7 @@ use TeamTeaTime\Forum\Models\Post;
 class DeletePost extends BaseAction
 {
     private Post $post;
+
     private bool $permaDelete;
 
     public function __construct(Post $post, bool $permaDelete = false)

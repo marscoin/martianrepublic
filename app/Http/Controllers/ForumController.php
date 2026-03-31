@@ -2,20 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\Posts;
+use App\Models\Profile;
+use App\Models\Threads;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
-use App\Models\Profile;
-use App\Models\Proposals;
-use App\Models\Threads;
-use App\Models\Posts;
 
 class ForumController extends Controller
 {
-
     /**
      * Forum home — all categories + recent threads.
      */
@@ -56,7 +53,6 @@ class ForumController extends Controller
         return view('forum.index', $viewData);
     }
 
-
     /**
      * Thread view — thread with all posts (chronological), author info, proposal data.
      */
@@ -77,7 +73,7 @@ class ForumController extends Controller
             ->whereNull('forum_threads.deleted_at')
             ->first();
 
-        if (!$thread) {
+        if (! $thread) {
             abort(404);
         }
 
@@ -111,23 +107,24 @@ class ForumController extends Controller
         return view('forum.show', $viewData);
     }
 
-
     /**
      * Create a new thread with its first post.
      */
     public function storeThread(Request $request)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect('/login');
         }
 
         // Profile / 2FA challenge check
         $authCheck = $this->requireProfile();
-        if ($authCheck) return $authCheck;
+        if ($authCheck) {
+            return $authCheck;
+        }
 
         $request->validate([
-            'title'       => 'required|string|min:3|max:255',
-            'content'     => 'required|string|min:3',
+            'title' => 'required|string|min:3|max:255',
+            'content' => 'required|string|min:3',
             'category_id' => 'required|integer|exists:forum_categories,id',
         ]);
 
@@ -139,21 +136,21 @@ class ForumController extends Controller
             // Create thread
             $threadId = DB::table('forum_threads')->insertGetId([
                 'category_id' => $request->input('category_id'),
-                'author_id'   => $uid,
-                'title'       => $request->input('title'),
-                'pinned'      => 0,
-                'locked'      => 0,
+                'author_id' => $uid,
+                'title' => $request->input('title'),
+                'pinned' => 0,
+                'locked' => 0,
                 'reply_count' => 0,
-                'created_at'  => $now,
-                'updated_at'  => $now,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
 
             // Create first post
             $postId = DB::table('forum_posts')->insertGetId([
-                'thread_id'  => $threadId,
-                'author_id'  => $uid,
-                'content'    => $request->input('content'),
-                'sequence'   => 1,
+                'thread_id' => $threadId,
+                'author_id' => $uid,
+                'content' => $request->input('content'),
+                'sequence' => 1,
                 'authorName' => Auth::user()->fullname,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -164,7 +161,7 @@ class ForumController extends Controller
                 ->where('id', $threadId)
                 ->update([
                     'first_post_id' => $postId,
-                    'last_post_id'  => $postId,
+                    'last_post_id' => $postId,
                 ]);
 
             // Increment category counters
@@ -184,18 +181,18 @@ class ForumController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Failed to create forum thread: " . $e->getMessage());
+            Log::error('Failed to create forum thread: '.$e->getMessage());
+
             return back()->withErrors(['error' => 'Failed to create thread. Please try again.'])->withInput();
         }
     }
-
 
     /**
      * Create a post/reply in a thread.
      */
     public function storePost(Request $request, $threadId)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -205,11 +202,12 @@ class ForumController extends Controller
             if ($request->expectsJson()) {
                 return response()->json(['error' => 'Profile verification required'], 403);
             }
+
             return $authCheck;
         }
 
         $request->validate([
-            'content'   => 'required|string|min:3',
+            'content' => 'required|string|min:3',
             'parent_id' => 'nullable|integer|exists:forum_posts,id',
         ]);
 
@@ -222,8 +220,9 @@ class ForumController extends Controller
             ->whereNull('deleted_at')
             ->first();
 
-        if (!$thread) {
+        if (! $thread) {
             $msg = 'Thread not found.';
+
             return $request->expectsJson()
                 ? response()->json(['error' => $msg], 404)
                 : back()->withErrors(['error' => $msg]);
@@ -231,6 +230,7 @@ class ForumController extends Controller
 
         if ($thread->locked) {
             $msg = 'This thread is locked.';
+
             return $request->expectsJson()
                 ? response()->json(['error' => $msg], 403)
                 : back()->withErrors(['error' => $msg]);
@@ -244,11 +244,11 @@ class ForumController extends Controller
                 ->max('sequence') ?? 0;
 
             $postId = DB::table('forum_posts')->insertGetId([
-                'thread_id'  => $threadId,
-                'author_id'  => $uid,
-                'content'    => $request->input('content'),
-                'post_id'    => $request->input('parent_id'),
-                'sequence'   => $maxSeq + 1,
+                'thread_id' => $threadId,
+                'author_id' => $uid,
+                'content' => $request->input('content'),
+                'post_id' => $request->input('parent_id'),
+                'sequence' => $maxSeq + 1,
                 'authorName' => Auth::user()->fullname,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -258,9 +258,9 @@ class ForumController extends Controller
             DB::table('forum_threads')
                 ->where('id', $threadId)
                 ->update([
-                    'reply_count'  => DB::raw('COALESCE(reply_count, 0) + 1'),
+                    'reply_count' => DB::raw('COALESCE(reply_count, 0) + 1'),
                     'last_post_id' => $postId,
-                    'updated_at'   => $now,
+                    'updated_at' => $now,
                 ]);
 
             // Increment category post count
@@ -289,7 +289,7 @@ class ForumController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'post'    => $post,
+                    'post' => $post,
                 ]);
             }
 
@@ -297,15 +297,15 @@ class ForumController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Failed to create forum post: " . $e->getMessage());
+            Log::error('Failed to create forum post: '.$e->getMessage());
 
             if ($request->expectsJson()) {
                 return response()->json(['error' => 'Failed to create post.'], 500);
             }
+
             return back()->withErrors(['error' => 'Failed to create post. Please try again.'])->withInput();
         }
     }
-
 
     /**
      * Threads filtered by category — pinned first, then by last activity.
@@ -317,7 +317,7 @@ class ForumController extends Controller
             ->where('id', $categoryId)
             ->first();
 
-        if (!$category) {
+        if (! $category) {
             abort(404);
         }
 
@@ -352,7 +352,6 @@ class ForumController extends Controller
         return view('forum.index', $viewData);
     }
 
-
     // ==================================================================================
     // Private helpers
     // ==================================================================================
@@ -367,15 +366,15 @@ class ForumController extends Controller
             $profile = Profile::where('userid', $uid)->first();
 
             return [
-                'isCitizen'   => $profile->citizen ?? false,
-                'isGP'        => $profile->general_public ?? false,
+                'isCitizen' => $profile->citizen ?? false,
+                'isGP' => $profile->general_public ?? false,
                 'wallet_open' => $profile->civic_wallet_open ?? false,
             ];
         }
 
         return [
-            'isCitizen'   => false,
-            'isGP'        => false,
+            'isCitizen' => false,
+            'isGP' => false,
             'wallet_open' => false,
         ];
     }
@@ -390,7 +389,7 @@ class ForumController extends Controller
         $uid = Auth::user()->id;
         $profile = Profile::where('userid', $uid)->first();
 
-        if (!$profile) {
+        if (! $profile) {
             return redirect('/twofa');
         }
 

@@ -7,6 +7,7 @@ use TeamTeaTime\Forum\Models\Thread;
 class RenameThread extends BaseAction
 {
     private Thread $thread;
+
     private string $title;
 
     public function __construct(Thread $thread, string $title)

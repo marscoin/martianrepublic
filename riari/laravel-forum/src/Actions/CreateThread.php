@@ -10,8 +10,11 @@ use TeamTeaTime\Forum\Models\Thread;
 class CreateThread extends BaseAction
 {
     private Category $category;
+
     private Model $author;
+
     private string $title;
+
     private string $content;
 
     public function __construct(Category $category, Model $author, string $title, string $content)

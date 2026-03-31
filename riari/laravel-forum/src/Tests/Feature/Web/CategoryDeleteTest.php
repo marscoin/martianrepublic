@@ -18,10 +18,13 @@ class CategoryDeleteTest extends FeatureTestCase
     private const ROUTE = 'category.delete';
 
     private UserFactory $userFactory;
+
     private User $user;
 
     private CategoryFactory $categoryFactory;
+
     private ThreadFactory $threadFactory;
+
     private PostFactory $postFactory;
 
     protected function setUp(): void

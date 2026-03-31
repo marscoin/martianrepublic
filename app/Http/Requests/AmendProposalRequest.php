@@ -20,10 +20,10 @@ class AmendProposalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'proposalId'  => 'required|integer',
-            'title'       => 'required|string|max:500',
+            'proposalId' => 'required|integer',
+            'title' => 'required|string|max:500',
             'description' => 'required|string|max:50000',
-            'note'        => 'nullable|string|max:1000',
+            'note' => 'nullable|string|max:1000',
         ];
     }
 }

@@ -10,6 +10,7 @@ use TeamTeaTime\Forum\Support\CategoryPrivacy;
 class MarkThreadsAsRead extends BaseAction
 {
     private User $user;
+
     private ?Category $category;
 
     public function __construct(User $user, ?Category $category)

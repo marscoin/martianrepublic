@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\RedirectResponse;
 use Tests\TestCase;
 
@@ -11,9 +10,9 @@ uses(TestCase::class)
             '--path' => [
                 'database/migrations/2025_01_26_202544_create_users_table.php',
                 'database/migrations/2025_01_26_202544_create_mars_sessions_table.php',
-                'database/migrations/2025_01_26_202544_create_password_resets_table.php'
+                'database/migrations/2025_01_26_202544_create_password_resets_table.php',
                 // Only include tables we actually need for auth
-            ]
+            ],
         ]);
     });
 
@@ -26,7 +25,7 @@ test('login screen can be rendered', function () {
         'content' => substr($response->getContent(), 0, 500),
     ];
 
-    if ($response instanceof \Illuminate\Http\RedirectResponse) {
+    if ($response instanceof RedirectResponse) {
         $debugData['url'] = $response->getTargetUrl();
     } else {
         $debugData['url'] = 'no redirect';
@@ -48,15 +47,14 @@ test('users can login with correct credentials', function () {
     $response->assertRedirect('/check');
 });
 
-
 test('users cannot login with incorrect password', function () {
     $user = User::factory()->create();
 
     $response = $this->withSession([])
         ->post('/login', [
-        'email' => $user->email,
-        'password' => 'wrong-password',
-    ]);
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
 
     // Add debugging
     $debugData = [
@@ -76,10 +74,10 @@ test('users cannot login with incorrect password', function () {
 test('users can logout successfully', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    
+
     $response = $this->post('/logout');
     Auth::forgetGuards();
-    
+
     $this->assertGuest();
     $response->assertRedirect('/');
 });

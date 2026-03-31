@@ -9,6 +9,7 @@ use TeamTeaTime\Forum\Models\Category;
 class CategoryPrivacy
 {
     const DEFAULT_SELECT = ['*'];
+
     const DEFAULT_WITH = ['newestThread', 'latestActiveThread', 'newestThread.lastPost', 'latestActiveThread.lastPost'];
 
     public static function isAccessibleTo(?User $user, int $categoryId)

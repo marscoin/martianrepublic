@@ -2,16 +2,15 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\Feed; 
 use App\Models\Citizen;
+use App\Models\Feed;
 use Illuminate\Support\Facades\Auth;
-
+use Livewire\Component;
 
 class ResearchActivity extends Component
 {
-
     public $activities;
+
     public $citcache;
 
     public function mount()

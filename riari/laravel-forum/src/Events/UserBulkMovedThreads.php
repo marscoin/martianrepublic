@@ -10,6 +10,7 @@ use TeamTeaTime\Forum\Models\Category;
 class UserBulkMovedThreads extends CollectionEvent
 {
     public Collection $sourceCategories;
+
     public Category $destinationCategory;
 
     public function __construct($user, SupportCollection $threads, Collection $sourceCategories, Category $destinationCategory)

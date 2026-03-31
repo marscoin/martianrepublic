@@ -20,7 +20,7 @@ class InjectSentryJs
 
         if (str_contains($content, '</head>')) {
             $snippet = $this->sentrySnippet();
-            $content = str_replace('</head>', $snippet . "\n</head>", $content);
+            $content = str_replace('</head>', $snippet."\n</head>", $content);
             $response->setContent($content);
         }
 
@@ -30,6 +30,7 @@ class InjectSentryJs
     private function isHtmlResponse(Response $response): bool
     {
         $contentType = $response->headers->get('Content-Type', '');
+
         return str_contains($contentType, 'text/html') || empty($contentType);
     }
 

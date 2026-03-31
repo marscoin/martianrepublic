@@ -10,12 +10,11 @@ uses(TestCase::class)
         $this->artisan('migrate:fresh', [
             '--path' => [
                 'database/migrations/2025_01_26_202544_create_users_table.php',
-                'database/migrations/2025_01_26_202544_create_password_resets_table.php'
+                'database/migrations/2025_01_26_202544_create_password_resets_table.php',
                 // Only include tables we actually need for auth
-            ]
+            ],
         ]);
     });
-
 
 test('reset password link screen can be rendered', function () {
     $response = $this->get('/forgot-password');

@@ -14,6 +14,7 @@ class CategoryUpdateTest extends FeatureTestCase
     private const ROUTE = 'category.update';
 
     private Category $category;
+
     private User $user;
 
     protected function setUp(): void

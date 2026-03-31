@@ -7,17 +7,24 @@
  * preventing regressions in future development.
  */
 
-use App\Models\User;
-use App\Models\Profile;
-use App\Models\CivicWallet;
-use App\Models\HDWallet;
+use App\Http\Controllers\Citizen\IdentityController;
+use App\Http\Controllers\Wallet\ApiController;
+use App\Http\Controllers\Wallet\DashboardController;
+use App\Livewire\WalletStatus;
 use App\Models\Citizen;
+use App\Models\CivicWallet;
 use App\Models\Feed;
-use App\Models\InventoryItem;
-use App\Models\Proposals;
+use App\Models\HDWallet;
+use App\Models\Profile;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
+use Tests\CreatesTestDatabase;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(function () {
+uses(TestCase::class, CreatesTestDatabase::class)->beforeEach(function () {
     $this->createCoreTables();
     $this->createWalletTables();
     $this->createCitizenTable();
@@ -53,7 +60,7 @@ function createUserWithWallet(array $overrides = []): array
     $wallet = CivicWallet::create([
         'user_id' => $user->id,
         'wallet_type' => 'civic',
-        'public_addr' => $overrides['address'] ?? 'MTestAddr' . $user->id . str_repeat('X', 25),
+        'public_addr' => $overrides['address'] ?? 'MTestAddr'.$user->id.str_repeat('X', 25),
         'encrypted_seed' => $overrides['encrypted_seed'] ?? 'test-encrypted-seed',
         'opened_at' => now(),
     ]);
@@ -72,38 +79,36 @@ function createUserWithWallet(array $overrides = []): array
     return compact('user', 'profile', 'wallet');
 }
 
-
 // ============================================================
 // BUG: Controllers had protected methods (should be public)
 // Fix: Changed protected -> public on all public-facing controllers
 // ============================================================
 
-test('citizen registry controller method is public and accessible', function () {
+test('citizen registry controller method requires auth', function () {
     $response = $this->get('/citizen/all');
-    // Should NOT redirect to login (was doing so when method was protected)
-    expect($response->status())->not->toBe(302);
+    // Should redirect to login when not authenticated
+    expect($response->status())->toBe(302);
 });
 
-test('congress dashboard controller method is public and accessible', function () {
+test('congress public proposals page loads', function () {
     $response = $this->get('/congress/all');
-    expect($response->status())->not->toBe(302);
+    expect($response->status())->toBe(200);
 });
 
-test('inventory controller method is public and accessible', function () {
+test('inventory public page loads', function () {
     $response = $this->get('/inventory/all');
-    expect($response->status())->not->toBe(302);
+    expect($response->status())->toBe(200);
 });
 
-test('logbook controller method is public and accessible', function () {
+test('logbook public page loads', function () {
     $response = $this->get('/logbook/all');
-    expect($response->status())->not->toBe(302);
+    expect($response->status())->toBe(200);
 });
 
-test('map controller method is public and accessible', function () {
+test('map public page loads', function () {
     $response = $this->get('/map/all');
-    expect($response->status())->not->toBe(302);
+    expect($response->status())->toBe(200);
 });
-
 
 // ============================================================
 // BUG: Auth-required routes should redirect to login
@@ -124,7 +129,6 @@ test('inventory store requires authentication', function () {
     $response->assertRedirect('/login');
 });
 
-
 // ============================================================
 // BUG: getWallet used HDWallet::get() instead of first()
 // This caused "Property [id] does not exist on collection" crash
@@ -137,9 +141,9 @@ test('getWallet sets civic_wallet_open for civic wallet users', function () {
     ]);
 
     // Test controller directly since string-based routes need RouteServiceProvider namespace
-    $controller = app()->make(\App\Http\Controllers\Wallet\DashboardController::class);
+    $controller = app()->make(DashboardController::class);
     $this->actingAs($user);
-    $response = $controller->getWallet(new \Illuminate\Http\Request());
+    $response = $controller->getWallet(new Request);
 
     // civic_wallet_open should now be set to the wallet ID
     $profile->refresh();
@@ -162,22 +166,21 @@ test('getWallet sets wallet_open for HD wallet users', function () {
         'civic_wallet_open' => 0,
     ]);
 
-    $hdWallet = new HDWallet();
+    $hdWallet = new HDWallet;
     $hdWallet->user_id = $user->id;
     $hdWallet->wallet_type = 'hd';
-    $hdWallet->public_addr = 'MHDTestAddr' . str_repeat('Y', 23);
+    $hdWallet->public_addr = 'MHDTestAddr'.str_repeat('Y', 23);
     $hdWallet->encrypted_seed = 'test-seed';
     $hdWallet->opened_at = now();
     $hdWallet->save();
 
     $this->actingAs($user);
-    $controller = app()->make(\App\Http\Controllers\Wallet\DashboardController::class);
-    $controller->getWallet(new \Illuminate\Http\Request());
+    $controller = app()->make(DashboardController::class);
+    $controller->getWallet(new Request);
 
     $profile = Profile::where('userid', $user->id)->first();
     expect($profile->wallet_open)->toBe($hdWallet->id);
 });
-
 
 // ============================================================
 // BUG: DashboardController $public_addr was always null for civic wallets
@@ -198,7 +201,6 @@ test('DashboardController sets public_addr from civic wallet not null', function
     expect($civicWallet->public_addr)->not->toBeNull();
 });
 
-
 // ============================================================
 // BUG: DashboardController referenced undefined $user and missing Citizen import
 // Fix: Changed to Auth::user() and added use App\Models\Citizen
@@ -206,12 +208,11 @@ test('DashboardController sets public_addr from civic wallet not null', function
 
 test('Citizen model import exists in DashboardController', function () {
     // Verify the Citizen class is importable from the DashboardController context
-    $reflection = new \ReflectionClass(\App\Http\Controllers\Wallet\DashboardController::class);
+    $reflection = new ReflectionClass(DashboardController::class);
     $source = file_get_contents($reflection->getFileName());
 
     expect($source)->toContain('use App\Models\Citizen;');
 });
-
 
 // ============================================================
 // BUG: Citizen registry showed authenticated user view defaults for guests
@@ -219,11 +220,11 @@ test('Citizen model import exists in DashboardController', function () {
 // ============================================================
 
 test('IdentityController showAll redirects unauthenticated users to login', function () {
-    $controller = app()->make(\App\Http\Controllers\Citizen\IdentityController::class);
+    $controller = app()->make(IdentityController::class);
     $response = $controller->showAll();
 
     // Should redirect to login (PII protection)
-    expect($response)->toBeInstanceOf(\Illuminate\Http\RedirectResponse::class);
+    expect($response)->toBeInstanceOf(RedirectResponse::class);
 });
 
 test('IdentityController showAll works for authenticated users with wallet', function () {
@@ -233,12 +234,11 @@ test('IdentityController showAll works for authenticated users with wallet', fun
     ]);
 
     $this->actingAs($user);
-    $controller = app()->make(\App\Http\Controllers\Citizen\IdentityController::class);
+    $controller = app()->make(IdentityController::class);
     $response = $controller->showAll();
 
-    expect($response)->toBeInstanceOf(\Illuminate\View\View::class);
+    expect($response)->toBeInstanceOf(View::class);
 });
-
 
 // ============================================================
 // BUG: failWallet should give clear error message
@@ -248,13 +248,12 @@ test('failWallet returns redirect with error message', function () {
     ['user' => $user] = createUserWithWallet();
     $this->actingAs($user);
 
-    $controller = app()->make(\App\Http\Controllers\Wallet\DashboardController::class);
+    $controller = app()->make(DashboardController::class);
     $response = $controller->failWallet();
 
-    expect($response)->toBeInstanceOf(\Illuminate\Http\RedirectResponse::class);
+    expect($response)->toBeInstanceOf(RedirectResponse::class);
     expect($response->getSession()->get('error'))->not->toBeNull();
 });
-
 
 // ============================================================
 // BUG: Wallet lock should clear both wallet_open flags
@@ -268,7 +267,7 @@ test('wallet lock clears both wallet_open and civic_wallet_open', function () {
 
     // Directly test the wallet logout logic (showHDClose is protected)
     $this->actingAs($user);
-    $controller = app()->make(\App\Http\Controllers\Wallet\DashboardController::class);
+    $controller = app()->make(DashboardController::class);
     $controller->walletLogout();
 
     $profile->refresh();
@@ -276,20 +275,18 @@ test('wallet lock clears both wallet_open and civic_wallet_open', function () {
     expect($profile->civic_wallet_open)->toBe(0);
 });
 
-
 // ============================================================
 // BUG: WalletStatus livewire crashed for unauthenticated users
 // Fix: Added null check for Auth::user()
 // ============================================================
 
 test('wallet status livewire component handles unauthenticated users', function () {
-    $component = new \App\Livewire\WalletStatus();
+    $component = new WalletStatus;
     $component->loadWalletData();
 
     expect($component->loading)->toBeFalse();
     expect($component->balance)->toBe(0);
 });
-
 
 // ============================================================
 // BUG: Feed API should be publicly accessible
@@ -308,7 +305,6 @@ test('public feed API returns data', function () {
     $response = $this->get('/api/feed/public');
     expect($response->status())->toBe(200);
 });
-
 
 // ============================================================
 // BUG: createwallet POST should handle civic wallet creation
@@ -329,10 +325,10 @@ test('createwallet creates civic wallet for user without one', function () {
     ]);
 
     $this->actingAs($user);
-    $controller = app()->make(\App\Http\Controllers\Wallet\DashboardController::class);
-    $request = new \Illuminate\Http\Request([
+    $controller = app()->make(DashboardController::class);
+    $request = new Request([
         'password' => '',
-        'public_addr' => 'MNewWalletTestAddr' . str_repeat('Z', 16),
+        'public_addr' => 'MNewWalletTestAddr'.str_repeat('Z', 16),
         'wallet_name' => 'Test Wallet',
     ]);
     $controller->postCreateWallet($request);
@@ -340,9 +336,8 @@ test('createwallet creates civic wallet for user without one', function () {
     // Civic wallet should exist
     $wallet = CivicWallet::where('user_id', $user->id)->first();
     expect($wallet)->not->toBeNull();
-    expect($wallet->public_addr)->toBe('MNewWalletTestAddr' . str_repeat('Z', 16));
+    expect($wallet->public_addr)->toBe('MNewWalletTestAddr'.str_repeat('Z', 16));
 });
-
 
 // ============================================================
 // BUG: closewallet API should work for authenticated users
@@ -354,8 +349,8 @@ test('closewallet API resets wallet open flag', function () {
     ]);
 
     $this->actingAs($user);
-    $controller = app()->make(\App\Http\Controllers\Wallet\ApiController::class);
-    $response = $controller->closewallet(new \Illuminate\Http\Request());
+    $controller = app()->make(ApiController::class);
+    $response = $controller->closewallet(new Request);
 
     expect($response->getStatusCode())->toBe(200);
 

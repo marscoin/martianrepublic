@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -8,11 +9,12 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @var string
  */
-class Citizen extends Model {
-
+class Citizen extends Model
+{
     protected $table = 'citizen';
+
     protected $fillable = [
-        'firstname', 'lastname', 'userid', 'displayname', 'public_address'
+        'firstname', 'lastname', 'userid', 'displayname', 'public_address',
     ];
 
     public function user()
@@ -20,14 +22,13 @@ class Citizen extends Model {
         return $this->belongsTo(User::class, 'userid');
     }
 
-    public function feeds() {
+    public function feeds()
+    {
         return $this->hasMany(Feed::class, 'userid', 'userid');
     }
 
-    public function posts() {
+    public function posts()
+    {
         return $this->hasMany(Posts::class, 'author_id');
     }
-
 }
-
-?>

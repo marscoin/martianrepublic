@@ -1,5 +1,9 @@
 <?php
 
+use TeamTeaTime\Forum\Models\Category;
+use TeamTeaTime\Forum\Models\Post;
+use TeamTeaTime\Forum\Models\Thread;
+
 // Categories
 Route::group(['prefix' => 'category', 'as' => 'category.'], function () {
     Route::get('/', ['as' => 'index', 'uses' => 'CategoryController@index']);
@@ -73,11 +77,11 @@ Route::group(['prefix' => 'bulk', 'as' => 'bulk.', 'namespace' => 'Bulk'], funct
 });
 
 Route::bind('category', function ($value) {
-    return \TeamTeaTime\Forum\Models\Category::find($value);
+    return Category::find($value);
 });
 
 Route::bind('thread', function ($value) {
-    $query = \TeamTeaTime\Forum\Models\Thread::with('category');
+    $query = Thread::with('category');
 
     if (Gate::allows('viewTrashedThreads')) {
         $query->withTrashed();
@@ -87,7 +91,7 @@ Route::bind('thread', function ($value) {
 });
 
 Route::bind('post', function ($value) {
-    $query = \TeamTeaTime\Forum\Models\Post::with(['thread', 'thread.category']);
+    $query = Post::with(['thread', 'thread.category']);
 
     if (Gate::allows('viewTrashedPosts')) {
         $query->withTrashed();

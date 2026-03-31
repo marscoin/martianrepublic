@@ -7,8 +7,10 @@
  */
 
 use App\Http\Controllers\StatusController;
+use Tests\CreatesTestDatabase;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(function () {
+uses(TestCase::class, CreatesTestDatabase::class)->beforeEach(function () {
     $this->createCoreTables();
 });
 

@@ -14,6 +14,7 @@ use TeamTeaTime\Forum\Models\Category;
 class ForumSeeder extends Seeder
 {
     const THREAD_COUNT = 2;
+
     const POSTS_PER_THREAD = 5;
 
     public function run()

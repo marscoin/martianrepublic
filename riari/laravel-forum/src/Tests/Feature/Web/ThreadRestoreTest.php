@@ -18,7 +18,9 @@ class ThreadRestoreTest extends FeatureTestCase
     private const ROUTE = 'thread.restore';
 
     private Category $category;
+
     private Thread $thread;
+
     private User $user;
 
     protected function setUp(): void

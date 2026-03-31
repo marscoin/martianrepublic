@@ -1,18 +1,19 @@
 <?php
 
+use Tests\TestCase;
+
 /**
  * Tests for pages using class-based route definitions (auth routes).
  * For string-based controller routes (citizen, congress, etc.), see WalletFlowTest
  * which tests controllers directly to avoid RouteServiceProvider namespace issues.
  */
-
-uses(Tests\TestCase::class)->beforeEach(function () {
+uses(TestCase::class)->beforeEach(function () {
     $this->artisan('migrate:fresh', [
         '--path' => [
             'database/migrations/2025_01_26_202544_create_users_table.php',
             'database/migrations/2025_01_26_202544_create_mars_sessions_table.php',
             'database/migrations/2025_01_26_202544_create_password_resets_table.php',
-        ]
+        ],
     ]);
 });
 

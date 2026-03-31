@@ -2,20 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\HDWallet;
-use App\Models\Profile;
-use App\Models\Feed;
-use App\Models\Citizen;
-use App\Models\CivicWallet;
 
 /**
  * @property Profile $profile
@@ -59,7 +51,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-
     // Define the relationship to Profile
     public function profile(): HasOne
     {
@@ -67,7 +58,7 @@ class User extends Authenticatable
     }
 
     // Define the relationship to Feed
-    public function feeds(): HasMany 
+    public function feeds(): HasMany
     {
         return $this->hasMany(Feed::class, 'userid', 'id');
     }
@@ -82,15 +73,11 @@ class User extends Authenticatable
         return $this->hasOne(Citizen::class, 'userid');
     }
 
-
     /**
      * Get the user's civic wallet.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function civicWallet(): HasOne
     {
         return $this->hasOne(CivicWallet::class, 'user_id');
     }
-
 }

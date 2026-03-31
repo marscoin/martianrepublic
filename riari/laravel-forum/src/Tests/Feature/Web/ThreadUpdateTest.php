@@ -15,15 +15,21 @@ use TeamTeaTime\Forum\Tests\FeatureTestCase;
 class ThreadUpdateTest extends FeatureTestCase
 {
     private const ROUTE_LOCK = 'thread.lock';
+
     private const ROUTE_UNLOCK = 'thread.unlock';
+
     private const ROUTE_PIN = 'thread.pin';
+
     private const ROUTE_UNPIN = 'thread.unpin';
+
     private const ROUTE_MOVE = 'thread.move';
+
     private const ROUTE_RENAME = 'thread.rename';
 
     private CategoryFactory $categoryFactory;
 
     private Thread $thread;
+
     private User $user;
 
     protected function setUp(): void

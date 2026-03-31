@@ -12,7 +12,9 @@ class CategoryShowTest extends FeatureTestCase
     private const ROUTE = 'category.show';
 
     private Category $topLevelCategory;
+
     private Category $secondLevelCategory;
+
     private Category $thirdLevelCategory;
 
     protected function setUp(): void

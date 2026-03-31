@@ -9,6 +9,7 @@ use TeamTeaTime\Forum\Models\Thread;
 class LockThreads extends BaseAction
 {
     private array $threadIds;
+
     private bool $includeTrashed;
 
     public function __construct(array $threadIds, bool $includeTrashed)

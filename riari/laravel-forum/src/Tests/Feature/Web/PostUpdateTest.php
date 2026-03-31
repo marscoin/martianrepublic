@@ -15,6 +15,7 @@ class PostUpdateTest extends FeatureTestCase
     private const ROUTE = 'post.update';
 
     private Post $post;
+
     private User $user;
 
     protected function setUp(): void

@@ -2,8 +2,11 @@
 
 namespace TeamTeaTime\Forum\Http\Controllers\Web;
 
+use App\Models\HDWallet;
+use App\Models\Profile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\View\View;
 use TeamTeaTime\Forum\Events\UserCreatingThread;
@@ -25,49 +28,41 @@ use TeamTeaTime\Forum\Models\Thread;
 use TeamTeaTime\Forum\Support\CategoryPrivacy;
 use TeamTeaTime\Forum\Support\Web\Forum;
 
-use Illuminate\Support\Facades\Auth;
-use App\Models\Profile;
-use App\Includes\AppHelper;
-use App\Models\HDWallet;
-
 class ThreadController extends BaseController
 {
-
     public function check($view)
     {
         if (Auth::check()) {
-			$uid = Auth::user()->id;
-			$profile = Profile::where('userid', '=', $uid)->first();
-			$wallet = HDWallet::where('user_id', '=', $uid)->first();
+            $uid = Auth::user()->id;
+            $profile = Profile::where('userid', '=', $uid)->first();
+            $wallet = HDWallet::where('user_id', '=', $uid)->first();
 
-			if (!$profile) {
-				return redirect('/twofa');
-			} else {
-				if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
-					return redirect('/twofachallenge');
-				}
-			}
-			$view->balance = 0; //for now, could move to stats helper function as well
+            if (! $profile) {
+                return redirect('/twofa');
+            } else {
+                if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
+                    return redirect('/twofachallenge');
+                }
+            }
+            $view->balance = 0; // for now, could move to stats helper function as well
 
             if ($wallet) {
-				$view->public_address = $wallet->public_addr;
-			} else {
-				$view->balance = 0;
-			}
+                $view->public_address = $wallet->public_addr;
+            } else {
+                $view->balance = 0;
+            }
 
-			$view->fullname = Auth::user()->fullname;
-			$view->isCitizen = $profile->citizen;
-			$view->isGP  = $profile->general_public;
-			$view->wallet_open = $profile->wallet_open;
+            $view->fullname = Auth::user()->fullname;
+            $view->isCitizen = $profile->citizen;
+            $view->isGP = $profile->general_public;
+            $view->wallet_open = $profile->wallet_open;
 
-			return $view;
+            return $view;
 
-
-		}else{
+        } else {
             return view('auth.login');
         }
     }
-
 
     public function recent(Request $request): View
     {
@@ -87,7 +82,7 @@ class ThreadController extends BaseController
             UserViewingRecent::dispatch($request->user(), $threads);
         }
 
-        return $this->check( ViewFactory::make('forum::thread.show', compact('categories', 'category', 'thread', 'posts', 'selectablePosts')) );
+        return $this->check(ViewFactory::make('forum::thread.show', compact('categories', 'category', 'thread', 'posts', 'selectablePosts')));
     }
 
     public function unread(Request $request): View

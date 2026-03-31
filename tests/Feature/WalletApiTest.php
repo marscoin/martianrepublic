@@ -5,15 +5,17 @@
  * Uses direct controller/model testing to avoid RouteServiceProvider namespace issues.
  */
 
-use App\Models\User;
-use App\Models\Profile;
+use App\Http\Controllers\Wallet\ApiController;
 use App\Models\CivicWallet;
 use App\Models\Feed;
-use App\Http\Controllers\Wallet\ApiController;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Profile;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Tests\CreatesTestDatabase;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(function () {
+uses(TestCase::class, CreatesTestDatabase::class)->beforeEach(function () {
     $this->createCoreTables();
     $this->createWalletTables();
     $this->createCitizenTable();
@@ -46,7 +48,7 @@ function createWalletApiUser(array $overrides = []): array
     $wallet = CivicWallet::create([
         'user_id' => $user->id,
         'wallet_type' => 'civic',
-        'public_addr' => $overrides['address'] ?? 'MApiTestAddr' . $user->id . str_repeat('X', 22),
+        'public_addr' => $overrides['address'] ?? 'MApiTestAddr'.$user->id.str_repeat('X', 22),
         'encrypted_seed' => 'test-seed',
         'opened_at' => now(),
     ]);
@@ -84,7 +86,7 @@ test('closewallet resets wallet_open to zero', function () {
 
     $this->actingAs($user);
     $controller = app()->make(ApiController::class);
-    $response = $controller->closewallet(new Request());
+    $response = $controller->closewallet(new Request);
 
     expect($response->getStatusCode())->toBe(200);
 
@@ -99,7 +101,7 @@ test('closewallet works when profile has no wallet open', function () {
 
     $this->actingAs($user);
     $controller = app()->make(ApiController::class);
-    $response = $controller->closewallet(new Request());
+    $response = $controller->closewallet(new Request);
 
     expect($response->getStatusCode())->toBe(200);
     $profile->refresh();

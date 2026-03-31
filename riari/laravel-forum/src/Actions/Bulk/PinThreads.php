@@ -9,6 +9,7 @@ use TeamTeaTime\Forum\Models\Thread;
 class PinThreads extends BaseAction
 {
     private array $threadIds;
+
     private bool $includeTrashed;
 
     public function __construct(array $threadIds, bool $includeTrashed)

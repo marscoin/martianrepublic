@@ -1,19 +1,19 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\DB;
-use App\Models\Profile;
-use App\Models\CivicWallet;
-use App\Models\Bads\OversightCommittee;
+use App\Models\Bads\Anomaly;
+use App\Models\Bads\Attestation;
+use App\Models\Bads\CalibrationRecord;
 use App\Models\Bads\Deputy;
 use App\Models\Bads\Instrument;
-use App\Models\Bads\Attestation;
-use App\Models\Bads\Anomaly;
-use App\Models\Bads\CalibrationRecord;
-use App\Includes\AppHelper;
+use App\Models\Bads\OversightCommittee;
+use App\Models\CivicWallet;
+use App\Models\Profile;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 
 class InstrumentController extends Controller
 {
@@ -21,13 +21,13 @@ class InstrumentController extends Controller
      * Device category mapping from hex prefix to human-readable category.
      */
     public const DEVICE_CATEGORIES = [
-        'atmospheric'  => ['prefix' => 0x01, 'label' => 'Atmospheric',  'icon' => 'fa-wind',       'color' => '#00e4ff'],
-        'power'        => ['prefix' => 0x02, 'label' => 'Power',        'icon' => 'fa-bolt',       'color' => '#f59e0b'],
+        'atmospheric' => ['prefix' => 0x01, 'label' => 'Atmospheric',  'icon' => 'fa-wind',       'color' => '#00e4ff'],
+        'power' => ['prefix' => 0x02, 'label' => 'Power',        'icon' => 'fa-bolt',       'color' => '#f59e0b'],
         'agricultural' => ['prefix' => 0x03, 'label' => 'Agricultural', 'icon' => 'fa-seedling',   'color' => '#34d399'],
-        'structural'   => ['prefix' => 0x04, 'label' => 'Structural',   'icon' => 'fa-building',   'color' => '#8b5cf6'],
-        'water'        => ['prefix' => 0x05, 'label' => 'Water',        'icon' => 'fa-droplet',    'color' => '#3b82f6'],
-        'medical'      => ['prefix' => 0x06, 'label' => 'Medical',      'icon' => 'fa-heart-pulse','color' => '#ef4444'],
-        'environmental'=> ['prefix' => 0x08, 'label' => 'Environmental','icon' => 'fa-globe',      'color' => '#f97316'],
+        'structural' => ['prefix' => 0x04, 'label' => 'Structural',   'icon' => 'fa-building',   'color' => '#8b5cf6'],
+        'water' => ['prefix' => 0x05, 'label' => 'Water',        'icon' => 'fa-droplet',    'color' => '#3b82f6'],
+        'medical' => ['prefix' => 0x06, 'label' => 'Medical',      'icon' => 'fa-heart-pulse', 'color' => '#ef4444'],
+        'environmental' => ['prefix' => 0x08, 'label' => 'Environmental', 'icon' => 'fa-globe',      'color' => '#f97316'],
     ];
 
     /**
@@ -35,7 +35,7 @@ class InstrumentController extends Controller
      */
     private function loadUserContext()
     {
-        $ctx = new \stdClass();
+        $ctx = new \stdClass;
         $ctx->wallet_open = false;
         $ctx->isCitizen = false;
         $ctx->isDeputy = false;
@@ -46,12 +46,14 @@ class InstrumentController extends Controller
             $uid = Auth::user()->id;
             $profile = Profile::where('userid', $uid)->first();
 
-            if (!$profile) {
+            if (! $profile) {
                 $ctx->redirect = redirect('/twofa');
+
                 return $ctx;
             }
             if ($profile->openchallenge == 1 || is_null($profile->openchallenge)) {
                 $ctx->redirect = redirect('/twofachallenge');
+
                 return $ctx;
             }
 
@@ -76,7 +78,9 @@ class InstrumentController extends Controller
     public function index()
     {
         $ctx = $this->loadUserContext();
-        if (isset($ctx->redirect)) return $ctx->redirect;
+        if (isset($ctx->redirect)) {
+            return $ctx->redirect;
+        }
 
         // Load instruments with relationships
         $instruments = Instrument::with(['certifiedBy.user', 'certifiedBy.committee'])
@@ -91,9 +95,9 @@ class InstrumentController extends Controller
 
         // Chain of trust stats
         $stats = [
-            'committees'   => OversightCommittee::where('status', 'active')->count(),
-            'deputies'     => Deputy::where('status', 'active')->count(),
-            'instruments'  => Instrument::count(),
+            'committees' => OversightCommittee::where('status', 'active')->count(),
+            'deputies' => Deputy::where('status', 'active')->count(),
+            'instruments' => Instrument::count(),
             'attestations' => Attestation::count(),
         ];
 
@@ -121,7 +125,9 @@ class InstrumentController extends Controller
     public function show($id)
     {
         $ctx = $this->loadUserContext();
-        if (isset($ctx->redirect)) return $ctx->redirect;
+        if (isset($ctx->redirect)) {
+            return $ctx->redirect;
+        }
 
         $instrument = Instrument::with([
             'certifiedBy.user',
@@ -173,9 +179,11 @@ class InstrumentController extends Controller
     public function create()
     {
         $ctx = $this->loadUserContext();
-        if (isset($ctx->redirect)) return $ctx->redirect;
+        if (isset($ctx->redirect)) {
+            return $ctx->redirect;
+        }
 
-        if (!$ctx->isDeputy) {
+        if (! $ctx->isDeputy) {
             return redirect()->route('instruments.index')
                 ->with('error', 'Only active deputies may certify new instruments.');
         }
@@ -202,21 +210,23 @@ class InstrumentController extends Controller
     public function store(Request $request)
     {
         $ctx = $this->loadUserContext();
-        if (isset($ctx->redirect)) return $ctx->redirect;
+        if (isset($ctx->redirect)) {
+            return $ctx->redirect;
+        }
 
-        if (!$ctx->isDeputy) {
+        if (! $ctx->isDeputy) {
             return redirect()->route('instruments.index')
                 ->with('error', 'Only active deputies may certify new instruments.');
         }
 
         $request->validate([
-            'device_type'      => 'required|integer',
-            'serial'           => 'required|string|max:255',
-            'make'             => 'nullable|string|max:255',
-            'model'            => 'nullable|string|max:255',
-            'location'         => 'nullable|string|max:255',
+            'device_type' => 'required|integer',
+            'serial' => 'required|string|max:255',
+            'make' => 'nullable|string|max:255',
+            'model' => 'nullable|string|max:255',
+            'location' => 'nullable|string|max:255',
             'firmware_version' => 'nullable|string|max:50',
-            'mqtt_namespace'   => 'nullable|string|max:255',
+            'mqtt_namespace' => 'nullable|string|max:255',
         ]);
 
         $deviceType = (int) $request->input('device_type');
@@ -233,21 +243,21 @@ class InstrumentController extends Controller
         }
 
         // Generate a Marscoin address for the device
-        $address = 'M' . substr(hash('sha256', uniqid('bads_', true) . $request->input('serial')), 0, 33);
+        $address = 'M'.substr(hash('sha256', uniqid('bads_', true).$request->input('serial')), 0, 33);
 
         $instrument = Instrument::create([
-            'address'               => $address,
-            'device_type'           => $deviceType,
-            'device_type_name'      => $deviceTypeName,
-            'device_category'       => $deviceCategory,
-            'make'                  => $request->input('make'),
-            'model'                 => $request->input('model'),
-            'serial'                => $request->input('serial'),
-            'location'              => $request->input('location'),
-            'firmware_version'      => $request->input('firmware_version'),
-            'mqtt_namespace'        => $request->input('mqtt_namespace'),
-            'certified_by_deputy_id'=> $ctx->deputyRecord->id,
-            'status'                => 'active',
+            'address' => $address,
+            'device_type' => $deviceType,
+            'device_type_name' => $deviceTypeName,
+            'device_category' => $deviceCategory,
+            'make' => $request->input('make'),
+            'model' => $request->input('model'),
+            'serial' => $request->input('serial'),
+            'location' => $request->input('location'),
+            'firmware_version' => $request->input('firmware_version'),
+            'mqtt_namespace' => $request->input('mqtt_namespace'),
+            'certified_by_deputy_id' => $ctx->deputyRecord->id,
+            'status' => 'active',
         ]);
 
         return redirect()->route('instruments.show', $instrument->id)
@@ -260,7 +270,9 @@ class InstrumentController extends Controller
     public function committees()
     {
         $ctx = $this->loadUserContext();
-        if (isset($ctx->redirect)) return $ctx->redirect;
+        if (isset($ctx->redirect)) {
+            return $ctx->redirect;
+        }
 
         $committees = OversightCommittee::with(['deputies.user', 'proposal'])
             ->withCount(['deputies', 'instruments'])
@@ -284,45 +296,47 @@ class InstrumentController extends Controller
         $instrument = Instrument::with([
             'certifiedBy.user',
             'certifiedBy.committee.proposal',
-            'attestations' => function ($q) { $q->orderBy('created_at', 'desc')->limit(10); },
+            'attestations' => function ($q) {
+                $q->orderBy('created_at', 'desc')->limit(10);
+            },
         ])->findOrFail($instrumentId);
 
         $chain = [
             'instrument' => [
-                'id'       => $instrument->id,
-                'address'  => $instrument->address,
-                'name'     => $instrument->device_type_name,
-                'serial'   => $instrument->serial,
-                'status'   => $instrument->status,
-                'cert_txid'=> $instrument->cert_txid,
+                'id' => $instrument->id,
+                'address' => $instrument->address,
+                'name' => $instrument->device_type_name,
+                'serial' => $instrument->serial,
+                'status' => $instrument->status,
+                'cert_txid' => $instrument->cert_txid,
             ],
         ];
 
         if ($instrument->certifiedBy) {
             $deputy = $instrument->certifiedBy;
             $chain['deputy'] = [
-                'id'            => $deputy->id,
+                'id' => $deputy->id,
                 'civic_address' => $deputy->civic_address,
-                'user_name'     => $deputy->user ? $deputy->user->fullname : 'Unknown',
-                'role_tag'      => $deputy->role_tag,
+                'user_name' => $deputy->user ? $deputy->user->fullname : 'Unknown',
+                'role_tag' => $deputy->role_tag,
                 'appointment_txid' => $deputy->appointment_txid,
             ];
 
             if ($deputy->committee) {
                 $committee = $deputy->committee;
                 $chain['committee'] = [
-                    'id'           => $committee->id,
-                    'name'         => $committee->name,
-                    'slug'         => $committee->slug,
-                    'proposal_txid'=> $committee->proposal_txid,
+                    'id' => $committee->id,
+                    'name' => $committee->name,
+                    'slug' => $committee->slug,
+                    'proposal_txid' => $committee->proposal_txid,
                 ];
 
                 if ($committee->proposal) {
                     $chain['proposal'] = [
-                        'id'    => $committee->proposal->id,
+                        'id' => $committee->proposal->id,
                         'title' => $committee->proposal->title,
-                        'status'=> $committee->proposal->status,
-                        'txid'  => $committee->proposal->ipfs_hash ?? null,
+                        'status' => $committee->proposal->status,
+                        'txid' => $committee->proposal->ipfs_hash ?? null,
                     ];
                 }
             }
@@ -330,13 +344,13 @@ class InstrumentController extends Controller
 
         $chain['attestations'] = $instrument->attestations->map(function ($a) {
             return [
-                'id'          => $a->id,
-                'txid'        => $a->txid,
+                'id' => $a->id,
+                'txid' => $a->txid,
                 'merkle_root' => $a->merkle_root,
-                'readings'    => $a->reading_count,
-                'verified'    => $a->verified,
+                'readings' => $a->reading_count,
+                'verified' => $a->verified,
                 'batch_start' => $a->batch_start ? $a->batch_start->toIso8601String() : null,
-                'batch_end'   => $a->batch_end ? $a->batch_end->toIso8601String() : null,
+                'batch_end' => $a->batch_end ? $a->batch_end->toIso8601String() : null,
             ];
         });
 

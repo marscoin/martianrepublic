@@ -16,9 +16,11 @@ class ThreadDeleteTest extends FeatureTestCase
     private const ROUTE = 'thread.delete';
 
     private ThreadFactory $threadFactory;
+
     private PostFactory $postFactory;
 
     private User $user;
+
     private Thread $thread;
 
     protected function setUp(): void

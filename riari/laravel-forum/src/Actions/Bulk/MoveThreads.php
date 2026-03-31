@@ -10,7 +10,9 @@ use TeamTeaTime\Forum\Models\Thread;
 class MoveThreads extends BaseAction
 {
     private array $threadIds;
+
     private Category $destinationCategory;
+
     private bool $includeTrashed;
 
     public function __construct(array $threadIds, Category $destinationCategory, bool $includeTrashed)

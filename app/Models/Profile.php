@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 
-class Profile extends Model {
-
+class Profile extends Model
+{
     protected $table = 'profile';
 
     protected $fillable = [
@@ -17,9 +18,6 @@ class Profile extends Model {
         'general_public',
         'endorse_cnt',
         'citizen',
-        'has_application'
+        'has_application',
     ];
-
 }
-
-?>

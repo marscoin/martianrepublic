@@ -15,9 +15,11 @@ class ThreadStoreTest extends FeatureTestCase
     private const ROUTE = 'thread.store';
 
     private CategoryFactory $categoryFactory;
+
     private UserFactory $userFactory;
 
     private Category $category;
+
     private User $user;
 
     protected function setUp(): void

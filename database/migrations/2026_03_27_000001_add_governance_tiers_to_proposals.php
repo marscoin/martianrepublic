@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('proposals', function (Blueprint $table) {
             $table->enum('tier', ['signal', 'operational', 'legislative', 'constitutional'])
-                  ->default('signal')->after('category');
+                ->default('signal')->after('category');
             $table->timestamp('screening_ends_at')->nullable()->after('mined');
             $table->timestamp('voting_ends_at')->nullable()->after('screening_ends_at');
             $table->timestamp('timelock_ends_at')->nullable()->after('voting_ends_at');

@@ -9,8 +9,10 @@
 use App\Http\Controllers\ContactFormController;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Tests\CreatesTestDatabase;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(function () {
+uses(TestCase::class, CreatesTestDatabase::class)->beforeEach(function () {
     $this->createCoreTables();
 });
 
@@ -101,5 +103,5 @@ test('contact route has throttle middleware configured', function () {
     // Read the routes file and verify throttle middleware is applied
     $routeFile = file_get_contents(base_path('routes/web.php'));
     expect($routeFile)->toContain("'/contact'");
-    expect($routeFile)->toContain("throttle:3,1");
+    expect($routeFile)->toContain('throttle:3,1');
 });

@@ -12,7 +12,9 @@ class UserSearchedPosts extends BaseEvent
     public $user;
 
     public ?Category $category;
+
     public string $term;
+
     public LengthAwarePaginator $results;
 
     public function __construct($user, ?Category $category, string $term, LengthAwarePaginator $results)

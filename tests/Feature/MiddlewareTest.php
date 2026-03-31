@@ -1,11 +1,13 @@
 <?php
 
+use Tests\CreatesTestDatabase;
+use Tests\TestCase;
+
 /**
  * Tests for SecurityHeaders and InjectSentryJs middleware.
  * Uses HTTP route testing since middleware runs on every request.
  */
-
-uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(function () {
+uses(TestCase::class, CreatesTestDatabase::class)->beforeEach(function () {
     $this->createCoreTables();
 });
 

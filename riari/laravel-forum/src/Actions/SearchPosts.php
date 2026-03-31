@@ -10,6 +10,7 @@ use TeamTeaTime\Forum\Models\Post;
 class SearchPosts extends BaseAction
 {
     private ?Category $category;
+
     private string $term;
 
     public function __construct(?Category $category, string $term)

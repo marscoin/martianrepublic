@@ -5,13 +5,14 @@
  * Uses direct DB testing to avoid RouteServiceProvider namespace issues.
  */
 
-use App\Models\User;
-use App\Models\Profile;
 use App\Http\Controllers\ForumController;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Tests\CreatesTestDatabase;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class, Tests\CreatesTestDatabase::class)->beforeEach(function () {
+uses(TestCase::class, CreatesTestDatabase::class)->beforeEach(function () {
     $this->createCoreTables();
     $this->createForumTables();
     $this->createProposalTables();

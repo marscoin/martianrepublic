@@ -7,6 +7,7 @@ use TeamTeaTime\Forum\Models\Post;
 class UpdatePost extends BaseAction
 {
     private Post $post;
+
     private string $content;
 
     public function __construct(Post $post, string $content)

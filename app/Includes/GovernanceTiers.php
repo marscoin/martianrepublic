@@ -2,6 +2,8 @@
 
 namespace App\Includes;
 
+use Carbon\Carbon;
+
 /**
  * GovernanceTiers — Single source of truth for the Martian Republic's 4-tier governance system.
  *
@@ -17,6 +19,7 @@ class GovernanceTiers
     // Voting: scales proportionally (Signal 7min, Operational 14min, etc.)
     // MUST be false in production
     const TEST_MODE = true;
+
     const TEST_MODE_MINUTES_PER_SOL = 1; // 1 minute = 1 sol in test mode
 
     // Duration of the screening period before voting opens (in sols/days)
@@ -25,56 +28,56 @@ class GovernanceTiers
     // Tier definitions: all parameters in one place
     const TIERS = [
         'signal' => [
-            'label'            => 'Signal',
-            'description'      => 'Non-binding temperature check — a formal poll',
-            'quorum_percent'   => 10,   // % of active citizens
-            'threshold'        => 51,   // % approval to pass
-            'duration_sols'    => 7,    // voting window
-            'timelock_sols'    => 0,    // no timelock (non-binding)
-            'sunset_sols'      => 0,    // non-binding, no sunset
-            'quiet_ending'     => false,
-            'coinshuffle'      => false, // simple signed messages
-            'binding'          => false,
-            'color'            => '#34d399', // green
+            'label' => 'Signal',
+            'description' => 'Non-binding temperature check — a formal poll',
+            'quorum_percent' => 10,   // % of active citizens
+            'threshold' => 51,   // % approval to pass
+            'duration_sols' => 7,    // voting window
+            'timelock_sols' => 0,    // no timelock (non-binding)
+            'sunset_sols' => 0,    // non-binding, no sunset
+            'quiet_ending' => false,
+            'coinshuffle' => false, // simple signed messages
+            'binding' => false,
+            'color' => '#34d399', // green
         ],
         'operational' => [
-            'label'            => 'Operational',
-            'description'      => 'Day-to-day governance, resource allocation, parameter changes',
-            'quorum_percent'   => 25,
-            'threshold'        => 60,
-            'duration_sols'    => 14,
-            'timelock_sols'    => 3,
-            'sunset_sols'      => 668,  // 1 Martian year
-            'quiet_ending'     => false,
-            'coinshuffle'      => true,
-            'binding'          => true,
-            'color'            => '#00e4ff', // cyan
+            'label' => 'Operational',
+            'description' => 'Day-to-day governance, resource allocation, parameter changes',
+            'quorum_percent' => 25,
+            'threshold' => 60,
+            'duration_sols' => 14,
+            'timelock_sols' => 3,
+            'sunset_sols' => 668,  // 1 Martian year
+            'quiet_ending' => false,
+            'coinshuffle' => true,
+            'binding' => true,
+            'color' => '#00e4ff', // cyan
         ],
         'legislative' => [
-            'label'            => 'Legislative',
-            'description'      => 'Significant policy, committees, major treasury decisions',
-            'quorum_percent'   => 40,
-            'threshold'        => 66,
-            'duration_sols'    => 30,
-            'timelock_sols'    => 7,
-            'sunset_sols'      => 2672, // ~4 Earth years
-            'quiet_ending'     => true,
-            'coinshuffle'      => true,
-            'binding'          => true,
-            'color'            => '#f59e0b', // amber
+            'label' => 'Legislative',
+            'description' => 'Significant policy, committees, major treasury decisions',
+            'quorum_percent' => 40,
+            'threshold' => 66,
+            'duration_sols' => 30,
+            'timelock_sols' => 7,
+            'sunset_sols' => 2672, // ~4 Earth years
+            'quiet_ending' => true,
+            'coinshuffle' => true,
+            'binding' => true,
+            'color' => '#f59e0b', // amber
         ],
         'constitutional' => [
-            'label'            => 'Constitutional',
-            'description'      => 'Code changes, governance rules, citizenship parameters',
-            'quorum_percent'   => 50,
-            'threshold'        => 75,
-            'duration_sols'    => 60,
-            'timelock_sols'    => 30,
-            'sunset_sols'      => 0,    // never expires
-            'quiet_ending'     => true,
-            'coinshuffle'      => true,
-            'binding'          => true,
-            'color'            => '#c84125', // mars red
+            'label' => 'Constitutional',
+            'description' => 'Code changes, governance rules, citizenship parameters',
+            'quorum_percent' => 50,
+            'threshold' => 75,
+            'duration_sols' => 60,
+            'timelock_sols' => 30,
+            'sunset_sols' => 0,    // never expires
+            'quiet_ending' => true,
+            'coinshuffle' => true,
+            'binding' => true,
+            'color' => '#c84125', // mars red
         ],
     ];
 
@@ -92,12 +95,12 @@ class GovernanceTiers
     public static function categoryToTier(string $category): string
     {
         return match ($category) {
-            'poll'       => 'signal',
+            'poll' => 'signal',
             'regulation' => 'operational',
             'statute', 'law' => 'legislative',
-            'amendment'  => 'constitutional',
+            'amendment' => 'constitutional',
             'signal', 'operational', 'legislative', 'constitutional' => $category,
-            default      => 'signal',
+            default => 'signal',
         };
     }
 
@@ -108,18 +111,18 @@ class GovernanceTiers
     public static function calculateTimestamps(string $tier, ?\DateTimeInterface $minedAt = null): array
     {
         $config = self::get($tier);
-        if (!$config) {
+        if (! $config) {
             $config = self::TIERS['signal'];
         }
 
         // If not yet mined/notarized, timestamps start from now
-        $start = $minedAt ? \Carbon\Carbon::parse($minedAt) : now();
+        $start = $minedAt ? Carbon::parse($minedAt) : now();
 
         if (self::TEST_MODE) {
             // Test mode: minutes instead of days
             $m = self::TEST_MODE_MINUTES_PER_SOL;
             $screeningEnds = $start->copy()->addMinutes(self::SCREENING_DURATION_SOLS * $m);
-            $votingEnds    = $screeningEnds->copy()->addMinutes($config['duration_sols'] * $m);
+            $votingEnds = $screeningEnds->copy()->addMinutes($config['duration_sols'] * $m);
 
             $timelockEnds = null;
             if ($config['timelock_sols'] > 0) {
@@ -134,7 +137,7 @@ class GovernanceTiers
         } else {
             // Production: days (sols)
             $screeningEnds = $start->copy()->addDays(self::SCREENING_DURATION_SOLS);
-            $votingEnds    = $screeningEnds->copy()->addDays($config['duration_sols']);
+            $votingEnds = $screeningEnds->copy()->addDays($config['duration_sols']);
 
             $timelockEnds = null;
             if ($config['timelock_sols'] > 0) {
@@ -150,9 +153,9 @@ class GovernanceTiers
 
         return [
             'screening_ends_at' => $screeningEnds,
-            'voting_ends_at'    => $votingEnds,
-            'timelock_ends_at'  => $timelockEnds,
-            'sunset_at'         => $sunsetAt,
+            'voting_ends_at' => $votingEnds,
+            'timelock_ends_at' => $timelockEnds,
+            'sunset_at' => $sunsetAt,
         ];
     }
 
@@ -170,30 +173,31 @@ class GovernanceTiers
         }
 
         // Screening phase
-        if ($proposal->screening_ends_at && $now->lt(\Carbon\Carbon::parse($proposal->screening_ends_at))) {
+        if ($proposal->screening_ends_at && $now->lt(Carbon::parse($proposal->screening_ends_at))) {
             return 'screening';
         }
 
         // Voting phase
-        if ($proposal->voting_ends_at && $now->lt(\Carbon\Carbon::parse($proposal->voting_ends_at))) {
+        if ($proposal->voting_ends_at && $now->lt(Carbon::parse($proposal->voting_ends_at))) {
             return 'voting';
         }
 
         // Timelock phase
-        if ($proposal->timelock_ends_at && $now->lt(\Carbon\Carbon::parse($proposal->timelock_ends_at))) {
+        if ($proposal->timelock_ends_at && $now->lt(Carbon::parse($proposal->timelock_ends_at))) {
             return 'timelock';
         }
 
         // Active (enacted, not yet sunset)
         if ($proposal->enacted_at) {
-            if ($proposal->sunset_at && $now->gte(\Carbon\Carbon::parse($proposal->sunset_at))) {
+            if ($proposal->sunset_at && $now->gte(Carbon::parse($proposal->sunset_at))) {
                 return 'sunset';
             }
+
             return 'active';
         }
 
         // Fallback: if voting ended but no result set, it's expired
-        if ($proposal->voting_ends_at && $now->gte(\Carbon\Carbon::parse($proposal->voting_ends_at))) {
+        if ($proposal->voting_ends_at && $now->gte(Carbon::parse($proposal->voting_ends_at))) {
             return 'expired';
         }
 
@@ -206,11 +210,11 @@ class GovernanceTiers
     public static function tierOrder(string $tier): int
     {
         return match ($tier) {
-            'signal'         => 1,
-            'operational'    => 2,
-            'legislative'    => 3,
+            'signal' => 1,
+            'operational' => 2,
+            'legislative' => 3,
             'constitutional' => 4,
-            default          => 0,
+            default => 0,
         };
     }
 

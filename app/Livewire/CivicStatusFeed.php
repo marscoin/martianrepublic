@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Livewire;
-use App\Models\CivicWallet;
-use Livewire\Component;
+
 use Illuminate\Support\Facades\DB;
-use App\Models\Feed;
+use Livewire\Component;
 
 class CivicStatusFeed extends Component
 {
@@ -18,20 +17,20 @@ class CivicStatusFeed extends Component
             ->orderByDesc('mined')
             ->take(8)
             ->get([
-                'feed.*', 
-                DB::raw("CONCAT(citizen.firstname, ' ', citizen.lastname) as citizenName")
+                'feed.*',
+                DB::raw("CONCAT(citizen.firstname, ' ', citizen.lastname) as citizenName"),
             ]);
 
         $this->activities = $activities->map(function ($activity) {
-            $citizenName = $activity->citizenName ?: "An anonymous user";
-    
+            $citizenName = $activity->citizenName ?: 'An anonymous user';
+
             switch ($activity->tag) {
                 case 'ED':
                     $endorsed = DB::table('citizen')
                         ->where('public_address', $activity->message)
                         ->select(DB::raw("CONCAT(firstname, ' ', lastname) as fullname"))
                         ->first();
-                    $endorsedName = $endorsed ? $endorsed->fullname : "someone";
+                    $endorsedName = $endorsed ? $endorsed->fullname : 'someone';
                     $actionWord = "<a href='{$activity->embedded_link}'>endorsed</a>";
                     $activity->displayMessage = "{$citizenName} {$actionWord} {$endorsedName}";
                     break;
@@ -48,11 +47,10 @@ class CivicStatusFeed extends Component
                     $activity->displayMessage = "{$citizenName} {$actionWord}";
                     break;
             }
-    
+
             return $activity;
         });
     }
-    
 
     public function render()
     {

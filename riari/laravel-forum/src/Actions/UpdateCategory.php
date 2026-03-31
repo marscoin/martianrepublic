@@ -7,10 +7,15 @@ use TeamTeaTime\Forum\Models\Category;
 class UpdateCategory extends BaseAction
 {
     private Category $category;
+
     private ?string $title;
+
     private ?string $description;
+
     private ?string $color;
+
     private ?bool $acceptsThreads;
+
     private ?bool $isPrivate;
 
     public function __construct(Category $category, ?string $title, ?string $description, ?string $color, ?bool $acceptsThreads, ?bool $isPrivate)

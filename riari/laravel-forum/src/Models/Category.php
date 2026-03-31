@@ -15,6 +15,7 @@ class Category extends BaseModel
     use NodeTrait;
 
     protected $table = 'forum_categories';
+
     protected $fillable = [
         'title',
         'description',
@@ -26,6 +27,7 @@ class Category extends BaseModel
         'is_private',
         'color',
     ];
+
     protected $appends = ['route'];
 
     public function __construct(array $attributes = [])

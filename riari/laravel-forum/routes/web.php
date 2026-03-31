@@ -1,5 +1,9 @@
 <?php
 
+use TeamTeaTime\Forum\Models\Category;
+use TeamTeaTime\Forum\Models\Post;
+use TeamTeaTime\Forum\Models\Thread;
+
 $authMiddleware = config('forum.web.router.auth_middleware');
 $prefix = config('forum.web.route_prefixes');
 
@@ -75,11 +79,11 @@ Route::group(['prefix' => 'bulk', 'as' => 'bulk.', 'namespace' => 'Bulk', 'middl
 });
 
 Route::bind('category', function ($value) {
-    return \TeamTeaTime\Forum\Models\Category::findOrFail($value);
+    return Category::findOrFail($value);
 });
 
 Route::bind('thread', function ($value) {
-    $query = \TeamTeaTime\Forum\Models\Thread::with('category');
+    $query = Thread::with('category');
 
     if (Gate::allows('viewTrashedThreads')) {
         $query->withTrashed();
@@ -95,7 +99,7 @@ Route::bind('thread', function ($value) {
 });
 
 Route::bind('post', function ($value) {
-    $query = \TeamTeaTime\Forum\Models\Post::with(['thread', 'thread.category']);
+    $query = Post::with(['thread', 'thread.category']);
 
     if (Gate::allows('viewTrashedPosts')) {
         $query->withTrashed();

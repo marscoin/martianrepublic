@@ -1,10 +1,8 @@
 <?php
 
 namespace App\Models;
-use App\Models\User;
+
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -22,25 +20,28 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property User $user
  * @property Citizen $citizen
  */
-class Feed extends Model {
-
+class Feed extends Model
+{
     protected $table = 'feed';
+
     protected $appends = ['profile_image'];
+
     protected $dates = ['mined'];
+
     protected $casts = [
         'mined' => 'datetime',
     ];
 
     protected $fillable = [
         'address',
-        'userid', 
+        'userid',
         'tag',
         'message',
         'embedded_link',
         'txid',
         'blockid',
-        'mined'
-     ];
+        'mined',
+    ];
 
     public function user(): BelongsTo
     {
@@ -49,18 +50,15 @@ class Feed extends Model {
 
     public function getProfileImageAttribute()
     {
-        if (!$this->address) {
+        if (! $this->address) {
             return null;
         }
 
-        return 'https://martianrepublic.org/assets/citizen/' . $this->address . '/profile_pic.png';
+        return 'https://martianrepublic.org/assets/citizen/'.$this->address.'/profile_pic.png';
     }
 
     public function citizen(): BelongsTo
     {
         return $this->belongsTo(Citizen::class, 'userid');
     }
-
 }
-
-?>
