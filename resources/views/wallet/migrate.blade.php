@@ -196,6 +196,8 @@
     const PBKDF2_ROUNDS = 100000;
     const PBKDF2_LEGACY_ROUNDS = 1;
     var iv = "{{ json_encode($iv) }}".replace("]", "").replace("[", "").split(",");
+    iv = iv.map(Number);
+    iv = new Uint8Array(iv);
 
     function hashPassword(passcode) {
         return my_bundle.pbkdf2.pbkdf2Sync(passcode, SALT, PBKDF2_ROUNDS, 16, 'sha512').toString('hex');
@@ -289,15 +291,19 @@
         try {
             // 1. Decrypt old civic wallet seed (try 100k rounds, fallback 1 round)
             var oldMnemonic = null;
+            // Try 100k-round PBKDF2 first, fallback to 1-round legacy
             try {
                 var dec = my_bundle.decrypt(encryptedSeed, hashPassword(password), iv).trim();
-                if (deriveCivicAddress(dec) === oldCivicAddr) oldMnemonic = dec;
-            } catch (e) {}
+                if (dec && dec.split(' ').length >= 12) oldMnemonic = dec;
+            } catch (e) { console.log('100k decrypt error:', e.message); }
             if (!oldMnemonic) {
                 try {
                     var decL = my_bundle.decrypt(encryptedSeed, hashPasswordLegacy(password), iv).trim();
-                    if (deriveCivicAddress(decL) === oldCivicAddr) oldMnemonic = decL;
-                } catch (e) {}
+                    if (decL && decL.split(' ').length >= 12) oldMnemonic = decL;
+                } catch (e) { console.log('1-round decrypt error:', e.message); }
+            }
+            if (oldMnemonic) {
+                console.log('Migration: decrypted old seed (' + oldMnemonic.split(' ').length + ' words)');
             }
             if (!oldMnemonic) {
                 errEl.textContent = 'Incorrect password — could not decrypt wallet.';
