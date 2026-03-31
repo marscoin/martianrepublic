@@ -28,14 +28,21 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SCREENSHOT_DIR = join(__dirname, 'screenshots', 'walkthrough');
 const BASE_URL = 'https://martianrepublic.org';
 
-// Astra Olympus test account
+// Astra Olympus test account — credentials from environment
 const ASTRA = {
-    email: 'astra.olympus@martianrepublic.ai',
-    password: 'MarsR3public2026!',
-    twofa_secret: 'VEYZIUCJG4CSZ7QK',
-    mnemonic: 'circle film slide velvet autumn library actual patient play whip roof marriage',
-    address: 'MDCURC61G7A5jNRjnDq42XB1RvU51y4Ftx',
+    email: process.env.TEST_EMAIL || '',
+    password: process.env.TEST_PASSWORD || '',
+    twofa_secret: process.env.TEST_2FA_SECRET || '',
+    mnemonic: process.env.TEST_MNEMONIC || '',
+    address: process.env.TEST_ADDRESS || '',
 };
+
+if (!ASTRA.email || !ASTRA.password) {
+    console.error('Missing test credentials. Set environment variables:');
+    console.error('  TEST_EMAIL, TEST_PASSWORD, TEST_2FA_SECRET, TEST_MNEMONIC, TEST_ADDRESS');
+    console.error('  Or source the test env file: source tests/visual/.env.test');
+    process.exit(1);
+}
 
 const results = [];
 let screenshotIndex = 0;

@@ -91,3 +91,5 @@ storage/legislation/
 backups/
 .ralph/
 .vscode/
+.env.test
+tests/visual/.env.test
