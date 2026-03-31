@@ -2013,6 +2013,25 @@
                     // Persist password hashes for multi-wallet discovery on hd-open page
                     localStorage.setItem('_walletHashedPw', hashPassword(wallet_password));
                     localStorage.setItem('_walletHashedPwLegacy', hashPasswordLegacy(wallet_password));
+
+                    // Decrypt ALL wallet seeds (same as second unlock path)
+                    try {
+                        const allWallets = {!! $all_seeds_json ?? '[]' !!};
+                        const h100k = hashPassword(wallet_password);
+                        const h1 = hashPasswordLegacy(wallet_password);
+                        const allMnemonics = [];
+                        for (const w of allWallets) {
+                            if (!w.s) continue;
+                            const enc = w.s.replace(/\s+/g, '');
+                            let mnem = null;
+                            try { const d = my_bundle.decrypt(enc, h100k, iv); if (d && d.trim().split(' ').length >= 12) mnem = d.trim(); } catch(e) {}
+                            if (!mnem) { try { const d = my_bundle.decrypt(enc, h1, iv); if (d && d.trim().split(' ').length >= 12) mnem = d.trim(); } catch(e) {} }
+                            if (mnem && !allMnemonics.includes(mnem)) { allMnemonics.push(mnem); console.log('Multi-wallet: decrypted', w.t, w.a); }
+                        }
+                        localStorage.setItem('_allMnemonics', JSON.stringify(allMnemonics));
+                        console.log('Multi-wallet: stored', allMnemonics.length, 'unique mnemonics');
+                    } catch(e) { console.warn('Multi-wallet decrypt failed:', e.message); }
+
                     if (usedLegacy) {
                         // Re-encrypt with stronger hash on next createwallet call
                         console.log("Legacy wallet detected - upgrading encryption");
