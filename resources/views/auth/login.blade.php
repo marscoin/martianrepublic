@@ -58,6 +58,7 @@
 
           {{-- ===== LOGIN FORM CARD (Front) ===== --}}
           <div id="cardFront" class="mr-form-card">
+            @if(false) {{-- QR Login: hidden until mobile app is ready --}}
             <button type="button" id="flip-btn" class="mr-qr-toggle-btn" title="Login with QR code">
               <i class="fa fa-qrcode"></i>
             </button>
@@ -135,7 +136,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   @livewireScripts
 
-  <script>
+  @endif
+
+    <script>
     const front = document.getElementById('cardFront');
     const back = document.getElementById('cardBack');
     const btn = document.getElementById('flip-btn');
