@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AiHelperController;
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\AuthApiController;
 use App\Http\Controllers\Citizen\IdentityController;
 use App\Http\Controllers\Congress\CongressController;
 use App\Http\Controllers\ContactFormController;
@@ -217,4 +217,4 @@ Route::middleware(['auth'])->group(function () {
 //
 // Mobile Authenticator Login
 // ================================================================================
-Route::get('/api/checkauth', [ApiController::class, 'checkAuth'])->name('api_marsauthcheck');
+Route::get('/api/checkauth', [AuthApiController::class, 'checkAuth'])->name('api_marsauthcheck');

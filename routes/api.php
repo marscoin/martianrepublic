@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\AuthApiController;
+use App\Http\Controllers\ContentApiController;
+use App\Http\Controllers\FeedApiController;
+use App\Http\Controllers\ForumApiController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,30 +19,30 @@ use Illuminate\Support\Facades\Route;
 */
 
 // mobile
-Route::get('/feed/public', 'App\Http\Controllers\ApiController@allPublic')->name('api_allpublic');
-Route::get('/feed/citizen', 'App\Http\Controllers\ApiController@allCitizen')->name('api_allcitizen');
-Route::get('/feed/applicant', 'App\Http\Controllers\ApiController@allApplicants')->name('api_allapplicants');
-Route::get('/feed', 'App\Http\Controllers\ApiController@allFeed')->name('api_allfeed');
-Route::post('/marsauth', 'App\Http\Controllers\ApiController@marsAuth')->middleware('throttle:10,1')->name('api_marsauth');
+Route::get('/feed/public', [FeedApiController::class, 'allPublic'])->name('api_allpublic');
+Route::get('/feed/citizen', [FeedApiController::class, 'allCitizen'])->name('api_allcitizen');
+Route::get('/feed/applicant', [FeedApiController::class, 'allApplicants'])->name('api_allapplicants');
+Route::get('/feed', [FeedApiController::class, 'allFeed'])->name('api_allfeed');
+Route::post('/marsauth', [AuthApiController::class, 'marsAuth'])->middleware('throttle:10,1')->name('api_marsauth');
 
-Route::get('/citizen/{address}', 'App\Http\Controllers\ApiController@showCitizen')->name('api_show');
+Route::get('/citizen/{address}', [FeedApiController::class, 'showCitizen'])->name('api_show');
 
-Route::post('/token', 'App\Http\Controllers\ApiController@token')->middleware('throttle:10,1');
-Route::post('/scitizen', 'App\Http\Controllers\ApiController@scitizen')->middleware(['auth:sanctum'])->name('api_scitizen');
-Route::post('/pinpic', 'App\Http\Controllers\ApiController@pinpic')->middleware(['auth:sanctum'])->name('api_pinpic');
-Route::post('/pinvideo', 'App\Http\Controllers\ApiController@pinvideo')->middleware(['auth:sanctum'])->name('api_pinvideo');
-Route::post('/pinjson', 'App\Http\Controllers\ApiController@pinjson')->middleware(['auth:sanctum'])->name('api_pinjson');
+Route::post('/token', [AuthApiController::class, 'token'])->middleware('throttle:10,1');
+Route::post('/scitizen', [FeedApiController::class, 'scitizen'])->middleware(['auth:sanctum'])->name('api_scitizen');
+Route::post('/pinpic', [ContentApiController::class, 'pinpic'])->middleware(['auth:sanctum'])->name('api_pinpic');
+Route::post('/pinvideo', [ContentApiController::class, 'pinvideo'])->middleware(['auth:sanctum'])->name('api_pinvideo');
+Route::post('/pinjson', [ContentApiController::class, 'pinjson'])->middleware(['auth:sanctum'])->name('api_pinjson');
 
-Route::post('/user/delete/{id}', 'App\Http\Controllers\ApiController@deleteUser')->middleware(['auth:sanctum', 'throttle:3,1'])->name('api_delete_user');
-Route::post('/user/block/{id}', 'App\Http\Controllers\ApiController@blockUser')->middleware(['auth:sanctum'])->name('api_block_user');
+Route::post('/user/delete/{id}', [UserManagementController::class, 'deleteUser'])->middleware(['auth:sanctum', 'throttle:3,1'])->name('api_delete_user');
+Route::post('/user/block/{id}', [UserManagementController::class, 'blockUser'])->middleware(['auth:sanctum'])->name('api_block_user');
 
-Route::get('/eula', 'App\Http\Controllers\ApiController@handleEula')->middleware(['auth:sanctum'])->name('api_handle_eula');
-Route::get('/set/eula', 'App\Http\Controllers\ApiController@setEula')->middleware(['auth:sanctum'])->name('api_set_eula');
-Route::get('/forum/thread/{threadId}/comments', 'App\Http\Controllers\ApiController@getThreadComments')->middleware(['auth:sanctum'])->name('api_forum_comments');
+Route::get('/eula', [UserManagementController::class, 'handleEula'])->middleware(['auth:sanctum'])->name('api_handle_eula');
+Route::get('/set/eula', [UserManagementController::class, 'setEula'])->middleware(['auth:sanctum'])->name('api_set_eula');
+Route::get('/forum/thread/{threadId}/comments', [ForumApiController::class, 'getThreadComments'])->middleware(['auth:sanctum'])->name('api_forum_comments');
 
-Route::get('/forum/category/{categoryId}/threads', 'App\Http\Controllers\ApiController@getThreadsByCategory')->middleware(['auth:sanctum'])->name('api_forum_threads');
-Route::get('/forum/categories/threads', 'App\Http\Controllers\ApiController@getAllCategoriesWithThreads')->middleware(['auth:sanctum'])->name('api_forum_catthreads');
+Route::get('/forum/category/{categoryId}/threads', [ForumApiController::class, 'getThreadsByCategory'])->middleware(['auth:sanctum'])->name('api_forum_threads');
+Route::get('/forum/categories/threads', [ForumApiController::class, 'getAllCategoriesWithThreads'])->middleware(['auth:sanctum'])->name('api_forum_catthreads');
 
-Route::post('/forum/thread', 'App\Http\Controllers\ApiController@createThread')->middleware(['auth:sanctum'])->name('api_create_thread');
-Route::post('/forum/thread/{threadId}/comment', 'App\Http\Controllers\ApiController@createComment')->middleware(['auth:sanctum'])->name('api_create_comment');
+Route::post('/forum/thread', [ForumApiController::class, 'createThread'])->middleware(['auth:sanctum'])->name('api_create_thread');
+Route::post('/forum/thread/{threadId}/comment', [ForumApiController::class, 'createComment'])->middleware(['auth:sanctum'])->name('api_create_comment');
 Route::get('/mstatus', 'App\Http\Controllers\StatusController@getSystemStatus')->middleware(['auth:sanctum'])->name('api_mobile_status');

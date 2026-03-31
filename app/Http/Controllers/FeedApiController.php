@@ -1,0 +1,287 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Citizen;
+use App\Models\CivicWallet;
+use App\Models\Feed;
+use App\Models\Profile;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+
+class FeedApiController extends Controller
+{
+    public function allPublic()
+    {
+        $perPage = 25;
+        $cacheKey = 'all_public_cache'; // Define a unique cache key for this query
+        $excludedUserIds = [6462, 7601]; // ID of the user you want to exclude, for example, a test account
+
+        // Attempt to get cached data. If not available, the closure will be run to fetch and cache the data.
+        $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserIds) {
+            $feeds = Feed::with(['user' => function ($query) use ($excludedUserIds) {
+                $query->select('id', 'fullname', 'created_at')
+                    ->where('id', '!=', $excludedUserIds); // Exclude the specific user by ID
+            }, 'user.profile' => function ($query) {
+                $query->select('userid', 'general_public', 'endorse_cnt', 'citizen', 'has_application');
+            }, 'user.citizen' => function ($query) {
+                $query->select('userid', 'avatar_link', 'liveness_link')
+                    ->whereNotNull('avatar_link');
+            }])
+                ->joinSub(
+                    Feed::selectRaw('max(id) as latest_id, userid')
+                        ->where('tag', 'GP') // Ensure the tag is 'GP'
+                        ->groupBy('userid'),
+                    'latest_feeds',
+                    function ($join) {
+                        $join->on('feed.id', '=', 'latest_feeds.latest_id');
+                    }
+                )
+                ->whereHas('user.profile', function ($query) {
+                    $query->where('tag', 'GP');
+                })
+                ->whereHas('user', function ($query) use ($excludedUserIds) {
+                    $query->whereNotIn('id', $excludedUserIds);
+                })
+                ->orderByDesc('id')
+                ->take($perPage)
+                ->distinct()
+                ->get();
+
+            return $feeds; // Directly return the fetched feeds
+        });
+
+        return response()->json($feeds);
+    }
+
+    public function allCitizen()
+    {
+        $perPage = 25;
+        $cacheKey = 'all_citizens_cache';
+        $excludedUserId = '';
+
+        $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserId) {
+            return Feed::with([
+                'user' => function ($query) use ($excludedUserId) {
+                    $query->where('id', '!=', $excludedUserId)
+                        ->select('id', 'fullname', 'created_at');
+                },
+                'user.profile' => function ($query) {
+                    $query->select('userid', 'general_public', 'endorse_cnt', 'citizen', 'has_application');
+                },
+                'user.citizen' => function ($query) {
+                    $query->select('userid', 'avatar_link', 'liveness_link')
+                        ->whereNotNull('avatar_link'); // Ensure that avatar_link is not NULL
+                },
+            ])
+                ->whereHas('user', function ($query) use ($excludedUserId) {  // Ensure user exists and is not excluded
+                    $query->where('id', '!=', $excludedUserId);
+                })
+                ->whereHas('user.citizen', function ($query) {  // Ensure user has valid citizen data
+                    $query->whereNotNull('avatar_link');
+                })
+                ->whereHas('user.profile', function ($query) {  // Additional filters for the profile
+                    $query->where('tag', 'CT');
+                })
+                ->select('id', 'address', 'userid', 'tag', 'message', 'embedded_link', 'txid', 'blockid', 'mined', 'updated_at', 'created_at')  // Only select columns from the feed table
+                ->orderByDesc('id')
+                ->take($perPage)
+                ->get();
+        });
+
+        return response()->json($feeds);
+    }
+
+    public function allApplicants()
+    {
+        $perPage = 25;
+
+        $applicants = User::whereHas('profile', function ($query) {
+            $query->where('has_application', 1);
+        })
+            ->where('id', '!=', 6462) // Exclude user with id 6462
+            ->with(['profile', 'hdWallet' => function ($query) {
+                $query->select('user_id', 'public_addr');
+            }, 'citizen']) // Add citizen relationship
+            ->orderByDesc('id')
+            ->paginate($perPage, ['id', 'fullname']);
+
+        $customResult = $applicants->getCollection()->transform(function ($user) {
+            return [
+                'userid' => $user->id,
+                'fullname' => $user->fullname,
+                'address' => $user->hdWallet ? $user->hdWallet->public_addr : null,
+                'citizen' => $user->citizen, // Include citizen data
+            ];
+        });
+
+        return response()->json([
+            'current_page' => $applicants->currentPage(),
+            'data' => $customResult,
+            'total' => $applicants->total(),
+            'per_page' => $applicants->perPage(),
+            'last_page' => $applicants->lastPage(),
+        ]);
+    }
+
+    public function allFeed(Request $request)
+    {
+        $perPage = 25;
+        $page = $request->input('page', 1);
+        $excludedUserIds = [6462, 7601];
+        $cacheKey = 'all_feed_cache_'.$page;
+
+        $feeds = Cache::remember($cacheKey, 60, function () use ($perPage, $excludedUserIds) {
+            return Feed::with(['user' => function ($query) use ($excludedUserIds) {
+                $query->select('id', 'fullname', 'created_at')
+                    ->whereNotIn('id', $excludedUserIds);
+            }, 'user.profile' => function ($query) {
+                $query->select('userid', 'general_public', 'endorse_cnt', 'citizen', 'has_application');
+            }, 'user.citizen' => function ($query) {
+                $query->select('userid', 'avatar_link', 'liveness_link')
+                    ->whereNotNull('avatar_link');
+            }])
+                ->whereHas('user', function ($query) use ($excludedUserIds) {
+                    $query->whereNotIn('id', $excludedUserIds);
+                })
+                ->whereNotNull('mined')
+                ->select(
+                    'id',
+                    'address',
+                    'userid',
+                    'tag',
+                    'message',
+                    'embedded_link',
+                    'txid',
+                    'blockid',
+                    'mined',
+                    'created_at',
+                    'updated_at'
+                )
+                ->orderByDesc('mined')
+                ->orderByDesc('id')
+                ->paginate($perPage);
+        });
+
+        return $this->paginatedResponse($feeds);
+    }
+
+    // Helper method to format paginated responses consistently
+    private function paginatedResponse($feeds)
+    {
+        return response()->json([
+            'current_page' => $feeds->currentPage(),
+            'data' => $feeds->items(),
+            'first_page_url' => $feeds->url(1),
+            'from' => $feeds->firstItem(),
+            'last_page' => $feeds->lastPage(),
+            'last_page_url' => $feeds->url($feeds->lastPage()),
+            'next_page_url' => $feeds->nextPageUrl(),
+            'path' => $feeds->path(),
+            'per_page' => $feeds->perPage(),
+            'prev_page_url' => $feeds->previousPageUrl(),
+            'to' => $feeds->lastItem(),
+            'total' => $feeds->total(),
+        ]);
+    }
+
+    public function showCitizen(Request $request, $address)
+    {
+        // Look up the Martian user by public address
+        $martianWallet = CivicWallet::where('public_addr', $address)->first();
+
+        if (! $martianWallet) {
+            return response()->json(['message' => 'Martian not found.'], 404);
+        }
+
+        // Attempt to fetch the user's profile and additional data
+        $citizen = Citizen::where('public_address', $address)->first();
+        $profile = Profile::where('userid', $martianWallet->user_id)->first();
+        $feedItems = Feed::where('userid', $martianWallet->user_id)->whereNotNull('mined')->whereNotIn('tag', ['GP', 'CT'])->orderBy('created_at', 'desc')->get();
+
+        // Fetch the latest 3 activities
+        $activity = DB::table('feed')
+            ->join('users', 'feed.userid', '=', 'users.id')
+            ->join('profile', 'feed.userid', '=', 'profile.userid')
+            ->select('profile.userid', 'users.fullname', 'feed.tag', 'feed.mined')
+            ->where('feed.userid', $martianWallet->user_id)
+            ->orderBy('feed.id', 'desc')
+            ->get();
+
+        // Construct response
+        $response = [
+            'citizen' => $citizen,
+            'profile' => [
+                'general_public' => $profile ? $profile->general_public : null,
+                'isCitizen' => $profile ? $profile->citizen : null,
+            ],
+            'feedItems' => $feedItems,
+            'activity' => $activity,
+        ];
+
+        return response()->json($response);
+    }
+
+    // token access
+    public function scitizen(Request $request)
+    {
+
+        $uid = Auth::user()->id;
+        $citcache = Citizen::where('userid', '=', $uid)->first();
+        if (is_null($citcache)) {
+            $citcache = new Citizen;
+        }
+        $citcache->userid = $uid;
+
+        $firstname = $request->input('firstname');
+        $lastname = $request->input('lastname');
+        $shortbio = $request->input('shortbio');
+        $displayname = $request->input('displayname');
+
+        if (isset($firstname) && isset($lastname)) {
+            $fullname = $firstname.' '.$lastname;
+
+            $citcache->firstname = $firstname;
+            $citcache->lastname = $lastname;
+            $user = User::where('id', '=', $uid)->first();
+            $user->fullname = $fullname;
+            $user->save();
+            $profile = Profile::where('userid', '=', $uid)->first();
+            $profile->has_application = 1;
+            $profile->save();
+        }
+        if (isset($shortbio)) {
+            $citcache->shortbio = $shortbio;
+            $profile = Profile::where('userid', '=', $uid)->first();
+            $profile->has_application = 1;
+            $profile->save();
+        }
+        if (isset($displayname)) {
+            $citcache->displayname = $displayname;
+            $profile = Profile::where('userid', '=', $uid)->first();
+            $profile->has_application = 1;
+            $profile->save();
+        }
+
+        $citcache->save();
+        // Fetch profile data
+        $profile = Profile::where('userid', '=', $uid)->first();
+
+        // Merge citizen and profile data
+        $response = [
+            'citizen' => $citcache,
+            'profile' => [
+                'citizen' => $profile->citizen ?? null,
+                'endorse_cnt' => $profile->endorse_cnt ?? null,
+                'general_public' => $profile->general_public ?? null,
+                'has_application' => $profile->has_application ?? null,
+            ],
+        ];
+
+        // Return the merged data as a JSON response
+        return response()->json($response);
+    }
+}
