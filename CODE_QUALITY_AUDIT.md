@@ -86,7 +86,7 @@
 
 ### Critical
 
-- [ ] **A1. God controllers need splitting**
+- [x] **A1. God controllers need splitting**
   - `app/Http/Controllers/ApiController.php` — 1,147 lines, 24 methods
     - Split into: `FeedApiController`, `AuthApiController`, `ForumApiController`, `UserManagementController`
   - `app/Http/Controllers/Wallet/ApiController.php` — 923 lines, 23+ methods
