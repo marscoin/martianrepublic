@@ -197,6 +197,9 @@ class IdentityController extends Controller
 			$uid = Auth::user()->id;
 			//Martian user we are looking at
 			$martian = Citizen::where('public_address', '=', $address)->first();
+			if (!$martian) {
+				abort(404, 'Citizen not found');
+			}
 			$martian_profile = Profile::where('userid', '=', $martian->userid)->first();
 			$martian_proposals = Proposals::where('user_id', '=', $martian->userid)->count();
 			$myprofile = Profile::where('userid', '=', $uid)->first();
