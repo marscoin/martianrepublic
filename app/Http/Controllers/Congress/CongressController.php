@@ -39,31 +39,7 @@ class CongressController extends Controller
      */
     private function syncProposalPhases(): void
     {
-        $now = now();
-
-        // Proposals in screening that should move to voting
-        Proposals::where('status', 'screening')
-            ->whereNotNull('screening_ends_at')
-            ->where('screening_ends_at', '<=', $now)
-            ->update(['status' => 'voting']);
-
-        // Proposals in voting that have expired (voting period ended)
-        // Note: vote tallying and pass/fail determination happens separately
-        Proposals::where('status', 'voting')
-            ->whereNotNull('voting_ends_at')
-            ->where('voting_ends_at', '<=', $now)
-            ->update(['active' => 0]);
-
-        // Legacy: also handle old-style expiration for pre-tier proposals
-        Proposals::where(DB::raw('DATE_ADD(mined, INTERVAL duration DAY)'), '<', $now)
-            ->whereNull('voting_ends_at')
-            ->update(['active' => 0]);
-
-        // Active proposals that have reached sunset
-        Proposals::where('status', 'active')
-            ->whereNotNull('sunset_at')
-            ->where('sunset_at', '<=', $now)
-            ->update(['status' => 'sunset', 'active' => 0]);
+        app(\App\Services\ProposalService::class)->syncPhases();
     }
 
     // Get all inventory data and display table
