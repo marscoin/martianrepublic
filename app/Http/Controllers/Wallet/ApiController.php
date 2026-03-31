@@ -982,4 +982,25 @@ class ApiController extends Controller
 
         return response()->json(['Proposal' => $prop_id, 'Discussion' => $thd_id], 200);
     }
+
+    /**
+     * Broadcast a signed raw transaction via local marscoind.
+     * No Pebas/Electrum dependency.
+     */
+    public function broadcastTx(Request $request)
+    {
+        $rawTx = $request->input('rawtx');
+        if (! $rawTx) {
+            return response()->json(['error' => 'rawtx required'], 400);
+        }
+
+        $rpc = new \App\Services\BlockchainRpc;
+        $txid = $rpc->broadcast($rawTx);
+
+        if ($txid) {
+            return response()->json(['txid' => $txid]);
+        }
+
+        return response()->json(['error' => 'Broadcast failed'], 500);
+    }
 }

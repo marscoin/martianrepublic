@@ -211,6 +211,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/api/wallet/migrate/initiate', [App\Http\Controllers\Wallet\MigrationController::class, 'initiate']);
     Route::post('/api/wallet/migrate/confirm', [App\Http\Controllers\Wallet\MigrationController::class, 'confirm']);
     Route::get('/api/wallet/migrate/history', [App\Http\Controllers\Wallet\MigrationController::class, 'history']);
+    Route::post('/api/broadcast', [App\Http\Controllers\Wallet\ApiController::class, 'broadcastTx']);
 });
 
 //
