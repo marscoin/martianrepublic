@@ -54,7 +54,7 @@
   - `app/Http/Controllers/ApiController.php:370` — `createToken()` with no expiry
   - Fix: Set `'expiration' => 60` in Sanctum config
 
-- [ ] **S9. File upload path traversal risk**
+- [x] **S9. File upload path traversal risk**
   - `app/Includes/AppHelper.php:376,416` — `realpath()` used but no base-path validation
   - Fix: Assert resolved path starts with storage directory
 
@@ -64,11 +64,11 @@
 
 ### Medium
 
-- [ ] **S11. No pagination on large citizen/feed queries**
+- [x] **S11. No pagination on large citizen/feed queries**
   - `app/Http/Controllers/Citizen/IdentityController.php:68,72,76` — returns all rows
   - Fix: Use `->paginate(25)` instead of fetching all records
 
-- [ ] **S12. Unvalidated external HTTP requests**
+- [x] **S12. Unvalidated external HTTP requests**
   - `Congress/CongressController.php:82` — `file_get_contents()` with no timeout
   - Fix: Use `Http::timeout(5)->get()` with try-catch
 
@@ -133,7 +133,7 @@
 
 ### Medium
 
-- [ ] **A8. Route syntax inconsistency**
+- [x] **A8. Route syntax inconsistency**
   - Mix of string notation `'Wallet\DashboardController@show'` and array `[Controller::class, 'method']`
   - Fix: Standardize to array notation (Laravel 9+ convention)
 
@@ -203,21 +203,21 @@
 
 ### High
 
-- [ ] **D1. CONTRIBUTING.md is broken**
+- [x] **D1. CONTRIBUTING.md is broken**
   - Points to `laravel/framework` repo instead of this project
   - Fix: Rewrite with actual contribution guidelines
 
-- [ ] **D2. No DEVELOPMENT.md or DEPLOYMENT.md found**
+- [x] **D2. No DEVELOPMENT.md or DEPLOYMENT.md found**
   - (Note: CLAUDE.md partially covers this but isn't a substitute)
   - Fix: Create setup guide for new contributors
 
-- [ ] **D3. No CODE_OF_CONDUCT.md**
+- [x] **D3. No CODE_OF_CONDUCT.md**
   - Standard for professional open source projects
   - Fix: Add Contributor Covenant
 
 ### Medium
 
-- [ ] **D4. Mixed tabs/spaces across files**
+- [x] **D4. Mixed tabs/spaces across files**
   - Most files use tabs, some use spaces
   - Fix: Run Laravel Pint, enforce in CI
 
