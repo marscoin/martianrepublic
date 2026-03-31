@@ -59,7 +59,7 @@
           {{-- ===== LOGIN FORM CARD (Front) ===== --}}
           <div id="cardFront" class="mr-form-card">
             @if(false) {{-- QR Login: hidden until mobile app is ready --}}
-            <button type="button" id="flip-btn" class="mr-qr-toggle-btn" title="Login with QR code">
+            <button type="button" id="flip-btn" class="mr-qr-toggle-btn" title="Login with QR code" style="display:none;">
               <i class="fa fa-qrcode"></i>
             </button>
 
@@ -103,7 +103,7 @@
         </form>
 
         {{-- ===== QR LOGIN CARD (Back) ===== --}}
-        <div id="cardBack" class="mr-qr-card">
+        <div id="cardBack" class="mr-qr-card" style="display:none;">
           <button type="button" id="flip-btn4" class="mr-qr-toggle-btn" title="Back to login form">
             <i class="fa fa-arrow-left"></i>
           </button>
@@ -153,15 +153,15 @@
       }
     }
 
-    btn.addEventListener('click', handleFlip);
-    btn4.addEventListener('click', handleFlip);
+    if (btn) btn.addEventListener('click', handleFlip);
+    if (btn4) btn4.addEventListener('click', handleFlip);
   </script>
 
   <script>
     let currentSid = '';
 
     document.addEventListener('DOMContentLoaded', () => {
-      window.Livewire.on('sidUpdated', (data) => {
+      window.Livewire && window.Livewire.on('sidUpdated', (data) => {
         currentSid = data[0].sid;
       });
 
