@@ -842,6 +842,109 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
         db.rollback()
 
         
+
+def process_civic_migration(cur, db, sender_addr, new_addr, userid, txid, height, blockdate):
+    """
+    Process a civic wallet migration (MG_ OP_RETURN).
+    The sender signs from their OLD civic address, announcing their NEW civic address.
+    
+    This function:
+    1. Verifies the sender is the current civic address owner
+    2. Preserves the old address as an HD wallet
+    3. Updates civic_wallet and citizen records to the new address
+    4. Updates the civic_wallet_migrations table
+    """
+    logger.info(f"Processing civic migration: {sender_addr} -> {new_addr} (user {userid}, txid {txid})")
+    
+    try:
+        # Verify sender owns the current civic wallet
+        cur.execute("SELECT id, encrypted_seed FROM civic_wallet WHERE user_id = %s AND public_addr = %s", (userid, sender_addr))
+        civic = cur.fetchone()
+        if not civic:
+            logger.warning(f"Migration rejected: {sender_addr} is not the civic wallet for user {userid}")
+            return
+        
+        civic_id = civic[0]
+        old_encrypted_seed = civic[1]
+        
+        # Check for pending migration record
+        cur.execute(
+            "SELECT id FROM civic_wallet_migrations WHERE user_id = %s AND old_address = %s AND new_address = %s AND status = 'broadcast'",
+            (userid, sender_addr, new_addr)
+        )
+        migration_row = cur.fetchone()
+        
+        # Extract new encrypted seed from migration record if available
+        new_encrypted_seed = None
+        if migration_row:
+            cur.execute("SELECT old_encrypted_seed FROM civic_wallet_migrations WHERE id = %s", (migration_row[0],))
+            seed_data = cur.fetchone()
+            if seed_data and seed_data[0] and '|NEW:' in seed_data[0]:
+                new_encrypted_seed = seed_data[0].split('|NEW:')[1]
+        
+        # 1. Preserve old civic wallet as HD wallet (if not already)
+        cur.execute("SELECT id FROM hd_wallet WHERE user_id = %s AND public_addr = %s", (userid, sender_addr))
+        existing_hd = cur.fetchone()
+        if not existing_hd:
+            cur.execute(
+                "INSERT INTO hd_wallet (user_id, wallet_type, public_addr, encrypted_seed, created_at, updated_at) VALUES (%s, %s, %s, %s, NOW(), NOW())",
+                (userid, 'Migrated', sender_addr, old_encrypted_seed)
+            )
+            logger.info(f"Old civic wallet preserved as HD wallet: {sender_addr}")
+        
+        # 2. Update civic wallet to new address
+        if new_encrypted_seed:
+            cur.execute(
+                "UPDATE civic_wallet SET public_addr = %s, encrypted_seed = %s, updated_at = NOW() WHERE id = %s",
+                (new_addr, new_encrypted_seed, civic_id)
+            )
+        else:
+            cur.execute(
+                "UPDATE civic_wallet SET public_addr = %s, updated_at = NOW() WHERE id = %s",
+                (new_addr, civic_id)
+            )
+        logger.info(f"Civic wallet updated: {sender_addr} -> {new_addr}")
+        
+        # 3. Update citizen record
+        cur.execute(
+            "UPDATE citizen SET public_address = %s WHERE userid = %s",
+            (new_addr, userid)
+        )
+        logger.info(f"Citizen record updated for user {userid}")
+        
+        # 4. Reset wallet open state
+        cur.execute(
+            "UPDATE profile SET civic_wallet_open = 0, wallet_open = 0 WHERE userid = %s",
+            (userid,)
+        )
+        
+        # 5. Update migration record
+        if migration_row:
+            cur.execute(
+                "UPDATE civic_wallet_migrations SET status = 'confirmed', migration_txid = %s, confirmed_at = NOW(), updated_at = NOW() WHERE id = %s",
+                (txid, migration_row[0])
+            )
+        else:
+            # No pending record — create one (migration was done outside our UI)
+            cur.execute(
+                "INSERT INTO civic_wallet_migrations (user_id, old_address, new_address, migration_txid, status, confirmed_at, created_at, updated_at) VALUES (%s, %s, %s, %s, 'confirmed', NOW(), NOW(), NOW())",
+                (userid, sender_addr, new_addr, txid)
+            )
+        
+        # 6. Record in feed
+        cur.execute(
+            "INSERT INTO feed (userid, address, tag, message, txid, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (userid, new_addr, 'MG', f'MG_{new_addr}', txid, blockdate, blockdate)
+        )
+        
+        db.commit()
+        logger.info(f"Civic wallet migration CONFIRMED for user {userid}: {sender_addr} -> {new_addr} (block {height})")
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Civic wallet migration FAILED for user {userid}: {e}")
+
+
 def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_hash):
     userid = get_user_by_address(cur, addr)
     if userid is None:
@@ -866,6 +969,7 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
         "ED": "Citizenship Endorsement",
         "PR": "Voting Proposal launched",
         "SP": "Signed Post",
+        "MG": "Civic Wallet Migration",
     }
 
     logger.info(head_messages.get(head, "Unknown operation"))

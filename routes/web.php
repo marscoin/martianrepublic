@@ -205,6 +205,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/mars-price', [App\Http\Controllers\Wallet\ApiController::class, 'marsPrice']);
     Route::get('/api/mars-txhistory', [App\Http\Controllers\Wallet\ApiController::class, 'marsTxHistory']);
     Route::get('/api/mars-utxo-multi', [App\Http\Controllers\Wallet\ApiController::class, 'marsUtxoMulti']);
+
+    // Civic wallet migration
+    Route::get('/wallet/migrate', [App\Http\Controllers\Wallet\MigrationController::class, 'show'])->name('wallet.migrate');
+    Route::post('/api/wallet/migrate/initiate', [App\Http\Controllers\Wallet\MigrationController::class, 'initiate']);
+    Route::post('/api/wallet/migrate/confirm', [App\Http\Controllers\Wallet\MigrationController::class, 'confirm']);
+    Route::get('/api/wallet/migrate/history', [App\Http\Controllers\Wallet\MigrationController::class, 'history']);
 });
 
 //

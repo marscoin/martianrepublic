@@ -1029,6 +1029,13 @@
                                             <div class="sec-desc">Re-encrypt with new key</div>
                                         </div>
                                     </a>
+                                    <a class="bridge-sec-btn" href="/wallet/migrate">
+                                        <i class="fa fa-exchange-alt" style="color: #f59e0b;"></i>
+                                        <div>
+                                            <div class="sec-label">Migrate Wallet</div>
+                                            <div class="sec-desc">Move to new civic address</div>
+                                        </div>
+                                    </a>
                                 </div>
                                 <div style="margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--mr-text-faint, #5a5968); line-height: 1.8;">
                                     <div><i class="fa fa-check-circle" style="color: var(--mr-green, #34d399); margin-right: 4px;"></i> Encrypted backup stored on server</div>
