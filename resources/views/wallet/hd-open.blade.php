@@ -773,7 +773,7 @@
                             </div>
                         </div>
                         <script>
-                        // Load recent transactions using pebas (Electrum) - works with all address formats
+                        // Load recent transactions via Laravel proxy (marscoind fallback)
                         // Waits for HD discovery to provide working addresses, then fetches tx history
                         function loadRecentTxs(addresses) {
                             if (!addresses || addresses.length === 0) {
@@ -2327,7 +2327,7 @@
                 //console.log(amount)
 
                 const url =
-                    `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
+                    `/api/mars-utxo-multi?xpub=&addresses[]=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
 
                 try {
                     const response = await fetch(url, {
@@ -2348,7 +2348,7 @@
                 if (!txhashstring) {
                     throw new Error("Missing tx hash...");
                 }
-                const url = "https://pebas.marscoin.org/api/mars/broadcast"
+                const url = "/api/broadcast"
                 try {
                     const config = {
                         method: 'POST',
