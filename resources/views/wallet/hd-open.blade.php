@@ -2327,7 +2327,7 @@
                 //console.log(amount)
 
                 const url =
-                    `/api/mars-utxo-multi?xpub=&addresses[]=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
+                    `/api/mars-utxo-multi?addresses[]=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
 
                 try {
                     const response = await fetch(url, {
