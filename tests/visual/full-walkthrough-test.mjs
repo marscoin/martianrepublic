@@ -161,13 +161,33 @@ async function run() {
         console.log('\n🔐 Phase 2: Authentication');
 
         await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-        await page.type('input[name="email"]', ASTRA.email);
-        await page.type('input[name="password"]', ASTRA.password);
-        await Promise.all([
-            page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => {}),
-            page.click('button[type="submit"]'),
-        ]);
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, 1000));
+        
+        // Check if we're already logged in (redirected away from login)
+        if (!page.url().includes('/login')) {
+            log('pass', '2.1', 'Already logged in — skipped login form');
+        } else {
+            const emailInput = await page.$('input[name="email"]');
+            if (!emailInput) {
+                // Try alternative selector
+                const altInput = await page.$('#login-email');
+                if (altInput) {
+                    await altInput.type(ASTRA.email);
+                    const pwInput = await page.$('#login-password');
+                    if (pwInput) await pwInput.type(ASTRA.password);
+                } else {
+                    log('fail', '2.1', 'No email input found — login page may have changed'); /* continue anyway */
+                }
+            } else {
+                await emailInput.type(ASTRA.email);
+                await page.type('input[name="password"]', ASTRA.password);
+            }
+            await Promise.all([
+                page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => {}),
+                page.click('button[type="submit"]'),
+            ]);
+            await new Promise(r => setTimeout(r, 2000));
+        }
         await screenshot(page, 'after-login');
 
         let url = page.url();
