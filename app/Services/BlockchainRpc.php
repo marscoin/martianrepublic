@@ -25,6 +25,7 @@ class BlockchainRpc
         $args = [$this->cli, '-datadir='.$this->dataDir, $method, ...$params];
         $result = Process::timeout($timeout)->run($args);
         if (! $result->successful()) {
+            Log::warning("RPC {$method} failed", ['stderr' => trim($result->errorOutput()), 'exit' => $result->exitCode()]);
             return null;
         }
         $output = trim($result->output());
@@ -57,9 +58,85 @@ class BlockchainRpc
         ], $result['unspents']);
     }
 
-    public function getUtxosForTx(string $address, float $amount): array
+    /**
+     * Get UTXOs across multiple addresses, filtering out mempool-spent ones.
+     */
+    public function getUtxosMulti(array $addresses): array
     {
-        $utxos = $this->getUtxos($address);
+        // Build descriptors for all addresses in one scantxoutset call
+        $descriptors = array_map(fn ($a) => "addr({$a})", $addresses);
+        $result = $this->call('scantxoutset', ['start', json_encode($descriptors)], 60);
+        if (! $result || ! isset($result['unspents'])) {
+            return [];
+        }
+
+        // Get mempool txids to filter out already-spent UTXOs
+        $mempoolSpent = $this->getMempoolSpentOutputs();
+
+        $utxos = [];
+        foreach ($result['unspents'] as $u) {
+            $outpoint = $u['txid'].':'.$u['vout'];
+            if (isset($mempoolSpent[$outpoint])) {
+                Log::debug("Skipping mempool-spent UTXO: {$outpoint}");
+                continue;
+            }
+            // Find which address owns this UTXO
+            $addr = $u['desc'] ?? null;
+            if ($addr && preg_match('/addr\(([A-Za-z0-9]+)\)/', $addr, $m)) {
+                $addr = $m[1];
+            } else {
+                // Fallback: decode the raw tx to find the address
+                $addr = $addresses[0];
+                foreach ($addresses as $a) {
+                    if (str_contains($u['desc'] ?? '', $a)) {
+                        $addr = $a;
+                        break;
+                    }
+                }
+            }
+            $utxos[] = [
+                'txid' => $u['txid'], 'vout' => $u['vout'],
+                'amount' => $u['amount'], 'satoshis' => (int) round($u['amount'] * 1e8),
+                'height' => $u['height'] ?? null, 'confirmations' => $u['confirmations'] ?? 0,
+                'address' => $addr,
+            ];
+        }
+
+        return $utxos;
+    }
+
+    /**
+     * Get set of outpoints (txid:vout) that are spent by mempool transactions.
+     */
+    private function getMempoolSpentOutputs(): array
+    {
+        $rawMempool = $this->call('getrawmempool', ['true'], 10);
+        $spent = [];
+        if (is_array($rawMempool)) {
+            foreach ($rawMempool as $txid => $info) {
+                // Get the full tx to find its inputs
+                $tx = $this->call('getrawtransaction', [$txid, '1'], 10);
+                if ($tx && isset($tx['vin'])) {
+                    foreach ($tx['vin'] as $vin) {
+                        if (isset($vin['txid'])) {
+                            $spent[$vin['txid'].':'.$vin['vout']] = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $spent;
+    }
+
+    public function getUtxosForTx(array|string $addresses, float $amount, string $receiver = null, string $changeAddress = null): array
+    {
+        // Accept single address or array
+        if (is_string($addresses)) {
+            $addresses = [$addresses];
+        }
+
+        $utxos = $this->getUtxosMulti($addresses);
         if (empty($utxos)) {
             return ['error' => 'No UTXOs found'];
         }
@@ -73,7 +150,7 @@ class BlockchainRpc
             $rawTx = $this->call('getrawtransaction', [$utxo['txid']]);
             $selected[] = [
                 'txId' => $utxo['txid'], 'vout' => $utxo['vout'],
-                'value' => $utxo['satoshis'], 'rawTx' => $rawTx, 'address' => $address,
+                'value' => $utxo['satoshis'], 'rawTx' => $rawTx, 'address' => $utxo['address'],
             ];
             $total += $utxo['satoshis'];
             $estFee = (count($selected) * 180 + 68 + 10) * 10;
@@ -82,11 +159,17 @@ class BlockchainRpc
             }
         }
 
+        if ($total < $targetSat) {
+            return ['error' => 'Insufficient funds'];
+        }
+
         $fee = (count($selected) * 180 + 68 + 10) * 10;
         $change = $total - $targetSat - $fee;
-        $outputs = [['address' => $address, 'value' => $targetSat]];
+        $toAddr = $receiver ?: $addresses[0];
+        $chgAddr = $changeAddress ?: $addresses[0];
+        $outputs = [['address' => $toAddr, 'value' => $targetSat]];
         if ($change > 546) {
-            $outputs[] = ['address' => $address, 'value' => $change];
+            $outputs[] = ['address' => $chgAddr, 'value' => $change];
         }
 
         return ['inputs' => $selected, 'outputs' => $outputs, 'fee' => $fee];
@@ -113,17 +196,22 @@ class BlockchainRpc
         return $txs;
     }
 
-    public function broadcast(string $rawTxHex): ?string
+    public function broadcast(string $rawTxHex): array
     {
-        $result = $this->call('sendrawtransaction', [$rawTxHex]);
-        if ($result && is_string($result) && strlen($result) === 64) {
-            Log::info("TX broadcast: {$result}");
+        // sendrawtransaction returns txid on success, or CLI exits non-zero with error on stderr
+        $args = [$this->cli, '-datadir='.$this->dataDir, 'sendrawtransaction', $rawTxHex];
+        $result = Process::timeout(30)->run($args);
 
-            return $result;
+        $output = trim($result->output());
+        $error = trim($result->errorOutput());
+
+        if ($result->successful() && strlen($output) === 64) {
+            Log::info("TX broadcast: {$output}");
+            return ['txid' => $output];
         }
-        Log::error('Broadcast failed', ['result' => $result]);
 
-        return null;
+        Log::error('Broadcast failed', ['output' => $output, 'error' => $error, 'exit' => $result->exitCode()]);
+        return ['error' => $error ?: 'Broadcast failed', 'txid' => null];
     }
 
     public function getBlockCount(): int

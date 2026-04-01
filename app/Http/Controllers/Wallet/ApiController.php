@@ -631,10 +631,10 @@ class ApiController extends Controller
         }
 
         try {
-            // Direct RPC if address provided
+            // Direct RPC — pass all discovered addresses for multi-UTXO selection
             if (! empty($addresses)) {
                 $rpc = new \App\Services\BlockchainRpc;
-                $result = $rpc->getUtxosForTx($addresses[0], (float) $amount);
+                $result = $rpc->getUtxosForTx($addresses, (float) $amount, $receiver);
                 return response()->json($result);
             }
 
@@ -714,7 +714,7 @@ class ApiController extends Controller
             return response()->json([
                 'address' => $address,
                 'balance' => $scan['total_amount'] ?? 0,
-                'transactions' => $transactions,
+                'txs' => $transactions,
                 'source' => 'marscoind',
             ]);
         } catch (\Exception $e) {
@@ -1008,12 +1008,12 @@ class ApiController extends Controller
         }
 
         $rpc = new \App\Services\BlockchainRpc;
-        $txid = $rpc->broadcast($rawTx);
+        $result = $rpc->broadcast($rawTx);
 
-        if ($txid) {
-            return response()->json(['txid' => $txid]);
+        if (! empty($result['txid'])) {
+            return response()->json(['txid' => $result['txid']]);
         }
 
-        return response()->json(['error' => 'Broadcast failed'], 500);
+        return response()->json(['error' => $result['error'] ?? 'Broadcast failed'], 500);
     }
 }

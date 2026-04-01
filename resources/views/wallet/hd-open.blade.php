@@ -1688,10 +1688,18 @@
                 // Trigger Recent Activity loading with discovered addresses
                 var allAddrs = withBalance.map(function(a) { return a.address; });
                 window._walletDiscoveredAddresses = allAddrs;
-                // Store address-to-path mapping for transaction signing
+                // Store address-to-path mapping for transaction signing (includes scheme for correct lib)
                 window._walletAddressMap = {};
                 discovered.forEach(function(a) {
-                    window._walletAddressMap[a.address] = { chain: a.chain === 'change' ? 1 : 0, index: a.index };
+                    // Only store first match per address (discovery order = priority)
+                    if (!window._walletAddressMap[a.address]) {
+                        window._walletAddressMap[a.address] = {
+                            chain: a.chain === 'change' ? 1 : 0,
+                            index: a.index,
+                            scheme: a.scheme || 'standard',
+                            fullPath: a.path || null,
+                        };
+                    }
                 });
                 if (typeof loadRecentTxs === 'function') { loadRecentTxs(allAddrs); }
             } else {
@@ -2082,9 +2090,9 @@
                                         <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-faint, #5a5968); margin-bottom: 20px;">
                                             Waiting for block confirmation (~2 min)
                                         </div>
-                                        <a href="https://explore.marscoin.org/tx/${tx.tx_hash}" target="_blank"
+                                        <a href="https://explore.marscoin.org/tx/${tx.txid}" target="_blank"
                                            style="display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-cyan, #00e4ff); background: var(--mr-dark, #0c0c16); padding: 12px 18px; border-radius: 8px; border: 1px solid rgba(0,228,255,0.2); text-decoration: none; word-break: break-all; max-width: 100%; transition: border-color 0.2s;">
-                                            <i class="fa fa-cube" style="margin-right: 6px;"></i>${tx.tx_hash.substring(0, 24)}...
+                                            <i class="fa fa-cube" style="margin-right: 6px;"></i>${tx.txid.substring(0, 24)}...
                                         </a>
                                         <div style="margin-top: 24px;">
                                             <button onclick="location.reload()" style="
@@ -2121,8 +2129,17 @@
 
 
                         } catch (e) {
-                            handleError("unable to sign")
-                            throw e;
+                            $("#loading").hide()
+                            $("#send-mars").show()
+                            let userMsg = e.message || 'Transaction failed';
+                            if (userMsg.includes('bip125-replacement-disallowed') || userMsg.includes('txn-mempool-conflict')) {
+                                userMsg = 'A previous transaction is still confirming. Please wait ~2 minutes and try again.';
+                            } else if (userMsg.includes('insufficient') || userMsg.includes('No UTXOs')) {
+                                userMsg = 'Insufficient funds.';
+                            } else if (userMsg.includes('unable to sign')) {
+                                userMsg = 'Could not sign transaction. The wallet key may not match this address.';
+                            }
+                            $(".error-unlocking-tx").text(userMsg).css('color', 'var(--mr-mars, #c84125)');
                         }
 
                     } else {
@@ -2147,31 +2164,21 @@
 
             const sendMARS = async (mars_amount, receiver_address) => {
 
-                // Use client-side discovered addresses (derived with same BIP32 as genSeed)
+                // Pass ALL discovered addresses — server picks UTXOs across all of them
+                // and filters out mempool-spent ones automatically
                 const allAddresses = window._walletDiscoveredAddresses || [];
                 const sender_address = "{{ $public_addr }}".trim();
+                const addressList = allAddresses.length > 0 ? allAddresses : [sender_address];
 
-                // Try each discovered address until we find one with enough funds
-                if (allAddresses.length > 0) {
-                    for (const addr of allAddresses) {
-                        try {
-                            const io = await getTxInputsOutputs(addr, receiver_address, mars_amount);
-                            if (io && io.inputs && io.inputs.length > 0) {
-                                console.log("UTXO found on address:", addr, "inputs:", io.inputs.length);
-                                return io;
-                            }
-                        } catch (e) {
-                            console.log("No sufficient UTXOs on", addr, "- trying next...");
-                        }
-                    }
-                }
-
-                // Fallback: try the stored wallet address directly
                 try {
-                    const io = await getTxInputsOutputs(sender_address, receiver_address, mars_amount);
-                    return io;
+                    const io = await getTxInputsOutputs(addressList, receiver_address, mars_amount);
+                    if (io && io.inputs && io.inputs.length > 0) {
+                        console.log("UTXOs selected:", io.inputs.length, "inputs from", [...new Set(io.inputs.map(i => i.address))].join(', '));
+                        return io;
+                    }
+                    throw new Error(io.error || 'No UTXOs found');
                 } catch (e) {
-                    handleError("get input outputs - insufficient funds across all addresses");
+                    handleError("get input outputs - " + e.message);
                     throw e;
                 }
             }
@@ -2180,22 +2187,61 @@
 
                 const sender_address = "{{ $public_addr }}".trim()
                 const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
-                // IMPORTANT: use my_bundle.bitcoin.bip32 (same as genSeed) NOT my_bundle.bip32
                 const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
                 const addressMap = window._walletAddressMap || {};
 
-                // Helper: derive key for a specific address using its HD path
+                // Helper: derive key for a specific address using its HD path + scheme
                 function getKeyForAddress(address) {
                     const pathInfo = addressMap[address];
-                    if (pathInfo) {
-                        const path = `m/44'/2'/0'/${pathInfo.chain}/${pathInfo.index}`;
-                        const child = root.derivePath(path);
-                        console.log(`Signing with path ${path} for address ${address}`);
+                    if (!pathInfo) {
+                        console.log(`No path info for ${address}, using default m/44'/2'/0'/0/0`);
+                        const child = root.derivePath("m/44'/2'/0'/0/0");
                         return my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
                     }
-                    // Fallback: try first address key (same derivation as genSeed)
-                    console.log(`Signing with default path m/44'/2'/0'/0/0 for address ${address}`);
-                    const child = root.derivePath("m/44'/2'/0'/0/0");
+
+                    const scheme = pathInfo.scheme || 'standard';
+                    const chain = pathInfo.chain;
+                    const idx = pathInfo.index;
+
+                    // Mixed-lib schemes: derive account with bitcoin.bip32, export, re-import with bip32
+                    if (scheme === 'genseed-mixed' && my_bundle.bip32) {
+                        try {
+                            const gsAccount = root.derivePath("m/44'/2'/0'/0'");
+                            const gsNode = my_bundle.bip32.fromBase58(gsAccount.toBase58(), Marscoin.mainnet);
+                            const childNode = gsNode.derive(chain).derive(idx);
+                            console.log(`Signing [genseed-mixed] chain=${chain} idx=${idx} for ${address}`);
+                            return my_bundle.bitcoin.ECPair.fromWIF(childNode.toWIF(), Marscoin.mainnet);
+                        } catch(e) { console.warn('genseed-mixed sign failed:', e.message); }
+                    }
+
+                    if (scheme === 'standard-mixed' && my_bundle.bip32) {
+                        try {
+                            const gsAccount = root.derivePath("m/44'/2'/0'");
+                            const gsNode = my_bundle.bip32.fromBase58(gsAccount.toBase58(), Marscoin.mainnet);
+                            const childNode = gsNode.derive(chain).derive(idx);
+                            console.log(`Signing [standard-mixed] chain=${chain} idx=${idx} for ${address}`);
+                            return my_bundle.bitcoin.ECPair.fromWIF(childNode.toWIF(), Marscoin.mainnet);
+                        } catch(e) { console.warn('standard-mixed sign failed:', e.message); }
+                    }
+
+                    if (scheme === 'genseed') {
+                        const path = `m/44'/2'/0'/0'/${chain}/${idx}`;
+                        console.log(`Signing [genseed] ${path} for ${address}`);
+                        const child = root.derivePath(path);
+                        return my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
+                    }
+
+                    if (scheme === 'marscoin') {
+                        const path = `m/44'/107'/0'/${chain}/${idx}`;
+                        console.log(`Signing [marscoin] ${path} for ${address}`);
+                        const child = root.derivePath(path);
+                        return my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
+                    }
+
+                    // Default: standard BIP44
+                    const path = `m/44'/2'/0'/${chain}/${idx}`;
+                    console.log(`Signing [standard] ${path} for ${address}`);
+                    const child = root.derivePath(path);
                     return my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
                 }
 
@@ -2265,28 +2311,55 @@
                         console.error(`  Key pubkey:      ${keyPub}`);
                         console.error(`  Match: ${inputAddr === derivedAddr}`);
 
-                        // Try brute-force: scan paths from ALL known mnemonics
+                        // Brute-force: try ALL schemes × ALL mnemonics
                         let signed = false;
                         const allMnemonics = JSON.parse(localStorage.getItem('_allMnemonics') || '[]');
-                        const paths = ["m/44'/2'/0'", "m/44'/2'/0'/0'"];
-                        
-                        for (const tryMnemonic of allMnemonics) {
+                        // Include current mnemonic if not already in the list
+                        const mnemonicsToTry = [...new Set([mnemonic.trim(), ...allMnemonics])];
+                        const basePaths = ["m/44'/2'/0'", "m/44'/2'/0'/0'", "m/44'/107'/0'"];
+
+                        for (const tryMnemonic of mnemonicsToTry) {
                             if (signed) break;
                             const trySeed = my_bundle.bip39.mnemonicToSeedSync(tryMnemonic);
                             const tryRoot = my_bundle.bitcoin.bip32.fromSeed(trySeed, Marscoin.mainnet);
-                            
-                            for (const basePath of paths) {
+
+                            // Try standard derivation paths
+                            for (const basePath of basePaths) {
                                 if (signed) break;
-                                for (let chain = 0; chain <= 1 && !signed; chain++) {
+                                for (let ch = 0; ch <= 1 && !signed; ch++) {
                                     for (let idx = 0; idx < 20 && !signed; idx++) {
                                         try {
-                                            const tryChild = tryRoot.derivePath(`${basePath}/${chain}/${idx}`);
+                                            const tryChild = tryRoot.derivePath(`${basePath}/${ch}/${idx}`);
                                             const tryKey = my_bundle.bitcoin.ECPair.fromWIF(tryChild.toWIF(), Marscoin.mainnet);
                                             psbt.signInput(i, tryKey);
-                                            console.log(`  ✓ Signed with multi-wallet path ${basePath}/${chain}/${idx}`);
+                                            console.log(`  ✓ Signed with ${basePath}/${ch}/${idx}`);
                                             signed = true;
                                         } catch (e) { /* try next */ }
                                     }
+                                }
+                            }
+
+                            // Try mixed-lib derivations (genseed-mixed & standard-mixed)
+                            if (!signed && my_bundle.bip32) {
+                                const mixedBases = ["m/44'/2'/0'/0'", "m/44'/2'/0'"];
+                                for (const mb of mixedBases) {
+                                    if (signed) break;
+                                    try {
+                                        const acct = tryRoot.derivePath(mb);
+                                        const node = my_bundle.bip32.fromBase58(acct.toBase58(), Marscoin.mainnet);
+                                        for (let ch = 0; ch <= 1 && !signed; ch++) {
+                                            const chainNode = node.derive(ch);
+                                            for (let idx = 0; idx < 20 && !signed; idx++) {
+                                                try {
+                                                    const childNode = chainNode.derive(idx);
+                                                    const tryKey = my_bundle.bitcoin.ECPair.fromWIF(childNode.toWIF(), Marscoin.mainnet);
+                                                    psbt.signInput(i, tryKey);
+                                                    console.log(`  ✓ Signed with mixed-lib ${mb}/${ch}/${idx}`);
+                                                    signed = true;
+                                                } catch (e) { /* try next */ }
+                                            }
+                                        }
+                                    } catch(e) { /* skip */ }
                                 }
                             }
                         }
@@ -2317,31 +2390,19 @@
             //===============================================================================
             // API CALLS
 
-            const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
-                // Default options are marked with *
-                if (!sender_address || !receiver_address || !amount) {
+            const getTxInputsOutputs = async (sender_addresses, receiver_address, amount) => {
+                if (!sender_addresses || !receiver_address || !amount) {
                     throw new Error("Missing inputs for tx hash call...");
                 }
-                //console.log(sender_address)
-                //console.log(receiver_address)
-                //console.log(amount)
+                // Accept single address or array
+                const addrs = Array.isArray(sender_addresses) ? sender_addresses : [sender_addresses];
+                const params = new URLSearchParams();
+                addrs.forEach(a => params.append('addresses[]', a));
+                params.set('receiver_address', receiver_address);
+                params.set('amount', amount);
 
-                const url =
-                    `/api/mars-utxo-multi?addresses[]=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
-
-                try {
-                    const response = await fetch(url, {
-                        method: 'GET', // *GET, POST, PUT, DELETE, etc.
-                    });
-
-                    return response.json()
-
-                } catch (e) {
-                    throw e;
-                }
-
-
-
+                const response = await fetch(`/api/mars-utxo-multi?${params.toString()}`);
+                return response.json();
             }
 
             const broadcastTxHash = async (txhashstring) => {
@@ -2355,20 +2416,24 @@
                         headers: {
                             'Accept': 'application/json',
                             'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                         },
                         body: JSON.stringify({
-                            a: 1,
-                            txhash: txhashstring
+                            rawtx: txhashstring
                         })
                     }
                     const response = await fetch(url, config)
-                    if (response.ok) {
-                        return response.json()
+                    const data = await response.json()
+                    if (response.ok && data.txid) {
+                        return data
                     } else {
-                        console.log(response)
+                        const errMsg = data.error || 'Broadcast failed'
+                        console.error('Broadcast error:', errMsg)
+                        throw new Error(errMsg)
                     }
                 } catch (error) {
-                    console.log(error)
+                    console.error('Broadcast error:', error.message)
+                    throw error
                 }
 
             }

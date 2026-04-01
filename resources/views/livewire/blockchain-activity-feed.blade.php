@@ -8,9 +8,9 @@
                 @foreach($activities as $activity)
                     <li>
                         <i class="icon-li fa fa-location-arrow"></i>
-                        <strong>{{ $activity->firstname }} {{ $activity->lastname }}</strong> {{ $activity->description }}
+                        <strong>{{ $activity->firstname }} {{ $activity->lastname }}</strong> {!! $activity->description !!}
                         <br>
-                        <small>{{ $activity->mined->diffForHumans() }}</small>
+                        <small>{{ $activity->mined ? $activity->mined->diffForHumans() : "Pending confirmation" }}</small>
                     </li>
                 @endforeach
             </ul>

@@ -632,6 +632,7 @@
     </footer>
 
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
+    @include('partials.mars-tx')
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
     <script src="/assets/wallet/js/jquery-ui.min.js"></script>
@@ -776,33 +777,35 @@
                                         return false;
                                     }
                                     var cid = data.Hash;
-                                    var message = "PR_"+cid;
-                                    const io = await sendMARS(1, "<?=$public_address?>");
-                                    const tx = await signMARS(message, 0.01, io);
-                                    $(".transaction-hash").text(tx.tx_hash);
-                                    const feedData = await doAjax("/api/setfeed", {"type": "PR", "txid": tx.tx_hash, message: $("#title").val(), "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+                                    var publicAddress = '<?=$public_address?>';
+                                    var mnemonic = WalletKey.get().trim();
+                                    const result = await MarsWallet.signCivicAction(publicAddress, mnemonic, 'PR_' + cid);
+                                    $(".transaction-hash").text(result.txid);
+                                    const feedData = await doAjax("/api/setfeed", {"type": "PR", "txid": result.txid, message: $("#title").val(), "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": publicAddress});
                                     if (feedData.Hash) {
                                         $("#modal-message-success").show();
                                         $("#loading").hide();
                                         $(".modal-footer").hide();
                                         try {
-                                            const cacheData = await doAjax("/api/cacheproposal", {"type": "PR", "txid": tx.tx_hash, message: jsonString, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+                                            const cacheData = await doAjax("/api/cacheproposal", {"type": "PR", "txid": result.txid, message: jsonString, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": publicAddress});
                                             if (cacheData && cacheData.Proposal) {
                                                 location.href = "/congress/proposal/" + cacheData.Proposal;
                                             } else {
                                                 console.error("cacheproposal failed:", cacheData);
-                                                alert("Proposal submitted to blockchain but failed to save locally. TX: " + tx.tx_hash);
+                                                alert("Proposal submitted to blockchain but failed to save locally. TX: " + result.txid);
                                                 location.href = "/congress/voting";
                                             }
                                         } catch (cacheErr) {
                                             console.error("cacheproposal error:", cacheErr);
-                                            alert("Proposal submitted to blockchain but failed to save. TX: " + tx.tx_hash);
+                                            alert("Proposal submitted to blockchain but failed to save. TX: " + result.txid);
                                             location.href = "/congress/voting";
                                         }
                                     }
                                 } catch (e) {
                                     console.error(e);
                                     $("#loading").hide();
+                                    $("#modal-message-error").text(MarsWallet.friendlyError(e));
+                                    $(".modal-message").show();
                                 }
                             });
                         } else {
@@ -836,62 +839,6 @@
             }
         };
 
-        const Marscoin = {
-            mainnet: {
-                messagePrefix: "\x19Marscoin Signed Message:\n",
-                bech32: "M", bip44: 2,
-                bip32: { public: 0x043587cf, private: 0x04358394 },
-                pubKeyHash: 0x32, scriptHash: 0x32, wif: 0x80,
-            }
-        };
-
-        const sendMARS = async (mars_amount, receiver_address) => {
-            const sender_address = "<?=$public_address?>".trim();
-            const io = await getTxInputsOutputs(sender_address, receiver_address, mars_amount);
-            return io;
-        };
-
-        const signMARS = async (message, mars_amount, tx_i_o) => {
-            const mnemonic = WalletKey.get().trim();
-            const sender_address = "<?=$public_address?>".trim();
-            const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-            const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet);
-            const child = root.derivePath("m/44'/2'/0'/0/0");
-            const wif = child.toWIF();
-            var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-            var psbt = new my_bundle.bitcoin.Psbt({ network: Marscoin.mainnet });
-            psbt.setVersion(1);
-            psbt.setMaximumFeeRate(10000000);
-            var data = my_bundle.Buffer(message);
-            const embed = my_bundle.bitcoin.payments.embed({ data: [data] });
-            psbt.addOutput({ script: embed.output, value: 0 });
-            tx_i_o.inputs.forEach((input) => {
-                psbt.addInput({ hash: input.txId, index: input.vout, nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex') });
-            });
-            tx_i_o.outputs.forEach(output => {
-                if (!output.address) output.address = sender_address;
-                psbt.addOutput({ address: output.address, value: output.value });
-            });
-            for (let i = 0; i < tx_i_o.inputs.length; i++) {
-                try { psbt.signInput(i, key); } catch (e) { alert("Problem signing. Please reconnect your wallet."); }
-            }
-            const tx = psbt.finalizeAllInputs().extractTransaction();
-            return await broadcastTxHash(tx.toHex());
-        };
-
-        const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
-            if (!sender_address || !receiver_address || !amount) throw new Error("Missing inputs");
-            const url = `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`;
-            const response = await fetch(url, { method: 'GET' });
-            return response.json();
-        };
-
-        const broadcastTxHash = async (txhash) => {
-            if (!txhash) throw new Error("Missing tx hash");
-            const url = 'https://pebas.marscoin.org/api/mars/broadcast?txhash=' + txhash;
-            const response = await fetch(url, { method: 'GET' });
-            return response.json();
-        };
     });
     </script>
 </body>

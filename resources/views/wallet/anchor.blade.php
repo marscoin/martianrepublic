@@ -49,6 +49,23 @@
         @include('footer')
     </footer>
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
+    <script>
+    const Marscoin = {
+        mainnet: {
+            messagePrefix: "\x19Marscoin Signed Message:\n",
+            bech32: "M",
+            bip44: 2,
+            bip32: {
+                public: 0x043587cf,
+                private: 0x04358394,
+            },
+            pubKeyHash: 0x32,
+            scriptHash: 0x32,
+            wif: 0x80,
+        }
+    };
+    </script>
+    @include('partials.mars-tx')
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
     <script src="/assets/wallet/js/plugins/flot/jquery.flot.js"></script>
@@ -64,197 +81,29 @@
 
 
 <script type="text/javascript">
-        
+
 $(document).ready(function() {
 
-const Marscoin = {
-    mainnet: {
-        messagePrefix: "\x19Marscoin Signed Message:\n",
-        bech32: "M",
-        bip44: 2,
-        bip32: {
-            public: 0x043587cf,
-            private: 0x04358394,
-        },
-        pubKeyHash: 0x32,
-        scriptHash: 0x32,
-        wif: 0x80,
-    }
-};
-
 $("#publish").click(async (e) => {
-    event.preventDefault();
-    cid = "QmSyMr2CjV1qS4cBpVv9EpeXZDuaWxMSyY5Z7Hwrpdb1Mi";
-    message = "test_"+cid;
-
-    const io = await sendMARS(1, "<?=$public_address?>");
-
-    //const fee = marsConvert(io.fee);
-    const fee = 0.001
-    //console.log("THE FEE: ", fee);
-    const mars_amount = 0.001
-    const total_amount = fee + parseInt(mars_amount)
-    $(".estimated-fee").text("$ " + fee)
-    $(".conversion-rate").text(total_amount)
+    e.preventDefault();
+    const cid = "QmSyMr2CjV1qS4cBpVv9EpeXZDuaWxMSyY5Z7Hwrpdb1Mi";
+    const message = "test_" + cid;
+    const senderAddress = "<?=$public_address?>";
+    const mnemonic = WalletKey.get().trim();
 
     try {
-        const tx = await signMARS(message, mars_amount, io)
+        const result = await MarsWallet.signCivicAction(senderAddress, mnemonic, message);
+        console.log("Anchor tx broadcast:", result.txid);
         //$("#loading").hide()
         //$(".success-message").show()
         // $(".transaction-hash-link").attr("href",
-        //     "https://explore.marscoin.org/tx/" + tx.tx_hash)
-        //$(".transaction-hash").text("" + tx.tx_hash)
-
+        //     "https://explore.marscoin.org/tx/" + result.txid)
+        //$(".transaction-hash").text("" + result.txid)
     } catch (e) {
+        console.error("Anchor error:", MarsWallet.friendlyError(e));
         throw e;
     }
-
-})
-
-const sendMARS = async (mars_amount, receiver_address) => {
-    //console.log("send mars running...")
-
-    // obtain utxo i/o
-    const sender_address = "<?=$public_address?>".trim()
-
-    try {
-        const io = await getTxInputsOutputs(sender_address, receiver_address,
-            mars_amount)
-
-        return io
-    } catch (e) {
-        handleError()
-        throw e;
-    }
-
-    return null
-}
-
-const signMARS = async (message, mars_amount, tx_i_o) => {
-    const mnemonic = WalletKey.get().trim();
-    const sender_address = "<?=$public_address?>".trim();
-    const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-    const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-    const child = root.derivePath("m/44'/2'/0'/0/0");
-    const wif = child.toWIF()
-    const zubs = zubrinConvert(mars_amount)
-    var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-    var psbt = new my_bundle.bitcoin.Psbt({
-        network: Marscoin.mainnet,
-    });
-    psbt.setVersion(1)
-    psbt.setMaximumFeeRate(100000);
-
-    unspent_vout = 0
-    var data = my_bundle.Buffer(message)
-    const embed = my_bundle.bitcoin.payments.embed({ data: [data] });
-    psbt.addOutput({
-    script: embed.output,
-    value: 0,
-    })
-    tx_i_o.inputs.forEach((input, i) => {
-        psbt.addInput({
-            hash: input.txId,
-            index: input.vout,
-            nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex'),
-        })
-    })
-
-    tx_i_o.outputs.forEach(output => {
-        if (!output.address) {
-            output.address = sender_address
-        }
-
-        psbt.addOutput({
-            address: output.address,
-            value: output.value,
-        })
-    })
-    for (let i = 0; i < tx_i_o.inputs.length; i++) {
-        psbt.signInput(i, key);
-    }
-
-    // psbt.signInput(0, key);
-
-    //console.log(psbt.finalizeAllInputs().extractTransaction().toHex());
-    const txhash = psbt.finalizeAllInputs().extractTransaction().toHex()
-
-    try {
-        const txId = await broadcastTxHash(txhash);
-
-    } catch (e) {
-        handleError()
-        throw e;
-    }
-
-    return txId;
-
-}
-
-const handleError = () => {
-    console.log("PANIC AN ERROR!!!!!!!!")
-}
-
-
-//===============================================================================
-//===============================================================================
-// API CALLS
-
-const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
-    // Default options are marked with *
-    if (!sender_address || !receiver_address || !amount) {
-        throw new Error("Missing inputs for tx hash call...");
-    }
-    //console.log(sender_address)
-    //console.log(receiver_address)
-    //console.log(amount)
-
-    const url =
-        `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
-
-    try {
-        const response = await fetch(url, {
-            method: 'GET', // *GET, POST, PUT, DELETE, etc.
-        });
-
-        return response.json()
-
-    } catch (e) {
-        throw e;
-    }
-
-
-
-}
-
-const broadcastTxHash = async (txhash) => {
-    if (!txhash) {
-        throw new Error("Missing tx hash...");
-    }
-
-    const url =
-        `https://pebas.marscoin.org/api/mars/broadcast?txhash=${txhash}`
-    try {
-        const response = await fetch(url, {
-            method: 'GET'
-        });
-        return response.json() // parses JSON response into native JavaScript objects
-    } catch (e) {
-        throw e;
-    }
-
-
-}
-
-
-const zubrinConvert = (MARS) => {
-    return (MARS * 100000000)
-}
-
-const marsConvert = (zubrin) => {
-    return (zubrin / 100000000)
-}
-
+});
 
 });
 

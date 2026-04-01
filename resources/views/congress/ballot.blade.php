@@ -707,6 +707,7 @@
     </footer>
 
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
+    @include('partials.mars-tx')
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
     <script src="/assets/wallet/js/jquery-ui.min.js"></script>
@@ -987,9 +988,7 @@ $(document).ready(function() {
 
     const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
         if (!sender_address || !receiver_address || !amount) throw new Error("Missing inputs");
-        const url = `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
-        const response = await fetch(url, { method: 'GET' });
-        return response.json()
+        return MarsWallet.getUtxos([sender_address], receiver_address, amount);
     }
 
     function pollConfirmation(txId) {
@@ -1126,15 +1125,10 @@ $(document).ready(function() {
 
     const broadcastTxHash = async (txhashstring) => {
         if (!txhashstring) throw new Error("Missing tx hash...");
-        const url = "https://pebas.marscoin.org/api/mars/broadcast";
         try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({ a: 1, txhash: txhashstring })
-            });
-            const data = await response.json();
-            if (data.error) { console.error("Broadcast rejected:", data.error); return null; }
+            const data = await MarsWallet.broadcast(txhashstring);
+            // Normalize: MarsWallet returns {txid}, callers expect {tx_hash}
+            if (data.txid && !data.tx_hash) data.tx_hash = data.txid;
             return data;
         } catch (error) { console.error("Broadcast error:", error); return null; }
     }

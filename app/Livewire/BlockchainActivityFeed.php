@@ -16,12 +16,12 @@ class BlockchainActivityFeed extends Component
         $this->activities = \DB::table('feed')
             ->join('citizen', 'feed.userid', '=', 'citizen.userid')
             ->select('feed.*', 'citizen.displayname', 'citizen.firstname', 'citizen.lastname')
-            ->orderByDesc('feed.mined')
+            ->orderByRaw('feed.mined IS NOT NULL, feed.mined DESC')
             ->take($this->onloadDisplayCount)
             ->get()
             ->map(function ($activity) {
                 $activity->description = $this->formatActivityDescription($activity);
-                $activity->mined = Carbon::parse($activity->mined);
+                $activity->mined = $activity->mined ? Carbon::parse($activity->mined) : null;
 
                 return $activity;
             });

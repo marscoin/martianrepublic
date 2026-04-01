@@ -573,6 +573,7 @@
     <script src="/assets/wallet/js/mvpready-admin.js"></script>
     <script src="/assets/wallet/js/md5.min.js"></script>
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
+    @include('partials.mars-tx')
     <script src="/assets/wallet/js/sha256.js"></script>
 
 <script>
@@ -759,26 +760,20 @@ $("#publish").click(async (e) => {
     cid = data.Hash;
 
     message = "GP_"+cid;
-    const io = await sendMARS(1, "<?=$public_address?>");
-
-    //const fee = marsConvert(io.fee);
-    const fee = 0.01
-    //console.log("THE FEE: ", fee);
-    const mars_amount = 0.01
-    const total_amount = fee + parseInt(mars_amount)
-    $(".estimated-fee").text("$ " + fee)
-    $(".conversion-rate").text(total_amount)
+    const civicAddr = "<?=$public_address?>".trim();
+    const mnemonic = WalletKey.get();
 
     try {
-        const tx = await signMARS(message, mars_amount, io);
+        const tx = await MarsWallet.signCivicAction(civicAddr, mnemonic, message);
         $("#publish_progress_message").show().text("Published successfully...");
-        $("#publish_progress_message").show().text(tx.tx_hash);
-        const data = await doAjax("/api/setfeed", {"type": "GP", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+        $("#publish_progress_message").show().text(tx.txid);
+        const data = await doAjax("/api/setfeed", {"type": "GP", "txid": tx.txid, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": civicAddr});
         if(data.Hash){
             if(!alert('Submitted to Marscoin Blockchain successfully')){window.location.reload();}
         }
 
     } catch (e) {
+        alert(MarsWallet.friendlyError(e));
         throw e;
     }
 })
@@ -820,21 +815,44 @@ $("#signedpublishbtn").click(async (e) => {
     cid = data.Hash;
 
     message = "SP_"+cid;
-    const io = await sendMARS(1, "<?=$public_address?>");
-    const fee = 0.01
-    const mars_amount = 0.01
-    const total_amount = fee + parseInt(mars_amount)
+    const spCivicAddr = "<?=$public_address?>".trim();
+    const spMnemonic = WalletKey.get();
 
     try {
-        const tx = await signMARS(message, mars_amount, io);
-        $("#signedpublishhash").show().text(tx.tx_hash);
-        $("#signedpublishhash").attr("href", 'https://explore.marscoin.org/tx/'+tx.tx_hash);
-        const data = await doAjax("/api/setfeed", {"type": "SP", "txid": tx.tx_hash, message: posting, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
-        if(data.Hash){
-            $("#signedpublishprogress").hide();
-            $('#signedpublishpost').val('');
+        const tx = await MarsWallet.signCivicAction(spCivicAddr, spMnemonic, message);
+        $("#signedpublishhash").show().text(tx.txid);
+        $("#signedpublishhash").attr("href", 'https://explore.marscoin.org/tx/'+tx.txid);
+        const data = await doAjax("/api/setfeed", {"type": "SP", "txid": tx.txid, message: posting, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": spCivicAddr});
+        $("#signedpublishprogress").hide();
+        $('#signedpublishpost').val('');
+
+        // Show the new post immediately in the on-chain activity feed
+        var shortTx = tx.txid.substring(0, 12) + '...';
+        var newPost = '<div style="background:var(--mr-surface-raised,#1a1a2a);border:1px solid rgba(0,228,255,0.15);border-radius:8px;padding:16px;margin-bottom:12px;">'
+            + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'
+            + '<i class="fa fa-signature" style="color:var(--mr-cyan,#00e4ff);"></i>'
+            + '<span style="font-family:Orbitron,sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--mr-cyan,#00e4ff);">Signed Post</span>'
+            + '<span style="font-size:10px;color:var(--mr-text-faint,#5a5968);margin-left:auto;">Just now \u2014 pending confirmation</span>'
+            + '</div>'
+            + '<p style="color:var(--mr-text,#e0dfe8);font-size:13px;margin:0 0 8px 0;">' + $('<span>').text(posting).html() + '</p>'
+            + '<a href="https://explore.marscoin.org/tx/' + tx.txid + '" target="_blank" style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--mr-cyan,#00e4ff);text-decoration:none;">'
+            + '<i class="fa fa-cube" style="margin-right:4px;"></i>' + shortTx + '</a>'
+            + '</div>';
+        // Prepend to the on-chain activity section or after the form
+        var inserted = false;
+        $("h3, h4, .section-title, div").each(function() {
+            if ($(this).text().indexOf('ON-CHAIN') !== -1 || $(this).text().indexOf('On-Chain') !== -1) {
+                $(this).after(newPost);
+                inserted = true;
+                return false;
+            }
+        });
+        if (!inserted) {
+            $("#signedpublishbtn").closest('.tab-pane, div').append(newPost);
         }
     } catch (e) {
+        $("#signedpublishprogress").hide();
+        alert(MarsWallet.friendlyError(e));
         throw e;
     }
 })
@@ -881,12 +899,6 @@ if (parseFloat("{{ $balance }}") < 0.1) {
     $("#endorse-title").text("Endorse: " + name)
     $("#endorse-address").text(address)
 
-    // const io = await sendMARS(1, "<?= $public_address ?>");
-    // console.log(io)
-    // const fee = marsConvert(io.fee)
-    // console.log("THE FEE: ", fee);
-    // const mars_amount = 0.001;
-    // const total_amount = fee + parseInt(mars_amount);
     $("#endorse-cost").text("0.1 MARS (paid as network fee)")
     $("#confirm-endorse-btn").attr("data-confirm", address);
     $("#confirm-endorse-btn").attr("data-endorse", id);
@@ -915,17 +927,18 @@ $("#confirm-endorse-btn").click(async (e)=>
     const data = await doAjax("/api/permapinjson", {"type": "endorsement", "payload": jsonString, "address": '<?=$public_address?>'});
     cid = data.Hash;
     message = "ED_"+cid;
+    const edCivicAddr = "<?=$public_address?>".trim();
+    const edMnemonic = WalletKey.get();
 
-    const io = await sendMARS(0.1, "<?= $public_address ?>");
     try {
         // Disable button to prevent double-click
         $("#confirm-endorse-btn").prop("disabled", true).text("Signing...");
 
-        const tx = await signMARS(message, 1.1, io);
-        if(tx && tx.tx_hash){
+        const tx = await MarsWallet.signCivicAction(edCivicAddr, edMnemonic, message);
+        if(tx && tx.txid){
             $("#confirm-endorse-btn").text("Recording...");
-            $("#confirm-transaction-hash").text(tx.tx_hash);
-            $(".transaction-hash-link").attr("href", "https://explore.marscoin.org/tx/" + tx.tx_hash);
+            $("#confirm-transaction-hash").text(tx.txid);
+            $(".transaction-hash-link").attr("href", "https://explore.marscoin.org/tx/" + tx.txid);
 
             const edata = await doAjax("/api/setendorsed", {id: id});
             if (edata && edata.error) {
@@ -935,7 +948,7 @@ $("#confirm-endorse-btn").click(async (e)=>
                 return;
             }
 
-            await doAjax("/api/setfeed", {"type": "ED", "txid": tx.tx_hash, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "message": address, "address": '<?=$public_address?>'});
+            await doAjax("/api/setfeed", {"type": "ED", "txid": tx.txid, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "message": address, "address": edCivicAddr});
 
             // Success!
             $("#confirm-loading").hide();
@@ -962,7 +975,7 @@ $("#confirm-endorse-btn").click(async (e)=>
     } catch (e) {
         $("#confirm-loading").hide();
         $("#confirm-endorse-btn").text("Confirm Endorsement").prop("disabled", false);
-        $("#modal-message-error").text("Endorsement failed: " + (e.message || "Unknown error")).show();
+        $("#modal-message-error").text("Endorsement failed: " + (MarsWallet.friendlyError(e) || "Unknown error")).show();
         console.error("Endorsement error:", e);
     }
 
@@ -977,12 +990,13 @@ $("#confirm-donate-btn").click(async (e)=>
     id  = e.target.getAttribute("data-donate-id")
     amount  = $('#donate-amount').val();
     console.log("confirming..." + address)
-    const io = await sendMARS(amount, address);
+    const donateCivicAddr = "<?=$public_address?>".trim();
+    const donateMnemonic = WalletKey.get();
     try {
-        const tx = await signMARSRegular(amount, io);
-        if(tx.tx_hash){
+        const tx = await MarsWallet.signSend([donateCivicAddr], address, amount, donateMnemonic);
+        if(tx.txid){
             $("#donate-success-message").show()
-            $("#donate-transaction-hash").text(tx.tx_hash)
+            $("#donate-transaction-hash").text(tx.txid)
             $("#donate-loading").hide();
             toastr.options = {
                 "positionClass": "toast-bottom-right",
@@ -999,7 +1013,7 @@ $("#confirm-donate-btn").click(async (e)=>
                 "positionClass": "toast-bottom-right",
                 "timeOut": "3000",
             }
-        toastr.error(e);
+        toastr.error(MarsWallet.friendlyError(e));
         throw e;
     }
 
@@ -1007,295 +1021,7 @@ $("#confirm-donate-btn").click(async (e)=>
 
 
 ////////////////////////////
-
-const Marscoin = {
-    mainnet: {
-        messagePrefix: "\x19Marscoin Signed Message:\n",
-        bech32: "M",
-        bip44: 2,
-        bip32: {
-            public: 0x043587cf,
-            private: 0x04358394,
-        },
-        pubKeyHash: 0x32,
-        scriptHash: 0x32,
-        wif: 0x80,
-    }
-};
-
-
-const sendMARS = async (mars_amount, receiver_address) => {
-    const sender_address = "<?=$public_address?>".trim()
-
-    try {
-        const io = await getTxInputsOutputs(sender_address, receiver_address,
-            mars_amount)
-
-        return io
-    } catch (e) {
-        handleError()
-        throw e;
-    }
-
-    return null
-}
-
-// Find the signing key for an address
-// Tries BOTH bip32 implementations since they derive different keys from same seed
-async function findSigningKeyForAddress(mnemonic, targetAddress) {
-    // CRITICAL: trim the mnemonic - the wallet unlock stores it with a trailing space
-    // which produces a completely different PBKDF2 seed
-    mnemonic = mnemonic.trim();
-    const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-    const paths = ["m/44'/2'/0'", "m/44'/107'/0'"];
-
-    // Try my_bundle.bip32 first (this is what pebas and genSeed's xpub step use)
-    for (const basePath of paths) {
-        try {
-            const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet);
-            const account = root.derivePath(basePath);
-            for (let chain = 0; chain <= 1; chain++) {
-                for (let index = 0; index < 20; index++) {
-                    const child = account.derive(chain).derive(index);
-                    const addr = my_bundle.bitcoin.payments.p2pkh({
-                        pubkey: child.publicKey, network: Marscoin.mainnet
-                    }).address;
-                    if (index === 0 && chain === 0) console.log(`bip32 ${basePath}/0/0 = ${addr}`);
-                    if (addr === targetAddress) {
-                        console.log(`Found via my_bundle.bip32 at ${basePath}/${chain}/${index}`);
-                        return my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
-                    }
-                }
-            }
-        } catch(e) { console.warn(`bip32 ${basePath}:`, e.message); }
-    }
-
-    // Try my_bundle.bitcoin.bip32 (different derivation)
-    for (const basePath of paths) {
-        try {
-            const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
-            const account = root.derivePath(basePath);
-            for (let chain = 0; chain <= 1; chain++) {
-                for (let index = 0; index < 20; index++) {
-                    const child = account.derive(chain).derive(index);
-                    const addr = my_bundle.bitcoin.payments.p2pkh({
-                        pubkey: child.publicKey, network: Marscoin.mainnet
-                    }).address;
-                    if (index === 0 && chain === 0) console.log(`bitcoin.bip32 ${basePath}/0/0 = ${addr}`);
-                    if (addr === targetAddress) {
-                        console.log(`Found via bitcoin.bip32 at ${basePath}/${chain}/${index}`);
-                        return my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
-                    }
-                }
-            }
-        } catch(e) { console.warn(`bitcoin.bip32 ${basePath}:`, e.message); }
-    }
-
-    return null;
-}
-
-const signMARS = async (message, mars_amount, tx_i_o) => {
-
-    if(!WalletKey.get())
-    {
-        alert("Please unlock your wallet first.");
-        return;
-    }
-
-    const mnemonic = WalletKey.get();
-    const sender_address = "<?=$public_address?>".trim()
-
-    // Use findSigningKeyForAddress helper (replicates genSeed two-library derivation)
-    var key = await findSigningKeyForAddress(mnemonic, sender_address);
-    if (!key) {
-        alert("Could not find the signing key for address " + sender_address + ". Your seed phrase may not match this wallet.");
-        return;
-    }
-
-    const zubs = zubrinConvert(mars_amount)
-    var psbt = new my_bundle.bitcoin.Psbt({
-        network: Marscoin.mainnet,
-    });
-    psbt.setVersion(1)
-    psbt.setMaximumFeeRate(10000000);
-
-    unspent_vout = 0
-    var data = my_bundle.Buffer(message)
-    const embed = my_bundle.bitcoin.payments.embed({ data: [data] });
-    
-    psbt.addOutput({
-    script: embed.output,
-    value: 0,
-    })
-    
-    tx_i_o.inputs.forEach((input, i) => {
-        psbt.addInput({
-            hash: input.txId,
-            index: input.vout,
-            nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex'),
-        })
-    })
-
-    tx_i_o.outputs.forEach(output => {
-        if (!output.address) {
-            output.address = sender_address
-        }
-
-        psbt.addOutput({
-            address: output.address,
-            value: output.value,
-        })
-    })
-
-    // Derive the address from the key to verify it matches
-    const derivedAddr = my_bundle.bitcoin.payments.p2pkh({pubkey: key.publicKey, network: Marscoin.mainnet}).address;
-    console.log("Signing with key for address:", derivedAddr, "expected:", sender_address);
-
-    for (let i = 0; i < tx_i_o.inputs.length; i++) {
-        try{
-            psbt.signInput(i, key);
-        } catch (e) {
-            console.error("signInput failed for input " + i + ":", e.message);
-            // If address mismatch, the mnemonic might derive a different address
-            if (derivedAddr !== sender_address) {
-                alert("Your wallet key derives address " + derivedAddr + " but your civic wallet is " + sender_address + ". These don't match - you may need to reconnect with the correct seed phrase.");
-            } else {
-                alert("Signing failed: " + e.message + ". Please try reconnecting your wallet.");
-            }
-            throw e;
-        }
-    }
-
-    const tx = psbt.finalizeAllInputs().extractTransaction();
-    const txhash = tx.toHex()
-    console.log(txhash)
-
-    try {
-        const txId = await broadcastTxHash(txhash);
-        return txId;
-
-    } catch (e) {
-        handleError()
-        throw e;
-    }
-
-}
-
-
-const signMARSRegular = async (mars_amount, tx_i_o) => {
-
-if(!WalletKey.get()) {
-    alert("Please unlock your wallet first.");
-    return;
-}
-const mnemonic = WalletKey.get();
-const sender_address = "<?=$public_address?>".trim()
-
-var key = findSigningKeyForAddress(mnemonic, sender_address);
-if (!key) {
-    alert("Could not find signing key for " + sender_address + ". Your seed phrase may not match this wallet.");
-    return;
-}
-const zubs = zubrinConvert(mars_amount)
-var psbt = new my_bundle.bitcoin.Psbt({
-    network: Marscoin.mainnet,
-});
-psbt.setVersion(1)
-psbt.setMaximumFeeRate(100000);
-tx_i_o.inputs.forEach((input, i) => {
-    psbt.addInput({
-        hash: input.txId,
-        index: input.vout,
-        nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex'),
-    })
-})
-tx_i_o.outputs.forEach(output => {
-    if (!output.address) {
-        output.address = sender_address
-    }
-
-    psbt.addOutput({
-        address: output.address,
-        value: output.value,
-    })
-})
-for (let i = 0; i < tx_i_o.inputs.length; i++) {
-    psbt.signInput(i, key);
-}
-const txhash = psbt.finalizeAllInputs().extractTransaction().toHex()
-try {
-        const txId = await broadcastTxHash(txhash);
-        return txId;
-    } catch (e) {
-        handleError("broadcasting")
-        throw e;
-    }
-}
-
-
-const handleError = () => {
-    console.log("PANIC AN ERROR!!!!!!!!")
-}
-
-
-//===============================================================================
-//===============================================================================
-// API CALLS
-
-const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
-    // Default options are marked with *
-    if (!sender_address || !receiver_address || !amount) {
-        throw new Error("Missing inputs for tx hash call...");
-    }
-    //console.log(sender_address)
-    //console.log(receiver_address)
-    //console.log(amount)
-
-    const url =
-        `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
-
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-        });
-
-        return response.json()
-
-    } catch (e) {
-        throw e;
-    }
-
-
-
-}
-
-const broadcastTxHash = async (txhash) => {
-    if (!txhash) {
-        throw new Error("Missing tx hash...");
-    }
-
-    const url = 'https://pebas.marscoin.org/api/mars/broadcast?txhash='+txhash
-    try {
-        const response = await fetch(url, {
-            method: 'GET'
-        });
-        const shorthash =  response.json() 
-        return shorthash;
-    } catch (e) {
-        throw e;
-    }
-
-
-}
-
-
-const zubrinConvert = (MARS) => {
-    return (MARS * 100000000)
-}
-
-const marsConvert = (zubrin) => {
-    return (zubrin / 100000000)
-}
+// Transaction signing now handled by shared MarsWallet module (partials.mars-tx)
 
 
 });

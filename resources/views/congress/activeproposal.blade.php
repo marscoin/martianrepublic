@@ -66,6 +66,7 @@
 
 <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
 <script src="/assets/wallet/js/dist/my_bundle.js"></script>
+@include('partials.mars-tx')
 <script>
     $(document).ready(function() {
 
@@ -73,246 +74,64 @@
             location.reload();
         })
 
-        ////// Proposal creation Logic..........
+        const senderAddr = "{{$public_address}}".trim();
+
+        ////// Proposal Vote Logic..........
         // YES VOTE
         $(".vote-modal-btn-yes").click(async (e)=>
         {
-           await buildAndSign(e, "yes")
+           await prepareAndSign(e, "yes")
         })
 
         // NO VOTE
         $(".vote-modal-btn-no").click(async (e)=>
         {
-
-           await  buildAndSign(e, "no")
+           await prepareAndSign(e, "no")
         })
 
         // NULL VOTE
         $(".vote-modal-btn-null").click(async (e)=>
         {
-            await buildAndSign(e, "null")
-         
+            await prepareAndSign(e, "null")
         })
 
-        // Construct and send tx...
-        const buildAndSign = async (e, vote) =>
+        // Prepare fee estimate, then sign and broadcast on confirm
+        const prepareAndSign = async (e, vote) =>
         {
             const message = "PR" + e.target.id
-            //console.log("message:",message)
 
-            const io = await sendMARS(1, "{{$public_address}}");
+            try {
+                const io = await MarsWallet.getUtxos([senderAddr], senderAddr, MarsWallet.DUST_AMOUNT);
+                const fee = io.fee / 100000000;
+                const mars_amount = 0.001;
+                const total_amount = fee + parseInt(mars_amount);
 
-            //const fee = marsConvert(io.fee);
-            const fee = marsConvert(io.fee)
-            //console.log("THE FEE: ", fee);
-            const mars_amount = 0.001
-            const total_amount = fee + parseInt(mars_amount)
-
-            $(".modal-cost").text(total_amount + " MARS")
+                $(".modal-cost").text(total_amount + " MARS")
+            } catch (err) {
+                console.warn("Could not estimate fee:", err.message);
+                $(".modal-cost").text("~0.001 MARS")
+            }
 
             $(`#submit-${vote}-vote`).click(async(e)=>
             {
                 $("#loading").show()
                 $(`#submit-${vote}-vote`).hide()
                 try {
-                    const tx = await signMARS(message, mars_amount, io)
+                    const mnemonic = WalletKey.get().trim();
+                    const result = await MarsWallet.signCivicAction(senderAddr, mnemonic, message);
                     $("#loading").hide()
                     $("#modal-message-success").show()
                     $(".transaction-hash-link").attr("href",
-                        "https://explore.marscoin.org/tx/" + tx.tx_hash)
-                    $(".transaction-hash").text("" + tx.tx_hash)
+                        "https://explore.marscoin.org/tx/" + result.txid)
+                    $(".transaction-hash").text("" + result.txid)
 
-                } catch (e) {
-                    handleError("signing mars")
-                    throw e;
+                } catch (err) {
+                    $("#loading").hide()
+                    handleError(MarsWallet.friendlyError(err))
+                    throw err;
                 }
             })
         }
-
-
-
-        // Transaction OP-Return Building Logic
-         ////// Proposal creation Logic..........
-        const sendMARS = async (mars_amount, receiver_address) => {
-        //console.log("send mars running...")
-
-        // obtain utxo i/o
-        const public_address = "{{$public_address}}"
-        const sender_address = public_address.trim()
-
-
-        // console.log("amount", mars_amount)
-        // console.log("receiver", receiver_address)
-        // console.log("sender", sender_address)
-
-        try {
-            const io = await getTxInputsOutputs(sender_address, receiver_address,
-                mars_amount)
-
-            return io
-        } catch (e) {
-            handleError("sending mars")
-            throw e;
-        }
-
-        return null
-    }
-
-    const signMARS = async (message, mars_amount, tx_i_o) => {
-
-        const mnemonic = WalletKey.get().trim();
-        
-        const sender_address = "{{$public_address}}".trim()
-
-        //const mnemonic = "business tattoo current news edit bronze ketchup wrist thought prize mistake supply"
-        //console.log("Mnemonic:", mnemonic)
-
-        const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-
-        // console.log("seed: ", seed)
-
-        // ROOT === xprv
-        const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-
-        //private key
-        const child = root.derivePath("m/44'/2'/0'/0/0");
-        //const child = root.derivePath(getDerivationPath());
-
-        const wif = child.toWIF()
-
-        //=======================================================================
-
-        const zubs = zubrinConvert(mars_amount)
-
-
-        var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-        //console.log("Key:", key)
-
-        var psbt = new my_bundle.bitcoin.Psbt({
-            network: Marscoin.mainnet,
-        });
-        psbt.setVersion(1)
-        psbt.setMaximumFeeRate(100000);
-
-        unspent_vout = 0
-        var data = my_bundle.Buffer(message)
-        const embed = my_bundle.bitcoin.payments.embed({
-            data: [data]
-        });
-        //var dataScript = psbt.script.nullDataOutput(data)
-        psbt.addOutput({
-            script: embed.output,
-            value: 0,
-        })
-        //psbt.addOutput(dataScript, 1000)
-
-        tx_i_o.inputs.forEach((input, i) => {
-            psbt.addInput({
-                hash: input.txId,
-                index: input.vout,
-                nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex'),
-            })
-        })
-
-        tx_i_o.outputs.forEach(output => {
-            // watch out, outputs may have been added that you need to provide
-            // an output address/script for
-            if (!output.address) {
-                output.address = sender_address
-            }
-
-            psbt.addOutput({
-                address: output.address,
-                value: output.value,
-            })
-        })
-
-        //console.log("length:",tx_i_o.inputs.length )
-        for (let i = 0; i < tx_i_o.inputs.length; i++) {
-            psbt.signInput(i, key);
-        }
-
-        // psbt.signInput(0, key);
-
-        //console.log(psbt.finalizeAllInputs().extractTransaction().toHex());
-        var txId = "";
-        const txhash = psbt.finalizeAllInputs().extractTransaction().toHex()
-
-        try {
-            const txId = await broadcastTxHash(txhash);
-            return txId
-        } catch (e) {
-            handleError()
-            throw e;
-        }
-
-        return txId;
-
-    }
-        
-
-    //===============================================================================
-    //===============================================================================
-    // API CALLS
-    const PROD = "https://pebas.marscoin.org"
-    const TEST = "http://127.0.0.1:3001"
-
-    const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
-        // Default options are marked with *
-        if (!sender_address || !receiver_address || !amount) {
-            throw new Error("Missing inputs for tx hash call...");
-        }
-        //console.log(sender_address)
-        //console.log(receiver_address)
-        //console.log(amount)
-
-        const url =
-            `${PROD}/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
-
-        try {
-            const response = await fetch(url, {
-                method: 'GET', // *GET, POST, PUT, DELETE, etc.
-            });
-
-            return response.json()
-
-        } catch (e) {
-            console.log("error with io")
-            throw e;
-        }
-
-
-
-    }
-
-    const broadcastTxHash = async (txhash) => {
-        if (!txhash) {
-            throw new Error("Missing tx hash...");
-        }
-
-        const url =
-            `${PROD}/api/mars/broadcast?txhash=${txhash}`
-        try {
-            const response = await fetch(url, {
-                method: 'GET'
-            });
-            return response.json() // parses JSON response into native JavaScript objects
-        } catch (e) {
-            console.log("error with broadcast")
-            throw e;
-        }
-
-
-    }
-
-
-    const zubrinConvert = (MARS) => {
-        return (MARS * 100000000)
-    }
-
-    const marsConvert = (zubrin) => {
-        return (zubrin / 100000000)
-    }
 
     })
 </script>

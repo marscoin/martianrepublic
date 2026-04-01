@@ -355,6 +355,7 @@
     </footer>
 
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
+    @include('partials.mars-tx')
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
     <script>
@@ -546,55 +547,17 @@
             });
             const cid = ipfsResp.Hash;
 
-            // Build and sign blockchain transaction
+            // Sign and broadcast blockchain transaction
             document.getElementById('gate-publish-msg').textContent = 'Signing blockchain transaction...';
             const mnemonic = WalletKey.get();
             if (!mnemonic) { throw new Error('Wallet not unlocked. Please go back and unlock your wallet.'); }
 
-            // Get UTXO
-            const utxoResp = await fetch(`https://pebas.marscoin.org/api/mars/utxo?sender_address=${publicAddress}&receiver_address=${publicAddress}&amount=0.01`);
-            const io = await utxoResp.json();
-
-            // Sign with OP_RETURN
-            const Marscoin = {
-                mainnet: { messagePrefix: "\x19Marscoin Signed Message:\n", bech32: "M", bip44: 2,
-                    bip32: { public: 0x043587cf, private: 0x04358394 }, pubKeyHash: 0x32, scriptHash: 0x32, wif: 0x80 }
-            };
-            const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
-            const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
-            const child = root.derivePath("m/44'/2'/0'/0/0");
-            const key = my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
-
-            const psbt = new my_bundle.bitcoin.Psbt({ network: Marscoin.mainnet });
-            psbt.setVersion(1);
-            psbt.setMaximumFeeRate(100000);
-
-            const opReturnData = my_bundle.Buffer.from('GP_' + cid, 'utf8');
-            const opReturnScript = my_bundle.bitcoin.script.compile([my_bundle.bitcoin.opcodes.OP_RETURN, opReturnData]);
-
-            io.inputs.forEach(input => {
-                psbt.addInput({ hash: input.txId, index: input.vout, nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex') });
-            });
-            io.outputs.forEach(output => {
-                if (!output.address) output.address = publicAddress;
-                psbt.addOutput({ address: output.address, value: output.value });
-            });
-            psbt.addOutput({ script: opReturnScript, value: 0 });
-
-            io.inputs.forEach((_, i) => psbt.signInput(i, key));
-            const txhex = psbt.finalizeAllInputs().extractTransaction().toHex();
-
-            // Broadcast
-            document.getElementById('gate-publish-msg').textContent = 'Broadcasting to network...';
-            const broadcastResp = await fetch('https://pebas.marscoin.org/api/mars/broadcast', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ a: 1, txhash: txhex })
-            });
-            const txResult = await broadcastResp.json();
+            const txResult = await MarsWallet.signCivicAction(publicAddress, mnemonic, 'GP_' + cid);
 
             // Save to local DB
+            document.getElementById('gate-publish-msg').textContent = 'Recording civic action...';
             await $.post('/api/setfeed', {
-                tag: 'GP', txid: txResult.tx_hash, message: '',
+                tag: 'GP', txid: txResult.txid, message: '',
                 embedded_link: 'https://ipfs.marscoin.org/ipfs/' + cid, address: publicAddress
             });
 
@@ -603,7 +566,7 @@
             document.getElementById('gate-publish-success').style.display = 'block';
 
         } catch(err) {
-            document.getElementById('gate-publish-msg').textContent = 'Error: ' + err.message;
+            document.getElementById('gate-publish-msg').textContent = 'Error: ' + MarsWallet.friendlyError(err);
             document.getElementById('gate-publish-msg').style.color = 'var(--mr-mars)';
             document.getElementById('gate-publish-buttons').style.display = 'block';
         }

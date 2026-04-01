@@ -1,4 +1,4 @@
-{{-- v2026.03.31.1 - Civic Wallet Migration Wizard --}}
+{{-- v2026.03.31.2 - Civic Wallet Migration Wizard (MarsWallet module) --}}
 <html lang="en" class="no-js">
 <head>
     <title>Migrate Civic Wallet — Martian Republic</title>
@@ -177,6 +177,7 @@
     <footer class="footer">@include('footer')</footer>
 
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
+    @include('partials.mars-tx')
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
     <script src="/assets/wallet/js/mvpready-core.js"></script>
@@ -211,13 +212,6 @@
         var child = root.derivePath("m/44'/2'/0'/0/0");
         return my_bundle.bitcoin.payments.p2pkh({ pubkey: child.publicKey, network: Marscoin.mainnet }).address;
     }
-    function deriveCivicKeyPair(mnemonic) {
-        var seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
-        var root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet);
-        var child = root.derivePath("m/44'/2'/0'/0/0");
-        return my_bundle.bitcoin.ECPair.fromWIF(child.toWIF(), Marscoin.mainnet);
-    }
-
     // State
     var currentStep = 1;
     var newMnemonic = null, newCivicAddr = null, migrationId = null;
@@ -322,49 +316,12 @@
             });
             migrationId = initResp.migration_id;
 
-            // 3. Build OP_RETURN tx: MG_<new_address>
-            document.getElementById('sign-spinner-text').textContent = 'Building transaction...';
-            var dustAmount = 0.0001;
-            var utxoUrl = 'https://pebas.marscoin.org/api/mars/utxo?sender_address=' +
-                encodeURIComponent(oldCivicAddr) + '&receiver_address=' +
-                encodeURIComponent(oldCivicAddr) + '&amount=' + dustAmount;
-            var txIO = await (await fetch(utxoUrl)).json();
-            if (!txIO || !txIO.inputs || txIO.inputs.length === 0) {
-                throw new Error('No UTXOs on civic address. Fund it with a small amount first.');
-            }
+            // 3. Sign & broadcast migration tx via MarsWallet
+            document.getElementById('sign-spinner-text').textContent = 'Signing & broadcasting...';
+            var txResult = await MarsWallet.signCivicAction(oldCivicAddr, oldMnemonic, 'MG_' + newCivicAddr, 0.0001);
+            var txid = txResult.txid;
 
-            // 4. Sign transaction
-            document.getElementById('sign-spinner-text').textContent = 'Signing transaction...';
-            var oldKey = deriveCivicKeyPair(oldMnemonic);
-            var psbt = new my_bundle.bitcoin.Psbt({ network: Marscoin.mainnet });
-            psbt.setVersion(1);
-            psbt.setMaximumFeeRate(100000);
-
-            // OP_RETURN output
-            var embed = my_bundle.bitcoin.payments.embed({ data: [my_bundle.Buffer('MG_' + newCivicAddr)] });
-            psbt.addOutput({ script: embed.output, value: 0 });
-
-            txIO.inputs.forEach(function(input) {
-                psbt.addInput({ hash: input.txId, index: input.vout, nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex') });
-            });
-            txIO.outputs.forEach(function(output) {
-                if (!output.address) output.address = oldCivicAddr;
-                psbt.addOutput({ address: output.address, value: output.value });
-            });
-            for (var i = 0; i < txIO.inputs.length; i++) psbt.signInput(i, oldKey);
-            var txHex = psbt.finalizeAllInputs().extractTransaction().toHex();
-
-            // 5. Broadcast
-            document.getElementById('sign-spinner-text').textContent = 'Broadcasting...';
-            var bResp = await fetch('https://pebas.marscoin.org/api/mars/broadcast', {
-                method: 'POST',
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({ a: 1, txhash: txHex }),
-            });
-            var bData = await bResp.json();
-            var txid = bData.txid || bData.tx_hash || bData.result || txHex.substring(0, 64);
-
-            // 6. Encrypt new seed & confirm
+            // 4. Encrypt new seed & confirm
             document.getElementById('sign-spinner-text').textContent = 'Confirming migration...';
             var encryptedNewSeed = my_bundle.encrypt(newMnemonic.trim(), hashPassword(password), new Uint8Array(iv));
             await $.ajax({
@@ -373,7 +330,7 @@
                 data: JSON.stringify({ migration_id: migrationId, txid: txid, encrypted_seed: encryptedNewSeed }),
             });
 
-            // 7. Done
+            // 5. Done
             document.getElementById('done-old-addr').textContent = oldCivicAddr;
             document.getElementById('done-new-addr').textContent = newCivicAddr;
             var explorerUrl = 'https://explore.marscoin.org/tx/' + txid;
@@ -386,7 +343,7 @@
             console.error('Migration error:', err);
             document.getElementById('sign-spinner').style.display = 'none';
             document.getElementById('btn-sign').disabled = false;
-            errEl.textContent = err.responseJSON ? err.responseJSON.message : (err.message || 'Migration failed. Please try again.');
+            errEl.textContent = err.responseJSON ? err.responseJSON.message : (typeof MarsWallet !== 'undefined' ? MarsWallet.friendlyError(err) : (err.message || 'Migration failed. Please try again.'));
             errEl.style.display = 'block';
         }
     }

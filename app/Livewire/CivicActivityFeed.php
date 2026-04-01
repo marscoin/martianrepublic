@@ -49,7 +49,7 @@ class CivicActivityFeed extends Component
                 ->orWhere('message', 'like', '%'.$publicAddress.'%');
         })
             ->whereIn('tag', ['ED', 'SP', 'GP', 'CT', 'LB'])
-            ->orderBy('mined', 'desc')
+            ->orderByRaw('mined IS NOT NULL, mined DESC')
             ->orderBy('id', 'desc')
             ->take($total + 1)
             ->get();

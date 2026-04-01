@@ -779,6 +779,7 @@
     </footer>
 
     <script src="/assets/wallet/js/dist/my_bundle.js"></script>
+    @include('partials.mars-tx')
     <script src="/assets/wallet/js/libs/jquery-1.10.2.min.js"></script>
     <script src="/assets/wallet/js/libs/bootstrap.min.js"></script>
     <script src="/assets/wallet/js/plugins/flot/jquery.flot.js"></script>
@@ -930,34 +931,29 @@
                     try {
                         cid = publication;
                         message = "LB_"+cid;
-                        const io = await sendMARS(1, "<?=$public_address?>");
-                        const fee = 0.01
-                        const mars_amount = 0.01
-                        const total_amount = fee + parseInt(mars_amount)
+                        const senderAddr = "<?=$public_address?>".trim();
+                        const mnemonic = WalletKey.get().trim();
 
-                        try {
-                            const tx = await signMARS(message, mars_amount, io);
-                            $(".transaction-hash-link").text(tx.tx_hash)
-                            $(".transaction-hash-link").attr("href","https://explore.marscoin.org/tx/" + tx.tx_hash)
-                            $(".modal-message").show();
-                            $(".modal-footer").hide();
-                            $("#loading").hide();
-                            await doAjax("/api/setfeed", {"type": "LB", "txid": tx.tx_hash, message: publication, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
+                        const result = await MarsWallet.signCivicAction(senderAddr, mnemonic, message);
 
-                            // Update the row in-place to show pending state
-                            var btn = $(".notarizemeModalBtn[rel='" + publication + "']").closest('td');
-                            btn.html('<span class="badge-pending"><i class="fa-solid fa-spinner fa-spin" style="font-size:9px;"></i> Pending attestation</span>');
+                        $(".transaction-hash-link").text(result.txid)
+                        $(".transaction-hash-link").attr("href","https://explore.marscoin.org/tx/" + result.txid)
+                        $(".modal-message").show();
+                        $(".modal-footer").hide();
+                        $("#loading").hide();
+                        await doAjax("/api/setfeed", {"type": "LB", "txid": result.txid, message: publication, "embedded_link": "https://ipfs.marscoin.org/ipfs/"+cid, "address": '<?=$public_address?>'});
 
-                            // Auto-close modal after 2s
-                            setTimeout(function() {
-                                $('#notarizemeModal').modal('hide');
-                            }, 2000);
-                        } catch (e) {
-                            $("#loading").hide();
-                            alert("Notarization failed: " + (e.message || "Unknown error"));
-                        }
+                        // Update the row in-place to show pending state
+                        var btn = $(".notarizemeModalBtn[rel='" + publication + "']").closest('td');
+                        btn.html('<span class="badge-pending"><i class="fa-solid fa-spinner fa-spin" style="font-size:9px;"></i> Pending attestation</span>');
+
+                        // Auto-close modal after 2s
+                        setTimeout(function() {
+                            $('#notarizemeModal').modal('hide');
+                        }, 2000);
                     } catch (e) {
-                        throw e;
+                        $("#loading").hide();
+                        alert("Notarization failed: " + MarsWallet.friendlyError(e));
                     }
                 })
             }
@@ -1001,149 +997,6 @@
             }
         })
 
-
-        ////////////////////////////
-
-        const Marscoin = {
-            mainnet: {
-                messagePrefix: "\x19Marscoin Signed Message:\n",
-                bech32: "M",
-                bip44: 2,
-                bip32: {
-                    public: 0x043587cf,
-                    private: 0x04358394,
-                },
-                pubKeyHash: 0x32,
-                scriptHash: 0x32,
-                wif: 0x80,
-            }
-        };
-
-        const sendMARS = async (mars_amount, receiver_address) => {
-            const sender_address = "<?=$public_address?>".trim()
-            try {
-                const io = await getTxInputsOutputs(sender_address, receiver_address, mars_amount)
-                return io
-            } catch (e) {
-                handleError()
-                throw e;
-            }
-            return null
-        }
-
-        const signMARS = async (message, mars_amount, tx_i_o) => {
-            const mnemonic = WalletKey.get().trim();
-            const sender_address = "<?=$public_address?>".trim()
-            const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
-            const root = my_bundle.bip32.fromSeed(seed, Marscoin.mainnet)
-            const child = root.derivePath("m/44'/2'/0'/0/0");
-            const wif = child.toWIF()
-            const zubs = zubrinConvert(mars_amount)
-            var key = my_bundle.bitcoin.ECPair.fromWIF(wif, Marscoin.mainnet);
-
-            var psbt = new my_bundle.bitcoin.Psbt({
-                network: Marscoin.mainnet,
-            });
-            psbt.setVersion(1)
-            psbt.setMaximumFeeRate(10000000);
-
-            unspent_vout = 0
-            var data = my_bundle.Buffer(message)
-            const embed = my_bundle.bitcoin.payments.embed({ data: [data] });
-
-            psbt.addOutput({
-                script: embed.output,
-                value: 0,
-            })
-
-            tx_i_o.inputs.forEach((input, i) => {
-                psbt.addInput({
-                    hash: input.txId,
-                    index: input.vout,
-                    nonWitnessUtxo: my_bundle.Buffer.from(input.rawTx, 'hex'),
-                })
-            })
-
-            tx_i_o.outputs.forEach(output => {
-                if (!output.address) {
-                    output.address = sender_address
-                }
-                psbt.addOutput({
-                    address: output.address,
-                    value: output.value,
-                })
-            })
-
-            for (let i = 0; i < tx_i_o.inputs.length; i++) {
-                try{
-                    psbt.signInput(i, key);
-                } catch (e) {
-                    alert("Problem while trying to sign with your key. Please try to reconnect your wallet...");
-                }
-            }
-
-            const tx = psbt.finalizeAllInputs().extractTransaction();
-            const txhash = tx.toHex()
-            console.log(txhash)
-
-            try {
-                const txId = await broadcastTxHash(txhash);
-                return txId;
-            } catch (e) {
-                handleError()
-                throw e;
-            }
-        }
-
-        const handleError = () => {
-            console.log("PANIC AN ERROR!!!!!!!!")
-        }
-
-        //===============================================================================
-        // API CALLS
-
-        const getTxInputsOutputs = async (sender_address, receiver_address, amount) => {
-            if (!sender_address || !receiver_address || !amount) {
-                throw new Error("Missing inputs for tx hash call...");
-            }
-
-            const url =
-                `https://pebas.marscoin.org/api/mars/utxo?sender_address=${sender_address}&receiver_address=${receiver_address}&amount=${amount}`
-
-            try {
-                const response = await fetch(url, {
-                    method: 'GET',
-                });
-                return response.json()
-            } catch (e) {
-                throw e;
-            }
-        }
-
-        const broadcastTxHash = async (txhash) => {
-            if (!txhash) {
-                throw new Error("Missing tx hash...");
-            }
-
-            const url = 'https://pebas.marscoin.org/api/mars/broadcast?txhash='+txhash
-            try {
-                const response = await fetch(url, {
-                    method: 'GET'
-                });
-                const shorthash = response.json()
-                return shorthash;
-            } catch (e) {
-                throw e;
-            }
-        }
-
-        const zubrinConvert = (MARS) => {
-            return (MARS * 100000000)
-        }
-
-        const marsConvert = (zubrin) => {
-            return (zubrin / 100000000)
-        }
 
     });
     </script>
