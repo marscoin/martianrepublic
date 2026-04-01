@@ -621,22 +621,35 @@ class ApiController extends Controller
 
     public function marsUtxoMulti(Request $request)
     {
-        $xpub = $request->input('xpub');
         $receiver = $request->input('receiver_address');
         $amount = $request->input('amount');
-        if (! $xpub || ! $receiver || ! $amount) {
-            return response()->json(['error' => 'Missing parameters'], 400);
-        }
-        try {
-            $url = config('blockchain.pebas.url').'/api/mars/utxo-multi?xpub='.urlencode($xpub).'&receiver_address='.urlencode($receiver).'&amount='.urlencode($amount);
-            $response = Http::timeout(15)->get($url);
-            if ($response->successful()) {
-                return response($response->body())->header('Content-Type', 'application/json');
-            }
-        } catch (\Exception $e) {
+        $addresses = $request->input('addresses', []);
+        $xpub = $request->input('xpub');
+
+        if (! $receiver || ! $amount) {
+            return response()->json(['error' => 'Missing receiver_address or amount'], 400);
         }
 
-        return response()->json(['error' => 'UTXO selection failed'], 500);
+        try {
+            // Direct RPC if address provided
+            if (! empty($addresses)) {
+                $rpc = new \App\Services\BlockchainRpc;
+                $result = $rpc->getUtxosForTx($addresses[0], (float) $amount);
+                return response()->json($result);
+            }
+
+            // Fallback: Pebas with xpub
+            if ($xpub) {
+                $response = Http::timeout(15)->get(config('blockchain.pebas.url') . '/api/mars/utxo-multi?xpub=' . urlencode($xpub) . '&receiver_address=' . urlencode($receiver) . '&amount=' . urlencode($amount));
+                if ($response->successful()) {
+                    return response($response->body())->header('Content-Type', 'application/json');
+                }
+            }
+
+            return response()->json(['error' => 'No sender address or xpub'], 400);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'UTXO selection failed: ' . $e->getMessage()], 500);
+        }
     }
 
     public function marsTxHistory(Request $request)
