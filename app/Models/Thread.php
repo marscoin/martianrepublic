@@ -9,7 +9,6 @@ class Thread extends Model
     /**
      * The database table used by the model.
      *
-     * @var string
      */
     protected $table = 'forum_threads';
 
@@ -28,7 +27,6 @@ class Thread extends Model
     /**
      * The attributes excluded from the model's JSON form.
      *
-     * @var array
      */
     public static $rules = [
     ];

@@ -9,7 +9,6 @@ class Vote extends Model
     /**
      * The database table used by the model.
      *
-     * @var string
      */
     protected $table = 'votes';
 
@@ -24,7 +23,6 @@ class Vote extends Model
     /**
      * The attributes excluded from the model's JSON form.
      *
-     * @var array
      */
     public static $rules = [
     ];

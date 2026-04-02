@@ -9,7 +9,6 @@ class HDWallet extends Model
     /**
      * The database table used by the model.
      *
-     * @var string
      */
     protected $table = 'hd_wallet';
 
@@ -25,7 +24,6 @@ class HDWallet extends Model
     /**
      * The attributes excluded from the model's JSON form.
      *
-     * @var array
      */
     public static $rules = [
         'password' => 'required|between:6,32',
