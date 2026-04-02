@@ -1,0 +1,859 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined method Illuminate\\Http\\Client\\Response\:\:getBody\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/AiHelperController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CivicWallet\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/AuthApiController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\MSession\:\:\$s\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/AuthApiController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$balance\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$citcache\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$endorsed\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$endorsements\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$everyApplicant\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$everyCitizen\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$everyPublic\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$feed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$fullname\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isCitizen\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isGP\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$meCitizen\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$mePublic\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$proposals\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$public_address\.$#'
+			identifier: property.notFound
+			count: 9
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$recentActivityCount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$wallet_open\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Citizen/IdentityController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$activities\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$blockHeight\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$citizenCount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$closed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$expired\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$fullname\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isCitizen\.$#'
+			identifier: property.notFound
+			count: 6
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isGP\.$#'
+			identifier: property.notFound
+			count: 6
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isProposer\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$lifecyclePhase\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$oldproposals\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$passed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$posts\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$propid\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$proposal\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$proposalCount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$proposals\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$publicCount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$public_address\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$random_bytes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$rejected\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$tierConfig\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$wallet_open\.$#'
+			identifier: property.notFound
+			count: 6
+			path: app/Http/Controllers/Congress/CongressController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$anomalies\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$attestations\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$calibrations\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$categories\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$categoryCounts\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$chain\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$committees\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$deviceTypes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$instrument\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$instruments\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isCitizen\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isDeputy\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$myCommittees\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$stats\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$wallet_open\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to property \$id on an unknown class App\\Models\\Bads\\Proposals\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to property \$ipfs_hash on an unknown class App\\Models\\Bads\\Proposals\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to property \$status on an unknown class App\\Models\\Bads\\Proposals\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to property \$title on an unknown class App\\Models\\Bads\\Proposals\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Controllers/InstrumentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$allItems\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Inventory/InventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$balance\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Inventory/InventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$categories\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Inventory/InventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$conditions\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Inventory/InventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isCitizen\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Inventory/InventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isGP\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Inventory/InventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$myItems\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Inventory/InventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$public_address\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Inventory/InventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$wallet_open\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Inventory/InventoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$allPublications\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Logbook/LogbookController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$balance\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Logbook/LogbookController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isCitizen\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Logbook/LogbookController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isGP\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Logbook/LogbookController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$myPublications\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Logbook/LogbookController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$public_address\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Logbook/LogbookController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$wallet_open\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Logbook/LogbookController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isCitizen\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Planet/MapController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isGP\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Planet/MapController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$wallet_open\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Planet/MapController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$ballot_server_status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/StatusController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$blockchain_tracker_status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/StatusController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$blockexplorer\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/StatusController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$ipfs_status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/StatusController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$marscoind_status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/StatusController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$mysql_status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/StatusController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$network\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/StatusController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$pebas_status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/StatusController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$web_status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/StatusController.php
+
+		-
+			message: '#^Call to an undefined method App\\Includes\\jsonRPCClient\:\:getBlockchainInfo\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/StatusController.php
+
+		-
+			message: '#^Call to an undefined method App\\Includes\\jsonRPCClient\:\:getNetworkInfo\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/StatusController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\HDWallet\:\:\$balance\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$SALT\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$all_addresses\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$all_seeds_json\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$all_wallets\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$applied\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$balance\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$citizen\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$citizen_status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$civic_addr\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$civic_balance\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$civic_wallet\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$coincount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$encrypted_seed\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$forum_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$fullname\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$general_public\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$has_civic_wallet\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$has_wallet\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$is_civic_wallet\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$isvalid\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$iv\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$network\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$profile\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$proposal_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$public_addr\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$public_address\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$qrcode_image\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$transactions\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$wallet_open\.$#'
+			identifier: property.notFound
+			count: 6
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\View\\View\:\:\$wallets\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Wallet/DashboardController.php
+
+		-
+			message: '#^Method App\\Http\\Middleware\\Authenticate\:\:redirectTo\(\) should return string\|null but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: app/Http/Middleware/Authenticate.php
+
+		-
+			message: '#^Access to an undefined property DateInterval\:\:\$w\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Includes/AppHelper.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CivicWallet\:\:\$public_address\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/DashboardStats.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\HDWallet\:\:\$public_address\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/DashboardStats.php
+
+		-
+			message: '#^Generic type Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\Bads\\Instrument\> in PHPDoc tag @return does not specify all template types of class Illuminate\\Database\\Eloquent\\Relations\\HasMany\: TRelatedModel, TDeclaringModel$#'
+			identifier: generics.lessTypes
+			count: 1
+			path: app/Models/Bads/Deputy.php
+
+		-
+			message: '#^Generic type Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\Bads\\Anomaly\> in PHPDoc tag @return does not specify all template types of class Illuminate\\Database\\Eloquent\\Relations\\HasMany\: TRelatedModel, TDeclaringModel$#'
+			identifier: generics.lessTypes
+			count: 1
+			path: app/Models/Bads/Instrument.php
+
+		-
+			message: '#^Generic type Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\Bads\\Attestation\> in PHPDoc tag @return does not specify all template types of class Illuminate\\Database\\Eloquent\\Relations\\HasMany\: TRelatedModel, TDeclaringModel$#'
+			identifier: generics.lessTypes
+			count: 1
+			path: app/Models/Bads/Instrument.php
+
+		-
+			message: '#^Generic type Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\Bads\\CalibrationRecord\> in PHPDoc tag @return does not specify all template types of class Illuminate\\Database\\Eloquent\\Relations\\HasMany\: TRelatedModel, TDeclaringModel$#'
+			identifier: generics.lessTypes
+			count: 1
+			path: app/Models/Bads/Instrument.php
+
+		-
+			message: '#^Generic type Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\Bads\\Deputy\> in PHPDoc tag @return does not specify all template types of class Illuminate\\Database\\Eloquent\\Relations\\HasMany\: TRelatedModel, TDeclaringModel$#'
+			identifier: generics.lessTypes
+			count: 1
+			path: app/Models/Bads/OversightCommittee.php
+
+		-
+			message: '#^Generic type Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough\<App\\Models\\Bads\\Instrument\> in PHPDoc tag @return does not specify all template types of class Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough\: TRelatedModel, TIntermediateModel, TDeclaringModel$#'
+			identifier: generics.lessTypes
+			count: 1
+			path: app/Models/Bads/OversightCommittee.php
+
+		-
+			message: '#^Method App\\Models\\Bads\\OversightCommittee\:\:proposal\(\) has invalid return type App\\Models\\Bads\\Proposals\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/Bads/OversightCommittee.php
+
+		-
+			message: '#^Type App\\Models\\Bads\\Proposals in generic type Illuminate\\Database\\Eloquent\\Relations\\BelongsTo\<App\\Models\\Bads\\Proposals, App\\Models\\Bads\\OversightCommittee\> in PHPDoc tag @return is not subtype of template type TRelatedModel of Illuminate\\Database\\Eloquent\\Model of class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo\.$#'
+			identifier: generics.notSubtype
+			count: 1
+			path: app/Models/Bads/OversightCommittee.php
+
+		-
+			message: '#^Method App\\Models\\Ballot\:\:proposal\(\) has invalid return type App\\Models\\Proposals\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/Ballot.php
+
+		-
+			message: '#^Type App\\Models\\Proposals in generic type Illuminate\\Database\\Eloquent\\Relations\\BelongsTo\<App\\Models\\Proposals, App\\Models\\Ballot\> in PHPDoc tag @return is not subtype of template type TRelatedModel of Illuminate\\Database\\Eloquent\\Model of class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo\.$#'
+			identifier: generics.notSubtype
+			count: 1
+			path: app/Models/Ballot.php
+
+		-
+			message: '#^PHPDoc tag @property\-read for property App\\Models\\Post\:\:\$allRepliesWithCitizen contains unknown class App\\Models\\Posts\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/Post.php
+
+		-
+			message: '#^PHPDoc tag @property\-read for property App\\Models\\Post\:\:\$replies contains unknown class App\\Models\\Posts\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/Post.php
