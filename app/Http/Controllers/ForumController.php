@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Posts;
+use App\Models\Post;
 use App\Models\Profile;
-use App\Models\Threads;
+use App\Models\Thread;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

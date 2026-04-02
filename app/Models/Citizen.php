@@ -29,6 +29,6 @@ class Citizen extends Model
 
     public function posts()
     {
-        return $this->hasMany(Posts::class, 'author_id');
+        return $this->hasMany(Post::class, 'author_id');
     }
 }

@@ -4,7 +4,7 @@
  * Tests for the service layer: BlockchainRpc, IpfsService, ProposalService.
  */
 
-use App\Models\Proposals;
+use App\Models\Proposal;
 use App\Services\BlockchainRpc;
 use App\Services\IpfsService;
 use App\Services\ProposalService;
@@ -79,7 +79,7 @@ test('ProposalService syncPhases transitions screening to voting', function () {
         $table->timestamp('sunset_at')->nullable();
     });
 
-    Proposals::forceCreate([
+    Proposal::forceCreate([
         'title' => 'Test Screening Proposal',
         'description' => 'Should transition to voting',
         'status' => 'screening',
@@ -87,17 +87,17 @@ test('ProposalService syncPhases transitions screening to voting', function () {
     ]);
 
     // Test the transition directly (SQLite-compatible, avoids MySQL DATE_ADD)
-    Proposals::where('status', 'screening')
+    Proposal::where('status', 'screening')
         ->whereNotNull('screening_ends_at')
         ->where('screening_ends_at', '<=', now())
         ->update(['status' => 'voting']);
 
-    $proposal = Proposals::where('title', 'Test Screening Proposal')->first();
+    $proposal = Proposal::where('title', 'Test Screening Proposal')->first();
     expect($proposal->status)->toBe('voting');
 });
 
 test('ProposalService tallyVotes counts correctly', function () {
-    $proposal = Proposals::forceCreate([
+    $proposal = Proposal::forceCreate([
         'title' => 'Tally Test',
         'description' => 'Test',
         'status' => 'voting',
@@ -121,7 +121,7 @@ test('ProposalService tallyVotes counts correctly', function () {
 });
 
 test('ProposalService tallyVotes rejects below threshold', function () {
-    $proposal = Proposals::forceCreate([
+    $proposal = Proposal::forceCreate([
         'title' => 'Fail Test',
         'description' => 'Test',
         'status' => 'voting',

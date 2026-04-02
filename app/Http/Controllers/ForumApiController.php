@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Posts;
-use App\Models\Threads;
+use App\Models\Post;
+use App\Models\Thread;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -67,13 +67,13 @@ class ForumApiController extends Controller
             'content' => 'required|string',
         ]);
 
-        $thread = new Threads;
+        $thread = new Thread;
         $thread->category_id = $request->category_id;
         $thread->author_id = Auth::id();
         $thread->title = $request->title;
         $thread->save();
 
-        $post = new Posts;
+        $post = new Post;
         $post->thread_id = $thread->id;
         $post->author_id = Auth::id();
         $post->content = $request->content;
@@ -98,9 +98,9 @@ class ForumApiController extends Controller
             'post_id' => 'nullable|exists:forum_posts,id',
         ]);
 
-        $thread = Threads::findOrFail($threadId);
+        $thread = Thread::findOrFail($threadId);
 
-        $post = new Posts;
+        $post = new Post;
         $post->thread_id = $threadId;
         $post->author_id = Auth::id();
         $post->content = $request->content;

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Ballots extends Model
+class Ballot extends Model
 {
     protected $table = 'ballots';
 
@@ -32,7 +32,7 @@ class Ballots extends Model
     /** @return BelongsTo<Proposals, self> */
     public function proposal(): BelongsTo
     {
-        return $this->belongsTo(Proposals::class, 'proposalid');
+        return $this->belongsTo(Proposal::class, 'proposalid');
     }
 
     /**

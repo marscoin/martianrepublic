@@ -9,7 +9,7 @@ use App\Models\CivicWallet;
 use App\Models\Feed;
 use App\Models\HDWallet;
 use App\Models\Profile;
-use App\Models\Proposals;
+use App\Models\Proposal;
 use App\Models\User;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
@@ -271,7 +271,7 @@ class DashboardController extends Controller
                 return AppHelper::checkForRecentPosts();
             });
             $view->proposal_count = Cache::remember('proposal_open_count', 300, function () {
-                return Proposals::countOpenProposals();
+                return Proposal::countOpenProposals();
             });
             $citizenStatus = AppHelper::getCitizenStatus($uid);
             $view->citizen_status = $citizenStatus ? $citizenStatus->type : 'GP';

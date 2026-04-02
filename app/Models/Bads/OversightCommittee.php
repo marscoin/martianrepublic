@@ -2,7 +2,7 @@
 
 namespace App\Models\Bads;
 
-use App\Models\Proposals;
+use App\Models\Proposal;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,7 +17,7 @@ class OversightCommittee extends Model
     /** @return BelongsTo<Proposals, self> */
     public function proposal(): BelongsTo
     {
-        return $this->belongsTo(Proposals::class, 'proposal_id');
+        return $this->belongsTo(Proposal::class, 'proposal_id');
     }
 
     /** @return HasMany<Deputy> */

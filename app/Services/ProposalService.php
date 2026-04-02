@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Proposals;
+use App\Models\Proposal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -21,24 +21,24 @@ class ProposalService
         $now = now();
 
         // Screening → voting
-        Proposals::where('status', 'screening')
+        Proposal::where('status', 'screening')
             ->whereNotNull('screening_ends_at')
             ->where('screening_ends_at', '<=', $now)
             ->update(['status' => 'voting']);
 
         // Voting expired
-        Proposals::where('status', 'voting')
+        Proposal::where('status', 'voting')
             ->whereNotNull('voting_ends_at')
             ->where('voting_ends_at', '<=', $now)
             ->update(['active' => 0]);
 
         // Legacy expiration (pre-tier proposals)
-        Proposals::where(DB::raw('DATE_ADD(mined, INTERVAL duration DAY)'), '<', $now)
+        Proposal::where(DB::raw('DATE_ADD(mined, INTERVAL duration DAY)'), '<', $now)
             ->whereNull('voting_ends_at')
             ->update(['active' => 0]);
 
         // Active → sunset
-        Proposals::where('status', 'active')
+        Proposal::where('status', 'active')
             ->whereNotNull('sunset_at')
             ->where('sunset_at', '<=', $now)
             ->update(['status' => 'sunset', 'active' => 0]);
@@ -80,10 +80,10 @@ class ProposalService
     public function getStats(): array
     {
         return [
-            'total' => Proposals::count(),
-            'active' => Proposals::where('active', 1)->count(),
-            'passed' => Proposals::where('status', 'passed')->count(),
-            'rejected' => Proposals::where('status', 'rejected')->count(),
+            'total' => Proposal::count(),
+            'active' => Proposal::where('active', 1)->count(),
+            'passed' => Proposal::where('status', 'passed')->count(),
+            'rejected' => Proposal::where('status', 'rejected')->count(),
             'citizens' => DB::table('feed')->where('tag', 'CT')->distinct('userid')->count('userid'),
             'general_public' => DB::table('feed')->where('tag', 'GP')->distinct('userid')->count('userid'),
         ];

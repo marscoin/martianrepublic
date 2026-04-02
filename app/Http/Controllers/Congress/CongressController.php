@@ -9,11 +9,11 @@ use App\Http\Requests\ChallengeTierRequest;
 use App\Includes\AppHelper;
 use App\Includes\GovernanceTiers;
 use App\Includes\LegislationRepo;
-use App\Models\Ballots;
+use App\Models\Ballot;
 use App\Models\CivicWallet;
-use App\Models\Posts;
+use App\Models\Post;
 use App\Models\Profile;
-use App\Models\Proposals;
+use App\Models\Proposal;
 use App\Models\User;
 use App\Models\Vote;
 use App\Notifications\BallotReadyNotification;
@@ -49,7 +49,7 @@ class CongressController extends Controller
         $view = View::make('congress.dashboard');
 
         // Live stats for the dashboard
-        $view->proposalCount = Proposals::count();
+        $view->proposalCount = Proposal::count();
         $view->citizenCount = DB::table('feed')->where('tag', 'CT')->distinct('userid')->count('userid');
         $view->publicCount = DB::table('feed')->where('tag', 'GP')->distinct('userid')->count('userid');
         try {
@@ -316,7 +316,7 @@ class CongressController extends Controller
                 ->take(10)
                 ->get();
 
-            $posts = Posts::with('allRepliesWithCitizen', 'citizen')
+            $posts = Post::with('allRepliesWithCitizen', 'citizen')
                 ->where('thread_id', $proposal->discussion)
                 ->whereNull('post_id') // Top-level posts
                 ->get();
@@ -351,7 +351,7 @@ class CongressController extends Controller
             $uid = Auth::user()->id;
             $profile = Profile::where('userid', '=', $uid)->first();
             $civic_wallet = CivicWallet::where('user_id', '=', $uid)->first();
-            $proposal = Proposals::where('id', '=', $propid)->first();
+            $proposal = Proposal::where('id', '=', $propid)->first();
 
             $view = View::make('congress.ballot');
 
@@ -435,7 +435,7 @@ class CongressController extends Controller
         $proposalId = $request->input('proposalId');
         $uid = Auth::user()->id;
 
-        $proposal = Proposals::find($proposalId);
+        $proposal = Proposal::find($proposalId);
         if (! $proposal) {
             return response()->json(['success' => false, 'error' => 'Proposal not found'], 404);
         }
@@ -471,7 +471,7 @@ class CongressController extends Controller
         $newTitle = $validated['title'];
         $uid = Auth::user()->id;
 
-        $proposal = Proposals::find($proposalId);
+        $proposal = Proposal::find($proposalId);
         if (! $proposal) {
             return response()->json(['success' => false, 'error' => 'Proposal not found'], 404);
         }
@@ -541,7 +541,7 @@ class CongressController extends Controller
         $reason = $validated['reason'];
         $uid = Auth::user()->id;
 
-        $proposal = Proposals::find($proposalId);
+        $proposal = Proposal::find($proposalId);
         if (! $proposal) {
             return response()->json(['success' => false, 'error' => 'Proposal not found'], 404);
         }
@@ -599,7 +599,7 @@ class CongressController extends Controller
         $uid = Auth::user()->id;
         $proposalId = $validated['proposal_id'];
 
-        $ballot = Ballots::updateOrCreate(
+        $ballot = Ballot::updateOrCreate(
             ['userid' => $uid, 'proposalid' => $proposalId],
             [
                 'encrypted_key' => $validated['encrypted_key'],
@@ -626,7 +626,7 @@ class CongressController extends Controller
         $proposalId = $request->input('proposal_id');
         $uid = Auth::user()->id;
 
-        $ballot = Ballots::where('userid', $uid)
+        $ballot = Ballot::where('userid', $uid)
             ->where('proposalid', $proposalId)
             ->whereNotNull('encrypted_key')
             ->first();
@@ -661,7 +661,7 @@ class CongressController extends Controller
         ]);
 
         $uid = Auth::user()->id;
-        $ballot = Ballots::where('userid', $uid)
+        $ballot = Ballot::where('userid', $uid)
             ->where('proposalid', $request->input('proposal_id'))
             ->first();
 
@@ -688,7 +688,7 @@ class CongressController extends Controller
         $proposalId = $request->input('proposal_id');
         $uid = Auth::user()->id;
 
-        $ballot = Ballots::where('userid', $uid)
+        $ballot = Ballot::where('userid', $uid)
             ->where('proposalid', $proposalId)
             ->whereNotNull('ballot_txid')
             ->first();
@@ -708,7 +708,7 @@ class CongressController extends Controller
         // Send email notification if not already sent
         if (! $ballot->notified) {
             try {
-                $proposal = Proposals::find($proposalId);
+                $proposal = Proposal::find($proposalId);
                 $user = User::find($uid);
                 if ($user && $proposal) {
                     $user->notify(new BallotReadyNotification(
@@ -740,7 +740,7 @@ class CongressController extends Controller
         $proposalId = $request->input('proposal_id');
         $uid = Auth::user()->id;
 
-        Ballots::where('userid', $uid)
+        Ballot::where('userid', $uid)
             ->where('proposalid', $proposalId)
             ->update([
                 'status' => 'used',
@@ -761,7 +761,7 @@ class CongressController extends Controller
         }
 
         $uid = Auth::user()->id;
-        $pending = Ballots::where('userid', $uid)
+        $pending = Ballot::where('userid', $uid)
             ->where('status', 'received')
             ->whereNotNull('confirmed_at')
             ->whereNotNull('encrypted_key')

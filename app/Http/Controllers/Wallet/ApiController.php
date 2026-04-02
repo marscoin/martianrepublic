@@ -10,11 +10,11 @@ use App\Models\Citizen;
 use App\Models\CivicWallet;
 use App\Models\Feed;
 use App\Models\HDWallet;
-use App\Models\Posts;
+use App\Models\Post;
 use App\Models\Profile;
-use App\Models\Proposals;
+use App\Models\Proposal;
 use App\Models\Publication;
-use App\Models\Threads;
+use App\Models\Thread;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -588,7 +588,7 @@ class ApiController extends Controller
         $content = "The application of {$applicantAddress} has been rejected due to ".$rejectionReasons[$fieldToUpdate].'.';
 
         $fullname = $reporter ? ($reporter->firstname.' '.$reporter->lastname) : $user->fullname;
-        Posts::create([
+        Post::create([
             'thread_id' => 27,
             'author_id' => $user->id,
             'content' => $content,
@@ -921,7 +921,7 @@ class ApiController extends Controller
         $tier = GovernanceTiers::categoryToTier($category);
         $tierConfig = GovernanceTiers::get($tier);
 
-        $proposal = new Proposals;
+        $proposal = new Proposal;
         $proposal->user_id = $uid;
         $proposal->title = $data->data->title ?? '';
         $proposal->description = $data->data->description ?? '';
@@ -972,7 +972,7 @@ class ApiController extends Controller
 
         $authorName = $citcache ? ($citcache->firstname.' '.$citcache->lastname) : Auth::user()->fullname;
 
-        $post = new Posts;
+        $post = new Post;
         $post->thread_id = 2;
         $post->author_id = $uid;
         $post->content = $proposal->description;
@@ -981,7 +981,7 @@ class ApiController extends Controller
 
         $post_id = $post->id;
 
-        $threads = new Threads;
+        $threads = new Thread;
         $threads->category_id = 2;
         $threads->author_id = $uid;
         $threads->title = $data->data->title ?? '';
@@ -991,7 +991,7 @@ class ApiController extends Controller
 
         $thd_id = $threads->id;
 
-        Proposals::where('id', $prop_id)->update(['discussion' => $thd_id]);
+        Proposal::where('id', $prop_id)->update(['discussion' => $thd_id]);
 
         return response()->json(['Proposal' => $prop_id, 'Discussion' => $thd_id], 200);
     }

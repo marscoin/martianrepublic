@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Posts|null $allRepliesWithCitizen
  * @property-read Citizen $citizen
  */
-class Posts extends Model
+class Post extends Model
 {
     /**
      * The database table used by the model.
@@ -47,7 +47,7 @@ class Posts extends Model
 
     public function replies(): HasMany
     {
-        return $this->hasMany(Posts::class, 'post_id', 'id')->with('replies', 'citizen');
+        return $this->hasMany(Post::class, 'post_id', 'id')->with('replies', 'citizen');
     }
 
     public function allRepliesWithCitizen(): HasMany

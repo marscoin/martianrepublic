@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Proposals extends Model
+class Proposal extends Model
 {
     /**
      * The database table used by the model.

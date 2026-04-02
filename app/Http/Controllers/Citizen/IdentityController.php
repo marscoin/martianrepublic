@@ -8,7 +8,7 @@ use App\Models\Citizen;
 use App\Models\CivicWallet;
 use App\Models\Feed;
 use App\Models\Profile;
-use App\Models\Proposals;
+use App\Models\Proposal;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -192,7 +192,7 @@ class IdentityController extends Controller
                 abort(404, 'Citizen not found');
             }
             $martian_profile = Profile::where('userid', '=', $martian->userid)->first();
-            $martian_proposals = Proposals::where('user_id', '=', $martian->userid)->count();
+            $martian_proposals = Proposal::where('user_id', '=', $martian->userid)->count();
             $myprofile = Profile::where('userid', '=', $uid)->first();
 
             if (! $myprofile) {

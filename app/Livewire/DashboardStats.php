@@ -6,7 +6,7 @@ use App\Includes\AppHelper;
 use App\Models\CivicWallet;
 use App\Models\HDWallet;
 use App\Models\Profile;
-use App\Models\Proposals;
+use App\Models\Proposal;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -47,7 +47,7 @@ class DashboardStats extends Component
         $this->received = 0;
         $this->sent = 0;
         $this->forum_count = AppHelper::checkForRecentPosts();
-        $this->proposal_count = Proposals::countOpenProposals();
+        $this->proposal_count = Proposal::countOpenProposals();
         $citizenStatus = AppHelper::getCitizenStatus($uid);
         $this->citizen_status = $citizenStatus ? $citizenStatus->type : 'unknown';
         $this->balance = 0;
@@ -74,7 +74,7 @@ class DashboardStats extends Component
         $this->balance = $openwallet ? $this->received - $this->sent : 0;
 
         $this->forum_count = AppHelper::checkForRecentPosts();
-        $this->proposal_count = Proposals::countOpenProposals();
+        $this->proposal_count = Proposal::countOpenProposals();
         $citizenStatus = AppHelper::getCitizenStatus($user->id);
         $this->citizen_status = $citizenStatus ? $citizenStatus->type : 'unknown';
         $this->isLoaded = true;

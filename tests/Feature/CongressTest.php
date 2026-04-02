@@ -7,8 +7,8 @@
  */
 
 use App\Http\Controllers\Congress\CongressController;
-use App\Models\Ballots;
-use App\Models\Proposals;
+use App\Models\Ballot;
+use App\Models\Proposal;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Tests\CreatesTestDatabase;
@@ -22,7 +22,7 @@ uses(TestCase::class, CreatesTestDatabase::class)->beforeEach(function () {
 });
 
 test('Proposals model has correct table and casts', function () {
-    $proposal = new Proposals;
+    $proposal = new Proposal;
     expect($proposal->getTable())->toBe('proposals');
     expect($proposal->getCasts())->toHaveKey('created_at');
 });
@@ -34,14 +34,14 @@ test('ballot model relations resolve correctly', function () {
         'password' => Hash::make('password'),
     ]);
 
-    $proposal = Proposals::forceCreate([
+    $proposal = Proposal::forceCreate([
         'user_id' => $user->id,
         'title' => 'Ballot Test Proposal',
         'description' => 'Testing ballot relations.',
         'status' => 'submitted',
     ]);
 
-    $ballot = Ballots::create([
+    $ballot = Ballot::create([
         'userid' => $user->id,
         'proposalid' => $proposal->id,
         'status' => 'received',
@@ -55,14 +55,14 @@ test('ballot model relations resolve correctly', function () {
     expect($ballot->user->fullname)->toBe('Test Citizen');
 });
 
-test('Ballots::pendingForUser returns confirmed unvoted ballots', function () {
+test('Ballot::pendingForUser returns confirmed unvoted ballots', function () {
     $user = User::create([
         'fullname' => 'Voter',
         'email' => 'voter@test.mars',
         'password' => Hash::make('password'),
     ]);
 
-    $proposal = Proposals::forceCreate([
+    $proposal = Proposal::forceCreate([
         'user_id' => $user->id,
         'title' => 'Pending Ballot Test',
         'description' => 'Testing pending.',
@@ -70,7 +70,7 @@ test('Ballots::pendingForUser returns confirmed unvoted ballots', function () {
     ]);
 
     // Pending ballot
-    Ballots::create([
+    Ballot::create([
         'userid' => $user->id,
         'proposalid' => $proposal->id,
         'status' => 'received',
@@ -79,7 +79,7 @@ test('Ballots::pendingForUser returns confirmed unvoted ballots', function () {
     ]);
 
     // Used ballot (should NOT appear)
-    Ballots::create([
+    Ballot::create([
         'userid' => $user->id,
         'proposalid' => $proposal->id,
         'status' => 'used',
@@ -87,19 +87,19 @@ test('Ballots::pendingForUser returns confirmed unvoted ballots', function () {
         'confirmed_at' => now(),
     ]);
 
-    $pending = Ballots::pendingForUser($user->id);
+    $pending = Ballot::pendingForUser($user->id);
     expect($pending)->toHaveCount(1);
     expect($pending->first()->status)->toBe('received');
 });
 
-test('Ballots::pendingForUser excludes unconfirmed ballots', function () {
+test('Ballot::pendingForUser excludes unconfirmed ballots', function () {
     $user = User::create([
         'fullname' => 'Unconfirmed',
         'email' => 'unconfirmed@test.mars',
         'password' => Hash::make('password'),
     ]);
 
-    $proposal = Proposals::forceCreate([
+    $proposal = Proposal::forceCreate([
         'user_id' => $user->id,
         'title' => 'Unconfirmed Test',
         'description' => 'Test',
@@ -107,7 +107,7 @@ test('Ballots::pendingForUser excludes unconfirmed ballots', function () {
     ]);
 
     // Unconfirmed ballot (no confirmed_at)
-    Ballots::create([
+    Ballot::create([
         'userid' => $user->id,
         'proposalid' => $proposal->id,
         'status' => 'received',
@@ -115,7 +115,7 @@ test('Ballots::pendingForUser excludes unconfirmed ballots', function () {
         'confirmed_at' => null,
     ]);
 
-    $pending = Ballots::pendingForUser($user->id);
+    $pending = Ballot::pendingForUser($user->id);
     expect($pending)->toHaveCount(0);
 });
 
@@ -136,7 +136,7 @@ test('CongressController class exists and has expected methods', function () {
 test('proposal status transitions are valid values', function () {
     $validStatuses = ['submitted', 'screening', 'active', 'passed', 'failed', 'expired', 'withdrawn'];
 
-    $proposal = Proposals::forceCreate([
+    $proposal = Proposal::forceCreate([
         'title' => 'Status Test',
         'description' => 'Test',
         'status' => 'submitted',
