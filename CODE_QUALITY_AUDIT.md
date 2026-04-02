@@ -113,7 +113,7 @@
   - Explorer URLs: `https://explore.marscoin.org/...` in CongressController
   - Fix: Create `config/blockchain.php` with all endpoint URLs
 
-- [ ] **A5. Inconsistent model naming — mixed singular/plural**
+- [x] **A5. Inconsistent model naming — mixed singular/plural**
   - Plural: `Proposals`, `Ballots`, `Threads`, `Posts`
   - Singular: `User`, `Profile`, `Feed`, `Citizen`, `Vote`
   - Laravel convention is singular — standardize over time
@@ -229,7 +229,7 @@
   - Each page has its own CSS variables and styles
   - Fix: Extract shared CSS to stylesheet, use Blade layout
 
-- [ ] **D7. Return type hints missing on ~70% of public methods**
+- [x] **D7. Return type hints missing on ~70% of public methods**
   - Fix: Add gradually, raise PHPStan to level 2+ to enforce
 
 - [ ] **D8. Tailwind configured but unused — Bootstrap + custom CSS**
