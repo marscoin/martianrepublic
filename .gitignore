@@ -93,3 +93,4 @@ backups/
 .vscode/
 .env.test
 tests/visual/.env.test
+clover.xml
