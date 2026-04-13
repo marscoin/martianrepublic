@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CongressApiController;
 use App\Http\Controllers\AuthApiController;
 use App\Http\Controllers\ContentApiController;
 use App\Http\Controllers\FeedApiController;
@@ -46,3 +47,9 @@ Route::get('/forum/categories/threads', [ForumApiController::class, 'getAllCateg
 Route::post('/forum/thread', [ForumApiController::class, 'createThread'])->middleware(['auth:sanctum'])->name('api_create_thread');
 Route::post('/forum/thread/{threadId}/comment', [ForumApiController::class, 'createComment'])->middleware(['auth:sanctum'])->name('api_create_comment');
 Route::get('/mstatus', 'App\Http\Controllers\StatusController@getSystemStatus')->middleware(['auth:sanctum'])->name('api_mobile_status');
+
+// Congress / Governance API (mobile)
+Route::get('/congress/proposals', [CongressApiController::class, 'index'])->name('api_congress_proposals');
+Route::get('/congress/proposals/{id}', [CongressApiController::class, 'show'])->name('api_congress_proposal');
+Route::get('/congress/proposals/{id}/votes', [CongressApiController::class, 'votes'])->name('api_congress_votes');
+Route::get('/congress/stats', [CongressApiController::class, 'stats'])->name('api_congress_stats');
