@@ -125,16 +125,21 @@ class ForumApiController extends Controller
             ->where('forum_threads.category_id', $categoryId)
             ->leftJoin('users', 'forum_threads.author_id', '=', 'users.id')
             ->leftJoin('profile', 'users.id', '=', 'profile.userid')
+            ->leftJoin('citizen', 'users.id', '=', 'citizen.userid')
             ->leftJoin('user_blocks as ub', function ($join) use ($userId) {
                 $join->on('forum_threads.author_id', '=', 'ub.blocked_user_id')
                     ->where('ub.user_id', '=', $userId);
             })
             ->select(
                 'forum_threads.id',
+                'forum_threads.author_id',
                 'forum_threads.title',
                 'forum_threads.created_at',
                 'forum_threads.reply_count',
                 'users.fullname as author_name',
+                'citizen.avatar_link',
+                'citizen.displayname',
+                'profile.citizen as is_citizen',
                 DB::raw('IF(ub.blocked_user_id IS NOT NULL, true, false) as is_blocked')
             )
             ->orderBy('forum_threads.created_at', 'desc')
@@ -182,6 +187,9 @@ class ForumApiController extends Controller
                 ct.thread_id,
                 ct.author_id,
                 u.fullname,
+                c.avatar_link,
+                c.displayname,
+                pr.citizen as is_citizen,
                 ct.content,
                 ct.created_at,
                 ct.pid,
@@ -191,6 +199,7 @@ class ForumApiController extends Controller
                 CommentTree ct
             LEFT JOIN users u ON ct.author_id = u.id
             LEFT JOIN profile pr ON ct.author_id = pr.userid
+            LEFT JOIN citizen c ON ct.author_id = c.userid
             LEFT JOIN user_blocks ub ON ub.blocked_user_id = ct.author_id AND ub.user_id = ?
             ORDER BY
                 ct.pid ASC,
