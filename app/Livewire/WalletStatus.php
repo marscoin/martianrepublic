@@ -48,7 +48,8 @@ class WalletStatus extends Component
             $civicWallet = CivicWallet::where('user_id', '=', $user->id)->first();
             if ($civicWallet) {
                 $hasWallet = true;
-                $totalBalance += AppHelper::getMarscoinBalance($civicWallet->public_addr);
+                $bal = AppHelper::getMarscoinBalance($civicWallet->public_addr);
+                $totalBalance += is_numeric($bal) ? (float) $bal : 0;
             }
         }
 
@@ -60,7 +61,8 @@ class WalletStatus extends Component
                 // Avoid double-counting if HD and civic share the same address
                 $civicAddr = CivicWallet::where('user_id', $user->id)->value('public_addr');
                 if ($hdWallet->public_addr !== $civicAddr) {
-                    $totalBalance += AppHelper::getMarscoinBalance($hdWallet->public_addr);
+                    $bal = AppHelper::getMarscoinBalance($hdWallet->public_addr);
+                    $totalBalance += is_numeric($bal) ? (float) $bal : 0;
                 }
             }
         }

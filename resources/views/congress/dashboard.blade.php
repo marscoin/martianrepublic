@@ -448,10 +448,6 @@
         fetch('/api/price', { method: 'POST', headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content} })
             .then(r => r.json()).then(d => {}).catch(() => {});
 
-        // Fetch block count
-        fetch('https://pebas.marscoin.org/api/mars/balance?address=MDCURC61G7A5jNRjnDq42XB1RvU51y4Ftx')
-            .catch(() => {});
-
         // Use Livewire or inline data for now
         @if(isset($proposalCount))
             document.getElementById('proposal-count').textContent = '{{ $proposalCount }}';

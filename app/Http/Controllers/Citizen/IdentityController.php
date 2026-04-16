@@ -181,8 +181,11 @@ class IdentityController extends Controller
 
     // Get profile view of another Martian Citizen
     //
-    public function showId($address)
+    public function showId($address = null)
     {
+        if (! $address) {
+            return redirect('/citizen/all');
+        }
 
         if (Auth::check()) {
             $uid = Auth::user()->id;

@@ -14,7 +14,7 @@ class QRLogin extends Component
 
     public $qrCode = '';
 
-    public string $qrCodeImage = "";
+    public $qrCodeImage = '';
 
     public function mount()
     {
@@ -43,7 +43,13 @@ class QRLogin extends Component
             $this->sid = $session->sid;
             $url = "https://martianrepublic.org/api/marsauth?sid={$this->sid}&c={$challenge}&t=".dechex(time());
 
-            $this->qrCodeImage = base64_encode(QrCode::format('png')->size(250)->generate($url));
+            try {
+                $qrResult = QrCode::format('png')->size(250)->generate($url);
+                $this->qrCodeImage = base64_encode(is_string($qrResult) ? $qrResult : (string) $qrResult);
+            } catch (\Exception $e) {
+                Log::error('QR Code generation failed', ['error' => $e->getMessage()]);
+                $this->qrCodeImage = '';
+            }
             Log::debug('QR Code generated', ['sid' => $this->sid]);
             $this->dispatch('sidUpdated', ['sid' => $this->sid]);
         }

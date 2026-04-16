@@ -49,7 +49,7 @@
             <p style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--mr-text-dim, #8a8998); margin: 0 0 14px;"><?=$citcache->shortbio?></p>
 
             <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
-                @if($isGP)
+                @if($isGP && $mePublic)
                 <a target="_blank" href="https://explore.marscoin.org/tx/<?=$mePublic['txid']?>" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: rgba(0,228,255,0.08); border: 1px solid rgba(0,228,255,0.2); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; color: var(--mr-cyan, #00e4ff);">
                     <i class="fa fa-check-circle"></i> General Public
                 </a>
@@ -62,7 +62,7 @@
             </div>
 
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--mr-text-faint, #5a5968); line-height: 2;">
-                @if($isGP)
+                @if($isGP && $mePublic)
                 <div><i class="fa fa-users" style="width: 16px; color: var(--mr-cyan); margin-right: 6px;"></i> Joined the Republic on <?=date('M jS, Y', strtotime($mePublic['mined']))?></div>
                 @endif
                 @if(!is_null($meCitizen))

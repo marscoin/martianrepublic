@@ -33,7 +33,7 @@
     <script>
         let lastKnownBalance = null;
         $wire.on("balanceUpdated", () => {
-            const newBalance = "{{ $balance }}";
+            const newBalance = "{{ is_array($balance) ? '0' : $balance }}";
             if (lastKnownBalance !== null && lastKnownBalance !== newBalance) {
                 toastr.options = {
                     "positionClass": "toast-bottom-right",
