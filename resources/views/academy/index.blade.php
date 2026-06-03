@@ -549,6 +549,168 @@ img { max-width: 100%; height: auto; }
 </section>
 
 <!-- FEATURED ARTICLES -->
+<!-- ============ MCN ACADEMY PARTNER BANNER ============ -->
+<style>
+.mcn-banner {
+  max-width: 1200px;
+  margin: 60px auto 40px;
+  padding: 0 24px;
+}
+.mcn-banner-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 380px 1fr auto;
+  gap: 32px;
+  align-items: center;
+  padding: 0;
+  background: linear-gradient(135deg, rgba(200, 65, 37, 0.04) 0%, rgba(0, 228, 255, 0.04) 100%), var(--mr-surface, #12121e);
+  border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+  text-decoration: none;
+}
+.mcn-banner-inner:hover {
+  border-color: rgba(0, 228, 255, 0.25);
+  transform: translateY(-2px);
+}
+.mcn-banner-img {
+  height: 180px;
+  background: linear-gradient(120deg, #0a0d1a 0%, #1a0f08 100%);
+  background-image: url('https://martiannavy.com/images/og-cover.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.mcn-banner-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 60%, var(--mr-surface, #12121e) 100%);
+}
+.mcn-banner-body {
+  padding: 28px 0;
+}
+.mcn-banner-label {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--mr-cyan, #00e4ff);
+  margin-bottom: 10px;
+  padding: 3px 10px;
+  border: 1px solid rgba(0, 228, 255, 0.25);
+  border-radius: 3px;
+  background: rgba(0, 228, 255, 0.05);
+}
+.mcn-banner-title {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 8px;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+}
+.mcn-banner-title .mars-red { color: var(--mr-mars, #c84125); }
+.mcn-banner-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--mr-text-dim, #8a8998);
+  margin: 0;
+  max-width: 540px;
+}
+.mcn-banner-stats {
+  display: flex;
+  gap: 18px;
+  margin-top: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--mr-text-faint, #5a5968);
+}
+.mcn-banner-stats span strong {
+  color: var(--mr-amber, #d4a44a);
+  font-weight: 600;
+}
+.mcn-banner-cta {
+  padding: 32px 32px 32px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+.mcn-banner-cta .btn-enlist {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 12px 28px;
+  background: var(--mr-mars, #c84125);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+.mcn-banner-cta .btn-enlist:hover {
+  background: var(--mr-mars-glow, #e05535);
+  color: #fff;
+}
+.mcn-banner-cta .visit-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--mr-text-faint, #5a5968);
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .mcn-banner-inner {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .mcn-banner-img {
+    height: 160px;
+  }
+  .mcn-banner-img::after {
+    background: linear-gradient(180deg, transparent 40%, var(--mr-surface, #12121e) 100%);
+  }
+  .mcn-banner-body {
+    padding: 0 24px 8px;
+  }
+  .mcn-banner-cta {
+    padding: 0 24px 28px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+</style>
+<div class="mcn-banner">
+  <a href="https://martiannavy.com" target="_blank" rel="noopener" class="mcn-banner-inner">
+    <div class="mcn-banner-img"></div>
+    <div class="mcn-banner-body">
+      <span class="mcn-banner-label">Sister Project</span>
+      <h3 class="mcn-banner-title">Martian Congressional <span class="mars-red">Navy Academy</span></h3>
+      <p class="mcn-banner-desc">Master math, physics, and engineering through an immersive sci-fi academy on Mars. From basic arithmetic to orbital mechanics &mdash; trained by an AI Socratic tutor, ranked from Recruit to Voidmaster.</p>
+      <div class="mcn-banner-stats">
+        <span><strong>410</strong> concept nodes</span>
+        <span><strong>20</strong> ranks</span>
+        <span><strong>Free</strong> forever</span>
+      </div>
+    </div>
+    <div class="mcn-banner-cta">
+      <span class="btn-enlist">Enlist Today</span>
+      <span class="visit-link">martiannavy.com &rarr;</span>
+    </div>
+  </a>
+</div>
+
 <section class="articles-section">
   <div class="container">
     <div class="section-label">Featured Articles</div>

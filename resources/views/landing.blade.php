@@ -1248,6 +1248,237 @@ img { max-width: 100%; height: auto; }
   </div>
 </section>
 
+<!-- ============ SISTER PROJECT: MCN ACADEMY ============ -->
+<style>
+.mr-sister {
+  position: relative;
+  padding: 100px 0 120px;
+  overflow: hidden;
+  border-top: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+}
+.mr-sister-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://martiannavy.com/images/og-cover.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.25;
+  filter: contrast(1.05) saturate(1.1);
+}
+.mr-sister-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--mr-void, #06060c) 0%, rgba(6,6,12,0.4) 50%, var(--mr-void, #06060c) 100%);
+}
+.mr-sister-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.mr-sister-label {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--mr-cyan, #00e4ff);
+  margin-bottom: 18px;
+  padding: 4px 12px;
+  border: 1px solid rgba(0, 228, 255, 0.3);
+  border-radius: 3px;
+  background: rgba(0, 228, 255, 0.05);
+}
+.mr-sister-title {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: clamp(32px, 4.5vw, 48px);
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 18px;
+  letter-spacing: -0.5px;
+  line-height: 1.05;
+}
+.mr-sister-title .mars-red { color: var(--mr-mars, #c84125); }
+.mr-sister-quote {
+  font-family: 'DM Sans', sans-serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--mr-text, #e0dfe6);
+  line-height: 1.5;
+  margin: 0 0 8px;
+  border-left: 2px solid var(--mr-cyan, #00e4ff);
+  padding-left: 18px;
+}
+.mr-sister-attr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--mr-text-faint, #5a5968);
+  margin: 0 0 24px;
+  padding-left: 18px;
+}
+.mr-sister-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--mr-text-dim, #8a8998);
+  margin: 0 0 28px;
+}
+.mr-sister-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 36px;
+}
+.mr-sister-stat {
+  text-align: left;
+}
+.mr-sister-stat-num {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--mr-amber, #d4a44a);
+  line-height: 1;
+}
+.mr-sister-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--mr-text-faint, #5a5968);
+  margin-top: 6px;
+}
+.mr-sister-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.mr-sister-actions .enlist-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  background: var(--mr-mars, #c84125);
+  color: #fff;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+.mr-sister-actions .enlist-btn:hover {
+  background: var(--mr-mars-glow, #e05535);
+  color: #fff;
+}
+.mr-sister-actions .visit-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: var(--mr-text-dim, #8a8998);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.mr-sister-actions .visit-link:hover { color: var(--mr-cyan, #00e4ff); }
+
+.mr-sister-locations {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.mr-sister-loc {
+  padding: 14px 18px;
+  background: rgba(6, 6, 12, 0.6);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--mr-border, rgba(255,255,255,0.06));
+  border-radius: 6px;
+}
+.mr-sister-loc-name {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+.mr-sister-loc-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: var(--mr-text-dim, #8a8998);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .mr-sister-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .mr-sister { padding: 70px 0 80px; }
+  .mr-sister-stats { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .mr-sister-locations { grid-template-columns: 1fr; }
+}
+</style>
+<section class="mr-sister">
+  <div class="mr-sister-bg"></div>
+  <div class="mr-sister-inner">
+    <div>
+      <span class="mr-sister-label">Sister Project &middot; 2119</span>
+      <h2 class="mr-sister-title">Train for the<br><span class="mars-red">Martian Navy</span></h2>
+      <p class="mr-sister-quote">"The stars don't care about your feelings. They care about your math."</p>
+      <p class="mr-sister-attr">&mdash; Commander Voss, Academy Commandant</p>
+      <p class="mr-sister-desc">An immersive sci-fi academy that teaches you the real math, physics, and engineering of spaceflight. Interactive lessons, an AI Socratic tutor, and 20 ranks to earn &mdash; from Recruit to Voidmaster.</p>
+      <div class="mr-sister-stats">
+        <div class="mr-sister-stat">
+          <div class="mr-sister-stat-num">410</div>
+          <div class="mr-sister-stat-label">Concept Nodes</div>
+        </div>
+        <div class="mr-sister-stat">
+          <div class="mr-sister-stat-num">20</div>
+          <div class="mr-sister-stat-label">Ranks</div>
+        </div>
+        <div class="mr-sister-stat">
+          <div class="mr-sister-stat-num">Free</div>
+          <div class="mr-sister-stat-label">Always</div>
+        </div>
+      </div>
+      <div class="mr-sister-actions">
+        <a href="https://martiannavy.com" target="_blank" rel="noopener" class="enlist-btn">
+          Enlist Today
+          <i class="fa fa-arrow-right"></i>
+        </a>
+        <a href="https://martiannavy.com" target="_blank" rel="noopener" class="visit-link">martiannavy.com &rarr;</a>
+      </div>
+    </div>
+    <div class="mr-sister-locations">
+      <div class="mr-sister-loc">
+        <div class="mr-sister-loc-name">Olympus Academy</div>
+        <div class="mr-sister-loc-desc">Train at the caldera rim of the solar system's tallest mountain</div>
+      </div>
+      <div class="mr-sister-loc">
+        <div class="mr-sister-loc-name">Phobos Fleet Station</div>
+        <div class="mr-sister-loc-desc">Fleet command and systems certification</div>
+      </div>
+      <div class="mr-sister-loc">
+        <div class="mr-sister-loc-name">Deimos Shipyard</div>
+        <div class="mr-sister-loc-desc">Walk among warships in construction</div>
+      </div>
+      <div class="mr-sister-loc">
+        <div class="mr-sister-loc-name">Jupiter Frontier</div>
+        <div class="mr-sister-loc-desc">Deep space operations at the edge of human reach</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ FOOTER ============ -->
 <footer class="mr-footer">
   <div class="container">
