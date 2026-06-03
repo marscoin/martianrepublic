@@ -1259,7 +1259,7 @@ img { max-width: 100%; height: auto; }
 .mr-sister-bg {
   position: absolute;
   inset: 0;
-  background-image: url('https://martiannavy.com/images/og-cover.jpg');
+  background-image: url('/images/navy-cover.jpg');
   background-size: cover;
   background-position: center;
   opacity: 0.25;

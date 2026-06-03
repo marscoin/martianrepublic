@@ -577,7 +577,7 @@ img { max-width: 100%; height: auto; }
 .mcn-banner-img {
   height: 180px;
   background: linear-gradient(120deg, #0a0d1a 0%, #1a0f08 100%);
-  background-image: url('https://martiannavy.com/images/og-cover.jpg');
+  background-image: url('/images/navy-cover.jpg');
   background-size: cover;
   background-position: center;
   position: relative;
