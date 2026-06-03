@@ -153,17 +153,24 @@ PROMPT;
         );
 
         // Step 1: Non-streaming call to check for tool use
-        $firstResponse = Http::withHeaders([
-            'Authorization' => 'Bearer '.$apiKey,
-            'HTTP-Referer' => 'https://martianrepublic.org',
-            'X-Title' => 'Martian Republic',
-        ])->timeout(30)->post('https://openrouter.ai/api/v1/chat/completions', [
-            'model' => $model,
-            'messages' => $messages,
-            'tools' => $this->getTools(),
-            'max_tokens' => 500,
-            'temperature' => 0.7,
-        ]);
+        try {
+            $firstResponse = Http::withHeaders([
+                'Authorization' => 'Bearer '.$apiKey,
+                'HTTP-Referer' => 'https://martianrepublic.org',
+                'X-Title' => 'Martian Republic',
+            ])->timeout(20)->connectTimeout(5)->retry(1, 500)->post('https://openrouter.ai/api/v1/chat/completions', [
+                'model' => $model,
+                'messages' => $messages,
+                'tools' => $this->getTools(),
+                'max_tokens' => 500,
+                'temperature' => 0.7,
+            ]);
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            \Log::warning('OpenRouter timeout', ['error' => $e->getMessage()]);
+            return response()->json([
+                'error' => 'AI service is temporarily unavailable. Please try again in a moment.',
+            ], 503);
+        }
 
         $firstData = $firstResponse->json();
         $choice = $firstData['choices'][0] ?? null;

@@ -1913,7 +1913,11 @@
 
 
                 /* Copy the text inside the text field */
-                navigator.clipboard.writeText(copyText.text());
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(copyText.text()).catch(function(err) {
+                        console.warn('Clipboard write denied:', err);
+                    });
+                }
 
                 /* Alert the copied text */
                 //alert("Copied the text: " + copyText.text());
@@ -2536,6 +2540,10 @@
         $('.scan-popup').on('shown.bs.modal', function(e) {
 
             console.log("Here");
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                toastr.error('Camera not available in this browser');
+                return;
+            }
             navigator.mediaDevices
                 .getUserMedia({
                     video: {
@@ -2551,6 +2559,14 @@
                     video.play();
                     tick();
                     scan2();
+                })
+                .catch(function(err) {
+                    console.warn('Camera access denied:', err);
+                    if (err.name === 'NotAllowedError') {
+                        toastr.error('Camera access was denied. Please enable it in your browser settings to scan QR codes.');
+                    } else {
+                        toastr.error('Could not access camera: ' + err.message);
+                    }
                 });
 
         });
