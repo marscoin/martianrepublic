@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
+use Livewire\Mechanisms\HandleComponents\CorruptComponentPayloadException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -71,6 +72,11 @@ class Handler extends ExceptionHandler
             HttpException::class,
             NotFoundHttpException::class,
             MethodNotAllowedHttpException::class,
+            // Client/bot-induced, not a server fault: scrapers POST stale or
+            // mangled Livewire snapshots to /livewire/update, failing the
+            // checksum. Steady bot-noise baseline (~2-3/day, always Guest),
+            // not actionable — don't page on it. Still captured by Sentry.
+            CorruptComponentPayloadException::class,
         ];
 
         foreach ($skipExceptions as $type) {
