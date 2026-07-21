@@ -23,6 +23,7 @@
 <meta name="twitter:image" content="https://martianrepublic.org/assets/academy/data-streams.jpg">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
 <link rel="canonical" href="https://martianrepublic.org/academy/blockchain-attested-data-streams">
+@verbatim
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -43,6 +44,7 @@
   "keywords": "blockchain attestation, IoT, MQTT, DDS, OPC UA, secure element, DICE, IEEE 802.1AR, DV_ transaction, hardware root of trust, machine identity, Mars infrastructure"
 }
 </script>
+@endverbatim
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

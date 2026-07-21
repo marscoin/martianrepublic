@@ -22,6 +22,7 @@
 <meta name="twitter:image" content="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
 <link rel="canonical" href="https://martianrepublic.org/academy/ipfs-interplanetary-file-system">
+@verbatim
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -40,6 +41,7 @@
   "mainEntityOfPage": "https://martianrepublic.org/academy/ipfs-interplanetary-file-system"
 }
 </script>
+@endverbatim
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

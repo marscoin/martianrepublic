@@ -20,6 +20,7 @@
 <meta name="twitter:image" content="https://martianrepublic.org/assets/academy/seed-hero.jpg">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
 <link rel="canonical" href="https://martianrepublic.org/academy/the-seed">
+@verbatim
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -41,6 +42,7 @@
   "mainEntityOfPage": "https://martianrepublic.org/academy/the-seed"
 }
 </script>
+@endverbatim
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

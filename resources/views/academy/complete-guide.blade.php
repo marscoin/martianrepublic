@@ -20,6 +20,7 @@
 <meta name="twitter:image" content="https://martianrepublic.org/assets/academy/earth-mars-distance.jpg">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
 <link rel="canonical" href="https://martianrepublic.org/academy/complete-guide">
+@verbatim
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -42,6 +43,7 @@
   "mainEntityOfPage": "https://martianrepublic.org/academy/complete-guide"
 }
 </script>
+@endverbatim
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

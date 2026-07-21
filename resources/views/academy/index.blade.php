@@ -20,6 +20,9 @@
 <meta name="twitter:image" content="https://martianrepublic.org/assets/landing/img/logomarscoinwallet.png">
 <link rel="icon" type="image/png" href="https://martianrepublic.org/assets/favicon.ico">
 <link rel="canonical" href="https://martianrepublic.org/academy">
+{{-- JSON-LD guarded below so Blade does not parse its schema.org keys as
+     directives (the context key opens an unclosed if(), breaking compilation). --}}
+@verbatim
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -35,6 +38,7 @@
   }
 }
 </script>
+@endverbatim
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
