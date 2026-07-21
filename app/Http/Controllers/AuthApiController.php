@@ -57,10 +57,18 @@ class AuthApiController extends Controller
 
     public function checkAuth(Request $request)
     {
-        $session_string = $request->query('sid');
+        $session_string = (string) $request->query('sid');
         $session = MSession::where('sid', $session_string)->first();
 
         $authenticated = (! is_null($session) && ! empty($session->s)) ? true : false;
+
+        // Attack probes send invalid UTF-8 in ?sid= (e.g. %EF%BF%BD injection
+        // payloads). Reflecting that back through json_encode throws
+        // InvalidArgumentException (500). Such a sid never matches a session
+        // anyway, so blank it rather than echo malformed bytes.
+        if (! mb_check_encoding($session_string, 'UTF-8')) {
+            $session_string = '';
+        }
 
         return response()->json(['sid' => $session_string, 'authenticated' => $authenticated]);
     }
