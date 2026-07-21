@@ -769,12 +769,6 @@ parameters:
 			path: app/Http/Middleware/Authenticate.php
 
 		-
-			message: '#^Access to an undefined property DateInterval\:\:\$w\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Includes/AppHelper.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\CivicWallet\:\:\$public_address\.$#'
 			identifier: property.notFound
 			count: 1

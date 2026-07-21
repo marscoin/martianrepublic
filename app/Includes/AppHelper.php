@@ -615,10 +615,21 @@ class AppHelper
         $ago = new DateTime($datetime);
         $diff = $now->diff($ago);
 
-        $diff->w = floor($diff->d / 7);
-        $diff->d -= $diff->w * 7;
+        // Weeks are not a native DateInterval property; derive them from days
+        // in local vars rather than assigning a dynamic $diff->w (deprecated on
+        // internal classes in PHP 8.2+, and flagged by static analysis).
+        $weeks = (int) floor($diff->d / 7);
 
-        $string = [
+        $counts = [
+            'y' => $diff->y,
+            'm' => $diff->m,
+            'w' => $weeks,
+            'd' => $diff->d - $weeks * 7,
+            'h' => $diff->h,
+            'i' => $diff->i,
+            's' => $diff->s,
+        ];
+        $labels = [
             'y' => 'year',
             'm' => 'month',
             'w' => 'week',
@@ -627,11 +638,11 @@ class AppHelper
             'i' => 'minute',
             's' => 'second',
         ];
-        foreach ($string as $k => &$v) {
-            if ($diff->$k) {
-                $v = $diff->$k.' '.$v.($diff->$k > 1 ? 's' : '');
-            } else {
-                unset($string[$k]);
+
+        $string = [];
+        foreach ($counts as $k => $count) {
+            if ($count) {
+                $string[$k] = $count.' '.$labels[$k].($count > 1 ? 's' : '');
             }
         }
 
