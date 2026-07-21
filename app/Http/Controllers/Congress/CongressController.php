@@ -252,8 +252,15 @@ class CongressController extends Controller
         }
     }
 
-    public function proposal($id)
+    public function proposal($id = null)
     {
+        // Route is /congress/proposal/{id?} — a bare /congress/proposal (crawlers,
+        // truncated links) has no id. Send them to the public listing instead of
+        // letting PHP throw ArgumentCountError before the body even runs.
+        if (is_null($id)) {
+            return redirect('/congress/all');
+        }
+
         if (Auth::check()) {
             $uid = Auth::user()->id;
             $profile = Profile::where('userid', '=', $uid)->first();
