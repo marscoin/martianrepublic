@@ -16,6 +16,14 @@ use TeamTeaTime\Forum\Models\Post;
 
 class AppHelper
 {
+    // Browser capture uses WebM; native Android/iOS capture uses MP4/QuickTime.
+    // Keep this allowlist scoped to citizenship video uploads.
+    public const CITIZENSHIP_VIDEO_TYPES = [
+        'webm' => ['video/webm', 'audio/webm'],
+        'mp4' => ['video/mp4'],
+        'mov' => ['video/quicktime'],
+    ];
+
     /**
      * =========================================================================
      * FILE UPLOAD SECURITY HELPERS

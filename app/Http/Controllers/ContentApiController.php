@@ -83,9 +83,7 @@ class ContentApiController extends Controller
         if ($request->hasFile('file')) {
             // --- SECURITY: Validate the uploaded file (extension, MIME, size, PHP code) ---
             $uploadedFile = $request->file('file');
-            $validation = AppHelper::validateUploadedFile($uploadedFile, [
-                'webm' => ['video/webm', 'audio/webm'],
-            ]);
+            $validation = AppHelper::validateUploadedFile($uploadedFile, AppHelper::CITIZENSHIP_VIDEO_TYPES);
             if (! $validation['valid']) {
                 Log::warning('pinvideo upload rejected: '.$validation['error'].' (user: '.$uid.')');
 
@@ -103,8 +101,9 @@ class ContentApiController extends Controller
             AppHelper::writeUploadHtaccess($file_path);
 
             $file_path = './assets/citizen/'.$safeAddress.'/';
-            $request->file('file')->move($file_path, 'profile_video.webm');
-            $file_path = $file_path.'profile_video.webm';
+            $filename = 'profile_video.'.strtolower($uploadedFile->getClientOriginalExtension());
+            $uploadedFile->move($file_path, $filename);
+            $file_path = $file_path.$filename;
             $hash = AppHelper::upload($file_path, config('blockchain.ipfs.api_url').'/api/v0/add?pin=true');
             Log::debug('upload complete: '.$hash);
             $citcache = Citizen::where('userid', '=', $uid)->first();
@@ -120,6 +119,8 @@ class ContentApiController extends Controller
                 ->header('Content-Type', 'application/json;');
         } else {
             Log::debug('no file found!');
+
+            return response()->json(['error' => 'No valid file provided.'], 422);
         }
 
     }
