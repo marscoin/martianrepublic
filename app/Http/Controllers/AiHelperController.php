@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -165,8 +166,9 @@ PROMPT;
                 'max_tokens' => 500,
                 'temperature' => 0.7,
             ]);
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+        } catch (ConnectionException $e) {
             \Log::warning('OpenRouter timeout', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'error' => 'AI service is temporarily unavailable. Please try again in a moment.',
             ], 503);
@@ -236,7 +238,7 @@ PROMPT;
                 'temperature' => 0.7,
             ]);
 
-            $body = $response->getBody();
+            $body = $response->toPsrResponse()->getBody();
             while (! $body->eof()) {
                 $line = '';
                 while (! $body->eof()) {

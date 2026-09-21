@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Call to an undefined method Illuminate\\Http\\Client\\Response\:\:getBody\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/AiHelperController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\CivicWallet\:\:\$user\.$#'
 			identifier: property.notFound
 			count: 1
