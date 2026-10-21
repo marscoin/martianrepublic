@@ -900,6 +900,22 @@ img { max-width: 100%; height: auto; }
       </div>
     </a>
 
+    <a href="/academy/atomic-swap-market-makers" class="article-card fade-up fade-up-d2">
+      <div class="article-thumb blockchain" style="background:url('/assets/academy/swaps-dashboard.jpg') center/cover; font-size:0;">
+        &nbsp;
+      </div>
+      <div class="article-body">
+        <span class="article-tag blockchain">Economy</span>
+        <h3 class="article-title">Market Makers Without Exchanges: How Mars Will Trade with Earth</h3>
+        <p class="article-excerpt">No exchange can span two planets. Atomic swaps make the exchange a protocol, and the first live MARS/BTC market maker shows how trade across the light delay works.</p>
+        <div class="article-meta">
+          <span><i class="fa-solid fa-clock"></i> 12 min read</span>
+          <span><i class="fa-solid fa-calendar"></i> October 2026</span>
+          <span><i class="fa-solid fa-signal"></i> Intermediate</span>
+        </div>
+      </div>
+    </a>
+
     <a href="/academy/the-pioneers-journey" class="article-card fade-up fade-up-d3">
       <div class="article-thumb citizenship" style="background:url('/assets/academy/pioneers-journey.jpg') center/cover; font-size:0;">
         &nbsp;
