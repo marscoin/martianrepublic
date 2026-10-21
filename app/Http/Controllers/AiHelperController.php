@@ -31,6 +31,7 @@ Academy articles:
 - /academy/coinshuffle-secret-ballots — anonymous voting protocol
 - /academy/mars-timekeeping — sols, MTC, Darian calendar
 - /academy/the-public-good — political philosophy
+- /academy/atomic-swap-market-makers — atomic swaps, market makers, the live MARS/BTC maker at swaps.marscoin.org
 
 Rules:
 - Keep answers under 150 words unless asked for detail
