@@ -9,11 +9,11 @@ use App\Models\MSession;
 use App\Models\Profile;
 use App\Models\User;
 use BitcoinPHP\BitcoinECDSA\BitcoinECDSA;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class AuthApiController extends Controller
@@ -123,34 +123,31 @@ class AuthApiController extends Controller
 
     public function token(Request $request)
     {
-        $publicAddress = $request->input('a');
-        $msg = $request->input('m');
-        $sig = $request->input('s');
-        $timestamp = $request->input('t');
-
-        Log::debug('Address: '.$publicAddress);
-        Log::debug('msg: '.$msg);
-        Log::debug('sig: '.$sig);
-        Log::debug('timestamp: '.$timestamp);
-
-        if (empty($msg)) {
-            $data = $request->json()->all();
-
-            if (isset($data['data'])) {
-                $msg = $data['data']['m'] ?? null;
-                $sig = $data['data']['s'] ?? null;
-                $publicAddress = $data['data']['a'] ?? null;
-                $timestamp = $data['data']['t'] ?? '0';
-            }
+        $payload = $request->input('data');
+        if (! is_array($payload)) {
+            $payload = $request->all();
         }
-        // Validate timestamp
-        if (Carbon::now()->diffInSeconds(Carbon::createFromTimestamp($timestamp)) > 600) { // 5 minutes tolerance
-            return response()->json(['error' => 'Request timestamp is too old.'], 401);
+        $data = Validator::make($payload, [
+            'a' => ['required', 'string', 'regex:/^M[1-9A-HJ-NP-Za-km-z]{24,34}$/'],
+            'm' => 'required|string|max:256', 's' => 'required|string|max:128',
+            't' => 'required|integer|min:0|max:4102444800',
+        ])->validate();
+        $publicAddress = $data['a'];
+        $msg = $data['m'];
+        $sig = $data['s'];
+        $timestamp = $data['t'];
+        // The timestamp and identity must be inside the signed message. Merely
+        // checking an unsigned `t` lets an old signature mint fresh sessions.
+        $expected = 'https://martianrepublic.org/api/token?a='.$publicAddress.'&t='.$timestamp;
+        if (! hash_equals($expected, $msg) || abs(time() - (int) $timestamp) > 600) {
+            return response()->json(['message' => 'The sign-in request has expired or does not match this identity.'], 401);
         }
-
-        $bitcoinECDSA = new BitcoinECDSA;
-        $marscoinECDSA = new MarscoinECDSA;
-        if ($marscoinECDSA->checkSignatureForMessage($publicAddress, $sig, $msg)) {
+        try {
+            $valid = (new MarscoinECDSA)->checkSignatureForMessage($publicAddress, $sig, $msg);
+        } catch (\Throwable) {
+            $valid = false;
+        }
+        if ($valid) {
             $wallet = CivicWallet::where('public_addr', $publicAddress)->first();
 
             if ($wallet) {
