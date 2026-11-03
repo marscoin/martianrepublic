@@ -57,7 +57,9 @@ class CitizenshipVideoValidationTest extends TestCase
 
     public function test_missing_video_is_reported_as_a_validation_failure(): void
     {
-        Auth::shouldReceive('user')->once()->andReturn(new GenericUser(['id' => 1]));
+        // pinvideo now rejects a missing file before it resolves the caller,
+        // so Auth::user() may not be consulted on this path at all.
+        Auth::shouldReceive('user')->zeroOrMoreTimes()->andReturn(new GenericUser(['id' => 1]));
         $request = Request::create('/api/pinvideo', 'POST', ['address' => 'MTestVideoAddress']);
 
         $response = (new ContentApiController)->pinvideo($request);

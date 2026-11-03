@@ -4,228 +4,123 @@ namespace App\Http\Controllers;
 
 use App\Includes\AppHelper;
 use App\Models\Citizen;
+use App\Models\CivicWallet;
+use App\Services\CivicPinningService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ContentApiController extends Controller
 {
-    public function pinpic(Request $request)
+    public function pinpic(Request $request): JsonResponse
     {
-        $uid = Auth::user()->id;
-        $hash = '';
-        $dataPic = $request->input('picture');
-        $type = $request->input('type');
-        $public_address = $request->input('address');
-
-        // --- SECURITY: Sanitize the public_address to prevent directory traversal ---
-        $safeAddress = AppHelper::sanitizePathSegment($public_address);
-        if ($safeAddress === null) {
-            return response()->json(['error' => 'Invalid address format.'], 400);
-        }
-
-        // --- SECURITY: Validate the base64 image data (extension, MIME, size, PHP code) ---
-        $validation = AppHelper::validateBase64Image($dataPic);
+        $request->validate(['address' => 'required|string|max:50', 'picture' => 'required|string|max:7340032']);
+        $validation = AppHelper::validateBase64Image($request->input('picture'));
         if (! $validation['valid']) {
-            Log::warning('pinpic upload rejected: '.$validation['error'].' (user: '.$uid.')');
-
             return response()->json(['error' => $validation['error']], 422);
         }
+        $address = $this->ownedAddress($request);
 
-        $safeExtension = $validation['extension'];
-        $decodedData = $validation['data'];
-
-        $file_path = './assets/citizen/'.$safeAddress.'/';
-        if (! file_exists($file_path)) {
-            mkdir($file_path, 0755, true);
-        }
-
-        // --- SECURITY: Write .htaccess to prevent PHP execution in upload dir ---
-        AppHelper::writeUploadHtaccess($file_path);
-
-        // Use validated extension, not user-supplied one
-        $file_path = './assets/citizen/'.$safeAddress.'/profile_pic.'.$safeExtension;
-
-        file_put_contents($file_path, $decodedData);
-        $hash = AppHelper::upload($file_path, config('blockchain.ipfs.api_url').'/api/v0/add?pin=true');
-
-        $citcache = Citizen::where('userid', '=', $uid)->first();
-        if (is_null($citcache)) {
-            $citcache = new Citizen;
-        }
-        $citcache->userid = $uid;
-        $citcache->avatar_link = config('blockchain.ipfs.gateway_url').$hash;
-        $citcache->save();
-
-        return (new Response(json_encode(['Hash' => $hash]), 200))
-            ->header('Content-Type', 'application/json;');
-
+        return $this->pinBytes($validation['data'], 'profile_pic.'.$validation['extension'], function ($cid) use ($address) {
+            $this->saveMediaReference($address, 'avatar_link', $cid);
+        });
     }
 
-    public function pinvideo(Request $request)
+    public function pinvideo(Request $request): JsonResponse
     {
-
-        Log::debug('pinvid');
-        $uid = Auth::user()->id;
-        $hash = '';
-        $dataPic = $request->input('file');
-        $type = $request->input('type');
-        $public_address = $request->input('address');
-
-        // --- SECURITY: Sanitize the public_address to prevent directory traversal ---
-        $safeAddress = AppHelper::sanitizePathSegment($public_address);
-        if ($safeAddress === null) {
-            return response()->json(['error' => 'Invalid address format.'], 400);
-        }
-
-        Log::debug('public: '.$safeAddress);
-        if ($request->hasFile('file')) {
-            // --- SECURITY: Validate the uploaded file (extension, MIME, size, PHP code) ---
-            $uploadedFile = $request->file('file');
-            $validation = AppHelper::validateUploadedFile($uploadedFile, AppHelper::CITIZENSHIP_VIDEO_TYPES);
-            if (! $validation['valid']) {
-                Log::warning('pinvideo upload rejected: '.$validation['error'].' (user: '.$uid.')');
-
-                return response()->json(['error' => $validation['error']], 422);
-            }
-
-            Log::debug('storing file');
-            $file_path = './assets/citizen/'.$safeAddress.'/';
-            if (! file_exists($file_path)) {
-                mkdir($file_path, 0755, true);
-                Log::debug('making dir');
-            }
-
-            // --- SECURITY: Write .htaccess to prevent PHP execution in upload dir ---
-            AppHelper::writeUploadHtaccess($file_path);
-
-            $file_path = './assets/citizen/'.$safeAddress.'/';
-            $filename = 'profile_video.'.strtolower($uploadedFile->getClientOriginalExtension());
-            $uploadedFile->move($file_path, $filename);
-            $file_path = $file_path.$filename;
-            $hash = AppHelper::upload($file_path, config('blockchain.ipfs.api_url').'/api/v0/add?pin=true');
-            Log::debug('upload complete: '.$hash);
-            $citcache = Citizen::where('userid', '=', $uid)->first();
-            if (is_null($citcache)) {
-                $citcache = new Citizen;
-            }
-            $citcache->userid = $uid;
-            $citcache->liveness_link = config('blockchain.ipfs.gateway_url').$hash;
-            $citcache->save();
-            Log::debug('saved cit data');
-
-            return (new Response(json_encode(['Hash' => $hash]), 200))
-                ->header('Content-Type', 'application/json;');
-        } else {
-            Log::debug('no file found!');
-
+        $request->validate(['address' => 'required|string|max:50']);
+        if (! $request->hasFile('file')) {
             return response()->json(['error' => 'No valid file provided.'], 422);
         }
+        $file = $request->file('file');
+        $validation = AppHelper::validateUploadedFile($file, AppHelper::CITIZENSHIP_VIDEO_TYPES);
+        if (! $validation['valid']) {
+            return response()->json(['error' => $validation['error']], 422);
+        }
+        $address = $this->ownedAddress($request);
+        try {
+            $cid = app(CivicPinningService::class)->pin($file->getRealPath(), 'profile_video.'.strtolower($file->getClientOriginalExtension()));
+            $this->saveMediaReference($address, 'liveness_link', $cid);
 
+            return response()->json(['Hash' => $cid]);
+        } catch (\Throwable $error) {
+            report($error);
+
+            return $this->unavailable();
+        }
     }
 
-    /**
-     * Handles JSON storage and pinning to a distributed file system.
-     *
-     * @hideFromAPIDocumentation
-     */
-    public function pinjson(Request $request)
+    public function pinjson(Request $request): JsonResponse
     {
-        Log::info('in function');
-        $public_address = $request->input('address');
-        $type = $request->input('type');
-        $json = $request->input('payload');
-
-        // --- SECURITY: Sanitize the public_address to prevent directory traversal ---
-        $safeAddress = AppHelper::sanitizePathSegment($public_address);
-        if ($safeAddress === null) {
-            return response()->json(['error' => 'Invalid address format.'], 400);
-        }
-
-        // --- SECURITY: Sanitize the type parameter to prevent path traversal ---
-        $safeType = AppHelper::sanitizePathSegment($type);
-        if ($safeType === null) {
-            return response()->json(['error' => 'Invalid type format.'], 400);
-        }
-
-        // --- SECURITY: Check file size (max 5MB) ---
-        if (strlen($json) > 5242880) {
+        $data = $request->validate([
+            'address' => 'required|string|max:50', 'type' => ['required', 'string', 'max:64', 'regex:/^[A-Za-z0-9_-]+$/'],
+            'payload' => 'required|string|json|max:5242880',
+        ]);
+        $this->ownedAddress($request);
+        if (strlen($data['payload']) > 5242880) {
             return response()->json(['error' => 'Payload exceeds maximum size of 5MB.'], 422);
         }
-
-        // --- SECURITY: Reject payloads containing PHP code ---
-        if (AppHelper::containsPhpCode($json)) {
-            Log::warning('pinjson rejected: payload contains PHP code');
-
+        if (AppHelper::containsPhpCode($data['payload'])) {
             return response()->json(['error' => 'Payload contains potentially dangerous content.'], 422);
         }
 
-        // --- SECURITY: Validate that payload is valid JSON ---
-        $decodedJson = json_decode($json);
-        if ($json !== '' && json_last_error() !== JSON_ERROR_NONE) {
-            return response()->json(['error' => 'Invalid JSON payload.'], 422);
-        }
+        // Each upload has its own private temporary file. Concurrent devices
+        // cannot overwrite one another's metadata before IPFS reads it.
+        return $this->pinBytes($data['payload'], $data['type'].'.json', fn () => null, str_contains($data['type'], 'log'));
+    }
 
-        $projectRoot = config('app.project_root', base_path());
-        $base_path = $projectRoot.'/assets/citizen/'.$safeAddress;
+    private function ownedAddress(Request $request): string
+    {
+        $address = $request->input('address');
+        $user = Auth::user();
+        abort_unless($user && $user->status !== 'inactive' && is_string($address)
+            && CivicWallet::where('user_id', $user->id)->where('public_addr', $address)->exists(),
+            403, 'Uploads must use your own civic address.');
 
-        // Check and create the directory if it doesn't exist
-        Log::info($base_path);
-        clearstatcache();
-        if (! is_dir($base_path)) {
-            Log::info('Trying to create directory: '.$base_path);
-            if (! mkdir($base_path, 0755, true)) {
-                Log::error('Failed to create directory: '.$base_path);
+        return $address;
+    }
 
-                return response()->json(['error' => 'Failed to create directory. Check permissions.'], 500);
-            }
-            Log::info('Directory created: '.$base_path);
-        }
+    private function saveMediaReference(string $address, string $field, string $cid): void
+    {
+        // Update the profile only after successful pinning. A temporary outage
+        // must never erase a previously uploaded photograph or liveness video.
+        $citizen = Citizen::firstOrNew(['userid' => Auth::user()->id]);
+        $citizen->public_address = $address;
+        $citizen->$field = rtrim(config('blockchain.ipfs.gateway_url'), '/').'/'.$cid;
+        $citizen->save();
+    }
 
-        // Check if the directory is writable, regardless of whether it was just created or already existed
-        if (! is_writable($base_path)) {
-            Log::error('Directory not writable: '.$base_path);
-
-            return response()->json(['error' => 'Directory is not writable. Check permissions.'], 500);
-        }
-
-        // --- SECURITY: Write .htaccess to prevent PHP execution in upload dir ---
-        AppHelper::writeUploadHtaccess($base_path);
-
-        $file_path = $base_path.'/'.$safeType.'.json';
-
-        // Attempt to write the JSON data to the file
-        if (file_put_contents($file_path, $json) === false) {
-            return response()->json(['error' => 'Failed to write to file.'], 500);
-        }
-
+    private function pinBytes(string $bytes, string $filename, callable $afterPin, bool $wrap = false): JsonResponse
+    {
+        $directory = storage_path('app/private/civic-uploads');
+        $path = null;
         try {
-            Log::info('PermaJson: '.$file_path);
-
-            // Check if the type contains the word 'log'
-            if (strpos($safeType, 'log') !== false) {
-                // The type contains 'log', use uploadFolder
-                $apiResponse = AppHelper::uploadFolder($file_path, config('blockchain.ipfs.api_url').'/api/v0/add?pin=true&recursive=true&wrap-with-directory=true&quieter');
-            } else {
-                // The type does not contain 'log', use upload
-                $apiResponse = AppHelper::upload($file_path, config('blockchain.ipfs.api_url').'/api/v0/add?pin=true');
+            if (! is_dir($directory) && ! mkdir($directory, 0700, true) && ! is_dir($directory)) {
+                throw new \RuntimeException('Upload storage is unavailable.');
             }
-
-            if (is_string($apiResponse)) {
-                $formattedResponse = ['Hash' => $apiResponse];
-            } else {
-                Log::error('Upload error: Formatting');
-
-                return response()->json(['error' => 'formatting error'], 500);
+            $path = $directory.'/'.Str::uuid();
+            if (file_put_contents($path, $bytes, LOCK_EX) !== strlen($bytes)) {
+                throw new \RuntimeException('The upload could not be saved.');
             }
+            chmod($path, 0600);
+            $cid = app(CivicPinningService::class)->pin($path, $filename, $wrap);
+            $afterPin($cid);
 
-            return response()->json($formattedResponse, 200)->header('Content-Type', 'application/json;');
-        } catch (\Exception $e) {
-            // Handle exceptions during the upload and pinning process
-            Log::error('Upload error: '.$e->getMessage());
+            return response()->json(['Hash' => $cid]);
+        } catch (\Throwable $error) {
+            report($error);
 
-            return response()->json(['error' => $e->getMessage()], 500);
+            return $this->unavailable();
+        } finally {
+            if ($path !== null && is_file($path)) {
+                unlink($path);
+            }
         }
+    }
+
+    private function unavailable(): JsonResponse
+    {
+        return response()->json(['error' => 'Your upload could not be pinned. Your previous profile is unchanged; retry your saved draft.'], 503);
     }
 }
