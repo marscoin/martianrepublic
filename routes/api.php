@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CongressApiController;
+use App\Http\Controllers\Api\OrganizationApiController;
 use App\Http\Controllers\AuthApiController;
 use App\Http\Controllers\ContentApiController;
 use App\Http\Controllers\FeedApiController;
@@ -53,3 +54,23 @@ Route::get('/congress/proposals', [CongressApiController::class, 'index'])->name
 Route::get('/congress/proposals/{id}', [CongressApiController::class, 'show'])->name('api_congress_proposal');
 Route::get('/congress/proposals/{id}/votes', [CongressApiController::class, 'votes'])->name('api_congress_votes');
 Route::get('/congress/stats', [CongressApiController::class, 'stats'])->name('api_congress_stats');
+
+// Private organization workspaces. All writes have durable idempotency receipts.
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/workspace', [OrganizationApiController::class, 'home']);
+    Route::get('/organizations', [OrganizationApiController::class, 'index']);
+    Route::post('/organizations', [OrganizationApiController::class, 'store'])->middleware('throttle:20,1');
+    Route::get('/organizations/{organization}', [OrganizationApiController::class, 'show'])->whereUuid('organization');
+    Route::post('/organizations/{organization}/invitations', [OrganizationApiController::class, 'invite'])->whereUuid('organization')->middleware('throttle:20,1');
+    Route::post('/organizations/{organization}/invitations/respond', [OrganizationApiController::class, 'respond'])->whereUuid('organization');
+    Route::post('/organizations/{organization}/members/{member}/remove', [OrganizationApiController::class, 'removeMember'])->whereUuid('organization')->whereNumber('member');
+    Route::post('/organizations/{organization}/archive', [OrganizationApiController::class, 'archive'])->whereUuid('organization');
+    Route::get('/organizations/{organization}/tasks', [OrganizationApiController::class, 'tasks'])->whereUuid('organization');
+    Route::post('/organizations/{organization}/tasks', [OrganizationApiController::class, 'createTask'])->whereUuid('organization');
+    Route::get('/organizations/{organization}/tasks/{task}', [OrganizationApiController::class, 'showTask'])->whereUuid(['organization', 'task']);
+    Route::patch('/organizations/{organization}/tasks/{task}', [OrganizationApiController::class, 'updateTask'])->whereUuid(['organization', 'task']);
+    Route::get('/organizations/{organization}/activity', [OrganizationApiController::class, 'activity'])->whereUuid('organization');
+    Route::post('/organizations/{organization}/records', [OrganizationApiController::class, 'createRecord'])->whereUuid('organization');
+    Route::post('/organizations/{organization}/attachments', [OrganizationApiController::class, 'upload'])->whereUuid('organization')->middleware('throttle:12,1');
+    Route::get('/organizations/{organization}/attachments/{attachment}', [OrganizationApiController::class, 'photo'])->whereUuid(['organization', 'attachment']);
+});
