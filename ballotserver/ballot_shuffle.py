@@ -14,8 +14,18 @@ class CoinShuffleServer:
         self.started = False
 
     def submit_public_key(self, ek, address):
+        # One key per voter: a reconnecting voter replaces their earlier key.
+        self.remove(address)
         self.keys.append(ek)
         self.peers.append(address)
+
+    def remove(self, address):
+        """ Forgets a voter who left before the shuffle completed.
+        """
+        if address in self.peers:
+            i = self.peers.index(address)
+            del self.peers[i]
+            del self.keys[i]
 
     def get_keys(self):
         return keys

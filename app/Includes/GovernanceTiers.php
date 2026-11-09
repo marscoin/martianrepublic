@@ -18,7 +18,7 @@ class GovernanceTiers
     // Screening: 3 minutes instead of 3 sols
     // Voting: scales proportionally (Signal 7min, Operational 14min, etc.)
     // MUST be false in production
-    const TEST_MODE = true;
+    const TEST_MODE = false;
 
     const TEST_MODE_MINUTES_PER_SOL = 1; // 1 minute = 1 sol in test mode
 
@@ -168,8 +168,22 @@ class GovernanceTiers
         $now = now();
 
         // Check explicit terminal states first
-        if (in_array($proposal->status, ['passed', 'rejected', 'closed', 'withdrawn', 'expired', 'sunset'])) {
+        if (in_array($proposal->status, ['rejected', 'closed', 'withdrawn', 'expired', 'sunset'])) {
             return $proposal->status;
+        }
+
+        // A passed proposal still moves through its timelock, takes effect,
+        // and (for tiers that expire) reaches its sunset.
+        if ($proposal->status === 'passed') {
+            if (! empty($proposal->timelock_ends_at) && $now->lt(Carbon::parse($proposal->timelock_ends_at))) {
+                return 'timelock';
+            }
+            if (! empty($proposal->sunset_at) && $now->gte(Carbon::parse($proposal->sunset_at))) {
+                return 'sunset';
+            }
+            $binding = self::get($proposal->tier ?? 'signal')['binding'] ?? false;
+
+            return $binding && ! empty($proposal->enacted_at) ? 'active' : 'passed';
         }
 
         // Screening phase

@@ -45,6 +45,9 @@ from datetime import datetime
 from dotenv import load_dotenv
 from pymysql.cursors import DictCursor
 from subprocess import Popen, PIPE
+from datetime import timezone, timedelta
+import re
+import vote_validation
 
 # Load environment variables
 load_dotenv("../.env")
@@ -228,6 +231,10 @@ def load_next_block(cur):
 
         return block_details['height'], block_details['hash'], mined_date
 
+    except MySQLdb.Error:
+        # A dropped connection must reach the main loop, which reconnects.
+        # Swallowing it here once left the tracker idle for months.
+        raise
     except Exception as e:
         logger.error(f"Error loading the next block: {e}")
         return None, None, None
@@ -411,56 +418,118 @@ def get_author_name_by_user_id(cur, user_id):
         logger.error(f"Error retrieving author name for user ID {user_id}: {e}")
         return None
 
+CID_PATTERN = re.compile(r'^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{20,})$')
+
+
+def find_proposal_by_ipfs(cur, ipfs_hash):
+    """
+    The proposal a record refers to, with its voting window. When the website
+    and this tracker have both recorded the same proposal, the row carrying the
+    lifecycle timestamps is the authoritative one.
+    """
+    if not CID_PATTERN.match(ipfs_hash or ''):
+        return None
+    cur.execute(
+        "SELECT id, screening_ends_at, voting_ends_at FROM proposals WHERE ipfs_hash = %s OR ipfs_hash LIKE %s "
+        "ORDER BY (voting_ends_at IS NULL), id LIMIT 1",
+        (ipfs_hash, f"%/{ipfs_hash}"),
+    )
+    return cur.fetchone()
+
+
 def find_proposal_id_by_ipfs(cur, ipfs_hash):
-    # Note: Adjust the LIKE pattern as needed based on your IPFS URL structure
-    search_pattern = f"%{ipfs_hash}"
-    cur.execute("SELECT id FROM proposals WHERE ipfs_hash LIKE %s LIMIT 1", (search_pattern,))
-    result = cur.fetchone()
-    if result:
-        return result['id']
-    return None
+    proposal = find_proposal_by_ipfs(cur, ipfs_hash)
+    return proposal['id'] if proposal else None
+
+
+def is_citizen_address(cur, address):
+    """True when the address belongs to a user with confirmed citizenship."""
+    userid = get_user_by_address(cur, address)
+    if userid is None:
+        return False
+    cur.execute("SELECT 1 FROM feed WHERE tag = 'CT' AND userid = %s LIMIT 1", (userid,))
+    return cur.fetchone() is not None
+
+
+def utc_timestamp(value):
+    """Unix time of a lifecycle timestamp. The website stores these in UTC."""
+    return value.replace(tzinfo=timezone.utc).timestamp() if value else None
+
 
 #Caching functions
 ##################
-def cache_vote(cur, db, head, body, txid, height, mined):
+def cache_vote(cur, db, head, body, transaction, height, mined):
     """
-    Cache an anonymous vote in the database.
+    Count an anonymous vote if, and only if, it satisfies the rules in
+    vote_validation: it spends a ballot issued to citizens, voting is open,
+    and no citizen is counted twice.
 
     Args:
     cur: Database cursor to execute the query.
     db: Database connection object for committing the transaction.
     head: The voting indication (PRY, PRN, PRA).
-    body: The body of the message containing additional information or the actual vote context.
-    txid: Transaction ID of the vote.
+    body: The IPFS record of the proposal voted on.
+    transaction: The decoded vote transaction.
     height: The block height at which the vote was mined.
-    mined: The timestamp when the block was mined.
+    mined: The time the block was mined (local time, as elsewhere in this script).
     """
-    # Convert head to vote representation
-    vote_map = {"PRY": "Y", "PRN": "N", "PRA": "A"}
-    vote = vote_map.get(head)
-
+    txid = transaction['txid']
+    vote = vote_validation.VOTE_TAGS.get(head)
     if vote is None:
         logger.error(f"Invalid vote head: {head}")
         return
 
-    # Attempt to find the proposal ID based on the IPFS hash in the body
-    proposal_id = find_proposal_id_by_ipfs(cur, body)
-    if proposal_id is None:
-        logger.error(f"Could not find proposal with IPFS hash: {body}")
+    proposal = find_proposal_by_ipfs(cur, body)
+    if proposal is None:
+        logger.error(f"Vote {txid} not counted: no proposal with IPFS hash {body}")
+        return
+    proposal_id = proposal['id']
+
+    cur.execute("SELECT 1 FROM votes WHERE txid = %s LIMIT 1", (txid,))
+    if cur.fetchone():
+        return  # already counted (a block being processed again)
+
+    opens_at = utc_timestamp(proposal['screening_ends_at'])
+    closes_at = utc_timestamp(proposal['voting_ends_at'])
+    if not vote_validation.voting_open(mined.timestamp(), opens_at, closes_at):
+        logger.warning(f"Vote {txid} not counted: voting on proposal {proposal_id} was not open at block {height}")
         return
 
-    # Prepare and execute the SQL query to insert the vote into the database
-    insert_query = """
-    INSERT INTO votes (vote, proposal_id, txid, mined, block, created_at) 
-    VALUES (%s, %s, %s, %s, %s, NOW());
-    """
+    ballot, reason = vote_validation.examine_vote(transaction, get_tx_details, lambda address: is_citizen_address(cur, address))
+    if ballot is None:
+        logger.warning(f"Vote {txid} not counted: {reason}")
+        return
+
     try:
-        cur.execute(insert_query, (vote, proposal_id, txid, mined, height))
+        # Credit this issuance's citizens to the proposal the first time one of
+        # its ballots is used; the unique key keeps a citizen credited once.
+        cur.execute("SELECT address, join_txid FROM ballot_credits WHERE proposal_id = %s", (proposal_id,))
+        credits = cur.fetchall()
+        if not any(row['join_txid'] == ballot['ballot_txid'] for row in credits):
+            for address in vote_validation.issuance_allowance(ballot['citizens'], [row['address'] for row in credits]):
+                cur.execute(
+                    "INSERT IGNORE INTO ballot_credits (proposal_id, join_txid, address, created_at) VALUES (%s, %s, %s, NOW())",
+                    (proposal_id, ballot['ballot_txid'], address),
+                )
+        cur.execute("SELECT COUNT(*) AS n FROM ballot_credits WHERE proposal_id = %s AND join_txid = %s", (proposal_id, ballot['ballot_txid']))
+        allowance = cur.fetchone()['n']
+        cur.execute("SELECT COUNT(*) AS n FROM votes WHERE proposal_id = %s AND ballot_txid = %s", (proposal_id, ballot['ballot_txid']))
+        counted = cur.fetchone()['n']
+        if counted >= allowance:
+            db.commit()
+            logger.warning(f"Vote {txid} not counted: every citizen in its ballot issuance is already counted on proposal {proposal_id}")
+            return
+
+        cur.execute(
+            "INSERT INTO votes (vote, proposal_id, txid, mined, block, ballot_txid, ballot_vout, created_at) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())",
+            (vote, proposal_id, txid, mined, height, ballot['ballot_txid'], ballot['ballot_vout']),
+        )
         db.commit()
-        logger.info(f"Successfully cached vote for txid: {txid}")
+        logger.info(f"Counted vote {txid} on proposal {proposal_id}")
     except Exception as e:
         db.rollback()
-        logger.error(f"Failed to cache vote for txid {txid}: {e}")
+        logger.error(f"Failed to count vote {txid}: {e}")
 
 
 def cache_signed_messages(cur, db, addr, head, body, userid, txid, block, blockdate):
@@ -751,6 +820,35 @@ def cache_logbook_entry(cur, db, addr, head, body, userid, txid, height, blockda
 
 
 
+# Governance tiers. Keep in step with app/Includes/GovernanceTiers.php, the
+# source of truth: (voting sols, timelock sols, sunset sols).
+SCREENING_SOLS = 3
+TIER_SOLS = {
+    'signal': (7, 0, 0),
+    'operational': (14, 3, 668),
+    'legislative': (30, 7, 2672),
+    'constitutional': (60, 30, 0),
+}
+CATEGORY_TIERS = {'poll': 'signal', 'regulation': 'operational', 'statute': 'legislative', 'law': 'legislative', 'amendment': 'constitutional'}
+
+
+def proposal_tier(category):
+    category = str(category or '').lower()
+    return category if category in TIER_SOLS else CATEGORY_TIERS.get(category, 'signal')
+
+
+def proposal_lifecycle(tier, mined):
+    """Lifecycle timestamps in UTC (as the website stores them) for a proposal
+    mined at `mined`, a local-time datetime as used throughout this script."""
+    voting, timelock, sunset = TIER_SOLS[tier]
+    start = datetime.fromtimestamp(mined.timestamp(), tz=timezone.utc).replace(tzinfo=None)
+    screening_ends = start + timedelta(days=SCREENING_SOLS)
+    voting_ends = screening_ends + timedelta(days=voting)
+    timelock_ends = voting_ends + timedelta(days=timelock) if timelock else None
+    sunset_at = (timelock_ends or voting_ends) + timedelta(days=sunset) if sunset else None
+    return {'screening_ends_at': screening_ends, 'voting_ends_at': voting_ends, 'timelock_ends_at': timelock_ends, 'sunset_at': sunset_at}
+
+
 def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, blockdate):
     """
     Cache voting proposal in the database and insert corresponding details into the proposals table.
@@ -764,6 +862,18 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
             return
         
         proposal_data = ipfs_data['data']
+
+        # The website records a proposal as soon as it is published. When this
+        # tracker later sees the same transaction mined, it confirms that row
+        # instead of creating a second proposal (and a second forum thread).
+        cur.execute("SELECT id FROM proposals WHERE txid = %s OR ipfs_hash = %s LIMIT 1", (txid, embedded_link))
+        existing = cur.fetchone()
+        if existing:
+            cur.execute("UPDATE proposals SET mined = COALESCE(mined, %s) WHERE id = %s", (blockdate, existing['id']))
+            db.commit()
+            logger.info(f"Proposal {existing['id']} confirmed on chain by txid: {txid}")
+            return
+
         author_name = get_author_name_by_user_id(cur, userid) 
         if not author_name:
             logger.error(f"Author name not found for user ID {userid}.")
@@ -799,9 +909,14 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
 
         # Attempt to insert proposal with a placeholder for discussion ID
         try:
+            # A proposal first seen on the chain (published from the mobile
+            # app, say) gets the same lifecycle the website would give it,
+            # counted from the block that carried it.
+            tier = proposal_tier(proposal_data.get('category', ''))
+            lifecycle = proposal_lifecycle(tier, blockdate)
             insert_proposal_query = """
-            INSERT INTO proposals (user_id, title, description, category, participation, duration, threshold, expiration, txid, public_address, ipfs_hash, created_at, updated_at, mined, author, discussion) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, NULL);
+            INSERT INTO proposals (user_id, title, description, category, participation, duration, threshold, expiration, txid, public_address, ipfs_hash, created_at, updated_at, mined, author, discussion, tier, status, active, screening_ends_at, voting_ends_at, timelock_ends_at, sunset_at) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, NULL, %s, 'screening', 1, %s, %s, %s, %s);
             """
             cur.execute(insert_proposal_query, (
                 userid,
@@ -816,7 +931,12 @@ def cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, block
                 addr,
                 embedded_link,
                 blockdate,
-                author_name
+                author_name,
+                tier,
+                lifecycle['screening_ends_at'],
+                lifecycle['voting_ends_at'],
+                lifecycle['timelock_ends_at'],
+                lifecycle['sunset_at'],
             ))
             db.commit()
             proposal_id = cur.lastrowid
@@ -987,7 +1107,9 @@ def analyze_embedded_data(cur, db, data, addr, txid, height, blockdate, block_ha
         cache_voting_proposal(cur, db, addr, head, body, userid, txid, height, blockdate)
 
 
-def analyze_embedded_anonymous_data(cur, db, data, txid, height, blockdate, block_hash):
+def analyze_embedded_anonymous_data(cur, db, data, transaction, height, blockdate, block_hash):
+    if "_" not in data:
+        return
     head, body = data.split("_", 1)  # Safely unpack data with a maxsplit=1
     head_messages = {
         "PRY": "Vote Yes on Proposal",
@@ -996,7 +1118,7 @@ def analyze_embedded_anonymous_data(cur, db, data, txid, height, blockdate, bloc
     }
     logger.info(head_messages.get(head, "Unknown operation"))
     if head in ["PRY", "PRN", "PRA"]:
-        cache_vote(cur, db, head, body, txid, height, blockdate)
+        cache_vote(cur, db, head, body, transaction, height, blockdate)
 
 
 ################################################################################
@@ -1017,10 +1139,17 @@ def process_block_transactions(db, cur, block_hash, height, mined):
     Process transactions for a given block hash.
     """
     block_transactions = get_txs(block_hash)
-    for tx in block_transactions:
+    for tx in block_transactions or []:
         transaction = get_tx_details(tx)
-        if transaction:
+        if not transaction:
+            continue
+        try:
             process_transaction(cur, db, transaction, height, mined, block_hash)
+        except MySQLdb.Error:
+            raise  # the main loop reconnects and processes this block again
+        except Exception as e:
+            # One unreadable transaction must not hold up every later block.
+            logger.error(f"Skipping transaction {tx} in block {height}: {e}")
 
 
 def process_transaction(cur, db, transaction, height, mined, block_hash):
@@ -1045,10 +1174,14 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
         script = vo['scriptPubKey']
         if "OP_RETURN" in script['asm']:
             logging.info("We found a notarized transaction")
-            data = script['asm'].split(" ")[1]
-            byte_array = bytearray.fromhex(data)
-            plain = byte_array.decode()
-            logging.info("Decoded message: %s", plain)
+            # Other applications also write data outputs; anything that is
+            # not readable text is simply not a Republic record.
+            try:
+                data = script['asm'].split(" ")[1]
+                plain = bytearray.fromhex(data).decode()
+                logging.info("Decoded message: %s", plain)
+            except (IndexError, ValueError):
+                plain = None
         else:
             print("No OPRETURN")
             # Check if this output has the highest value so far and capture the address
@@ -1066,7 +1199,7 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
         return analyze_embedded_data(cur, db, plain, owner_address, transaction['txid'], height, mined, block_hash)
     if plain:
         logger.info("Anonymous data discovered...analyzing...")
-        return analyze_embedded_anonymous_data(cur, db, plain, transaction['txid'], height, mined, block_hash)
+        return analyze_embedded_anonymous_data(cur, db, plain, transaction, height, mined, block_hash)
     else:
         logger.info("Unable to determine transaction initiator.")
         return
@@ -1106,10 +1239,12 @@ def main_loop():
                     time.sleep(30)  # Delay if there's no new block to process
         except MySQLdb.Error as e:
             logger.error("Database error occurred: %s", e)
+            time.sleep(5)
             db, cur = db_connect()  # Attempt to reconnect
             if not db or not cur:
-                logger.error("Reconnection failed. Exiting loop.")
-                break
+                # Exit non-zero so the service manager starts a fresh process.
+                logger.error("Reconnection failed. Exiting.")
+                sys.exit(1)
         except KeyboardInterrupt:
             logger.info("Shutting down...")
             break
