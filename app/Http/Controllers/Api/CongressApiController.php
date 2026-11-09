@@ -47,8 +47,8 @@ class CongressApiController extends Controller
                 COALESCE(yay_votes.yays, 0) as yays,
                 COALESCE(nay_votes.nays, 0) as nays,
                 COALESCE(yay_votes.yays, 0) + COALESCE(nay_votes.nays, 0) as total_votes,
-                COALESCE(100 * yay_votes.yays / NULLIF(yay_votes.yays + nay_votes.nays, 0), 0) as yay_percent,
-                COALESCE(100 * nay_votes.nays / NULLIF(yay_votes.yays + nay_votes.nays, 0), 0) as nay_percent,
+                COALESCE(100 * COALESCE(yay_votes.yays, 0) / NULLIF(COALESCE(yay_votes.yays, 0) + COALESCE(nay_votes.nays, 0), 0), 0) as yay_percent,
+                COALESCE(100 * COALESCE(nay_votes.nays, 0) / NULLIF(COALESCE(yay_votes.yays, 0) + COALESCE(nay_votes.nays, 0), 0), 0) as nay_percent,
                 COALESCE(fp.post_count, 0) as post_count
             ');
 
@@ -118,8 +118,8 @@ class CongressApiController extends Controller
                 COALESCE(yay_votes.yays, 0) as yays,
                 COALESCE(nay_votes.nays, 0) as nays,
                 COALESCE(yay_votes.yays, 0) + COALESCE(nay_votes.nays, 0) as total_votes,
-                COALESCE(100 * yay_votes.yays / NULLIF(yay_votes.yays + nay_votes.nays, 0), 0) as yay_percent,
-                COALESCE(100 * nay_votes.nays / NULLIF(yay_votes.yays + nay_votes.nays, 0), 0) as nay_percent,
+                COALESCE(100 * COALESCE(yay_votes.yays, 0) / NULLIF(COALESCE(yay_votes.yays, 0) + COALESCE(nay_votes.nays, 0), 0), 0) as yay_percent,
+                COALESCE(100 * COALESCE(nay_votes.nays, 0) / NULLIF(COALESCE(yay_votes.yays, 0) + COALESCE(nay_votes.nays, 0), 0), 0) as nay_percent,
                 COALESCE(fp.post_count, 0) as post_count
             ')
             ->where('p.id', $id)
@@ -132,6 +132,8 @@ class CongressApiController extends Controller
         $tierConfig = GovernanceTiers::get($proposal->tier ?? 'signal');
         $proposal->tier_config = $tierConfig;
         $proposal->phase = GovernanceTiers::currentPhase($proposal);
+        // Turnout, quorum and whether it would pass if voting closed now
+        $proposal->outcome = app(ProposalService::class)->tallyVotes($id);
 
         // Include any open tier challenges
         $challenges = DB::table('proposal_challenges')
@@ -164,25 +166,22 @@ class CongressApiController extends Controller
             return response()->json(['message' => 'Proposal not found.'], 404);
         }
 
-        $yays = Vote::where('proposal_id', $id)->where('vote', 'Y')->count();
-        $nays = Vote::where('proposal_id', $id)->where('vote', 'N')->count();
-        $totalVotes = $yays + $nays;
-        $yayPercent = $totalVotes > 0 ? round(($yays / $totalVotes) * 100, 2) : 0;
-        $nayPercent = $totalVotes > 0 ? round(($nays / $totalVotes) * 100, 2) : 0;
-
-        $tierConfig = GovernanceTiers::get($proposal->tier ?? 'signal');
-        $threshold = $tierConfig['threshold'];
-        $passed = $yayPercent >= $threshold && $totalVotes > 0;
+        $tally = app(ProposalService::class)->tallyVotes($id);
 
         return response()->json([
             'proposal_id' => $id,
-            'yays' => $yays,
-            'nays' => $nays,
-            'total_votes' => $totalVotes,
-            'yay_percent' => $yayPercent,
-            'nay_percent' => $nayPercent,
-            'threshold' => $threshold,
-            'passing' => $passed,
+            'yays' => $tally['yays'],
+            'nays' => $tally['nays'],
+            'abstains' => $tally['abstains'],
+            'total_votes' => $tally['total'],
+            'turnout' => $tally['turnout'],
+            'yay_percent' => $tally['yay_percent'],
+            'nay_percent' => $tally['nay_percent'],
+            'threshold' => $tally['threshold'],
+            'citizens' => $tally['citizens'],
+            'quorum_required' => $tally['quorum_required'],
+            'quorum_met' => $tally['quorum_met'],
+            'passing' => $tally['passed'],
         ]);
     }
 

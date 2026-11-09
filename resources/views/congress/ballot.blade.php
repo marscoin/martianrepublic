@@ -992,7 +992,7 @@ $(document).ready(function() {
     }
 
     function pollConfirmation(txId) {
-        $.get("https://pebas.marscoin.org/api/mars/txdetails?txid="+txId, {}, function(data) {
+        $.get("https://explore.marscoin.org/api/tx/"+txId, {}, function(data) {
             if(data && data.confirmations && data.confirmations > 0){
                 clearTimeout(ptimer);
                 goToStep(6); // Show vote buttons!
@@ -1198,7 +1198,9 @@ $(document).ready(function() {
                 json = event.data.split("#")[2]
                 sources = JSON.parse(json);
                 data = decrypt_data(data)
-                data[index] = { "public_key": ek, "target": encrypted_target }
+                // The entry carries only the destination. Attaching our key here
+                // would let the last voter match ballots to citizens.
+                data[index] = { "public_key": "", "target": encrypted_target }
                 sources[index] = inputBlock;
                 data = shuffle_data(data)
 
@@ -1235,8 +1237,14 @@ $(document).ready(function() {
                     }
                     var tx = psbt.finalizeAllInputs().extractTransaction(true);
                     var txhash = tx.toHex();
+                    var txid = tx.getId();
 
                     broadcastTxHash(txhash).then(function(result) {
+                        // Every voter in the round broadcasts this same
+                        // transaction, so all but the first are told it is
+                        // already known. That is success: the transaction ID
+                        // is computed here, and confirmation is awaited below.
+                        if (!result || !result.tx_hash) result = { tx_hash: txid };
                         if (result && result.tx_hash) {
                             setPhase('phase-broadcast', 'done');
                             // Save ballot tx to sessionStorage
@@ -1306,13 +1314,8 @@ $(document).ready(function() {
                 markBallotUsedOnServer(); // Wipe encrypted key from server
                 goToStep(7);
 
-                // Record the vote
-                doAjax("/api/setfeed", {
-                    "type": prefix,
-                    "txid": tx.tx_hash,
-                    "embedded_link": "https://ipfs.marscoin.org/ipfs/<?=str_replace("https://ipfs.marscoin.org/ipfs/", "", $proposal->ipfs_hash)?>",
-                    "address": '<?=$public_address?>'
-                });
+                // The vote is deliberately not recorded against this account:
+                // doing so would tie an anonymous ballot to a citizen.
             }
         }).catch(function(e) {
             alert("Vote failed: " + e.message);

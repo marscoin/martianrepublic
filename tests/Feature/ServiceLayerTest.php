@@ -104,11 +104,16 @@ test('ProposalService tallyVotes counts correctly', function () {
     ]);
 
     DB::table('votes')->insert([
-        ['proposal_id' => $proposal->id, 'vote' => 'YES', 'txid' => 'tx1', 'created_at' => now(), 'updated_at' => now()],
-        ['proposal_id' => $proposal->id, 'vote' => 'YES', 'txid' => 'tx2', 'created_at' => now(), 'updated_at' => now()],
-        ['proposal_id' => $proposal->id, 'vote' => 'YES', 'txid' => 'tx3', 'created_at' => now(), 'updated_at' => now()],
-        ['proposal_id' => $proposal->id, 'vote' => 'NO', 'txid' => 'tx4', 'created_at' => now(), 'updated_at' => now()],
+        ['proposal_id' => $proposal->id, 'vote' => 'Y', 'txid' => 'tx1', 'created_at' => now(), 'updated_at' => now()],
+        ['proposal_id' => $proposal->id, 'vote' => 'Y', 'txid' => 'tx2', 'created_at' => now(), 'updated_at' => now()],
+        ['proposal_id' => $proposal->id, 'vote' => 'Y', 'txid' => 'tx3', 'created_at' => now(), 'updated_at' => now()],
+        ['proposal_id' => $proposal->id, 'vote' => 'N', 'txid' => 'tx4', 'created_at' => now(), 'updated_at' => now()],
     ]);
+
+    // Four citizens: a signal proposal needs one of them to take part.
+    foreach ([1, 2, 3, 4] as $userid) {
+        DB::table('feed')->insert(['userid' => $userid, 'tag' => 'CT', 'address' => "M{$userid}"]);
+    }
 
     $service = new ProposalService;
     $tally = $service->tallyVotes($proposal->id);
@@ -128,9 +133,9 @@ test('ProposalService tallyVotes rejects below threshold', function () {
     ]);
 
     DB::table('votes')->insert([
-        ['proposal_id' => $proposal->id, 'vote' => 'YES', 'txid' => 'tx1', 'created_at' => now(), 'updated_at' => now()],
-        ['proposal_id' => $proposal->id, 'vote' => 'NO', 'txid' => 'tx2', 'created_at' => now(), 'updated_at' => now()],
-        ['proposal_id' => $proposal->id, 'vote' => 'NO', 'txid' => 'tx3', 'created_at' => now(), 'updated_at' => now()],
+        ['proposal_id' => $proposal->id, 'vote' => 'Y', 'txid' => 'tx1', 'created_at' => now(), 'updated_at' => now()],
+        ['proposal_id' => $proposal->id, 'vote' => 'N', 'txid' => 'tx2', 'created_at' => now(), 'updated_at' => now()],
+        ['proposal_id' => $proposal->id, 'vote' => 'N', 'txid' => 'tx3', 'created_at' => now(), 'updated_at' => now()],
     ]);
 
     $tally = (new ProposalService)->tallyVotes($proposal->id);
