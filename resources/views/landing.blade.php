@@ -1509,6 +1509,7 @@ img { max-width: 100%; height: auto; }
         <h5>Resources</h5>
         <ul class="mr-footer-links">
           <li><a href="/academy">Academy</a></li>
+          <li><a href="https://swaps.marscoin.org" target="_blank" rel="noopener">Swap Bitcoin for Marscoin</a></li>
           <li><a href="https://github.com/marscoin/martianrepublic" target="_blank">Source Code</a></li>
           <li><a href="https://apps.apple.com/us/app/martianrepublic/id6480416861" target="_blank">iOS App</a></li>
         </ul>

@@ -176,21 +176,19 @@ def get_raw_tx(txid):
 
 def get_tx_details(txid):
     """
-    Retrieves the transaction details for a given transaction ID.
+    Retrieves the decoded transaction for a given transaction ID.
+
+    The node decodes it in one call. Passing the raw transaction back on the
+    command line to be decoded, as this used to, failed for large transactions
+    ("Argument list too long") and silently skipped them.
     """
     try:
-        raw_tx = get_raw_tx(txid)
-        if raw_tx:
-            command = [MARSCOIN_EXEC_PATH, "-datadir=" + MARSCOIN_CONF_PATH, "decoderawtransaction", raw_tx]
-            p = Popen(command, stdout=PIPE, stderr=PIPE, encoding='utf8')
-            output, errors = p.communicate()
-            if p.returncode == 0:
-                #print(output)
-                return json.loads(output)
-            else:
-                logger.error("Error decoding transaction for txid %s: %s", txid, errors)
-        else:
-            logger.warning("No TX data for txid %s", txid)
+        command = [MARSCOIN_EXEC_PATH, "-datadir=" + MARSCOIN_CONF_PATH, "getrawtransaction", str(txid), "1"]
+        p = Popen(command, stdout=PIPE, stderr=PIPE, encoding='utf8')
+        output, errors = p.communicate()
+        if p.returncode == 0:
+            return json.loads(output)
+        logger.error("Error getting transaction details for txid %s: %s", txid, errors)
     except Exception as e:
         logger.error("Exception getting transaction details for txid %s: %s", txid, e)
     return None
