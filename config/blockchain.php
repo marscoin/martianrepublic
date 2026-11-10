@@ -85,4 +85,16 @@ return [
         'coingecko_url' => env('COINGECKO_PRICE_URL', 'https://api.coingecko.com/api/v3/simple/price?ids=marscoin&vs_currencies=usd'),
     ],
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Status alerts
+    |--------------------------------------------------------------------------
+    |
+    | Comma-separated addresses told by `php artisan status:watch` when a
+    | subsystem on the status page stays down. Empty means nobody.
+    |
+    */
+    'status_alert_emails' => env('STATUS_ALERT_EMAILS', ''),
+
 ];
