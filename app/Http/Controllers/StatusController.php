@@ -19,6 +19,8 @@ class StatusController extends Controller
      *
      * @return void
      */
+    public const TRACKER_MAX_BLOCKS_BEHIND = 3;
+
     public function __construct() {}
 
     protected function showStatus()
@@ -42,7 +44,8 @@ class StatusController extends Controller
         return $view;
     }
 
-    protected function collectStatusData()
+    // Public so that `php artisan status:watch` can run the same checks.
+    public function collectStatusData()
     {
         $web_status = 'danger';
         $mysql_status = 'danger';
@@ -142,21 +145,7 @@ class StatusController extends Controller
         }
 
         // Check the blockchain tracker status
-        // In your check method
-        $lastProcessed = $this->getLastProcessedTimestamp();
-        $now = Carbon::now(); // Use same timezone as database
-
-        Log::debug('Last Processed: '.$lastProcessed);
-        Log::debug('Now: '.$now);
-        Log::debug('Diff in minutes: '.$lastProcessed->diffInMinutes($now));
-
-        if ($lastProcessed->diffInMinutes($now) <= 15) {
-            Log::debug('Success - diff is under 15 mins');
-            $blockchain_tracker_status = 'success';
-        } else {
-            Log::debug('Danger - diff is over 15 mins');
-            $blockchain_tracker_status = 'danger';
-        }
+        $blockchain_tracker_status = $this->trackerIsCurrent($network['blocks'] ?? null) ? 'success' : 'danger';
 
         // Check the ballot shuffle server status
         $ballot_server_status = $this->checkBallotServer();
@@ -192,9 +181,8 @@ class StatusController extends Controller
 
         // Blockchain tracker status
         try {
-            $lastProcessed = $this->getLastProcessedTimestamp();
-            $now = Carbon::now();
-            $response['blockchain_tracker_status'] = $lastProcessed->diffInMinutes($now) <= 15 ? 'online' : 'offline';
+            $nodeHeight = Cache::get('status_page_data')['network']['blocks'] ?? null;
+            $response['blockchain_tracker_status'] = $this->trackerIsCurrent($nodeHeight) ? 'online' : 'offline';
         } catch (Exception $e) {
             $response['blockchain_tracker_status'] = 'offline';
         }
@@ -224,6 +212,23 @@ class StatusController extends Controller
         }
 
         return 'danger';
+    }
+
+    /**
+     * Whether the tracker has processed the chain up to (nearly) its tip.
+     *
+     * Judged by block height where the node's height is known. Marscoin can
+     * go half an hour or more without a block, so "nothing processed lately"
+     * says nothing about the tracker. Without a height, fall back to that
+     * time-based guess.
+     */
+    private function trackerIsCurrent($nodeHeight): bool
+    {
+        if (is_numeric($nodeHeight) && (int) $nodeHeight > 0) {
+            return (int) DB::table('feed_log')->max('block') >= (int) $nodeHeight - self::TRACKER_MAX_BLOCKS_BEHIND;
+        }
+
+        return $this->getLastProcessedTimestamp()->diffInMinutes(Carbon::now()) <= 15;
     }
 
     private function getLastProcessedTimestamp()
