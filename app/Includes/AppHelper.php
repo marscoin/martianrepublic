@@ -254,6 +254,19 @@ class AppHelper
     }
 
     /**
+     * The IPFS content ID in a link or bare ID, or null if there is none.
+     *
+     * Pages send records either as a bare CID or as the gateway link
+     * (https://ipfs.marscoin.org/ipfs/<cid>); both name the same content.
+     */
+    public static function cidFromLink(string $link): ?string
+    {
+        $cid = preg_replace('#^https://ipfs\.marscoin\.org/ipfs/#', '', trim($link));
+
+        return self::isValidCID($cid) ? $cid : null;
+    }
+
+    /**
      * Validate an IPFS CID format (CIDv0 starting with 'Qm' or CIDv1 starting with 'b').
      */
     public static function isValidCID(string $cid): bool

@@ -913,8 +913,23 @@ class ApiController extends Controller
 
         $citcache = Citizen::where('userid', '=', $uid)->first();
 
-        if (! AppHelper::isValidCID($embedded_link ?? '')) {
+        // The page sends the gateway link; the record is stored in that form
+        // everywhere (ballot rooms and vote records derive the CID from it).
+        $cid = AppHelper::cidFromLink($embedded_link ?? '');
+        if ($cid === null) {
             return response()->json(['error' => 'Invalid IPFS hash'], 400);
+        }
+        $embedded_link = 'https://ipfs.marscoin.org/ipfs/'.$cid;
+
+        if (! is_string($txid) || ! preg_match('/^[0-9a-f]{64}$/', $txid)) {
+            return response()->json(['error' => 'Invalid transaction ID'], 400);
+        }
+
+        // Recording is repeatable: a retry, or the chain tracker having seen
+        // the transaction first, must not create a second proposal.
+        $existing = Proposal::where('txid', $txid)->orWhere('ipfs_hash', $embedded_link)->first();
+        if ($existing) {
+            return response()->json(['Proposal' => $existing->id, 'Discussion' => $existing->discussion], 200);
         }
 
         $category = $data->data->category ?? '';
