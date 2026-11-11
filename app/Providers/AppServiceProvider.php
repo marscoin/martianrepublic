@@ -15,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(\App\Services\WelcomeGrant\GrantSender::class, \App\Services\WelcomeGrant\RpcGrantSender::class);
     }
 
     /**
