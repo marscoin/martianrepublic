@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\CivicWallet;
+use App\Models\Feed;
 use App\Models\Organization;
 use App\Models\OrganizationActivity;
 use App\Models\OrganizationAttachment;
@@ -49,11 +50,30 @@ class OrganizationApiController extends Controller
             ->where('assigned_to', $user->id)->where('status', 'open')
             ->orderByRaw('due_date IS NULL')->orderBy('due_date')->orderBy('created_at')->limit(12)->get();
         $profile = $user->profile;
+        // `status` keeps its values for existing clients, but 'submitted' only
+        // means that details were saved here (has_application is set as soon
+        // as a name is posted). `application_stage` says where the
+        // application really is:
+        //   null                 nothing saved yet
+        //   'draft'              details saved on this server, nothing seen on chain
+        //   'published_pending'  the website reported a broadcast that is not mined yet
+        //   'confirmed'          the application was mined (general public or citizen)
+        // The server only learns of a broadcast from the mobile app when the
+        // chain tracker sees it mined, so an app user goes from 'draft'
+        // straight to 'confirmed'.
+        $stage = null;
+        if ($profile?->citizen || $profile?->general_public) {
+            $stage = 'confirmed';
+        } elseif ($profile?->has_application) {
+            $stage = Feed::where('userid', $user->id)->where('tag', 'GP')->whereNotNull('txid')->whereNull('mined')->exists()
+                ? 'published_pending' : 'draft';
+        }
 
         return $this->read([
             'identity' => $this->workspace->person($user),
             'citizenship' => [
                 'status' => $profile?->citizen ? 'citizen' : ($profile?->general_public ? 'public_member' : ($profile?->has_application ? 'submitted' : 'new')),
+                'application_stage' => $stage,
                 'endorsements' => (int) ($profile?->endorse_cnt ?? 0), 'terms_accepted' => (bool) $profile?->signed_eula,
             ],
             'organizations' => $memberships->map(fn ($member) => $this->workspace->organization($member->organization, $member->role))->all(),

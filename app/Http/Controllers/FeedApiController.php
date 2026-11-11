@@ -105,6 +105,8 @@ class FeedApiController extends Controller
             ->where('id', '!=', 6462) // Exclude user with id 6462
             ->with(['profile', 'hdWallet' => function ($query) {
                 $query->select('user_id', 'public_addr');
+            }, 'civicWallet' => function ($query) {
+                $query->select('user_id', 'public_addr');
             }, 'citizen']) // Add citizen relationship
             ->orderByDesc('id')
             ->paginate($perPage, ['id', 'fullname']);
@@ -113,7 +115,9 @@ class FeedApiController extends Controller
             return [
                 'userid' => $user->id,
                 'fullname' => $user->fullname,
-                'address' => $user->hdWallet ? $user->hdWallet->public_addr : null,
+                // The application is published from the civic address, and users
+                // who registered in the app have no hd_wallet row at all.
+                'address' => $user->civicWallet?->public_addr ?: ($user->hdWallet?->public_addr ?: $user->citizen?->public_address),
                 'citizen' => $user->citizen, // Include citizen data
             ];
         });
