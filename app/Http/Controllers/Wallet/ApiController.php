@@ -16,6 +16,7 @@ use App\Models\Proposal;
 use App\Models\Publication;
 use App\Models\Thread;
 use App\Models\User;
+use App\Services\CivicTransactionVerifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -413,20 +414,41 @@ class ApiController extends Controller
     {
         $uid = Auth::user()->id;
         $txid = $request->input('txid');
-        $action_tag = $request->input('type');
+        // The join page sends the kind of record as `tag`, the other pages as `type`.
+        $action_tag = $request->input('type') ?? $request->input('tag');
         $public_address = $request->input('address');
         $embedded_link = $request->input('embedded_link');
         $message = $request->input('message');
 
+        // This route only caches what the browser says it has just broadcast,
+        // so the page can show it before the chain tracker sees the block.
+        // It accepts the records the site itself publishes, and only for the
+        // user's own addresses, so nobody can file a row under another name.
+        if (! in_array($action_tag, ['GP', 'SP', 'ED', 'LB', 'PR'], true)) {
+            return response()->json(['error' => 'Unknown record type.'], 422);
+        }
+        $ownAddresses = array_values(array_filter(array_merge(
+            CivicWallet::where('user_id', $uid)->pluck('public_addr')->all(),
+            HDWallet::where('user_id', $uid)->pluck('public_addr')->all(),
+            Citizen::where('userid', $uid)->pluck('public_address')->all(),
+        )));
+        if (! is_string($public_address) || ! in_array($public_address, $ownAddresses, true)) {
+            return response()->json(['error' => 'Records must use your own address.'], 403);
+        }
+
         AppHelper::insertBlockchainCache($public_address, $uid, $action_tag, $message, $embedded_link, $txid);
 
         $profile = Profile::where('userid', '=', $uid)->first();
-        if ($profile) {
-            $profile->general_public = 1;
-            // Set has_application when GP application is submitted
-            if ($action_tag === 'GP') {
-                $profile->has_application = 1;
+        if ($profile && $action_tag === 'GP' && ! $profile->general_public) {
+            // A reported txid alone proves nothing. Membership of the general
+            // public is granted here only when the node confirms a real
+            // application transaction signed by this user; otherwise the
+            // chain tracker grants it once the transaction is mined.
+            $cid = is_string($embedded_link) ? basename(rtrim($embedded_link, '/')) : '';
+            if ($cid !== '' && app(CivicTransactionVerifier::class)->carries($txid, 'GP_'.$cid, $ownAddresses)) {
+                $profile->general_public = 1;
             }
+            $profile->has_application = 1;
             $profile->save();
         }
 
