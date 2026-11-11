@@ -124,7 +124,7 @@
                             <strong style="color: #fff;">1.</strong> A photo of yourself (camera access)<br>
                             <strong style="color: #fff;">2.</strong> Your name and a short bio<br>
                             <strong style="color: #fff;">3.</strong> A short video proving you're human<br>
-                            <strong style="color: #fff;">4.</strong> ~0.01 MARS for the blockchain registration fee
+                            <strong style="color: #fff;">4.</strong> A little Marscoin in your civic wallet for the network fee (well under 0.001 MARS). Voting later needs 0.2 MARS for each ballot.
                         </div>
                     </div>
 
@@ -303,7 +303,7 @@
                         </div>
                         <div class="gate-review-row" style="border: none;">
                             <span class="gate-review-label">Fee</span>
-                            <span class="gate-review-value">~0.03 MARS</span>
+                            <span class="gate-review-value">Network fee, under 0.001 MARS</span>
                         </div>
                     </div>
 
