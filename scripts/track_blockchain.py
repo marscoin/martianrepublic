@@ -48,6 +48,7 @@ from subprocess import Popen, PIPE
 from datetime import timezone, timedelta
 import re
 import vote_validation
+import record_author
 
 # Load environment variables
 load_dotenv("../.env")
@@ -1191,10 +1192,18 @@ def process_transaction(cur, db, transaction, height, mined, block_hash):
                 single_addr = script.get('address', None)
                 owner_address = addresses[0] if addresses else single_addr
     
-    print("Here")
     if plain and owner_address:
-        logger.info(f"Transaction initiated by: {owner_address}")
-        return analyze_embedded_data(cur, db, plain, owner_address, transaction['txid'], height, mined, block_hash)
+        # A record belongs to the address that signed the transaction, not to
+        # an address that merely receives coins from it.
+        author = record_author.record_author(
+            transaction, get_tx_details, lambda address: get_user_by_address(cur, address) is not None)
+        if author is None:
+            logger.info(f"Record in {transaction['txid'][:8]} has no registered signer. Ignoring.")
+            return
+        if author != owner_address:
+            logger.info(f"Record in {transaction['txid'][:8]} credited to its signer {author}, not to {owner_address}")
+        logger.info(f"Transaction initiated by: {author}")
+        return analyze_embedded_data(cur, db, plain, author, transaction['txid'], height, mined, block_hash)
     if plain:
         logger.info("Anonymous data discovered...analyzing...")
         return analyze_embedded_anonymous_data(cur, db, plain, transaction, height, mined, block_hash)

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CongressApiController;
 use App\Http\Controllers\Api\OrganizationApiController;
+use App\Http\Controllers\Api\WelcomeGrantApiController;
 use App\Http\Controllers\AuthApiController;
 use App\Http\Controllers\ContentApiController;
 use App\Http\Controllers\FeedApiController;
@@ -48,6 +49,14 @@ Route::get('/forum/categories/threads', [ForumApiController::class, 'getAllCateg
 Route::post('/forum/thread', [ForumApiController::class, 'createThread'])->middleware(['auth:sanctum'])->name('api_create_thread');
 Route::post('/forum/thread/{threadId}/comment', [ForumApiController::class, 'createComment'])->middleware(['auth:sanctum'])->name('api_create_comment');
 Route::get('/mstatus', 'App\Http\Controllers\StatusController@getSystemStatus')->middleware(['auth:sanctum'])->name('api_mobile_status');
+
+// Welcome grant: one small payment so a newcomer can publish their application.
+// Off unless WELCOME_GRANT_ENABLED is set. See docs/WELCOME_GRANT.md.
+Route::middleware(['auth:sanctum', 'throttle:10,1'])->group(function () {
+    Route::post('/grant/challenge', [WelcomeGrantApiController::class, 'challenge'])->name('api_grant_challenge');
+    Route::post('/grant/claim', [WelcomeGrantApiController::class, 'claim'])->name('api_grant_claim');
+});
+Route::get('/grant/status', [WelcomeGrantApiController::class, 'status'])->middleware(['auth:sanctum'])->name('api_grant_status');
 
 // Congress / Governance API (mobile)
 Route::get('/congress/proposals', [CongressApiController::class, 'index'])->name('api_congress_proposals');
