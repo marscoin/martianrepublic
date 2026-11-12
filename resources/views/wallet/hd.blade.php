@@ -1609,7 +1609,6 @@
 
             const genSeed = (mnemonic) => {
                 // console.log("SALT: {{ $SALT }}")
-                //mnemonic = "invite feature forget axis radar stone bind squirrel dog crash 
 
                 const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic.trim());
                 const root = my_bundle.bitcoin.bip32.fromSeed(seed, Marscoin.mainnet)
@@ -2072,8 +2071,6 @@
 
             //     const decrypted = my_bundle.decrypt(encrypted_mnem, hashed, iv).trim()
 
-            //     // console.log("Encrypted SEED: {{ $encrypted_seed }}")
-            //     // console.log("MNEM:", decrypted)
 
 
             //     const response = genSeed(decrypted)ion
