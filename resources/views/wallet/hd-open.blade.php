@@ -1831,7 +1831,6 @@
                 });
 
             const decryptWallet = (seed) => {
-                //  console.log(seed)
 
 
             }
@@ -2460,13 +2459,11 @@
             const genSeed = (mnemonic) => {
 
                 //const mnemonic = my_bundle.bip39.generateMnemonic();
-                // console.log(mnemonic)
 
                 //const root = new my_bundle.BIP84.fromMnemonic(mnemonic, null, false, 107);
 
                 const seed = my_bundle.bip39.mnemonicToSeedSync(mnemonic);
 
-                // console.log("seed: ", seed)
 
 
                 // ROOT === xprv
@@ -2476,7 +2473,6 @@
 
                 //private key
                 const child = root.derivePath("m/44'/2'/0'/0'");
-                // console.log("child: ", child.toWIF())
 
                 // tpub == tpub
                 let tpub = child.toBase58()
@@ -2728,8 +2724,6 @@
 
             const decrypted = my_bundle.decrypt(encrypted_seed, hashed, iv).trim()
 
-            // console.log("Encrypted SEED: {{ $encrypted_seed }}")
-            // console.log("MNEM:", decrypted)
 
 
             const response = genSeed(decrypted)
@@ -2739,7 +2733,6 @@
 
             console.log("response:", response.address)
 
-            console.log(decrypted)
 
             console.log("user_wallet:",user_wallet)
             if (response.address == user_wallet) {
@@ -2812,10 +2805,8 @@
         }
         const genSeed = (mnemonic) => {
             // console.log("SALT: {{ $SALT }}")
-            //mnemonic = "invite feature forget axis radar stone bind squirrel dog crash trap equip"
 
             //const mnemonic = my_bundle.bip39.generateMnemonic();
-            //  console.log(mnemonic)
 
             //const root = new my_bundle.BIP84.fromMnemonic(mnemonic, null, false, 107);
 
