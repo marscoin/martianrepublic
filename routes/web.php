@@ -34,6 +34,12 @@ Route::get('/privacy', function () {
     });
 });
 
+Route::get('/delete-account', function () {
+    return Cache::remember('delete-account.page', 2, function () {
+        return view('delete-account')->render();
+    });
+});
+
 Route::get('/tos', function () {
     return Cache::remember('tos.page', 2, function () {
         return view('tos')->render();
