@@ -42,6 +42,14 @@ test('tos page loads', function () {
     $response->assertStatus(200);
 });
 
+test('delete account page loads and says what stays public', function () {
+    $response = $this->get('/delete-account');
+    $response->assertStatus(200);
+    $response->assertSee('Delete account');
+    $response->assertSee('permanent public record');
+    $response->assertSee('voluntary');
+});
+
 test('support page loads', function () {
     $response = $this->get('/support');
     $response->assertStatus(200);
