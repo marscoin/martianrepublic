@@ -142,12 +142,13 @@
     const btn4 = document.getElementById('flip-btn4');
 
     function handleFlip() {
-      front.style.display = (front.style.display === 'none') ? '' : 'none';
-      if (front.style.display === 'none') {
-        back.classList.add('visible');
-      } else {
-        back.classList.remove('visible');
-      }
+      // Toggle the cards explicitly. The back card carries an inline
+      // display:none, which a class alone can't override, so set display
+      // directly or the flip lands on an empty screen.
+      const goingToBack = (front.style.display !== 'none');
+      front.style.display = goingToBack ? 'none' : '';
+      back.style.display = goingToBack ? '' : 'none';
+      back.classList.toggle('visible', goingToBack);
     }
 
     if (btn) btn.addEventListener('click', handleFlip);
