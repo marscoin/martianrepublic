@@ -42,6 +42,10 @@
       accent-color: var(--mr-mars);
       cursor: pointer;
     }
+    /* Footer should reach the bottom: drop the 48px tail padding and let the
+       footer take up any slack so it sits flush even when the card is short. */
+    .mr-auth-page { padding-bottom: 0; }
+    .mr-auth-page > .mr-footer { margin-top: auto; }
   </style>
 </head>
 
@@ -128,7 +132,7 @@
             <div style="display:flex; gap:8px;">
               <a href="https://apps.apple.com/us/app/martianrepublic/id6480416861" target="_blank" rel="noopener"
                  style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 12px; background:var(--mr-dark,#0c0c16); border:1px solid var(--mr-border-bright,rgba(255,255,255,0.1)); border-radius:6px; text-decoration:none;">
-                <i class="fa fa-apple" style="font-size:18px; color:#fff;"></i>
+                <i class="fa-brands fa-apple" style="font-size:18px; color:#fff;"></i>
                 <div>
                   <div style="font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--mr-text-faint,#5a5968); letter-spacing:0.5px;">Download on</div>
                   <div style="font-family:'Orbitron',sans-serif; font-size:10px; font-weight:600; color:#fff;">App Store</div>
@@ -136,7 +140,7 @@
               </a>
               <a href="https://play.google.com/store/apps/details?id=io.bytewallet.bytewallet" target="_blank" rel="noopener"
                  style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 12px; background:var(--mr-dark,#0c0c16); border:1px solid var(--mr-border-bright,rgba(255,255,255,0.1)); border-radius:6px; text-decoration:none;">
-                <i class="fa fa-android" style="font-size:18px; color:var(--mr-green,#34d399);"></i>
+                <i class="fa-brands fa-android" style="font-size:18px; color:var(--mr-green,#34d399);"></i>
                 <div>
                   <div style="font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--mr-text-faint,#5a5968); letter-spacing:0.5px;">Get it on</div>
                   <div style="font-family:'Orbitron',sans-serif; font-size:10px; font-weight:600; color:#fff;">Google Play</div>
