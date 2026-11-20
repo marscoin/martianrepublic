@@ -121,6 +121,30 @@
             <span>Biometrically &amp;<br>Cryptographically Secured</span>
           </div>
 
+          <div style="margin-top:18px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.5px; color:var(--mr-text-faint,#5a5968); text-align:center; margin-bottom:10px;">
+              NEED THE APP? SCAN THE CODE WITH IT, OR GET IT HERE
+            </div>
+            <div style="display:flex; gap:8px;">
+              <a href="https://apps.apple.com/us/app/martianrepublic/id6480416861" target="_blank" rel="noopener"
+                 style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 12px; background:var(--mr-dark,#0c0c16); border:1px solid var(--mr-border-bright,rgba(255,255,255,0.1)); border-radius:6px; text-decoration:none;">
+                <i class="fa fa-apple" style="font-size:18px; color:#fff;"></i>
+                <div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--mr-text-faint,#5a5968); letter-spacing:0.5px;">Download on</div>
+                  <div style="font-family:'Orbitron',sans-serif; font-size:10px; font-weight:600; color:#fff;">App Store</div>
+                </div>
+              </a>
+              <a href="https://play.google.com/store/apps/details?id=io.bytewallet.bytewallet" target="_blank" rel="noopener"
+                 style="flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 12px; background:var(--mr-dark,#0c0c16); border:1px solid var(--mr-border-bright,rgba(255,255,255,0.1)); border-radius:6px; text-decoration:none;">
+                <i class="fa fa-android" style="font-size:18px; color:var(--mr-green,#34d399);"></i>
+                <div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:8px; color:var(--mr-text-faint,#5a5968); letter-spacing:0.5px;">Get it on</div>
+                  <div style="font-family:'Orbitron',sans-serif; font-size:10px; font-weight:600; color:#fff;">Google Play</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
           <div class="mr-form-footer">
             No account yet? <a href="{{ route('register') }}">Sign up with MartianRepublic Mobile App</a>
           </div>
