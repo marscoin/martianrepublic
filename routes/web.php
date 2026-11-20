@@ -224,3 +224,7 @@ Route::middleware(['auth'])->group(function () {
 // Mobile Authenticator Login
 // ================================================================================
 Route::get('/api/checkauth', [AuthApiController::class, 'checkAuth'])->name('api_marsauthcheck');
+// Final hop of the QR handshake: the browser polls checkauth, then redirects
+// here to actually establish the Laravel session. Must live in web.php (not
+// api.php) so the session/cookie middleware is active for Auth::login().
+Route::get('/api/wauth', [AuthApiController::class, 'wauth'])->name('api_wauth');
