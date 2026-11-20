@@ -528,6 +528,12 @@ class AppHelper
     public static function getUserFromCache($address)
     {
         $user = [];
+        // Only ever touch the filesystem for a well-formed Mars address. A raw,
+        // attacker-supplied value here could traverse or litter
+        // public/assets/citizen (this path does not sanitize like the writers do).
+        if (! is_string($address) || ! preg_match('/^M[1-9A-HJ-NP-Za-km-z]{24,34}$/', $address)) {
+            return $user;
+        }
         $file_path = './assets/citizen/'.$address.'/';
 
         if (! file_exists($file_path)) {

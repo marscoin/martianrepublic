@@ -14,7 +14,7 @@ class MSession extends Model
 
     protected $keyType = 'string';
 
-    protected $fillable = ['sid', 'v'];
+    protected $fillable = ['sid', 'v', 's'];
 
     public $timestamps = false;
 }
