@@ -58,7 +58,7 @@
 
           {{-- ===== LOGIN FORM CARD (Front) ===== --}}
           <div id="cardFront" class="mr-form-card">
-            <button type="button" id="flip-btn" class="mr-qr-toggle-btn" title="Login with QR code" style="display:none;">
+            <button type="button" id="flip-btn" class="mr-qr-toggle-btn" title="Login with QR code"@unless(request()->has('qrlogin')) style="display:none;"@endunless>
               <i class="fa fa-qrcode"></i>
             </button>
 
