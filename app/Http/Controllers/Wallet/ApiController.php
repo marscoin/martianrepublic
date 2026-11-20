@@ -51,7 +51,7 @@ class ApiController extends Controller
         $public_address = $request->input('address');
 
         // --- SECURITY: Sanitize the public_address to prevent directory traversal ---
-        $safeAddress = AppHelper::sanitizePathSegment($public_address);
+        $safeAddress = AppHelper::sanitizeMarsAddress($public_address);
         if ($safeAddress === null) {
             return response()->json(['error' => 'Invalid address format.'], 400);
         }
@@ -108,7 +108,7 @@ class ApiController extends Controller
         $public_address = $request->input('address');
 
         // --- SECURITY: Sanitize the public_address to prevent directory traversal ---
-        $safeAddress = AppHelper::sanitizePathSegment($public_address);
+        $safeAddress = AppHelper::sanitizeMarsAddress($public_address);
         if ($safeAddress === null) {
             return response()->json(['error' => 'Invalid address format.'], 400);
         }
@@ -165,7 +165,7 @@ class ApiController extends Controller
         $uid = Auth::user()->id;
 
         // --- SECURITY: Sanitize the public_address to prevent directory traversal ---
-        $safeAddress = AppHelper::sanitizePathSegment($public_address);
+        $safeAddress = AppHelper::sanitizeMarsAddress($public_address);
         if ($safeAddress === null) {
             return response()->json(['error' => 'Invalid address format.'], 400);
         }
@@ -314,7 +314,7 @@ class ApiController extends Controller
         $json = $request->input('payload');
 
         // --- SECURITY: Sanitize the public_address to prevent directory traversal ---
-        $safeAddress = AppHelper::sanitizePathSegment($public_address);
+        $safeAddress = AppHelper::sanitizeMarsAddress($public_address);
         if ($safeAddress === null) {
             return response()->json(['error' => 'Invalid address format.'], 400);
         }

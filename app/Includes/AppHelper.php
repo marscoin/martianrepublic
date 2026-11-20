@@ -244,6 +244,23 @@ class AppHelper
     }
 
     /**
+     * Return the address only if it is a well-formed Mars (Marscoin) address,
+     * otherwise null. Citizen cache directories are named by address, so this
+     * blocks both path traversal and junk directories created from bogus input
+     * (e.g. probe values like "-", "pubx", "TESTPWN..."). Use this instead of
+     * sanitizePathSegment anywhere a path segment must be a real citizen address.
+     */
+    public static function sanitizeMarsAddress($input): ?string
+    {
+        if (! is_string($input)) {
+            return null;
+        }
+        $candidate = basename($input);
+
+        return preg_match('/^M[1-9A-HJ-NP-Za-km-z]{24,34}$/', $candidate) ? $candidate : null;
+    }
+
+    /**
      * Validate a Marscoin address format (Base58Check starting with 'M').
      * Valid Marscoin addresses are 25-35 characters, start with 'M',
      * and only use Base58 characters (no 0, O, I, l).
