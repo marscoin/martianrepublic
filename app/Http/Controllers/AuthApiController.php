@@ -8,7 +8,6 @@ use App\Models\CivicWallet;
 use App\Models\MSession;
 use App\Models\Profile;
 use App\Models\User;
-use BitcoinPHP\BitcoinECDSA\BitcoinECDSA;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,16 +19,15 @@ class AuthApiController extends Controller
 {
     public function marsAuth(Request $request)
     {
-        $this->setCorsHeaders();
-
+        // Native wallet app only — no browser calls this, so no CORS header.
         if (! $request->isMethod('post')) {
             return $this->fastcode(400, 'bad request');
         }
 
-        $challenge = $request->query('c');
-        $session_string = $request->query('sid');
-        $timestamp = hexdec($request->query('t'));
-        $pubk = $request->input('pubk');
+        $challenge = (string) $request->query('c');
+        $session_string = (string) $request->query('sid');
+        $timestampHex = (string) $request->query('t');
+        $timestamp = hexdec($timestampHex);
         $msg = $request->input('msg');
         $sig = $request->input('sig');
         $address = $request->input('addr');
@@ -38,12 +36,35 @@ class AuthApiController extends Controller
             return $this->fastcode(408, 'request timed out');
         }
 
+        // The wallet must sign exactly this canonical, domain-bound message,
+        // built from the request's own query values (t is the hex string as
+        // produced by dechex(time())). Without this binding marsAuth would
+        // accept any signature an address ever produced — including sample
+        // signatures published in the repo, or any a citizen posted publicly —
+        // and let it be replayed to log in as that citizen.
+        $expected = "Martian Republic login\n"
+            ."domain: martianrepublic.org\n"
+            ."sid: {$session_string}\n"
+            ."challenge: {$challenge}\n"
+            ."issued: {$timestampHex}";
+
+        if (! is_string($msg) || ! hash_equals($expected, $msg)) {
+            return $this->fastcode(406, "couldn't verify message");
+        }
+
         $session = MSession::where('sid', $session_string)->first();
 
-        if ($session && in_array($challenge, explode(',', $session->v))) {
+        if ($session && in_array($challenge, explode(',', $session->v), true)) {
             $marscoinECDSA = new MarscoinECDSA;
             if ($marscoinECDSA->checkSignatureForMessage($address, $sig, $msg)) {
                 $session->s = $address;
+                // Single-use: consume the challenge so a captured request
+                // cannot be replayed within the freshness window.
+                $remaining = array_values(array_filter(
+                    explode(',', $session->v),
+                    fn ($c) => $c !== $challenge
+                ));
+                $session->v = implode(',', $remaining);
                 $session->save();
 
                 return $this->fastcode(200, 'successfully authenticated');
@@ -209,57 +230,8 @@ class AuthApiController extends Controller
         }
     }
 
-    public function test()
-    {
-
-        $messageM = 'https://martianrepublic.org/api/token?a=MCHe2XTUEegyqsYc5ePe2dQiPtixLfhppR&t=1715354045';
-        $addressM = 'MCHe2XTUEegyqsYc5ePe2dQiPtixLfhppR';
-        $signatureM = 'H+Qrav6eWNrB0P5DiRaGRRR/RVtD8qd5dKlWA3FOfeiFc4h04769HtfMbsmxrrNPk0MeTJmwPCR9xg67f1NatOA=';
-
-        $bitcoinECDSA = new BitcoinECDSA;
-        $bitcoinECDSA->generateRandomPrivateKey(); // generate new random private key
-        $address = $bitcoinECDSA->getAddress();
-        $message = 'Test message';
-        $signedMessage = $bitcoinECDSA->signMessage($message, true);
-        echo 'message: '.PHP_EOL.'<br>';
-        echo $message.PHP_EOL.'<br>';
-        echo 'signed message: '.PHP_EOL.'<br>';
-        echo $signedMessage.PHP_EOL.'<br>';
-        // $signedMessage = "random";
-
-        // loading Bitcoin crypto library
-        if ($bitcoinECDSA->checkSignatureForMessage($address, $signedMessage, $message)) {       // verifying signature
-            Log::debug('True');
-            echo 'True<br>';
-        } else {
-            Log::debug('False');
-            echo 'False<br>';
-        }
-
-        echo 'mars test';
-        $marscoinECDSA = new MarscoinECDSA;
-        echo 'Address; '.$addressM;
-        echo 'Message:'.$messageM;
-        echo 'sig:'.$signatureM;
-        // loading Bitcoin crypto library
-        if ($marscoinECDSA->checkSignatureForMessage($addressM, $signatureM, $messageM)) {       // verifying signature
-            Log::debug('True');
-            echo 'True<br>';
-        } else {
-            Log::debug('False');
-            echo 'False<br>';
-        }
-    }
-
     private function fastcode($status, $message)
     {
         return response()->json(['status' => $status, 'message' => $message], $status);
-    }
-
-    private function setCorsHeaders()
-    {
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: GET, POST');
-        header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization');
     }
 }
