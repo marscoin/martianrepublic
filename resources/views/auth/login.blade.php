@@ -46,6 +46,36 @@
        footer take up any slack so it sits flush even when the card is short. */
     .mr-auth-page { padding-bottom: 0; }
     .mr-auth-page > .mr-footer { margin-top: auto; }
+    /* "or" divider between the email sign-in and the wallet-login button. */
+    .mr-login-or {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+      color: var(--mr-text-faint, #5a5968);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .mr-login-or::before,
+    .mr-login-or::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--mr-border-bright, rgba(255,255,255,0.1));
+    }
+    /* Tint the outline button cyan to match the QR/secure accent. */
+    .mr-wallet-login-btn {
+      color: var(--mr-cyan, #00e4ff);
+      border-color: rgba(0,228,255,0.35);
+      text-transform: none;
+    }
+    .mr-wallet-login-btn:hover {
+      color: var(--mr-cyan, #00e4ff);
+      border-color: var(--mr-cyan, #00e4ff);
+      background: var(--mr-cyan-dim, rgba(0,228,255,0.08));
+      box-shadow: 0 0 24px rgba(0,228,255,0.15);
+    }
   </style>
 </head>
 
@@ -62,10 +92,6 @@
 
           {{-- ===== LOGIN FORM CARD (Front) ===== --}}
           <div id="cardFront" class="mr-form-card">
-            <button type="button" id="flip-btn" class="mr-qr-toggle-btn" title="Login with QR code"@unless(request()->has('qrlogin')) style="display:none;"@endunless>
-              <i class="fa fa-qrcode"></i>
-            </button>
-
             <h2>Welcome Back</h2>
             <p class="mr-form-sub">Sign in to the Martian Republic</p>
 
@@ -96,6 +122,12 @@
 
             <button type="submit" class="mr-btn mr-btn-primary" tabindex="4">
               Sign In <i class="fa fa-arrow-right"></i>
+            </button>
+
+            <div class="mr-login-or"><span>or</span></div>
+
+            <button type="button" id="flip-btn" class="mr-btn mr-btn-outline mr-wallet-login-btn" tabindex="5">
+              <i class="fa fa-qrcode"></i> Log in with your Martian wallet
             </button>
 
             <div class="mr-form-footer">
